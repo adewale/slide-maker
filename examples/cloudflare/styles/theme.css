@@ -1,0 +1,220 @@
+.slidev-layout {
+  font-family: var(--deck-font-body);
+  color: var(--deck-fg);
+  background: var(--deck-bg);
+}
+
+h1, h2, h3 {
+  font-family: var(--deck-font-display);
+  font-weight: 700;
+}
+
+h1 {
+  font-size: 2.75rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--deck-fg);
+}
+
+h3 {
+  color: var(--deck-accent);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+strong {
+  color: var(--deck-accent);
+}
+
+code {
+  font-family: var(--deck-font-mono);
+  color: var(--deck-accent-alt);
+  background: rgba(255, 102, 51, 0.08);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+ol, ul {
+  line-height: 1.8;
+}
+
+ol li::marker {
+  color: var(--deck-accent);
+  font-weight: 700;
+}
+
+ul li::marker {
+  color: var(--deck-accent);
+}
+
+/* Click animations — cloudflare preset */
+.slidev-vclick-target {
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slidev-vclick-hidden {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+/* Cover */
+.slidev-layout.cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem;
+  background: var(--deck-surface);
+}
+
+.slidev-layout.cover h1 {
+  font-size: 3.5rem;
+  letter-spacing: -0.03em;
+}
+
+.slidev-layout.cover p {
+  font-size: 1.15rem;
+  color: var(--deck-muted);
+  margin-top: 1rem;
+}
+
+/* Center / Statement */
+.slidev-layout.center h1,
+.slidev-layout.statement h1 {
+  font-size: 2.5rem;
+  max-width: 70%;
+  margin: 0 auto;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.slidev-layout.center p,
+.slidev-layout.statement p {
+  color: var(--deck-muted);
+  max-width: 60%;
+  margin: 1rem auto 0;
+  text-align: center;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* Fact */
+.slidev-layout.fact h1 {
+  font-size: 7rem;
+  color: var(--deck-accent);
+  letter-spacing: -0.04em;
+}
+
+.slidev-layout.fact p:first-of-type {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--deck-muted);
+  margin-top: -0.5rem;
+}
+
+.slidev-layout.fact p:last-of-type {
+  font-size: 1.15rem;
+  margin-top: 2rem;
+  color: var(--deck-fg);
+}
+
+/* Section */
+.slidev-layout.section {
+  background: var(--deck-fg);
+  color: var(--deck-bg);
+}
+
+.slidev-layout.section h1 {
+  font-size: 3rem;
+  letter-spacing: -0.02em;
+  color: var(--deck-bg);
+}
+
+.slidev-layout.section p {
+  color: rgba(245, 241, 235, 0.6);
+  font-size: 1.15rem;
+  margin-top: 0.75rem;
+}
+
+/* End */
+.slidev-layout.end {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: var(--deck-fg);
+  color: var(--deck-bg);
+}
+
+.slidev-layout.end h1 {
+  font-size: 3.5rem;
+  color: var(--deck-bg);
+}
+
+.slidev-layout.end p {
+  color: var(--deck-accent);
+  font-family: var(--deck-font-mono);
+  font-size: 1.2rem;
+  margin-top: 1rem;
+}
+
+/* Quote */
+.slidev-layout.quote {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem;
+  background: var(--deck-surface);
+}
+
+.slidev-layout.quote h1 {
+  font-size: 2rem;
+  font-style: italic;
+  line-height: 1.4;
+  border-left: 4px solid var(--deck-accent);
+  padding-left: 1.5rem;
+}
+
+.slidev-layout.quote p {
+  color: var(--deck-muted);
+  margin-top: 1.5rem;
+  font-size: 1rem;
+}
+
+/* Cards — Cloudflare style */
+.cf-card {
+  background: white;
+  border: 1px solid var(--deck-border);
+  border-radius: var(--deck-radius);
+  padding: 1.25rem;
+}
+
+.cf-card-accent {
+  background: rgba(255, 102, 51, 0.05);
+  border: 1px solid rgba(255, 102, 51, 0.2);
+  border-radius: var(--deck-radius);
+  padding: 1rem;
+}
+
+.cf-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--deck-font-mono);
+  font-size: 0.75rem;
+  padding: 0.2em 0.6em;
+  border-radius: 9999px;
+  background: rgba(255, 102, 51, 0.1);
+  color: var(--deck-accent);
+  font-weight: 600;
+}
+
+/* Code blocks on light background */
+:deep(.slidev-code) {
+  border: 1px solid var(--deck-border);
+  border-radius: var(--deck-radius);
+}

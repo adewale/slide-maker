@@ -1,0 +1,13 @@
+:root {
+  --deck-bg: #f5f1eb;
+  --deck-fg: #521000;
+  --deck-accent: #ff6633;
+  --deck-accent-alt: #b45309;
+  --deck-muted: rgba(82, 16, 0, 0.6);
+  --deck-surface: #fffbf5;
+  --deck-border: #ebd5c1;
+  --deck-font-display: 'Work Sans', sans-serif;
+  --deck-font-body: 'DM Sans', sans-serif;
+  --deck-font-mono: 'IBM Plex Mono', monospace;
+  --deck-radius: 10px;
+}

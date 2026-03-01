@@ -1,0 +1,267 @@
+<!--
+  Slidev Deck Menu
+
+  Static build:
+    bash build.sh          # builds all decks to _build/
+    npx serve _build       # serve at http://localhost:3000
+
+  Dev servers (individual):
+    npx slidev --port 3030                          # Slide Maker (root)
+    cd vaders && npx slidev --port 3031             # Vaders
+    cd planet-cf && npx slidev --port 3032          # Planet CF
+    cd keyboardia && npx slidev --port 3033         # Keyboardia
+    cd garten && npx slidev --port 3034             # Garten
+    cd claude-history-explorer && npx slidev --port 3035  # Claude History Explorer
+    cd geist-fabrik && npx slidev --port 3036       # GeistFabrik
+    cd olsen && npx slidev --port 3037              # Olsen
+    cd tasche && npx slidev --port 3038             # Tasche
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slide Maker - All Decks</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: #0a0a0f;
+      color: #e4e4e7;
+      min-height: 100vh;
+      padding: 3rem 2rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    header h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: #a78bfa;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      color: #71717a;
+      font-size: 1rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      max-width: 72rem;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover {
+      border-color: var(--accent);
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.01em;
+    }
+
+    .card .desc {
+      font-size: 0.875rem;
+      color: #a1a1aa;
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .card .meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #52525b;
+      background: #27272a;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .card a {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .card a:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 560px) {
+      .grid { grid-template-columns: 1fr; }
+      body { padding: 2rem 1rem; }
+      header h1 { font-size: 1.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Slide Maker</h1>
+    <p>14 Slidev decks. Pick one to present.</p>
+  </header>
+
+  <div class="grid">
+    <div class="card" style="--accent: #a78bfa">
+      <h2>Slide Maker</h2>
+      <div class="desc">Native Slidev decks. Strong visual direction. Minimal abstraction.</div>
+      <div class="meta">
+        <span class="tag">bold-modern</span>
+        <a href="slide-maker/">View deck</a>
+      </div>
+    </div>
+
+    <div class="card" style="--accent: #39ff14">
+      <h2>Vaders</h2>
+      <div class="desc">Multiplayer TUI Space Invaders. 1-4 players. Cloudflare Durable Objects.</div>
+      <div class="meta">
+        <span class="tag">bold-modern</span>
+        <a href="vaders/">View deck</a>
+      </div>
+    </div>
+
+    <div class="card" style="--accent: #f6821f">
+      <h2>Planet CF</h2>
+      <div class="desc">A feed aggregator built on Cloudflare Python Workers.</div>
+      <div class="meta">
+        <span class="tag">swiss-minimal</span>
+        <a href="planet-cf/">View deck</a>
+      </div>
+    </div>
+
+    <div class="card" style="--accent: #e040fb">
+      <h2>Keyboardia</h2>
+      <div class="desc">Multiplayer step sequencer with polyrhythmic patterns.</div>
+      <div class="meta">
+        <span class="tag">bold-modern</span>
+        <a href="keyboardia/">View deck</a>
+      </div>
+    </div>
+
+    <div class="card" style="--accent: #2d8a4e">
+      <h2>Garten</h2>
+      <div class="desc">An animated canvas garden that grows over time. Zero dependencies.</div>
+      <div class="meta">
+        <span class="tag">swiss-minimal</span>
+        <a href="garten/">View deck</a>
+      </div>
+    </div>
+
+    <div class="card" style="--accent: #38bdf8">
+      <h2>Claude History Explorer</h2>
+      <div class="desc">Search and visualize your Claude Code conversation history.</div>
+      <div class="meta">
+        <span class="tag">editorial-dark</span>
+        <a href="claude-history-explorer/">View deck</a>
+      </div>
+    </div>
+
+    <div class="card" style="--accent: #f59e0b">
+      <h2>GeistFabrik</h2>
+      <div class="desc">A divergence engine for Obsidian vaults.</div>
+      <div class="meta">
+        <span class="tag">editorial-dark</span>
+        <a href="geist-fabrik/">View deck</a>
+      </div>
+    </div>
+
+    <div class="card" style="--accent: #ca8a04">
+      <h2>Olsen</h2>
+      <div class="desc">Local-first photo indexing and faceted browsing.</div>
+      <div class="meta">
+        <span class="tag">swiss-minimal</span>
+        <a href="olsen/">View deck</a>
+      </div>
+    </div>
+
+    <div class="card" style="--accent: #fb923c">
+      <h2>Tasche</h2>
+      <div class="desc">Self-hosted read-it-later on Cloudflare.</div>
+      <div class="meta">
+        <span class="tag">editorial-dark</span>
+        <a href="tasche/">View deck</a>
+      </div>
+    </div>
+    <div class="card" style="--accent: #818cf8">
+      <h2>Slidev Showcase</h2>
+      <div class="desc">Every layout, animation, data component, and Slidev feature in one deck.</div>
+      <div class="meta">
+        <span class="tag">bold-modern</span>
+        <a href="component-showcase/">View deck</a>
+      </div>
+    </div>
+
+    <div class="card" style="--accent: #c23b22">
+      <h2>The Garden</h2>
+      <div class="desc">Ink wash on washi paper. A philosophical narrative about constraints and creativity.</div>
+      <div class="meta">
+        <span class="tag">sumi-e</span>
+        <a href="sumi-e/">View deck</a>
+      </div>
+    </div>
+
+    <div class="card" style="--accent: #2d5f8a">
+      <h2>Debug at the Source</h2>
+      <div class="desc">A debugging detective story. Dense prose, sidenotes, and sparklines.</div>
+      <div class="meta">
+        <span class="tag">tufte-data</span>
+        <a href="tufte/">View deck</a>
+      </div>
+    </div>
+
+    <div class="card" style="--accent: #6750A4">
+      <h2>Keyboardia M3</h2>
+      <div class="desc">Multiplayer step sequencer. Material Design 3 cards, chips, and elevation.</div>
+      <div class="meta">
+        <span class="tag">material-design</span>
+        <a href="material/">View deck</a>
+      </div>
+    </div>
+
+    <div class="card" style="--accent: #ff6633">
+      <h2>Cloudflare Agents</h2>
+      <div class="desc">Build and deploy AI-powered agents. Durable Objects, tool calling, workflows.</div>
+      <div class="meta">
+        <span class="tag">cloudflare</span>
+        <a href="cloudflare/">View deck</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

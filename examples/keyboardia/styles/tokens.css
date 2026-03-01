@@ -1,0 +1,10 @@
+:root {
+  --deck-bg: #0d0118;
+  --deck-fg: #f0e6ff;
+  --deck-accent: #e040fb;
+  --deck-accent-alt: #00e5ff;
+  --deck-muted: rgba(240, 230, 255, 0.5);
+  --deck-font-display: 'Space Grotesk', sans-serif;
+  --deck-font-body: 'Space Grotesk', sans-serif;
+  --deck-font-mono: 'JetBrains Mono', monospace;
+}

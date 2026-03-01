@@ -1,0 +1,12 @@
+:root {
+  /* Base palette — overridden per slide via scoped styles */
+  --deck-bg: #0f0a1e;
+  --deck-fg: #f0eef5;
+  --deck-accent: #a78bfa;
+  --deck-accent-alt: #fb923c;
+  --deck-muted: rgba(240, 238, 245, 0.5);
+  --deck-font-display: 'Bricolage Grotesque', sans-serif;
+  --deck-font-body: 'DM Sans', sans-serif;
+  --deck-font-mono: 'JetBrains Mono', monospace;
+  --deck-radius: 12px;
+}
