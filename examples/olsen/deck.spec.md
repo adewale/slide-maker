@@ -5,8 +5,8 @@
 - purpose: showcase the project
 - audience: developers and photographers
 - tone: precise, calm, confident
-- target-length: 7
-- notes: no
+- target-length: 9
+- notes: yes
 - style-preset: swiss-minimal
 
 ## Design Tokens
@@ -26,8 +26,10 @@
 - prefer-builtins: true
 - builtins:
   - cover
-  - center
+  - statement
   - default
+  - two-cols
+  - section
   - fact
   - end
 - custom-layouts: []
@@ -41,53 +43,88 @@
 ### Slide 1
 - kind: cover
 - layout: cover
+- transition: slide-left
 - title: Olsen
 - subtitle: Local-first photo indexing and faceted browsing.
+- notes: yes
 
 ### Slide 2
-- kind: center-statement
-- layout: center
+- kind: statement
+- layout: statement
+- transition: fade
 - title: Your photos. Your database. Guaranteed read-only.
+- body: Olsen indexes without touching a single source file. No sidecar files. No hidden databases. One SQLite file you control.
 
 ### Slide 3
 - kind: default-content
 - layout: default
-- title: What it extracts
+- transition: slide-up
+- title: Why build another photo tool?
 - body:
-  - bullet: EXIF metadata — camera, lens, exposure, GPS, lighting
-  - bullet: Aspect-ratio-preserving thumbnails at 4 sizes
-  - bullet: Dominant color palette via k-means clustering
-  - bullet: Perceptual hashes for near-duplicate detection
+  - bullet: Photo libraries grow to 100K+ images. Existing tools lock you in.
+  - bullet: Apple Photos and Google Photos own the index. You can't query or export it.
+  - bullet: Olsen indexes into a single SQLite database — never modifies a source file.
+- features:
+  - v-clicks
 
 ### Slide 4
-- kind: default-content
+- kind: code
 - layout: default
-- title: Faceted search as state machine
-- body:
-  - bullet: Users never transition from results to zero results
-  - bullet: SQL computes valid facet values given current filters
-  - bullet: 11 Berlin-Kay universal color categories
-  - bullet: Temporal, visual, equipment, and technical facets
+- transition: slide-left
+- title: Extracting from raw photos
+- body: Go code showing embedded JPEG extraction from DNG files. Avoids decoding raw Bayer data for thumbnail generation.
+- notes: yes
 
 ### Slide 5
-- kind: default-content
-- layout: default
-- title: Built for scale
+- kind: two-cols
+- layout: two-cols
+- transition: fade
+- title: What it extracts / Faceted search
 - body:
-  - bullet: 100K+ photos — initial index in 1.5-2 hours
-  - bullet: 500MB constant memory, ~25GB database with thumbnails
-  - bullet: Hash-based resume — re-running skips processed files
-  - bullet: Per-file timeout and graceful degradation
+  - left:
+    - bullet: EXIF metadata — camera, lens, exposure, GPS
+    - bullet: Thumbnails at 4 sizes, aspect-preserving
+    - bullet: Dominant colors via k-means clustering
+    - bullet: Perceptual hashes for duplicate detection
+  - right:
+    - bullet: Users never hit zero results
+    - bullet: SQL computes valid facet values
+    - bullet: 11 Berlin-Kay color categories
+    - bullet: Temporal, visual, equipment facets
+- features:
+  - v-clicks
+  - v-mark on "Users never hit zero results"
+  - hover-accent interactive styling
 
 ### Slide 6
-- kind: fact
-- layout: fact
-- title: 62ms
-- subtitle: Per photo
-- body: Metadata, thumbnails, color palette, and perceptual hash — all in one pass
+- kind: diagram
+- layout: default
+- transition: slide-up
+- title: The state machine guarantee
+- body: Mermaid TD diagram — filter state machine from All Photos through camera, color, and year filters.
+- features:
+  - v-motion
+  - v-mark on the pre-validation guarantee
 
 ### Slide 7
+- kind: fact
+- layout: fact
+- transition: slide-left
+- title: 62ms
+- subtitle: per photo x 100K photos = 103 minutes
+- body: 500MB constant memory. Hash-based resume. Metadata, thumbnails, color palette, and perceptual hash — all in one pass.
+- notes: yes
+
+### Slide 8
+- kind: section
+- layout: section
+- transition: fade
+- title: Start at the source
+- body: Debug from the file, not from the abstraction. Every record links back to the original path.
+
+### Slide 9
 - kind: end
 - layout: end
+- transition: fade
 - title: Index your photos
 - body: ./bin/olsen index ~/Pictures --db photos.db

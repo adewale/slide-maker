@@ -5,8 +5,8 @@
 - purpose: showcase the project
 - audience: developers and Obsidian users
 - tone: serious, intellectual, restrained
-- target-length: 7
-- notes: no
+- target-length: 9
+- notes: yes
 - style-preset: editorial-dark
 
 ## Design Tokens
@@ -26,7 +26,8 @@
 - prefer-builtins: true
 - builtins:
   - cover
-  - center
+  - statement
+  - quote
   - default
   - fact
   - end
@@ -41,52 +42,77 @@
 ### Slide 1
 - kind: cover
 - layout: cover
+- transition: fade
 - title: GeistFabrik
 - subtitle: A divergence engine for Obsidian vaults.
+- notes: yes
 
 ### Slide 2
-- kind: center-statement
-- layout: center
-- title: Muses, not oracles. Questions, not answers.
+- kind: statement
+- layout: statement
+- transition: slide-left
+- title: AI tools give answers. Creativity needs divergent questions.
+- body: LLMs are convergent by design. Creative thinking needs unexpected connections, oblique angles, surprising juxtapositions. That's what a muse does.
 
 ### Slide 3
-- kind: default-content
-- layout: default
-- title: What it does
-- body:
-  - bullet: 57 default geists — 48 code + 9 Tracery grammars
-  - bullet: Semantic search via 384-dim embeddings
-  - bullet: Temporal embeddings track how understanding evolves
-  - bullet: Session notes with linkable suggestions in your vault
+- kind: quote
+- layout: quote
+- transition: fade
+- title: Muses, not oracles. Questions, not answers.
 
 ### Slide 4
-- kind: default-content
+- kind: code
 - layout: default
-- title: Three ways to extend
-- body:
-  - bullet: Metadata inference — add custom note properties via Python modules
-  - bullet: Vault functions — reusable query functions with @vault_function
-  - bullet: Geists — full Python or declarative Tracery YAML grammars
+- transition: slide-up
+- title: A geist definition
+- body: YAML Tracery grammar definition for the bridge-builder geist. Shows declarative rule structure with vault-data interpolation.
+- notes: yes
 
 ### Slide 5
 - kind: default-content
 - layout: default
-- title: Design principles
+- transition: slide-left
+- title: What a geist session produces
+- body: Concrete example of a session note with divergent question output and linked suggestions. v-mark highlights the divergent output line.
+- features:
+  - v-mark
+
+### Slide 6
+- kind: diagram
+- layout: default
+- transition: fade
+- title: How a geist runs
+- body: Mermaid LR pipeline — Vault Notes, Embeddings, Semantic Sampling, Geist, Session Note.
+- features:
+  - v-motion
+
+### Slide 7
+- kind: default-content
+- layout: default
+- transition: slide-up
+- title: Four guardrails
 - body:
   - bullet: Sample, don't rank — avoid preferential attachment
   - bullet: Intermittent invocation — user-initiated, not continuous
   - bullet: Local-first — no network required, 100% private
   - bullet: Deterministic randomness — same date + vault = same output
+- features:
+  - v-clicks
+  - v-mark on Local-first
+  - hover-lift interactive styling
+- notes: yes
 
-### Slide 6
+### Slide 8
 - kind: fact
 - layout: fact
+- transition: fade
 - title: 57
-- subtitle: Default geists
-- body: 48 code geists + 9 Tracery grammars. All local. All extensible.
+- subtitle: geists, 384-dim embeddings, 0 cloud dependencies
+- body: 48 code geists + 9 Tracery grammars. All local. All extensible. All deterministic.
 
-### Slide 7
+### Slide 9
 - kind: end
 - layout: end
+- transition: slide-left
 - title: Start exploring
 - body: uv run geistfabrik init ~/your-vault

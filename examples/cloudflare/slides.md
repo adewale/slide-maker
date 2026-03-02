@@ -14,6 +14,8 @@ layout: cover
 
 Cloudflare Workers, Durable Objects, and the Agents SDK.
 
+<!-- This tutorial walks through building AI agents on Cloudflare's platform. -->
+
 ---
 layout: statement
 transition: morph-fade
@@ -99,6 +101,8 @@ export class SupportAgent extends AIChatAgent {
 
 One class. WebSocket connections, chat history, tool dispatch, and state persistence handled for you.
 
+<!-- The key insight — one class gives you everything. WebSocket, history, tools, state. -->
+
 ---
 layout: section
 transition: iris
@@ -128,7 +132,7 @@ tools = [{
 
 <v-clicks>
 
-- Validate all tool inputs with Zod schemas
+- Validate all tool inputs with <v-mark at="1" color="#ff6633" type="underline">Zod schemas</v-mark>
 - Gate destructive actions behind human approval
 - Return structured data the model can reason over
 
@@ -147,7 +151,7 @@ Each agent instance is a Durable Object with built-in SQLite.
 - **Per-instance storage** — SQL queries, key-value, or raw bytes
 - **WebSocket connections** — broadcast state changes to all clients
 - **Hibernation** — schedules survive sleep and deployments
-- **Single-threaded guarantee** — no race conditions on state
+- <v-mark at="5" color="#ff6633" type="underline">**Single-threaded guarantee**</v-mark> — no race conditions on state
 
 </v-clicks>
 
@@ -202,6 +206,8 @@ transition: fade
 5. **Use workflows for multi-step** — don't chain promises by hand
 
 </v-clicks>
+
+<!-- These five rules prevent the most common agent bugs. -->
 
 ---
 layout: quote

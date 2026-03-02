@@ -10,34 +10,49 @@ layout: cover
 
 An animated canvas garden that grows over time. Zero dependencies.
 
+<!--
+Garten turns any webpage into a living landscape. It's a pure Canvas API library — no framework, no build step, no dependencies. Drop a script tag, point it at a canvas, and watch 147 plant types grow in real time. This talk covers why it exists, how it works, and how little code it takes to get started.
+-->
+
 ---
-layout: quote
+layout: statement
+transition: slide-left
 ---
 
-# "Add a living, breathing background to any webpage with one line of code"
+# Static hero backgrounds are boring
+
+Every website has the same gradient or stock photo. What if your background was alive? What if it grew over time?
 
 ---
 transition: slide-up
 ---
 
-# What grows
+# One line to start a garden
 
-<v-clicks>
+```js
+// One line to start a garden
+const garden = new Garden(canvas, {
+  preset: 'meadow',
+  density: 0.7,
+  seed: 42,  // deterministic — same seed, same garden
+});
+garden.play();
+```
 
-- **147 plant types** across 19 categories
-- Flowers, trees, grasses, tropicals, cacti, bamboo
-- Plants grow in waves called **generations**
-- Respects `prefers-reduced-motion`
-
-</v-clicks>
+<!--
+The entire API surface fits in a single constructor call. You pass a canvas element, pick a preset, set density and an optional seed for determinism, and call play. That's it. The seed parameter is particularly important — it means the same configuration produces the exact same garden every time, which makes testing, screenshots, and visual regression trivial.
+-->
 
 ---
 layout: two-cols-header
+transition: fade
 ---
 
 # Customize everything
 
 ::left::
+
+<div class="hover-item">
 
 ### Presets
 
@@ -48,7 +63,11 @@ layout: two-cols-header
 
 </v-clicks>
 
+</div>
+
 ::right::
+
+<div class="hover-item">
 
 ### Controls
 
@@ -60,6 +79,42 @@ layout: two-cols-header
 
 </v-clicks>
 
+</div>
+
+<style>
+.hover-item {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  border: 1px solid transparent;
+}
+.hover-item:hover {
+  transform: scale(1.03);
+  border-color: #2d8a4e;
+}
+</style>
+
+---
+layout: center
+transition: slide-up
+---
+
+<div v-motion :initial="{ scale: 0.3, opacity: 0 }" :enter="{ scale: 1, opacity: 1, transition: { duration: 1000, type: 'spring', stiffness: 80 } }">
+
+<div class="text-6xl text-center font-serif" style="color: var(--deck-accent);">
+growth
+</div>
+
+</div>
+
+<div class="mt-6 text-center text-lg">
+
+<v-mark at="1" color="#2d8a4e" type="underline">Zero dependencies = zero excuses not to use it</v-mark>
+
+</div>
+
+---
+transition: slide-left
 ---
 
 # Playback API
@@ -77,27 +132,23 @@ graph LR
 Full programmatic control — play, pause, seek, speed, destroy.
 
 ---
-layout: section
-transition: slide-left
----
-
-# Zero dependencies
-
-Pure Canvas API. No framework. No build step. Just `<script>` and go.
-
----
 layout: fact
+transition: fade
 ---
 
 # 147
 
-Plant types
+plants, 19 categories, 0 dependencies
 
-Across 19 categories — from simple flowers to cherry blossoms, bamboo, and conifers
+<4KB gzipped. Pure Canvas API. No framework. No build step.
+
+<!--
+147 plant types spread across 19 categories — from simple grasses to flowering trees, bamboo, cacti, and cherry blossoms. The entire library ships under 4KB gzipped. No framework dependency, no build step required. It's a single script tag or npm install away from running on any page.
+-->
 
 ---
 layout: end
-transition: fade
+transition: slide-left
 ---
 
 # Try it

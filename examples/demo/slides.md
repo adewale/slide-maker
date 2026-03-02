@@ -14,6 +14,8 @@ layout: cover
 
 Native Slidev decks. Strong visual direction. Minimal abstraction.
 
+<!-- This meta-deck explains how Slide Maker works — the skill that builds all other decks. -->
+
 ---
 layout: statement
 transition: fade
@@ -66,6 +68,8 @@ transition: fade
 
 # Five levels of implementation
 
+<div v-motion :initial="{ opacity: 0, x: -30 }" :enter="{ opacity: 1, x: 0, transition: { delay: 200, duration: 600 } }">
+
 <v-clicks>
 
 1. **Markdown** — always start here
@@ -75,6 +79,10 @@ transition: fade
 5. **Inline HTML** — last resort
 
 </v-clicks>
+
+</div>
+
+<!-- The escalation ladder is the core principle — use the simplest tool that works. -->
 
 ---
 layout: SplitInsight
@@ -107,6 +115,33 @@ layout: SplitInsight
 - Layouts and components only when justified
 
 </v-clicks>
+
+---
+transition: slide-left
+---
+
+# From spec to slides
+
+````md
+# deck.spec.md
+## Meta
+- title: My Deck
+- style-preset: editorial-dark
+- target-length: 8
+
+## Slides
+### Slide 1
+- kind: cover
+- title: My Deck
+````
+
+<v-click>
+
+becomes `slides.md` with tokens, theme, layouts, and visual polish — all from one spec file.
+
+</v-click>
+
+<!-- The spec file is the single source of truth. Everything flows from it. -->
 
 ---
 transition: slide-up

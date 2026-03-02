@@ -70,8 +70,8 @@
 - Toc (table of contents)
 - Mermaid diagrams (flowchart, timeline)
 - LaTeX / KaTeX math
-- Monaco editor (live code editing)
-- Code groups
+- v-click.hide (hide on click) + v-after (simultaneous reveal)
+- Presenter notes (delivery cues via HTML comments)
 - Cinematic transitions (iris, morph-fade, zoom-in, flip-x, wipe-right, blur, glide)
 - GlassCard (backdrop-filter glass effect)
 - ShadowStack (multi-layer shadow presets)
@@ -237,7 +237,7 @@
 ### Slide 31
 - kind: default-content
 - layout: default
-- title: Code groups and Monaco editor
+- title: v-click.hide and v-after
 
 ### Slide 32
 - kind: default-content

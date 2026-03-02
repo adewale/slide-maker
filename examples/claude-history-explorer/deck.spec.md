@@ -5,8 +5,8 @@
 - purpose: showcase the project
 - audience: developers and Claude Code users
 - tone: serious, modern, developer-focused
-- target-length: 6
-- notes: no
+- target-length: 8
+- notes: yes
 - style-preset: editorial-dark
 
 ## Design Tokens
@@ -27,7 +27,9 @@
 - builtins:
   - cover
   - center
+  - statement
   - default
+  - two-cols
   - fact
   - end
 - custom-layouts: []
@@ -43,42 +45,68 @@
 - layout: cover
 - title: Claude History Explorer
 - subtitle: Search and visualize your Claude Code conversation history.
+- notes: yes
 
 ### Slide 2
-- kind: center-statement
-- layout: center
-- title: Turn raw JSONL files into searchable conversations and insights
+- kind: why-statement
+- layout: statement
+- transition: slide-left
+- title: JSONL files are where Claude conversations go to die
+- body: Raw JSONL logs are unreadable — thousands of lines, no search, no structure. You need a tool to explore them.
 
 ### Slide 3
-- kind: default-content
+- kind: code
 - layout: default
-- title: What it does
-- body:
-  - bullet: Story generation — narratives about work patterns and collaboration style
-  - bullet: Concurrent Claude detection — find parallel instance usage
-  - bullet: Regex search across all conversations
-  - bullet: Multiple export formats — JSON, Markdown, plain text
+- transition: slide-up
+- title: Search in action
+- body: Python CLI example showing `che search` with context output
+- notes: yes
 
 ### Slide 4
-- kind: default-content
-- layout: default
-- title: Commands
+- kind: two-cols
+- layout: two-cols
+- transition: fade
+- title: What it does / Design principles
 - body:
-  - numbered: projects — list all Claude Code projects
-  - numbered: sessions / show — browse and display conversations
-  - numbered: search — regex search with context
-  - numbered: stats / summary / story — analytics and narratives
-  - numbered: wrapped — shareable year-in-review URL
+  - left:
+    - bullet: Story generation — narratives about work patterns
+    - bullet: Concurrent detection — find parallel instance usage
+    - bullet: Regex search across all conversations
+    - bullet: Multiple exports — JSON, Markdown, plain text
+  - right:
+    - bullet: Read-only by design (v-mark underline)
+    - bullet: Never modifies history files
+    - bullet: Local-first, no network
+    - bullet: Fast — streams JSONL lazily
+- interactive: hover-accent on design principles list items
 
 ### Slide 5
-- kind: fact
-- layout: fact
-- title: 9
-- subtitle: CLI commands
-- body: Read-only by design. Never modifies your Claude history files.
+- kind: architecture
+- layout: default
+- transition: slide-left
+- title: How data flows
+- body: Mermaid graph LR — JSONL Files -> Parser -> Conversations -> Search / Stats / Stories
+- motion: v-motion fade-up on diagram
 
 ### Slide 6
+- kind: fact
+- layout: fact
+- transition: slide-up
+- title: "1,200 lines of JSONL"
+- subtitle: becomes a 3-second search
+- body: 9 commands. All read-only. Your data never leaves your machine.
+
+### Slide 7
+- kind: design-insight
+- layout: center
+- transition: fade
+- title: Read-only by design means zero risk
+- body: When you never modify source files, you can experiment freely. No backup needed. No undo anxiety.
+
+### Slide 8
 - kind: end
 - layout: end
+- transition: fade
 - title: Explore your history
 - body: uv tool install .
+- notes: yes

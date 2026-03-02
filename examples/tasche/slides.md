@@ -10,30 +10,62 @@ layout: cover
 
 Self-hosted read-it-later on Cloudflare.
 
+<!--
+Tasche is German for "pocket" — a nod to the service it replaces, but fully self-hosted.
+We built it on Cloudflare's developer platform so your reading list is truly yours.
+-->
+
 ---
 layout: statement
+transition: slide-left
 ---
 
-# Save articles. Read offline. Listen later. Your data stays yours.
+# Read-later services own your data
+
+Pocket, Instapaper, Omnivore — they store your articles on their servers.
+When they shut down (Omnivore did in 2024), your library vanishes overnight.
+
+<v-click>
+
+**You need a self-hosted alternative.**
+
+</v-click>
+
+---
+transition: slide-up
+---
+
+# Article extraction pipeline
+
+```python
+async def save_article(url: str, db: D1Database, r2: R2Bucket):
+    """Extract, archive, and index in one pipeline."""
+    html = await fetch(url)
+    article = extract_content(html)  # readability
+
+    # Archive everything to R2
+    await r2.put(f"{article.id}/content.md", article.markdown)
+    await r2.put(f"{article.id}/original.html", html)
+
+    # Index for full-text search
+    await db.execute(
+        "INSERT INTO articles_fts ...", [article]
+    )
+```
+
+<!--
+This is the core save flow. One async function handles fetch, extraction, archival, and indexing.
+R2 stores both markdown and original HTML so you never lose fidelity.
+D1's FTS5 extension gives you instant full-text search without an external service.
+-->
 
 ---
 transition: slide-left
 ---
 
-# Features
-
-<v-clicks>
-
-- **Save by URL** with automatic content extraction and archival
-- **Full-text search** across your entire library via FTS5
-- **Listen Later** — audio versions via Workers AI TTS
-- **PWA** with offline reading and service worker caching
-
-</v-clicks>
-
----
-
 # The Cloudflare stack
+
+<div v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { duration: 600 } }">
 
 ```mermaid {theme: 'dark', scale: 0.85}
 graph TD
@@ -46,8 +78,11 @@ graph TD
   class D1,R2,Q,AI,KV svc
 ```
 
+</div>
+
 ---
 layout: two-cols
+transition: fade
 ---
 
 # Storage layer
@@ -55,7 +90,7 @@ layout: two-cols
 <v-clicks>
 
 - **D1** — articles, users, tags
-- **FTS5** search index
+- <v-mark at="4" color="#fb923c" type="underline">**FTS5**</v-mark> — full-text search index
 - **R2** — archived HTML, markdown, images, audio
 
 </v-clicks>
@@ -72,43 +107,49 @@ layout: two-cols
 
 </v-clicks>
 
+<style>
+.slidev-layout li {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.slidev-layout li:hover {
+  transform: translateY(-2px);
+  text-shadow: 0 0 8px rgba(251, 146, 60, 0.4);
+}
+</style>
+
 ---
-layout: section
+layout: center
 transition: slide-up
 ---
 
-# Listen Later
+# Cloudflare stack = <v-mark at="1" color="#fb923c" type="circle">$5/month</v-mark> for unlimited articles
 
-Workers AI generates audio versions of saved articles. Play them in the PWA.
+D1 for metadata. R2 for content. Queues for async processing. AI for TTS.
 
----
+The entire stack runs on one platform — no Docker, no VPS, no ops.
 
-# How an article flows
-
-<v-clicks>
-
-1. **Save** — user submits a URL
-2. **Extract** — Worker fetches and parses content
-3. **Archive** — HTML + markdown + images to R2
-4. **Index** — metadata + FTS5 into D1
-5. **Audio** — queue triggers TTS generation
-6. **Read** — PWA serves from cache or network
-
-</v-clicks>
+<!--
+This is the design thesis: Cloudflare's developer platform is cheap enough that a single $5/month plan
+covers everything. D1 gives you SQLite with FTS5, R2 gives you S3-compatible storage,
+Queues handle background work, and Workers AI provides TTS. No external dependencies.
+-->
 
 ---
 layout: fact
+transition: fade
 ---
 
 # $5
 
-Per month
+per month vs $120/year Pocket Premium
 
-On the Cloudflare Workers Paid plan. Free tier covers light personal use.
+Your data, your rules. Self-hosted on Cloudflare Workers Paid plan.
 
 ---
 layout: end
-transition: fade
+transition: slide-left
 ---
 
 # Deploy in 5 minutes

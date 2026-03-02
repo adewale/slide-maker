@@ -14,6 +14,8 @@ fonts:
 
 A thumbnail bug, a wrong turn, and the 60x speedup hiding in plain sight.
 
+<!-- This is a debugging detective story. We start with a mystery -- broken thumbnails -- follow a false trail that wastes days, then find the real culprit hiding in plain sight. The punchline: the fix was simpler, faster, and better than the original approach. Set the tone as investigative, not instructional. -->
+
 ---
 layout: TufteSlide
 transition: slide-left
@@ -30,6 +32,8 @@ The file contained **44 embedded JPEG previews** at different sizes. A 2.1MB ful
 <Sidenote number="1">DNG (Digital Negative) files contain multiple embedded JPEG previews at various sizes. The largest is typically full or near-full resolution, intended for fast display without RAW decoding.</Sidenote>
 
 <Sidenote number="2">The quality pipeline detects upscaling: if the source image is only 160x120, it refuses to generate 256, 512, and 1024px thumbnails.</Sidenote>
+
+<!-- The key revelation: the DNG file contained 44 embedded JPEG previews, including a 2.1MB full-resolution one at 9504x6320. But our code grabbed the first one it found -- a tiny 160x120 thumbnail. The quality pipeline then correctly refused to upscale from 160x120, so larger thumbnail sizes were never generated. The clue was right there in the "upscale warning" log line. -->
 
 ---
 layout: TufteSlide
@@ -57,6 +61,8 @@ Then the thumbnails turned completely black. We had removed `isBlackImage()` det
 ::sidenote::
 
 <Sidenote number="3">The instinct to fix what you can see first is strong. The UI was broken, so we fixed the UI. But the data was wrong at the source.</Sidenote>
+
+<!-- We debugged backwards -- starting at the display layer and working toward the source. Three attempted fixes, three failures. We fixed the web UI fallback, fixed database queries, assumed "8 thumbnails generated" meant success. Then the thumbnails turned completely black because we removed black-image detection trusting the pipeline. The lesson: debugging in the wrong order does not just waste time, it can make things worse. -->
 
 ---
 transition: slide-up
@@ -92,6 +98,8 @@ return jpeg.Decode(bytes.NewReader(largestJPEG)), nil
 
 <v-mark v-click type="highlight" color="rgba(45, 95, 138, 0.15)">The critical line: `if jpegSize > largestSize`</v-mark>
 
+<!-- This is the key moment of the talk. The Magic Move transition shows the code transformation: from a naive first-match algorithm that returns the first JPEG marker it finds (the tiny 160x120 thumbnail) to a largest-match algorithm that scans all embedded JPEGs and returns the biggest one (9504x6320). One conditional -- `if jpegSize > largestSize` -- is the entire fix. Let the code transition speak for itself. -->
+
 ---
 layout: TufteSlide
 transition: fade
@@ -99,6 +107,7 @@ transition: fade
 
 # The data
 
+<div v-motion :initial="{ opacity: 0, x: -40 }" :enter="{ opacity: 1, x: 0, transition: { delay: 200, duration: 600 } }">
 <SmallMultiples :cols="3">
 <div>
   <Sparkline :data="[1200, 1250, 1180, 1220, 1190]" :width="90" :height="20" color="#c0392b" />
@@ -116,6 +125,7 @@ transition: fade
   <div style="color: var(--deck-muted); font-size: 0.78rem;">Embedded JPEG</div>
 </div>
 </SmallMultiples>
+</div>
 
 <div style="margin-top: 2rem;">
 
@@ -126,6 +136,17 @@ The embedded JPEG extraction is **60x faster** than full RAW decoding. Equal or 
 ::sidenote::
 
 <Sidenote number="4">The full pipeline with fallback costs 1600ms per file. Direct embedded JPEG extraction costs 20ms. For 100K photos, that is 44 hours vs 33 minutes.</Sidenote>
+
+<style>
+.small-multiples > div {
+  transition: opacity 0.3s ease, filter 0.3s ease;
+  cursor: pointer;
+}
+.small-multiples:hover > div:not(:hover) {
+  opacity: 0.3;
+  filter: blur(1px);
+}
+</style>
 
 ---
 layout: TufteSlide
@@ -173,6 +194,8 @@ transition: fade
 <Sidenote number="7">Visual inspection over metrics. "Generated 8 thumbnails" told us nothing. Opening the file and looking at it would have caught the bug immediately.</Sidenote>
 
 <Sidenote number="8">Diagnostic logging proactively. After adding [EMBED] and [RAW] log prefixes, every future bug became immediately visible in the output stream.</Sidenote>
+
+<!-- Five transferable principles: (1) State machines over hierarchies -- data determines valid transitions, not your assumptions. (2) Simple over complex -- embedded JPEG extraction was 60x faster than full RAW decode with zero dependencies. (3) Test at the right layer -- we added web UI tests when the bug lived in the decode layer. (4) Visual inspection over metrics -- "8 thumbnails generated" told us nothing; opening the file would have caught it instantly. (5) Diagnostic logging proactively -- log prefixes like [EMBED] and [RAW] make future bugs self-diagnosing. These apply far beyond image processing. -->
 
 ---
 layout: section

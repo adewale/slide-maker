@@ -12,6 +12,8 @@ fonts:
 
 # The Garden
 
+<!-- This deck is about Garten, the canvas garden library. The sumi-e preset embodies the project's philosophy of constraint and emergence. -->
+
 ---
 layout: ZenSlide
 ---
@@ -30,6 +32,8 @@ transition: fade
 <BrushDivider width="40%" :opacity="0.2" />
 
 When you remove everything unnecessary, what remains is essential.
+
+<!-- The core thesis — removing everything unnecessary reveals what's essential. This applies to code architecture as much as aesthetics. -->
 
 ---
 layout: ZenSlide
@@ -82,6 +86,8 @@ transition: fade
 A canvas garden teaches you that complex beauty arises from simple rules applied patiently.
 
 </div>
+
+<!-- The deeper meaning — complex beauty from simple rules. This is what makes canvas rendering special. -->
 
 ---
 layout: ZenSlide

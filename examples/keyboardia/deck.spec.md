@@ -5,8 +5,8 @@
 - purpose: showcase the project
 - audience: developers and musicians
 - tone: assertive, energetic, creative
-- target-length: 7
-- notes: no
+- target-length: 8
+- notes: yes
 - style-preset: bold-modern
 
 ## Design Tokens
@@ -28,7 +28,9 @@
 - builtins:
   - cover
   - center
+  - statement
   - default
+  - two-cols-header
   - fact
   - end
 - custom-layouts: []
@@ -42,53 +44,71 @@
 ### Slide 1
 - kind: cover
 - layout: cover
+- transition: slide-up
 - title: Keyboardia
 - subtitle: Multiplayer step sequencer with polyrhythmic patterns.
+- notes: yes
 
 ### Slide 2
-- kind: center-statement
-- layout: center
-- title: Up to 10 players. 64 sound generators. Real-time collaboration.
+- kind: why-statement
+- layout: statement
+- transition: fade
+- title: Collaborative music tools require expensive DAWs
+- body: Ableton, Logic, FL Studio cost $200-800. Browser-native collaborative music should be free and instant. No install. Share a link. Start jamming.
 
 ### Slide 3
-- kind: default-content
+- kind: code
 - layout: default
-- title: Sequencer features
-- body:
-  - bullet: 3-128 step counts per track with triplet-friendly values
-  - bullet: Parameter locks — per-step pitch, volume, and tied notes
-  - bullet: Chromatic grid with scale lock and scale sidebar
-  - bullet: Per-track swing and global groove control
+- transition: slide-left
+- title: Web Audio synth creation
+- body: TypeScript createVoice function — oscillator, gain, parameter locks, polyphony normalization.
+- notes: yes
 
 ### Slide 4
-- kind: default-content
-- layout: default
-- title: Sound engine
+- kind: two-cols-header
+- layout: two-cols-header
+- transition: slide-up
+- title: Sequencer + Sound engine
 - body:
-  - bullet: 32 Web Audio synths with 40+ presets
-  - bullet: 11 Tone.js FM, AM, and Membrane synths
-  - bullet: 21 sampled instruments — piano, 808 kit, vibraphone, strings
-  - bullet: Effects chain — reverb, delay, chorus, distortion with limiter
+  - left: 3-128 steps, parameter locks, chromatic grid, per-track swing
+  - right: 32 Web Audio, 11 Tone.js, 21 sampled, effects chain
+- features:
+  - hover-scale interaction on column sections
 
 ### Slide 5
-- kind: default-content
+- kind: architecture-diagram
 - layout: default
-- title: Multiplayer architecture
-- body:
-  - bullet: Cloudflare Durable Objects for session state
-  - bullet: WebSocket Hibernation API for cost efficiency
-  - bullet: Hybrid persistence — DO storage for immediacy, KV on disconnect
-  - bullet: Session sharing, remixing, and QR code links
+- transition: fade
+- title: Multiplayer sync
+- body: Mermaid graph — Players to Durable Object via WebSocket, DO Storage, KV Backup, broadcast.
+- features:
+  - v-motion with initial opacity 0 and y offset
+  - v-mark underline on polyrhythm design insight
 
 ### Slide 6
-- kind: fact
-- layout: fact
-- title: 64
-- subtitle: Sound generators
-- body: 32 Web Audio + 11 Tone.js + 21 sampled instruments across 4 synthesis engines
+- kind: workflow
+- layout: default
+- transition: slide-left
+- title: How sessions work
+- body:
+  - step: Create — host starts a session
+  - step: Join — players scan QR or paste URL
+  - step: Sync — pattern changes broadcast in real-time
+  - step: Persist — state in DO, backs up to KV
+  - step: Remix — fork any session
 
 ### Slide 7
+- kind: fact
+- layout: fact
+- transition: slide-up
+- title: 64
+- subtitle: generators, 10 concurrent players, <50ms latency
+- body: 32 Web Audio + 11 Tone.js + 21 sampled. All audio client-side. Server is a state relay.
+- notes: yes
+
+### Slide 8
 - kind: end
 - layout: end
+- transition: fade
 - title: Start jamming
 - body: cd app && npm install && npm run dev

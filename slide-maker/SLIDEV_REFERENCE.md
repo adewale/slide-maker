@@ -1,6 +1,6 @@
 # Slidev Comprehensive Reference
 
-Complete reference for building high-quality Slidev slide decks. Covers every feature, layout, component, directive, and configuration option available in Slidev v0.52+.
+Complete reference for building high-quality Slidev slide decks. Covers every feature, layout, component, directive, and configuration option available in Slidev v52.13+.
 
 ---
 
@@ -18,39 +18,35 @@ Complete reference for building high-quality Slidev slide decks. Covers every fe
 10. [Rough Marker Annotations](#10-rough-marker-annotations)
 11. [Code Blocks & Highlighting](#11-code-blocks--highlighting)
 12. [Shiki Magic Move](#12-shiki-magic-move)
-13. [Monaco Editor](#13-monaco-editor)
-14. [Code Groups](#14-code-groups)
-15. [Import Code Snippets](#15-import-code-snippets)
-16. [TwoSlash](#16-twoslash)
-17. [Mermaid Diagrams](#17-mermaid-diagrams)
-18. [PlantUML Diagrams](#18-plantuml-diagrams)
-19. [LaTeX / Math](#19-latex--math)
-20. [Icons](#20-icons)
-21. [MDC Syntax](#21-mdc-syntax)
-22. [Scoped Styles](#22-scoped-styles)
-23. [Drawing & Annotations](#23-drawing--annotations)
-24. [Draggable Elements](#24-draggable-elements)
-25. [Importing Slides](#25-importing-slides)
-26. [Frontmatter Merging](#26-frontmatter-merging)
-27. [Presenter Notes](#27-presenter-notes)
-28. [Click Markers in Notes](#28-click-markers-in-notes)
-29. [Global Layers](#29-global-layers)
-30. [Global Context & Composables](#30-global-context--composables)
-31. [Slide Hooks](#31-slide-hooks)
-32. [Fonts](#32-fonts)
-33. [UnoCSS](#33-unocss)
-34. [Canvas Size & Zoom](#34-canvas-size--zoom)
-35. [Exporting](#35-exporting)
-36. [SEO & Open Graph](#36-seo--open-graph)
-37. [Navigation & Keyboard Shortcuts](#37-navigation--keyboard-shortcuts)
-38. [Presenter Mode](#38-presenter-mode)
-39. [Recording](#39-recording)
-40. [Directory Structure](#40-directory-structure)
-41. [Configuration Files](#41-configuration-files)
-42. [CLI Commands](#42-cli-commands)
-43. [Theme Writing](#43-theme-writing)
-44. [Addon Writing](#44-addon-writing)
-45. [FAQ & Troubleshooting](#45-faq--troubleshooting)
+13. [Import Code Snippets](#13-import-code-snippets)
+14. [Mermaid Diagrams](#14-mermaid-diagrams)
+15. [PlantUML Diagrams](#15-plantuml-diagrams)
+16. [LaTeX / Math](#16-latex--math)
+17. [Icons](#17-icons)
+18. [MDC Syntax](#18-mdc-syntax)
+19. [Scoped Styles](#19-scoped-styles)
+20. [Drawing & Annotations](#20-drawing--annotations)
+21. [Draggable Elements](#21-draggable-elements)
+22. [Importing Slides](#22-importing-slides)
+23. [Frontmatter Merging](#23-frontmatter-merging)
+24. [Presenter Notes](#24-presenter-notes)
+25. [Global Layers](#25-global-layers)
+26. [Global Context & Composables](#26-global-context--composables)
+27. [Slide Hooks](#27-slide-hooks)
+28. [Fonts](#28-fonts)
+29. [UnoCSS](#29-unocss)
+30. [Canvas Size & Zoom](#30-canvas-size--zoom)
+31. [Exporting](#31-exporting)
+32. [SEO & Open Graph](#32-seo--open-graph)
+33. [Navigation & Keyboard Shortcuts](#33-navigation--keyboard-shortcuts)
+34. [Presenter Mode](#34-presenter-mode)
+35. [Recording](#35-recording)
+36. [Directory Structure](#36-directory-structure)
+37. [Configuration Files](#37-configuration-files)
+38. [CLI Commands](#38-cli-commands)
+39. [Theme Writing](#39-theme-writing)
+40. [Addon Writing](#40-addon-writing)
+41. [FAQ & Troubleshooting](#41-faq--troubleshooting)
 
 ---
 
@@ -131,13 +127,7 @@ Place in the first `---` block. Controls the entire deck.
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `twoslash` | boolean/`'dev'`/`'build'` | `true` | Enable TwoSlash type annotations |
 | `lineNumbers` | boolean | `false` | Show line numbers in code blocks globally |
-| `monaco` | boolean/`'dev'`/`'build'` | `true` | Enable Monaco editor |
-| `monacoTypesSource` | `'cdn'`/`'local'`/`'none'`/`'ata'` | `'local'` | Where Monaco gets TypeScript types |
-| `monacoTypesAdditionalPackages` | string[] | `[]` | Extra packages for Monaco types |
-| `monacoRunAdditionalDeps` | string[] | `[]` | Extra modules for Monaco runner |
-| `monacoRunUseStrict` | boolean | `true` | Run Monaco code in strict mode (v0.52+) |
 | `remoteAssets` | boolean/`'dev'`/`'build'` | `false` | Download and cache remote assets locally |
 | `mdc` | boolean | `false` | Enable MDC (Markdown Components) syntax |
 | `codeCopy` | boolean | `true` | Show copy button on code blocks |
@@ -1240,131 +1230,7 @@ console.log('Step 2')
 
 ---
 
-## 13. Monaco Editor
-
-### Editable Code Block
-
-````md
-```ts {monaco}
-console.log('HelloWorld')
-```
-````
-
-### Monaco Diff
-
-````md
-```ts {monaco-diff}
-console.log('Original text')
-~~~
-console.log('Modified text')
-```
-````
-
-### Monaco Runner (Executable Code)
-
-````md
-```ts {monaco-run}
-function distance(x: number, y: number) {
-  return Math.sqrt(x ** 2 + y ** 2)
-}
-console.log(distance(3, 4))
-```
-````
-
-### Runner Options
-
-````md
-```ts {monaco-run} {autorun:false}
-console.log('Click play to run')
-```
-````
-
-````md
-```ts {monaco-run} {showOutputAt:'+1'}
-console.log('Output shown after click')
-```
-````
-
-### Editor Height
-
-````md
-```ts {monaco} {height:'auto'}
-// Auto-growing editor
-```
-````
-
-````md
-```ts {monaco} {height:'300px'}
-// Fixed height editor
-```
-````
-
-### Editor Options
-
-````md
-```ts {monaco} {editorOptions: {wordWrap:'on'}}
-console.log('HelloWorld')
-```
-````
-
-### Writable Monaco
-
-For code that persists changes, use with imported snippets:
-
-````md
-<<< @/snippets/snippet.js {monaco-write}
-````
-
-### Type Support
-
-Types auto-imported from dependencies. Add more:
-
-```yaml
----
-monacoTypesAdditionalPackages:
-  - lodash-es
----
-```
-
----
-
-## 14. Code Groups
-
-Requires `mdc: true` in headmatter.
-
-````md
-::code-group
-
-```sh [npm]
-npm install @slidev/cli
-```
-
-```sh [yarn]
-yarn add @slidev/cli
-```
-
-```sh [pnpm]
-pnpm add @slidev/cli
-```
-
-::
-````
-
-### Custom Icons
-
-Install icon collection and use `~icon~` syntax:
-
-````md
-```js [npm ~i-uil:github~]
-console.log('Hello, GitHub!')
-```
-````
-
-Icons auto-matched for common tools (npm, yarn, pnpm, bun, deno, Vue, React, TypeScript, Python, etc.). Requires `@iconify-json/vscode-icons` for built-in icons.
-
----
-
-## 15. Import Code Snippets
+## 13. Import Code Snippets
 
 ### Basic Import
 
@@ -1396,34 +1262,7 @@ Icons auto-matched for common tools (npm, yarn, pnpm, bun, deno, Vue, React, Typ
 
 ---
 
-## 16. TwoSlash
-
-TypeScript type annotations displayed inline. Shows inferred types on hover.
-
-### Enable
-
-````md
-```ts twoslash
-import { ref } from 'vue'
-
-const count = ref(0)
-//            ^?
-```
-````
-
-The `^?` marker indicates where type information displays. Available since v0.46.0.
-
-### Configuration
-
-```yaml
----
-twoslash: true    # or 'dev' or 'build'
----
-```
-
----
-
-## 17. Mermaid Diagrams
+## 14. Mermaid Diagrams
 
 ### Basic Syntax
 
@@ -1483,7 +1322,7 @@ export default defineMermaidSetup(() => {
 
 ---
 
-## 18. PlantUML Diagrams
+## 15. PlantUML Diagrams
 
 ````md
 ```plantuml
@@ -1503,7 +1342,7 @@ plantUmlServer: https://your-plantuml-server.com/plantuml
 
 ---
 
-## 19. LaTeX / Math
+## 16. LaTeX / Math
 
 Powered by KaTeX.
 
@@ -1571,7 +1410,7 @@ export default defineKatexSetup(() => {
 
 ---
 
-## 20. Icons
+## 17. Icons
 
 Uses Iconify via `unplugin-icons`. Pattern: `{collection-name}-{icon-name}`.
 
@@ -1604,7 +1443,7 @@ Browse collections at [Icones](https://icones.js.org/).
 
 ---
 
-## 21. MDC Syntax
+## 18. MDC Syntax
 
 Enable with `mdc: true` in headmatter.
 
@@ -1631,7 +1470,7 @@ The **default** slot content
 
 ---
 
-## 22. Scoped Styles
+## 19. Scoped Styles
 
 ### Per-Slide CSS
 
@@ -1679,7 +1518,7 @@ Place in `./style.css` or `./styles/index.css`. These are processed by UnoCSS an
 
 ---
 
-## 23. Drawing & Annotations
+## 20. Drawing & Annotations
 
 Built-in drawing powered by the `drauu` library.
 
@@ -1708,7 +1547,7 @@ drawings:
 
 ---
 
-## 24. Draggable Elements
+## 21. Draggable Elements
 
 ### v-drag Directive
 
@@ -1765,7 +1604,7 @@ New draggable elements get auto-generated positions; no manual specification nee
 
 ---
 
-## 25. Importing Slides
+## 22. Importing Slides
 
 ### Basic Import
 
@@ -1793,7 +1632,7 @@ The same file can be imported multiple times across different slides.
 
 ---
 
-## 26. Frontmatter Merging
+## 23. Frontmatter Merging
 
 When importing slides with `src`, frontmatter from both files merges.
 
@@ -1823,11 +1662,13 @@ Result: `layout: cover` from external + `background` and `class` from main entry
 
 ---
 
-## 27. Presenter Notes
+## 24. Presenter Notes
+
+Presenter notes are delivery cues visible only in presenter mode — the audience never sees them. Use them for talking points, timing reminders, and click-by-click narration.
 
 ### Syntax
 
-Add HTML comments at the end of each slide:
+Add an HTML comment at the **end** of each slide. Comments placed elsewhere are ignored as notes.
 
 ```md
 ---
@@ -1845,45 +1686,68 @@ Content here
 
 ```md
 <!--
-Line 1 of notes
-Line 2 of notes
+**Key message:** Explain the architecture before diving into code.
 
-- Bullet point
-- Another point
+- Mention the three-layer design
+- Transition: "Let me show you how this works in practice"
+- Timing: ~2 minutes on this slide
 -->
 ```
 
-### Notes Visibility
+Notes support full Markdown formatting: **bold**, *italic*, `code`, lists, and links.
 
-Notes appear in:
-- Presenter mode view
-- Slide overview (`/overview`)
-- Notes editor (`/notes-edit`)
-- PPTX export (as speaker notes)
+### Click Markers in Notes
 
----
-
-## 28. Click Markers in Notes
-
-Synchronize presenter notes with click animations.
+Synchronize notes with click animations so the relevant talking point highlights as you advance:
 
 ```md
+# Architecture Overview
+
+<v-clicks>
+
+- Frontend (Vue 3 SPA)
+- API Gateway (Cloudflare Workers)
+- Database (D1 SQLite)
+
+</v-clicks>
+
 <!--
-[click] First animation happened - talk about this
-[click] Second animation - discuss the next point
-[click:3] After skipping to click 3 - wrap up
+Introduce the three layers at a high level.
+
+[click] Frontend — mention the Vue 3 SPA with Vite bundling.
+
+[click] API Gateway — explain how Workers sit at the edge.
+
+[click] Database — D1 gives us SQLite at the edge, no connection pooling needed.
 -->
 ```
 
-- `[click]` -- advances note highlight on next click
-- `[click:{n}]` -- skips to click n
-- Notes auto-scroll to the relevant section
+- `[click]` — highlights next section of notes when the next click fires
+- `[click:{n}]` — jumps to click n (use for non-sequential reveals)
+- Notes auto-scroll to the active section in presenter mode
 
-Available since v0.48.0.
+### Where Notes Appear
+
+| Context | Visible? |
+|---------|----------|
+| Presenter mode (`/presenter`) | Yes — right panel |
+| Slide overview (`/overview`) | Yes — below each slide |
+| Notes editor (`/notes-edit`) | Yes — editable live |
+| PPTX export | Yes — as speaker notes per slide |
+| Audience view | No |
+| PDF export | No |
+
+### Best Practices
+
+- Keep notes **delivery-oriented**: what to say, not what the slide says
+- Use click markers to pace yourself through progressive reveals
+- Include transition phrases: how you'll bridge to the next slide
+- Add timing hints for rehearsal: `~90 seconds`, `pause here`
+- Notes are slide-local — no separate notes file needed
 
 ---
 
-## 29. Global Layers
+## 25. Global Layers
 
 Special Vue components that persist across all slides or per-slide.
 
@@ -1930,7 +1794,7 @@ For `--per-slide` export, use `slide-top.vue` / `slide-bottom.vue` instead of gl
 
 ---
 
-## 30. Global Context & Composables
+## 26. Global Context & Composables
 
 ### Direct Access Variables (in Vue templates)
 
@@ -1977,7 +1841,7 @@ const isActive = useIsSlideActive()
 
 ---
 
-## 31. Slide Hooks
+## 27. Slide Hooks
 
 ### Available Hooks
 
@@ -1999,7 +1863,7 @@ onSlideLeave(() => {
 
 ---
 
-## 32. Fonts
+## 28. Fonts
 
 ### Configuration
 
@@ -2052,7 +1916,7 @@ fonts:
 
 ---
 
-## 33. UnoCSS
+## 29. UnoCSS
 
 ### Default Presets (Auto-Enabled)
 
@@ -2098,7 +1962,7 @@ export default defineConfig({
 
 ---
 
-## 34. Canvas Size & Zoom
+## 30. Canvas Size & Zoom
 
 ### Global Canvas Size
 
@@ -2129,7 +1993,7 @@ Reduces slide to 80% size. Other slides unaffected.
 
 ---
 
-## 35. Exporting
+## 31. Exporting
 
 Requires `playwright-chromium` dependency.
 
@@ -2194,7 +2058,7 @@ export:
 
 ---
 
-## 36. SEO & Open Graph
+## 32. SEO & Open Graph
 
 ### Configuration
 
@@ -2224,7 +2088,7 @@ Powered by `unhead`.
 
 ---
 
-## 37. Navigation & Keyboard Shortcuts
+## 33. Navigation & Keyboard Shortcuts
 
 ### Keyboard Shortcuts
 
@@ -2279,7 +2143,7 @@ export default defineShortcutsSetup((nav, base) => {
 
 ---
 
-## 38. Presenter Mode
+## 34. Presenter Mode
 
 ### Access
 
@@ -2308,17 +2172,9 @@ presenter: true    # true | false | 'dev' | 'build'
 
 ---
 
-## 39. Recording
+## 35. Recording
 
-### Access
-
-Click the recording button in the navigation bar.
-
-### Features
-
-- Built-in recording with WebRTC API
-- Camera widget overlay
-- RecordRTC integration for advanced recording
+Slidev has built-in camera and recording so you can capture your presentation without switching to external tools.
 
 ### Configuration
 
@@ -2328,9 +2184,37 @@ record: true    # true | false | 'dev' | 'build'
 ---
 ```
 
+| Value | Behavior |
+|-------|----------|
+| `true` | Always available |
+| `false` | Disabled |
+| `'dev'` | Available in dev server only (default) |
+| `'build'` | Available in built SPA only |
+
+### Camera View
+
+- Click the camera button in the navigation bar to toggle your webcam overlay
+- **Drag** the camera view to reposition it anywhere on the slide
+- **Resize** via the handle in the bottom-right corner
+- Size and position **persist** across page reloads
+
+### Recording
+
+Click the record button in the navigation bar. Two modes:
+
+1. **Embedded** — camera output composited into the slide recording (single video)
+2. **Separate** — camera and screen captured as two distinct video files
+
+### Technical Details
+
+- Uses **WebRTC API** for browser-based media capture
+- Uses **RecordRTC** library for recording engine
+- No external software required — runs entirely in the browser
+- Requires navigation bar to be visible (camera/record buttons live there)
+
 ---
 
-## 40. Directory Structure
+## 36. Directory Structure
 
 All directories and files are optional.
 
@@ -2379,7 +2263,7 @@ project/
 
 ---
 
-## 41. Configuration Files
+## 37. Configuration Files
 
 ### `vite.config.ts`
 
@@ -2573,7 +2457,7 @@ export default defineShortcutsSetup((nav, base) => {
 
 ---
 
-## 42. CLI Commands
+## 38. CLI Commands
 
 ### `slidev [entry]` -- Dev Server
 
@@ -2615,7 +2499,7 @@ Formats the slides.md organization.
 
 ---
 
-## 43. Theme Writing
+## 39. Theme Writing
 
 ### Scaffold
 
@@ -2671,7 +2555,7 @@ theme: ./
 
 ---
 
-## 44. Addon Writing
+## 40. Addon Writing
 
 ### Package Naming
 
@@ -2718,7 +2602,7 @@ addons:
 
 ---
 
-## 45. FAQ & Troubleshooting
+## 41. FAQ & Troubleshooting
 
 ### Assets Handling
 

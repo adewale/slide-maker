@@ -18,6 +18,8 @@ fonts:
 
 </div>
 
+<!-- This deck follows a war stories structure: we open with the product vision, walk through the battles we fought building real-time multiplayer audio in the browser, and close with three hard-won lessons. The arc is: promise, pain, payoff. -->
+
 ---
 layout: MaterialSlide
 transition: slide-left
@@ -47,6 +49,8 @@ Unlimited polyphony caused audio dropouts on mobile. Safari caps at ~32 concurre
 
 </div>
 
+<!-- Three battle scars from Web Audio API: gain staging causes clipping with multiple voices, AudioBufferSourceNodes leak memory because they are single-use, and Safari caps polyphony around 32 sources. Each of these shipped as a production bug before we understood the underlying constraint. The pattern: browser APIs have undocumented limits that only surface under real load. -->
+
 ---
 transition: slide-up
 ---
@@ -73,7 +77,7 @@ transition: fade
 
 # Three surfaces must align
 
-<div class="card-grid">
+<div class="card-grid" v-motion :initial="{ opacity: 0, y: 20 }" :enter="{ opacity: 1, y: 0, transition: { delay: 200, duration: 600 } }">
 
 <v-click>
 <MDCard variant="outlined" title="API surface">
@@ -100,6 +104,18 @@ What persists and syncs. `{ tempo, swing, tracks }` in the Durable Object. If a 
 A feature is not done until all three surfaces support it. We rolled back reverb and delay because they existed only in the API.
 
 </v-click>
+
+<!-- The three-surface framework is the core design insight: API surface (what the code can do), UI surface (what users can control), and session state (what persists and syncs). A feature is incomplete if it exists in fewer than all three. We actually rolled back reverb and delay because they only had API support -- users could not control them and they did not sync across players. -->
+
+<style>
+.card-grid > div {
+  transition: transform 0.2s cubic-bezier(0.05, 0.7, 0.1, 1.0), box-shadow 0.2s ease;
+}
+.card-grid > div:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(103, 80, 164, 0.2);
+}
+</style>
 
 ---
 transition: slide-left
@@ -208,6 +224,8 @@ All audio synthesis happens client-side. The server is a state relay. This keeps
 
 </v-click>
 
+<!-- 64 instruments, 10 simultaneous players, 18 lessons learned, and zero server-side audio. The last number is the most important: all synthesis is client-side. The server is purely a state relay. This architecture choice keeps latency under 50ms and means we never need to mix audio on the server. The tradeoff is that every client must be capable of audio synthesis, which limits us on low-powered mobile devices. -->
+
 ---
 transition: fade
 ---
@@ -256,6 +274,8 @@ Audio effects touch session state, WebSocket protocol, server validation, and UI
 </MDCard>
 
 </div>
+
+<!-- Three takeaways for the audience: (1) Align all surfaces -- API, UI, and session state must agree or the feature is incomplete. (2) Defer high-integration work -- audio effects that touch every layer should wait until the core is stable. (3) Test the spec, not your mental model -- 100% coverage means nothing if the tests encode the wrong behavior. These apply to any real-time collaborative system, not just audio. -->
 
 ---
 layout: end
