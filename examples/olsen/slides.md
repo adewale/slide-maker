@@ -10,6 +10,8 @@ layout: cover
 
 Local-first photo indexing and faceted browsing.
 
+github.com/adewale/olsen
+
 <!-- Olsen is a read-only photo indexer. It never modifies source files — not a sidecar, not a hidden database, not a single byte. The through-line is "read-only": stated as a guarantee on the cover, tested by every design decision, and resolved in the closing as a philosophy of trust. Position against Apple Photos and Google Photos — those own your index. Olsen indexes YOUR files on YOUR disk. -->
 
 ---

@@ -16,6 +16,8 @@ fonts:
 
 10 players. 64 instruments. One room. Everyone hears the same music.
 
+github.com/adewale/keyboardia
+
 </div>
 
 <!-- This deck follows a war stories structure: we open with the product vision ("everyone hears the same music"), walk through the battles we fought building real-time multiplayer audio in the browser, and close by resolving the promise. The arc is: promise, pain, payoff. "Everyone hears the same music" is the through-line — stated here, threatened by every bug, and resolved in the closing. -->

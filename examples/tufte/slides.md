@@ -14,6 +14,8 @@ fonts:
 
 A thumbnail bug, a wrong turn, and the 60x speedup hiding in plain sight.
 
+github.com/adewale/olsen
+
 <!-- This is a debugging detective story. We start with a mystery — broken thumbnails — follow a false trail that wastes days, then find the real culprit hiding in plain sight. The punchline: the fix was simpler, faster, and better than the original approach. The through-line is "start at the source" — a debugging rule we violated, paid for, and learned. Set the tone as investigative, not instructional. -->
 
 ---

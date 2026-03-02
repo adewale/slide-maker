@@ -14,6 +14,8 @@ fonts:
 
 What grows when you plant a single `<canvas>` element?
 
+github.com/adewale/garten
+
 <!-- Garten is a zero-dependency canvas garden library. This deck presents it through the sumi-e lens: constraint as creative force. The question isn't what the library does — it's what emerges when you remove everything unnecessary. -->
 
 ---

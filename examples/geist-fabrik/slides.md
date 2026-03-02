@@ -10,6 +10,8 @@ layout: cover
 
 A divergence engine for Obsidian vaults.
 
+github.com/adewale/geist-fabrik
+
 <!-- GeistFabrik is a creative-divergence tool, not an AI assistant. The key pitch: it generates questions, not answers. LLMs are convergence machines — they find the most probable response. Creative work needs the opposite: unexpected connections, oblique angles, productive confusion. The through-line is "muses vs. oracles" — stated here, threaded through guardrails, and resolved in the closing. -->
 
 ---

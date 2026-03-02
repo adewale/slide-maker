@@ -10,6 +10,8 @@ layout: cover
 
 Search and visualize your Claude Code conversation history.
 
+github.com/adewale/claude-history-explorer
+
 <!-- Every Claude Code session writes a JSONL file to disk. After a few months you have hundreds of them — thousands of conversations, millions of tokens, all sitting in a directory nobody reads. This tool turns that graveyard into a searchable archive. The pitch: your best ideas are already in there, buried. -->
 
 ---

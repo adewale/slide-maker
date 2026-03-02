@@ -10,6 +10,8 @@ layout: cover
 
 A feed aggregator built on Cloudflare Python Workers.
 
+github.com/adewale/planet-cf
+
 <!-- Planet CF collects developer blog posts from hundreds of personal sites into a single searchable index. The through-line is "invisible writing" — the best technical writing is scattered across personal blogs nobody discovers. D1, Vectorize, Queues, and Cron are all wired together in one codebase. Three ready-to-deploy instances included. -->
 
 ---

@@ -10,6 +10,8 @@ layout: cover
 
 Self-hosted read-it-later on Cloudflare.
 
+github.com/adewale/tasche
+
 <!-- Tasche is German for "pocket" — a nod to the service it replaces, but fully self-hosted. The through-line is "ownership": stated here as self-hosting, threaded through every architectural decision (you own the database, you own the archive, you own the search index), and resolved in the closing as permanence. -->
 
 ---

@@ -14,6 +14,8 @@ layout: cover
 
 Native Slidev decks. Strong visual direction. Minimal abstraction.
 
+github.com/adewale/skill-maker
+
 <!-- This meta-deck explains how Slide Maker works — the skill that builds all other decks. The tension it resolves: generated slides are either too generic (interchangeable, no visual identity) or too brittle (break when you edit them). The dual-layer architecture exists to solve this specific problem. -->
 
 ---

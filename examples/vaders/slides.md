@@ -13,6 +13,8 @@ layout: cover
 
 Multiplayer TUI Space Invaders. 1-4 players. Cloudflare Durable Objects.
 
+github.com/adewale/vaders
+
 <!-- Vaders is a complete reimagining of Space Invaders for the modern terminal. Built on Bun and Cloudflare Durable Objects, it supports 1-4 players in real-time co-op — all rendered in a 120x36 character grid. The through-line is "they said it couldn't" — terminal games are supposed to be single-player, local, and simple. Vaders is multiplayer, global, and real-time. Every technical challenge is framed as defiance. -->
 
 ---
