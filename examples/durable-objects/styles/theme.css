@@ -218,3 +218,20 @@ ul li::marker {
   border: 1px solid var(--deck-border);
   border-radius: var(--deck-radius);
 }
+
+/* Background treatments — dot pattern + glow */
+.cf-dots {
+  background-image: radial-gradient(circle, rgba(82, 16, 0, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.cf-glow {
+  background-image: radial-gradient(ellipse at 30% 50%, rgba(255, 102, 51, 0.15) 0%, transparent 60%);
+}
+
+.cf-dots-glow {
+  background-image:
+    radial-gradient(circle, rgba(82, 16, 0, 0.15) 1px, transparent 1px),
+    radial-gradient(ellipse at 30% 50%, rgba(255, 102, 51, 0.15) 0%, transparent 60%);
+  background-size: 20px 20px, 100% 100%;
+}

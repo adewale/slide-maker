@@ -38,6 +38,10 @@ The preset still controls:
 
 This means a cloudflare-preset deck for a project with green branding would still feel "warm, practical, workshop-ready" but with green accents instead of orange.
 
+## Scoped style rule
+
+Scoped styles (`<style scoped>`) must reference token variables (`var(--deck-bg)`, `var(--deck-fg)`, etc.), not override them with literal hex or rgb values. If a slide needs a palette variant (e.g., inverted section divider), define the variant as an additional CSS custom property in `styles/tokens.css` and reference that variable. Direct hex/rgb values in scoped styles are a token bypass and will be flagged by `tools/deck-lint.mjs`.
+
 ## editorial-dark
 
 Mood: serious, modern, restrained, high-trust.
@@ -275,6 +279,12 @@ Layout tendencies:
 - two-column comparisons (Agent vs AIChatAgent pattern)
 - inverted section dividers (dark bg, light text)
 - step-by-step workflow slides
+
+Background treatments:
+- dot pattern: `radial-gradient(circle, rgba(82, 16, 0, 0.15) 1px, transparent 1px) / 20px 20px`
+- gradient glow: `radial-gradient(ellipse at 30% 50%, rgba(255, 102, 51, 0.15) 0%, transparent 60%)`
+- combine dot + glow for high-impact section dividers
+- Use `.cf-dots`, `.cf-glow`, `.cf-dots-glow` utility classes in theme.css
 
 Motion:
 - medium reveals with slight translateY

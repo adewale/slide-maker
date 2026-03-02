@@ -22,6 +22,7 @@ Optimize for:
 - No dumping every bullet on screen at once — use `<v-clicks>` for progressive reveal
 - No same layout for every content slide — alternate between built-in layouts
 - No blanket `.slidev-layout { background }` overrides when using a non-default theme — let the theme control its own backgrounds
+- No hardcoded colors in scoped styles — always reference `var(--deck-*)` tokens. Literal hex/rgb values in `<style scoped>` blocks bypass the token system and cause palette drift.
 
 ## Inputs
 
@@ -209,6 +210,59 @@ Wrap bullet lists in `<v-clicks>` for progressive reveal:
 ```
 Use `v-click` on individual elements. Use `v-click.hide` to hide elements. Use `v-after` for simultaneous reveal with previous click.
 
+#### Code diff display
+
+Three Slidev-native mechanisms for showing code changes, in escalation order:
+
+**1. Line highlighting with click steps** — simplest, best for walkthrough:
+```
+```ts {1-3|5-7|all}
+// highlighted lines change on each click
+```
+```
+Use `[filename.ts]` bracket syntax to add a title bar header to the code block.
+
+**2. Magic Move** — animated code transformation between states:
+````
+````md magic-move
+```ts
+// Before
+const x = 1
+```
+```ts
+// After
+const x = computed(() => 1)
+```
+````
+````
+Best for refactoring demos, before/after, progressive code evolution.
+
+**3. Side-by-side diff** — two-cols layout with paired code blocks:
+```
+---
+layout: two-cols
+---
+```ts [before.ts]
+// old code
+```
+::right::
+```ts [after.ts]
+// new code
+```
+```
+Best for explicit comparison where both versions need to be visible simultaneously.
+
+**Escalation order:** line highlighting → Magic Move → two-cols side-by-side. Use the simplest mechanism that communicates the change clearly.
+
+#### Comparison grid tables
+
+CSS Grid-based comparison tables for feature matrices and multi-column comparisons:
+- Use CSS Grid (`grid-template-columns`) not HTML `<table>` for 3+ column comparisons
+- Use `var(--deck-*)` tokens for all colors
+- Maximum 4 columns, maximum 6 rows
+- Use Iconify icons for checkmarks (`<mdi-check />`, `<mdi-close />`) — never emoji
+- Header row should use `var(--deck-accent)` for emphasis
+
 ### 5b. Place visual evidence (project decks only)
 
 When source material includes screenshots, place them using the `visual-evidence` slide kind:
@@ -350,6 +404,15 @@ The through-line is how the deck holds together — not a tagline, but a concept
 - Never close with "Thanks", "Questions?", or a bare URL
 - The final impression should reinforce the deck's core insight
 
+### Presentation philosophy
+These compilation-affecting rules come from the full [PRESENTATION_PHILOSOPHY.md](../docs/PRESENTATION_PHILOSOPHY.md):
+- **One idea per slide** — 1-3 lines max. If you're scrolling, split it.
+- **Sustained metaphor** — the through-line's metaphor does analytical work, not decoration. It must bear weight across the whole deck.
+- **Dialectical progression** — decks are arguments (thesis → complication → synthesis), not outlines or feature lists.
+- **Text-dominant** — images only when demonstrative. Most slides are pure Markdown.
+- **Provocative openings** — never an agenda slide. Open with a question, epigraph, or bold declaration.
+- **Resonant closings** — never "Questions?" or "Thank you". Circle back, linger, or declare.
+
 ## Diagram guidelines
 
 ### Scale
@@ -377,6 +440,15 @@ The through-line is how the deck holds together — not a tagline, but a concept
 ### Layout collision prevention
 - For slides with both text and diagrams, use absolute positioning (`class: absolute`) or dedicated diagram-only slides
 - Prefer diagram-only slides over cramming text and diagrams together
+
+### Custom SVG diagram escalation
+When Mermaid can't achieve the needed visual (rounded cards, gradient borders, branded styling):
+1. **Mermaid first** — use it for all standard diagram types (flowchart, sequence, state, timeline, etc.)
+2. **Custom HTML/SVG** — escalate only when brand consistency requires it
+   - Use `var(--deck-*)` tokens for all colors — no hardcoded hex
+   - Keep SVG inline in the slide (no external .svg files)
+   - Prefer CSS Grid + styled `<div>` elements over raw `<svg>` when the diagram is a layout of cards/boxes
+   - Add a comment on the slide explaining the escalation reason: `<!-- Custom SVG: Mermaid can't render rounded branded cards -->`
 
 ## Animation guidelines
 
@@ -416,6 +488,7 @@ Copy into deck `components/` when needed:
 - **ImageFX** — CSS filter wrapper with `effect` prop (`duotone` | `vignette` | `grain` | `grayscale` | `sepia` | `none`)
 - **ShadowStack** — Multi-layer box-shadow with `preset` prop (`subtle` | `dramatic` | `glow` | `neon` | `long`)
 - **RevealPath** — CSS `offset-path` entrance with `path`, `duration`, `delay` props
+- **CornerCard** — Decorative corner marks with `size`, `thickness`, `color`, `padding` props. Defaults to deck accent color.
 
 ## Hover and cursor patterns
 
@@ -498,6 +571,7 @@ A compiled deck passes when:
 - at least one `v-motion` element in the deck
 - no slide overflows the viewport (7 bullet max, 8 code line max, 60 char bullet max)
 - at least one slide uses hover-interactive elements (data cards, code blocks, or comparison grids)
+- no `<style scoped>` block uses literal hex/rgb for `background` or `color` properties — must use `var(--deck-*)` token variables
 - (project decks) through-line appears in at least 3 slides, gaining new meaning each time
 - (project decks) source materials section lists at least 2 digested documents
 - (project decks) at least 1 visual evidence slide with real screenshot or terminal output (no placeholders)

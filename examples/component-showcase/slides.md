@@ -15,10 +15,12 @@ layout: cover
 Every layout, component, and feature this skill can produce.
 
 <style scoped>
-.slidev-layout { background: #0a0f0a; color: #e8f5e8; }
-h1 { color: #e8f5e8; }
-p { color: rgba(232, 245, 232, 0.6); }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+p { color: var(--deck-muted); }
 </style>
+
+<!-- This is a presenter note. It appears in Presenter Mode (press p) but is invisible to the audience. Use these for delivery cues, timing reminders, and talking points. This deck demonstrates presenter notes on key slides. -->
 
 ---
 layout: section
@@ -30,10 +32,12 @@ transition: fade
 Slidev ships 19 layouts. These are the ones that matter.
 
 <style scoped>
-.slidev-layout { background: #0d0118; color: #f0e6ff; }
-h1 { color: #f0e6ff; }
-p { color: rgba(240, 230, 255, 0.5); }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+p { color: var(--deck-muted); }
 </style>
+
+<!-- Pause here. Let the audience read the subtitle. This section covers 10 of the 19 built-in layouts — the ones most useful for project presentations. -->
 
 ---
 layout: statement
@@ -43,9 +47,11 @@ transition: slide-up
 # The statement layout demands attention
 
 <style scoped>
-.slidev-layout { background: #151008; color: #f5f0e8; }
-h1 { color: #f5f0e8; }
+.slidev-layout { background: var(--deck-bg-warm); color: var(--deck-fg-warm); }
+h1 { color: var(--deck-fg-warm); }
 </style>
+
+<!-- Statement is the "one big idea" layout. Use it for thesis slides, provocative questions, or moments where you want the audience to sit with a single thought. -->
 
 ---
 layout: center
@@ -57,9 +63,9 @@ transition: fade
 Use it for thesis slides, turning points, and transitions between major sections.
 
 <style scoped>
-.slidev-layout { background: #12100e; color: #f5f0eb; }
-h1 { color: #f5f0eb; }
-p { color: rgba(245, 240, 235, 0.5); }
+.slidev-layout { background: var(--deck-bg-warm); color: var(--deck-fg-warm); }
+h1 { color: var(--deck-fg-warm); }
+p { color: var(--deck-muted-warm); }
 </style>
 
 ---
@@ -78,10 +84,10 @@ transition: slide-left
 </v-clicks>
 
 <style scoped>
-.slidev-layout { background: #ffffff; color: #1a1a2e; }
-h1 { color: #1a1a2e; }
-strong { color: #f6821f; }
-ul li::marker { color: #f6821f; }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+strong { color: var(--deck-accent-alt); }
+ul li::marker { color: var(--deck-accent-alt); }
 </style>
 
 ---
@@ -91,15 +97,15 @@ transition: slide-up
 
 # 147
 
-Plant species
+Features demonstrated
 
-Garten grows them all from a single canvas element with zero dependencies.
+This showcase covers layouts, animations, diagrams, data components, transitions, and platform features across 46 slides.
 
 <style scoped>
-.slidev-layout { background: #fafdf7; color: #1b2e1b; }
-h1 { color: #2d8a4e !important; }
-p:first-of-type { color: rgba(27, 46, 27, 0.45); }
-p:last-of-type { color: #1b2e1b; }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-accent) !important; }
+p:first-of-type { color: var(--deck-muted); }
+p:last-of-type { color: var(--deck-fg); }
 </style>
 
 ---
@@ -109,12 +115,12 @@ transition: fade
 
 # "Good tools disappear into the workflow"
 
-The best photo indexer is the one you never think about. It just finds what you need.
+The best presentation tool is the one you never think about. It just builds what you need.
 
 <style scoped>
-.slidev-layout { background: #ffffff; color: #18181b; }
-h1 { color: #18181b; border-left-color: #ca8a04; }
-p { color: rgba(24, 24, 27, 0.45); }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); border-left-color: var(--deck-accent-alt); }
+p { color: var(--deck-muted); }
 </style>
 
 ---
@@ -149,10 +155,10 @@ transition: slide-left
 </v-clicks>
 
 <style scoped>
-.slidev-layout { background: #0f1219; color: #e2e8f0; }
-h1 { color: #e2e8f0; font-size: 1.75rem; }
-strong { color: #38bdf8; }
-ul li::marker { color: #38bdf8; }
+.slidev-layout { background: var(--deck-bg-slate); color: var(--deck-fg-slate); }
+h1 { color: var(--deck-fg-slate); font-size: 1.75rem; }
+strong { color: var(--deck-accent-slate); }
+ul li::marker { color: var(--deck-accent-slate); }
 </style>
 
 ---
@@ -189,11 +195,11 @@ transition: slide-up
 </v-clicks>
 
 <style scoped>
-.slidev-layout { background: #0f0a1e; color: #f0eef5; }
-h1 { color: #f0eef5; }
-h3 { color: #a78bfa; }
-strong { color: #a78bfa; }
-code { color: #fb923c; background: rgba(167, 139, 250, 0.1); }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+h3 { color: var(--deck-accent); }
+strong { color: var(--deck-accent); }
+code { color: var(--deck-accent-alt); background: rgba(167, 139, 250, 0.1); }
 </style>
 
 ---
@@ -208,9 +214,9 @@ An alternative to cover, designed for speaker introductions.
 Displays content with a left-aligned, editorial feel.
 
 <style scoped>
-.slidev-layout { background: #0f0a1e; color: #f0eef5; }
-h1 { color: #a78bfa; }
-p { color: rgba(240, 238, 245, 0.6); }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-accent); }
+p { color: var(--deck-muted); }
 </style>
 
 ---
@@ -247,11 +253,11 @@ transition: fade
 </v-clicks>
 
 <style scoped>
-.split-insight { background: #0f1219; color: #e2e8f0; }
-h1 { color: #e2e8f0; }
-h3 { color: #38bdf8; }
-.split-left { border-right-color: #38bdf8; }
-strong { color: #38bdf8; }
+.split-insight { background: var(--deck-bg-slate); color: var(--deck-fg-slate); }
+h1 { color: var(--deck-fg-slate); }
+h3 { color: var(--deck-accent-slate); }
+.split-left { border-right-color: var(--deck-accent-slate); }
+strong { color: var(--deck-accent-slate); }
 </style>
 
 ---
@@ -264,9 +270,9 @@ transition: slide-up
 Clicks, markers, motion, and code transforms.
 
 <style scoped>
-.slidev-layout { background: #0a0f0a; color: #e8f5e8; }
-h1 { color: #e8f5e8; }
-p { color: rgba(232, 245, 232, 0.5); }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+p { color: var(--deck-muted); }
 </style>
 
 ---
@@ -288,8 +294,8 @@ transition: slide-left
 <v-mark v-click type="bracket" color="#38bdf8">Bracket</v-mark> groups related text.
 
 <style scoped>
-.slidev-layout { background: #0f0a1e; color: #f0eef5; }
-h1 { color: #f0eef5; }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
 p { margin-bottom: 1rem; font-size: 1.2rem; }
 </style>
 
@@ -318,9 +324,9 @@ transition: fade
 </div>
 
 <style scoped>
-.slidev-layout { background: #0d0118; color: #f0e6ff; }
-h1 { color: #f0e6ff; }
-strong { color: #e040fb; }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+strong { color: var(--deck-accent); }
 </style>
 
 ---
@@ -329,37 +335,29 @@ transition: fade
 
 # v-switch: multi-state content
 
-<v-switch>
-<template #1>
+<v-clicks>
 
-### State 1: The problem
+### The problem
 
 Users needed a way to create presentations without leaving their code editor.
 
-</template>
-<template #2>
-
-### State 2: The approach
+### The approach
 
 Markdown-first. Vue-powered. Vite-compiled. Zero config.
 
-</template>
-<template #3>
-
-### State 3: The result
+### The result
 
 14 decks, 6 style presets, unlimited extensibility.
 
-</template>
-</v-switch>
+</v-clicks>
 
-Click to cycle through states. Each click replaces the content.
+Click to reveal each state. Progressive disclosure of a three-part narrative.
 
 <style scoped>
-.slidev-layout { background: #151008; color: #f5f0e8; }
-h1 { color: #f5f0e8; }
-h3 { color: #f59e0b; }
-p { color: rgba(245, 240, 232, 0.6); }
+.slidev-layout { background: var(--deck-bg-warm); color: var(--deck-fg-warm); }
+h1 { color: var(--deck-fg-warm); }
+h3 { color: var(--deck-accent-warm); }
+p { color: var(--deck-muted-warm); }
 </style>
 
 ---
@@ -400,8 +398,8 @@ const spec = {
 ````
 
 <style scoped>
-.slidev-layout { background: #0f1219; color: #e2e8f0; }
-h1 { color: #e2e8f0; }
+.slidev-layout { background: var(--deck-bg-slate); color: var(--deck-fg-slate); }
+h1 { color: var(--deck-fg-slate); }
 </style>
 
 ---
@@ -424,9 +422,9 @@ interface Slide {
 Line ranges separated by `|` reveal progressively on click. Line numbers highlight the active range.
 
 <style scoped>
-.slidev-layout { background: #12100e; color: #f5f0eb; }
-h1 { color: #f5f0eb; }
-p { color: rgba(245, 240, 235, 0.5); }
+.slidev-layout { background: var(--deck-bg-warm); color: var(--deck-fg-warm); }
+h1 { color: var(--deck-fg-warm); }
+p { color: var(--deck-muted-warm); }
 </style>
 
 ---
@@ -480,8 +478,8 @@ transition: fade
 </div>
 
 <style scoped>
-.slidev-layout { background: #0f0a1e; color: #f0eef5; }
-h1 { color: #f0eef5; }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
 </style>
 
 ---
@@ -505,8 +503,8 @@ This text is scaled to 75% using the Transform component. Useful for fitting den
 </Transform>
 
 <style scoped>
-.slidev-layout { background: #0f1219; color: #e2e8f0; }
-h1 { color: #e2e8f0; }
+.slidev-layout { background: var(--deck-bg-slate); color: var(--deck-fg-slate); }
+h1 { color: var(--deck-fg-slate); }
 </style>
 
 ---
@@ -519,9 +517,9 @@ transition: slide-left
 Flowcharts, timelines, state machines, and more.
 
 <style scoped>
-.slidev-layout { background: #151008; color: #f5f0e8; }
-h1 { color: #f5f0e8; }
-p { color: rgba(245, 240, 232, 0.5); }
+.slidev-layout { background: var(--deck-bg-warm); color: var(--deck-fg-warm); }
+h1 { color: var(--deck-fg-warm); }
+p { color: var(--deck-muted-warm); }
 </style>
 
 ---
@@ -542,8 +540,8 @@ graph TD
 ```
 
 <style scoped>
-.slidev-layout { background: #151008; color: #f5f0e8; }
-h1 { color: #f5f0e8; }
+.slidev-layout { background: var(--deck-bg-warm); color: var(--deck-fg-warm); }
+h1 { color: var(--deck-fg-warm); }
 </style>
 
 ---
@@ -562,8 +560,8 @@ timeline
 ```
 
 <style scoped>
-.slidev-layout { background: #0d0118; color: #f0e6ff; }
-h1 { color: #f0e6ff; }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
 </style>
 
 ---
@@ -576,9 +574,9 @@ transition: fade
 Six reusable Vue components for metrics, progress, and rankings.
 
 <style scoped>
-.slidev-layout { background: #fafdf7; color: #1b2e1b; }
-h1 { color: #1b2e1b; }
-p { color: rgba(27, 46, 27, 0.45); }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+p { color: var(--deck-muted); }
 </style>
 
 ---
@@ -595,10 +593,10 @@ transition: slide-left
 </div>
 
 <style scoped>
-.slidev-layout { background: #0f1219; color: #e2e8f0; }
-h1 { color: #e2e8f0; }
-.metric-card { border-color: #38bdf8; }
-.metric-card .metric-value { color: #38bdf8; }
+.slidev-layout { background: var(--deck-bg-slate); color: var(--deck-fg-slate); }
+h1 { color: var(--deck-fg-slate); }
+.metric-card { border-color: var(--deck-accent-slate); }
+.metric-card .metric-value { color: var(--deck-accent-slate); }
 </style>
 
 ---
@@ -614,10 +612,10 @@ transition: fade
 </StatGrid>
 
 <style scoped>
-.slidev-layout { background: #151008; color: #f5f0e8; }
-h1 { color: #f5f0e8; }
+.slidev-layout { background: var(--deck-bg-warm); color: var(--deck-fg-warm); }
+h1 { color: var(--deck-fg-warm); }
 .kpi-card { border-color: rgba(245, 158, 11, 0.2); background: rgba(245, 158, 11, 0.04); }
-.kpi-value { color: #f59e0b !important; }
+.kpi-value { color: var(--deck-accent-warm) !important; }
 </style>
 
 ---
@@ -634,11 +632,11 @@ transition: slide-left
 </div>
 
 <style scoped>
-.slidev-layout { background: #0a0f0a; color: #e8f5e8; }
-h1 { color: #e8f5e8; }
-.progress-fill { background: #39ff14; }
-.progress-value { color: #39ff14; }
-.progress-track { background: rgba(57, 255, 20, 0.08); }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+.progress-fill { background: var(--deck-accent); }
+.progress-value { color: var(--deck-accent); }
+.progress-track { background: rgba(167, 139, 250, 0.08); }
 </style>
 
 ---
@@ -654,11 +652,11 @@ transition: slide-up
 </div>
 
 <style scoped>
-.slidev-layout { background: #0d0118; color: #f0e6ff; }
-h1 { color: #f0e6ff; }
-.comparison-left { background: #e040fb; color: #0d0118; }
-.comparison-right { background: #00e5ff; color: #0d0118; }
-.comparison-label { color: rgba(240, 230, 255, 0.5); }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+.comparison-left { background: var(--deck-accent); }
+.comparison-right { background: var(--deck-accent-alt); }
+.comparison-label { color: var(--deck-muted); }
 </style>
 
 ---
@@ -672,10 +670,10 @@ transition: fade
 </div>
 
 <style scoped>
-.slidev-layout { background: #12100e; color: #f5f0eb; }
-h1 { color: #f5f0eb; }
-.rank-value { color: #fb923c; }
-.rank-fill { background: linear-gradient(90deg, #fb923c, #fb923c); }
+.slidev-layout { background: var(--deck-bg-warm); color: var(--deck-fg-warm); }
+h1 { color: var(--deck-fg-warm); }
+.rank-value { color: var(--deck-accent-alt); }
+.rank-fill { background: var(--deck-accent-alt); }
 .rank-track { background: rgba(251, 146, 60, 0.08); }
 </style>
 
@@ -689,9 +687,9 @@ transition: slide-left
 Syntax highlighting, LaTeX, and code groups.
 
 <style scoped>
-.slidev-layout { background: #0f1219; color: #e2e8f0; }
-h1 { color: #e2e8f0; }
-p { color: rgba(226, 232, 240, 0.5); }
+.slidev-layout { background: var(--deck-bg-slate); color: var(--deck-fg-slate); }
+h1 { color: var(--deck-fg-slate); }
+p { color: var(--deck-muted-slate); }
 </style>
 
 ---
@@ -713,43 +711,47 @@ $$
 $$
 
 <style scoped>
-.slidev-layout { background: #151008; color: #f5f0e8; }
-h1 { color: #f5f0e8; }
-p { color: rgba(245, 240, 232, 0.7); }
+.slidev-layout { background: var(--deck-bg-warm); color: var(--deck-fg-warm); }
+h1 { color: var(--deck-fg-warm); }
+p { color: var(--deck-muted-warm); }
 </style>
 
 ---
 transition: slide-left
 ---
 
-# Code groups: tabbed code blocks
+# v-click.hide and v-after
 
-```ts {all|1-3|5-7}
-// slides.md frontmatter
-const config = {
-  theme: 'default',
-  // add your own components
-  fonts: {
-    sans: 'Bricolage Grotesque',
-  },
-}
-```
+<div class="demo-area">
+  <div v-click.hide class="state-card before">
+    <h3>Before</h3>
+    <p>This card is visible initially and <v-mark v-click type="highlight" color="rgba(167, 139, 250, 0.2)">disappears on click</v-mark>.</p>
+  </div>
 
-```vue
-<script setup lang="ts"> // MetricCard.vue
-defineProps<{ label: string; value: string }>()
-</script>
-<template>
-<div class="metric-card">
-  <div class="label">{{ label }}</div>
-  <div class="value">{{ value }}</div>
-</div></template>
-```
+  <div v-after class="state-card after">
+    <h3>After</h3>
+    <p>This card appears at the <v-mark v-click type="underline" color="#fb923c">same moment</v-mark> using <code>v-after</code>.</p>
+  </div>
+</div>
+
+<v-click at="2">
+
+`v-click.hide` removes on click. `v-after` reveals with the previous click — no separate step.
+
+</v-click>
 
 <style scoped>
-.slidev-layout { background: #0f1219; color: #e2e8f0; }
-h1 { color: #e2e8f0; }
-p { color: rgba(226, 232, 240, 0.5); }
+.slidev-layout { background: var(--deck-bg-slate); color: var(--deck-fg-slate); }
+h1 { color: var(--deck-fg-slate); }
+p { color: var(--deck-muted-slate); }
+code { color: var(--deck-accent); background: rgba(167, 139, 250, 0.1); padding: 0.1em 0.3em; border-radius: 3px; font-size: 0.85em; }
+.demo-area { display: flex; gap: 2rem; margin-top: 2rem; }
+.state-card { flex: 1; padding: 1.5rem; border-radius: 12px; }
+.state-card.before { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); }
+.state-card.after { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); }
+.state-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+.state-card.before h3 { color: var(--deck-accent-alt); }
+.state-card.after h3 { color: var(--deck-accent); }
 </style>
 
 ---
@@ -773,9 +775,9 @@ This card can be repositioned during the presentation using v-drag.
 Drag elements and arrows reposition freely during your talk.
 
 <style scoped>
-.slidev-layout { background: #0d0118; color: #f0e6ff; }
-h1 { color: #f0e6ff; }
-p { color: rgba(240, 230, 255, 0.6); }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+p { color: var(--deck-muted); }
 </style>
 
 ---
@@ -802,9 +804,9 @@ Use `layout: full` for immersive visuals, large diagrams, or full-bleed backgrou
 </div>
 
 <style scoped>
-.slidev-layout { background: #0f0a1e; color: #f0eef5; }
-h1 { color: #f0eef5; position: absolute; top: 1rem; left: 2rem; }
-p { color: rgba(240, 238, 245, 0.6); }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); position: absolute; top: 1rem; left: 2rem; }
+p { color: var(--deck-muted); }
 </style>
 
 ---
@@ -829,9 +831,9 @@ transition: fade
 Adapt content, images, and diagrams to the viewer's preferred color scheme.
 
 <style scoped>
-.slidev-layout { background: #12100e; color: #f5f0eb; }
-h1 { color: #f5f0eb; }
-p { color: rgba(245, 240, 235, 0.5); margin-top: 1.5rem; }
+.slidev-layout { background: var(--deck-bg-warm); color: var(--deck-fg-warm); }
+h1 { color: var(--deck-fg-warm); }
+p { color: var(--deck-muted-warm); margin-top: 1.5rem; }
 </style>
 
 ---
@@ -844,9 +846,9 @@ transition: slide-left
 Table of contents, slide imports, and global layers.
 
 <style scoped>
-.slidev-layout { background: #0a0f0a; color: #e8f5e8; }
-h1 { color: #e8f5e8; }
-p { color: rgba(232, 245, 232, 0.5); }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+p { color: var(--deck-muted); }
 </style>
 
 ---
@@ -860,11 +862,11 @@ transition: fade
 The `<Toc>` component auto-generates navigation from slide titles. Props: `columns`, `maxDepth`, `mode`.
 
 <style scoped>
-.slidev-layout { background: #0f1219; color: #e2e8f0; }
-h1 { color: #e2e8f0; }
-p { color: rgba(226, 232, 240, 0.5); margin-top: 1rem; font-size: 0.8rem; }
+.slidev-layout { background: var(--deck-bg-slate); color: var(--deck-fg-slate); }
+h1 { color: var(--deck-fg-slate); }
+p { color: var(--deck-muted-slate); margin-top: 1rem; font-size: 0.8rem; }
 :deep(.slidev-toc) { font-size: 0.65rem; line-height: 1.4; }
-:deep(.slidev-toc a) { color: #e2e8f0; }
+:deep(.slidev-toc a) { color: var(--deck-fg-slate); }
 </style>
 
 ---
@@ -883,12 +885,12 @@ transition: fade
 | `RankList` | `items` `suffix?` | Ordered bar chart |
 
 <style scoped>
-.slidev-layout { background: #ffffff; color: #1a1a2e; }
-h1 { color: #1a1a2e; }
-th { color: #f6821f; border-bottom-color: #f6821f; }
-td { color: #1a1a2e; border-bottom-color: rgba(26, 26, 46, 0.1); }
-code { color: #f6821f; background: rgba(246, 130, 31, 0.08); }
-p { color: rgba(26, 26, 46, 0.6); }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+th { color: var(--deck-accent-alt); border-bottom-color: var(--deck-accent-alt); }
+td { color: var(--deck-fg); border-bottom-color: rgba(240, 238, 245, 0.1); }
+code { color: var(--deck-accent-alt); background: rgba(251, 146, 60, 0.08); }
+p { color: var(--deck-muted); }
 </style>
 
 ---
@@ -901,9 +903,9 @@ transition: iris
 Named CSS transitions for slide-level drama.
 
 <style scoped>
-.slidev-layout { background: #0f0a1e; color: #f0eef5; }
-h1 { color: #f0eef5; }
-p { color: rgba(240, 238, 245, 0.5); }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+p { color: var(--deck-muted); }
 </style>
 
 ---
@@ -923,10 +925,10 @@ Scale, blur, and opacity combine for a smooth morphing entrance. Set `transition
 </v-clicks>
 
 <style scoped>
-.slidev-layout { background: #0d0118; color: #f0e6ff; }
-h1 { color: #f0e6ff; }
-strong { color: #e040fb; }
-ul li::marker { color: #e040fb; }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+strong { color: var(--deck-accent); }
+ul li::marker { color: var(--deck-accent); }
 </style>
 
 ---
@@ -946,10 +948,10 @@ Content scales from 60% to full size with a fade. Ideal for reveals and dramatic
 </v-clicks>
 
 <style scoped>
-.slidev-layout { background: #151008; color: #f5f0e8; }
-h1 { color: #f5f0e8; }
-strong { color: #f59e0b; }
-ul li::marker { color: #f59e0b; }
+.slidev-layout { background: var(--deck-bg-warm); color: var(--deck-fg-warm); }
+h1 { color: var(--deck-fg-warm); }
+strong { color: var(--deck-accent-warm); }
+ul li::marker { color: var(--deck-accent-warm); }
 </style>
 
 ---
@@ -969,10 +971,10 @@ A 3D card flip around the Y axis. Adds depth and surprise between contrasting vi
 </v-clicks>
 
 <style scoped>
-.slidev-layout { background: #0f1219; color: #e2e8f0; }
-h1 { color: #e2e8f0; }
-strong { color: #38bdf8; }
-ul li::marker { color: #38bdf8; }
+.slidev-layout { background: var(--deck-bg-slate); color: var(--deck-fg-slate); }
+h1 { color: var(--deck-fg-slate); }
+strong { color: var(--deck-accent-slate); }
+ul li::marker { color: var(--deck-accent-slate); }
 </style>
 
 ---
@@ -985,9 +987,9 @@ transition: wipe-right
 GlassCard, ShadowStack, ImageFX, and more.
 
 <style scoped>
-.slidev-layout { background: #0a0f0a; color: #e8f5e8; }
-h1 { color: #e8f5e8; }
-p { color: rgba(232, 245, 232, 0.5); }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+p { color: var(--deck-muted); }
 </style>
 
 ---
@@ -1008,10 +1010,10 @@ transition: glide
 </div>
 
 <style scoped>
-.slidev-layout { background: linear-gradient(135deg, #0f0a1e 0%, #1a0a2e 50%, #0f0a1e 100%); color: #f0eef5; }
-h1 { color: #f0eef5; }
-h3 { color: #a78bfa; font-size: 1rem; margin-bottom: 0.5rem; }
-p { color: rgba(240, 238, 245, 0.6); font-size: 0.85rem; }
+.slidev-layout { background: linear-gradient(135deg, var(--deck-bg) 0%, color-mix(in srgb, var(--deck-bg) 70%, var(--deck-accent) 30%) 50%, var(--deck-bg) 100%); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+h3 { color: var(--deck-accent); font-size: 1rem; margin-bottom: 0.5rem; }
+p { color: var(--deck-muted); font-size: 0.85rem; }
 </style>
 
 ---
@@ -1033,8 +1035,8 @@ transition: blur
 </div>
 
 <style scoped>
-.slidev-layout { background: #0f0a1e; color: #f0eef5; }
-h1 { color: #f0eef5; }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
 .demo-card {
   background: rgba(167, 139, 250, 0.08);
   border: 1px solid rgba(167, 139, 250, 0.2);
@@ -1053,31 +1055,52 @@ transition: fade
 
 # Keyboard shortcuts: press ?
 
-Press <kbd>?</kbd> at any time to open the keyboard help panel. It shows all navigation, view, and tool shortcuts in a three-column grid.
+<div class="help-grid">
+  <div class="help-col" v-click>
+    <h3>Navigation</h3>
+    <div class="shortcut"><kbd>&rarr;</kbd> / <kbd>Space</kbd> <span>Next slide</span></div>
+    <div class="shortcut"><kbd>&larr;</kbd> <span>Previous slide</span></div>
+    <div class="shortcut"><kbd>&uarr;</kbd> <span>Previous click</span></div>
+    <div class="shortcut"><kbd>&darr;</kbd> <span>Next click</span></div>
+    <div class="shortcut"><kbd>Home</kbd> <span>First slide</span></div>
+  </div>
+  <div class="help-col" v-click>
+    <h3>View</h3>
+    <div class="shortcut"><kbd>o</kbd> <span>Slide overview</span></div>
+    <div class="shortcut"><kbd>d</kbd> <span>Toggle dark mode</span></div>
+    <div class="shortcut"><kbd>f</kbd> <span>Fullscreen</span></div>
+    <div class="shortcut"><kbd>g</kbd> <span>Go to slide</span></div>
+    <div class="shortcut"><kbd>Esc</kbd> <span>Close overlays</span></div>
+  </div>
+  <div class="help-col" v-click>
+    <h3>Tools</h3>
+    <div class="shortcut"><kbd>p</kbd> <span>Presenter mode</span></div>
+    <div class="shortcut"><kbd>?</kbd> <span>This panel</span></div>
+    <div class="shortcut"><kbd>e</kbd> <span>Pen / drawing</span></div>
+    <div class="shortcut"><kbd>u</kbd> <span>Pen color</span></div>
+    <div class="shortcut"><kbd>Del</kbd> <span>Clear drawings</span></div>
+  </div>
+</div>
 
-<v-clicks>
-
-- <kbd>?</kbd> toggles the overlay
-- <kbd>Escape</kbd> closes it
-- Works in both viewer and presenter modes
-
-</v-clicks>
+<!-- The KeyboardHelp component renders this as a full-screen overlay triggered by pressing ?. Here we show its content inline so the feature is visible without interaction. -->
 
 <style scoped>
-.slidev-layout { background: #12100e; color: #f5f0eb; }
-h1 { color: #f5f0eb; }
-p { color: rgba(245, 240, 235, 0.7); }
-strong { color: #fb923c; }
-ul li::marker { color: #fb923c; }
+.slidev-layout { background: var(--deck-bg-warm); color: var(--deck-fg-warm); }
+h1 { color: var(--deck-fg-warm); }
+.help-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 1.5rem; }
+.help-col h3 {
+  font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--deck-accent-alt); margin-bottom: 0.6rem;
+}
+.shortcut {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.75rem; color: var(--deck-muted-warm); margin-bottom: 0.35rem;
+}
+.shortcut span { margin-left: auto; white-space: nowrap; }
 kbd {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.1em 0.4em;
-  font-family: var(--deck-font-mono);
-  font-size: 0.85em;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 4px;
+  display: inline-flex; align-items: center; justify-content: center; min-width: 1.5em;
+  padding: 0.1em 0.4em; font-family: var(--deck-font-mono); font-size: 0.75rem;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px;
 }
 </style>
 
@@ -1091,7 +1114,7 @@ transition: fade
 13 decks. 6 presets. 46 slides. Every feature.
 
 <style scoped>
-.slidev-layout { background: #0f0a1e; color: #f0eef5; }
-h1 { color: #f0eef5; }
-p { color: #fb923c; }
+.slidev-layout { background: var(--deck-bg); color: var(--deck-fg); }
+h1 { color: var(--deck-fg); }
+p { color: var(--deck-accent-alt); }
 </style>

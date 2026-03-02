@@ -478,6 +478,98 @@ function lintDeck(deckDir) {
     }
   }
 
+  // ─── 8. Token bypass detection in scoped styles ────────────────
+
+  // Extract all <style scoped> blocks from slides.md
+  const scopedBlocks = [...slidesMd.matchAll(/<style\s+scoped\s*>([\s\S]*?)<\/style>/g)];
+
+  if (scopedBlocks.length > 0) {
+    // Rule 1: Token bypass — hardcoded hex/rgb in background or color properties
+    // Only match standalone "background" and "color" properties, not border-color etc.
+    let bypassCount = 0;
+    for (const block of scopedBlocks) {
+      const css = block[1];
+      const offset = slidesMd.slice(0, block.index).split('\n').length;
+      const lines = css.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        // Skip comment lines
+        if (/^\s*\/[/*]/.test(line)) continue;
+        // Match only standalone background or color (not border-color, outline-color, etc.)
+        const propMatch = line.match(/(?:^|[{;\s])(background|color)\s*:\s*(.+)/i);
+        if (!propMatch) continue;
+        // Ensure we didn't match a hyphenated prefix (e.g., border-color, background-color)
+        const matchStart = line.indexOf(propMatch[0]);
+        if (matchStart > 0 && line[matchStart] !== '{' && line[matchStart] !== ';' && !/\s/.test(line[matchStart])) {
+          // Could be part of a longer property name — check char before match
+          const charBefore = line[matchStart - 1];
+          if (charBefore === '-') continue;
+        }
+        const value = propMatch[2];
+        // Skip if the value contains var() references (mixed usage is acceptable)
+        if (/var\(/.test(value)) continue;
+        // Check for literal hex (#xxx, #xxxxxx, #xxxxxxxx)
+        if (/#[0-9a-fA-F]{3,8}\b/.test(value)) {
+          warns.push(`token bypass: hardcoded hex in scoped style near line ${offset + i + 1} — use var(--deck-*) instead`);
+          bypassCount++;
+        }
+        // Check for literal rgb/rgba — skip decorative tints (background with opacity < 0.2)
+        if (/rgba?\s*\(/.test(value)) {
+          const prop = propMatch[1].toLowerCase();
+          const opacityMatch = value.match(/rgba\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*,\s*([\d.]+)\s*\)/);
+          if (prop === 'background' && opacityMatch && parseFloat(opacityMatch[1]) < 0.2) {
+            // Decorative tint on background — not a palette bypass
+            continue;
+          }
+          warns.push(`token bypass: hardcoded rgb in scoped style near line ${offset + i + 1} — use var(--deck-*) instead`);
+          bypassCount++;
+        }
+      }
+    }
+    if (bypassCount > 0) {
+      info.push(`${bypassCount} token bypass warning(s) in scoped styles`);
+    }
+
+    // Rule 2: Low-opacity contrast check (text color properties only)
+    const colorSchema = fm?.colorSchema || 'dark';
+    const opacityThreshold = colorSchema === 'light' ? 0.6 : 0.5;
+    for (const block of scopedBlocks) {
+      const css = block[1];
+      const offset = slidesMd.slice(0, block.index).split('\n').length;
+      // Split CSS into individual declarations for accurate property matching
+      const declarations = css.replace(/\{/g, ';\n').replace(/\}/g, ';\n').split(';');
+      let lineAccum = 0;
+      for (const decl of declarations) {
+        const trimmed = decl.trim();
+        lineAccum += (decl.match(/\n/g) || []).length;
+        // Only check standalone "color:" declarations (not border-color, background, etc.)
+        const colorMatch = trimmed.match(/^color\s*:\s*(.+)/i);
+        if (!colorMatch) continue;
+        const value = colorMatch[1];
+        const rgbaMatches = [...value.matchAll(/rgba\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*,\s*([\d.]+)\s*\)/g)];
+        for (const m of rgbaMatches) {
+          const opacity = parseFloat(m[1]);
+          if (opacity < opacityThreshold) {
+            warns.push(`low-opacity rgba (${opacity}) near line ${offset + lineAccum + 1} may fail WCAG AA contrast (${colorSchema} scheme threshold: ${opacityThreshold})`);
+          }
+        }
+      }
+    }
+
+    // Rule 3: Palette consistency — too many distinct hardcoded backgrounds
+    const bgColors = new Set();
+    for (const block of scopedBlocks) {
+      const css = block[1];
+      const bgMatches = [...css.matchAll(/background\s*:\s*(#[0-9a-fA-F]{3,8})/gi)];
+      for (const m of bgMatches) {
+        bgColors.add(m[1].toLowerCase());
+      }
+    }
+    if (bgColors.size > 3) {
+      warns.push(`palette drift: ${bgColors.size} distinct hardcoded background colors across scoped styles (max 3 recommended) — use token variants instead`);
+    }
+  }
+
   return { name, errors, warns, info };
 }
 
