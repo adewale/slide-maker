@@ -16,6 +16,7 @@ Consult these during execution:
 - [SLIDE_KINDS.md](SLIDE_KINDS.md) — canonical slide types and escalation rules
 - [COMPILER_RULES.md](COMPILER_RULES.md) — compilation phases and acceptance checklist
 - [STYLE_PRESETS.md](STYLE_PRESETS.md) — visual direction presets (editorial-dark, swiss-minimal, bold-modern, sumi-e, tufte-data, cloudflare, material-design)
+- [PROJECT_DECK_RUBRIC.md](../docs/PROJECT_DECK_RUBRIC.md) — scoring guide for project decks (source material depth, through-line, visual evidence)
 
 ## Scope
 
@@ -86,7 +87,16 @@ In order:
 ### 1. Determine mode
 New project or update.
 
-### 2. Intake
+### 2. Gather source material (project decks only)
+When the deck presents a project (has a `project-url` or references a codebase):
+- Read the project's README, ARCHITECTURE, CHANGELOG, and LESSONS_LEARNED documents.
+- Collect screenshots or terminal output from the running project.
+- Extract a candidate through-line from the source material.
+- Note specific numbers, code snippets, and quotes for use in slides.
+
+See COMPILER_RULES.md Phase 1 for the full source-material lookup table.
+
+### 3. Intake
 Normalize:
 - title
 - goal
@@ -97,9 +107,11 @@ Normalize:
 - source material
 - brand constraints
 - notes requirement
+- through-line (project decks — concept, type, planned appearances)
+- project-url (project decks — triggers source material gathering and project color extraction)
 - current project constraints if updating
 
-### 3. Style direction
+### 4. Style direction
 Offer 2 or 3 directions in words only.
 Each direction should specify:
 - preset or mood
@@ -109,10 +121,10 @@ Each direction should specify:
 - motion character
 - expected abstraction density
 
-### 4. Write or revise `deck.spec.md`
+### 5. Write or revise `deck.spec.md`
 Do this before implementation-heavy changes.
 
-### 5. Compile the project
+### 6. Compile the project
 Generate or update:
 - `slides.md`
 - styles
@@ -120,7 +132,7 @@ Generate or update:
 - components
 - README if the project usage changed
 
-### 6. Validate
+### 7. Validate
 Before finishing, check:
 - `deck.spec.md` matches `slides.md`
 - slide density is controlled
@@ -181,3 +193,7 @@ A good result has:
 - obvious hierarchy
 - no crowded slides
 - no legacy HTML smell
+- (project decks) through-line present in 5+ slides, gaining meaning each time
+- (project decks) source materials digested and cited in slides (real code, real numbers, real quotes)
+- (project decks) at least 1 visual evidence slide with real screenshots
+- (project decks) project colors override preset palette tokens

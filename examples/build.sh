@@ -31,6 +31,7 @@ declare -a DECKS=(
   "tufte:tufte"
   "material:material"
   "cloudflare:cloudflare"
+  "durable-objects:durable-objects"
 )
 
 for entry in "${DECKS[@]}"; do

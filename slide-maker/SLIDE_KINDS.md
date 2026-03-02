@@ -67,6 +67,18 @@ Default target: Markdown or one local layout if the shell repeats.
 Use for phased plans or a simple roadmap.
 Default target: Markdown list first, local layout only when the visual timeline materially helps.
 
+### visual-evidence
+Use for real project screenshots or terminal output that prove the project works.
+Default target: built-in `image-right` or `image-left`.
+Required: `image`, `alt`. Never use placeholders — only real screenshots from the running project.
+Escalate only for a recurring screenshot treatment with consistent framing.
+
+### through-line-echo
+Use to resurface the deck's through-line mid-deck.
+Default target: built-in `section` or `center`.
+Max 2-3 per deck. The through-line should gain new meaning each time it appears — never repeat the exact same phrasing.
+Escalate only if the through-line requires a unique visual treatment.
+
 ## Density guardrails
 
 - one idea per slide
