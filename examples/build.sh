@@ -20,17 +20,13 @@ declare -a DECKS=(
   "demo:slide-maker"
   "vaders:vaders"
   "planet-cf:planet-cf"
-  "keyboardia:keyboardia"
-  "garten:garten"
   "claude-history-explorer:claude-history-explorer"
   "geist-fabrik:geist-fabrik"
   "olsen:olsen"
   "tasche:tasche"
-  "component-showcase:component-showcase"
   "sumi-e:sumi-e"
   "tufte:tufte"
   "material:material"
-  "cloudflare:cloudflare"
   "durable-objects:durable-objects"
 )
 

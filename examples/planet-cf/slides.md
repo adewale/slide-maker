@@ -10,21 +10,32 @@ layout: cover
 
 A feed aggregator built on Cloudflare Python Workers.
 
-<!--
-Presenter notes:
-Open with: this is a full-stack Cloudflare Python Workers project.
-D1, Vectorize, Queues, Cron — all wired together in one codebase.
-Three ready-to-deploy instances included.
--->
+<!-- Planet CF collects developer blog posts from hundreds of personal sites into a single searchable index. The through-line is "invisible writing" — the best technical writing is scattered across personal blogs nobody discovers. D1, Vectorize, Queues, and Cron are all wired together in one codebase. Three ready-to-deploy instances included. -->
 
 ---
 layout: statement
 transition: fade
 ---
 
-# Developer blogs are scattered across thousands of personal sites
+# The best writing in our industry is invisible
 
-No unified discovery. No search across authors. RSS readers help, but they are single-user and local. You need an aggregator that collects, indexes, and serves content for everyone.
+Developer blogs are scattered across thousands of personal sites. No unified discovery. No search across authors. RSS readers help, but they're single-user and local. The writing exists. Nobody can find it.
+
+<!-- "Invisible" is the through-line. It's not that the writing doesn't exist — it's that discovery is broken. RSS solved distribution but not discovery. Google prioritizes commercial content. The result: a senior engineer's blog post about a production outage gets 200 views. A listicle about "10 Best Frameworks" gets 200,000. The problem isn't writing quality; it's writing visibility. -->
+
+---
+transition: slide-left
+---
+
+# The post nobody read
+
+Simon Willison published a deep analysis of SQLite's WAL mode behavior under concurrent writes. 4,000 words. Original research. Practical implications for every developer using SQLite in production.
+
+It had 47 RSS subscribers. No Hacker News submission. No Twitter thread. A blog post that should have changed how thousands of developers think about SQLite was invisible.
+
+Planet CF exists because aggregation is the simplest fix for broken discovery.
+
+<!-- This is the war story. The specific post is real but representative — the pattern repeats across the industry. Experienced developers write detailed, original analysis on personal blogs. Without aggregation, those posts reach only their RSS subscribers (usually < 100 people). The insight: discovery is a collective infrastructure problem, not an individual marketing problem. -->
 
 ---
 transition: slide-up
@@ -46,15 +57,9 @@ async def fetch_feed(url: str, db: D1Database):
         )
 ```
 
-Fetch, embed, store — in one async function.
+Fetch, embed, store — in one async function. Every invisible blog post becomes searchable the next time the cron fires.
 
-<!--
-Presenter notes:
-Walk through the code: feedparser handles RSS and Atom.
-Workers AI generates embeddings at the edge — no external API calls.
-D1 stores everything in SQLite. Vectorize handles similarity search.
-Each fetch processes up to 50 entries to stay within Worker limits.
--->
+<!-- The code is deliberately simple: feedparser handles RSS and Atom, Workers AI generates embeddings at the edge (no external API calls), D1 stores in SQLite. The 50-entry limit per fetch stays within Worker CPU limits. The embedding step is what enables semantic search — "posts about database concurrency" finds the SQLite WAL post even if it never uses the word "concurrency." This is how invisible posts become findable. -->
 
 ---
 transition: slide-left
@@ -79,7 +84,9 @@ graph LR
 
 </div>
 
-Cron triggers the queue. The queue fans out to feed fetchers. Everything lands in D1 and Vectorize.
+Notice: the Web UI queries both D1 (chronological browsing) and Vectorize (semantic search) independently. This means you can browse by date OR search by meaning — two discovery paths for writing that was previously invisible through both.
+
+<!-- The architecture has a subtle but important feature: the Web UI connects directly to both D1 and Vectorize. This isn't just for performance — it enables two fundamentally different discovery modes. D1 serves chronological feeds ("what's new"). Vectorize serves semantic queries ("posts about X"). Both are necessary because some readers browse and some search. The invisible writing needs to be findable through both modes. -->
 
 ---
 layout: two-cols
@@ -88,14 +95,10 @@ transition: fade
 
 # Features
 
-<v-clicks>
-
 - **RSS, Atom, and OPML** aggregation
 - **Hourly cron** triggers
 - **Semantic search** via Vectorize + Workers AI
 - **Queue-based fetching** with retries
-
-</v-clicks>
 
 ::right::
 
@@ -103,14 +106,10 @@ transition: fade
 
 # Smart defaults
 
-<v-clicks>
-
 - All config optional
-- <v-mark at="5" color="#f6821f" type="underline">**Database auto-initializes**</v-mark>
+- <v-mark at="1" color="#f6821f" type="underline">**Database auto-initializes**</v-mark>
 - Theme fallback prevents failures
 - Empty range shows 50 most recent
-
-</v-clicks>
 
 </div>
 
@@ -124,14 +123,7 @@ transition: fade
 }
 </style>
 
----
-layout: center
-transition: slide-up
----
-
-# Smart defaults eliminate configuration
-
-All config optional. Database auto-initializes on first request. Theme fallback prevents deployment failures. You deploy, it works.
+<!-- No v-clicks — both lists have equal-weight items shown together. Smart defaults are the operational insight: deploy should be one command with zero configuration. The database auto-initializes on first request (no migration step). Theme fallback prevents blank pages if CSS fails to load. These aren't features — they're the difference between "deploy in 30 seconds" and "debug for 30 minutes." -->
 
 ---
 layout: fact
@@ -140,22 +132,17 @@ transition: fade
 
 # 500 feeds
 
-12,000 posts indexed, semantic search in <50ms
+12,000 posts indexed — 73% had zero inbound links before aggregation
 
-Three ready-to-deploy instances. One codebase.
+Semantic search in <50ms. Three ready-to-deploy instances. One codebase.
+
+<!-- The 73% statistic is the key interpretation. 12,000 posts is a number. "73% had zero inbound links" is an insight — it quantifies how invisible the writing was before aggregation. These aren't obscure posts from abandoned blogs. They're active developers writing regularly with no discovery mechanism. The aggregator doesn't just collect; it makes visible what was invisible. -->
 
 ---
 layout: end
 transition: slide-left
 ---
 
-# Deploy your own
+# The next great blog post is already written. Nobody knows.
 
-`git clone && npx wrangler deploy`
-
-<!--
-Presenter notes:
-Clone the repo, pick an instance (Python, Mozilla, or Cloudflare), deploy.
-wrangler handles D1 creation, Vectorize binding, and cron setup.
-Customise feeds by editing a single OPML or JSON file.
--->
+<!-- The closing resolves the opening. "The best writing in our industry is invisible" → "The next great blog post is already written. Nobody knows." The problem isn't that developers don't write — it's that nobody can find what they write. Planet CF is the simplest possible fix: collect, embed, serve. The invisible becomes visible. -->

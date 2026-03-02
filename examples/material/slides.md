@@ -14,11 +14,11 @@ fonts:
 
 # Keyboardia
 
-10 players. 64 instruments. One room.
+10 players. 64 instruments. One room. Everyone hears the same music.
 
 </div>
 
-<!-- This deck follows a war stories structure: we open with the product vision, walk through the battles we fought building real-time multiplayer audio in the browser, and close with three hard-won lessons. The arc is: promise, pain, payoff. -->
+<!-- This deck follows a war stories structure: we open with the product vision ("everyone hears the same music"), walk through the battles we fought building real-time multiplayer audio in the browser, and close by resolving the promise. The arc is: promise, pain, payoff. "Everyone hears the same music" is the through-line — stated here, threatened by every bug, and resolved in the closing. -->
 
 ---
 layout: MaterialSlide
@@ -49,7 +49,7 @@ Unlimited polyphony caused audio dropouts on mobile. Safari caps at ~32 concurre
 
 </div>
 
-<!-- Three battle scars from Web Audio API: gain staging causes clipping with multiple voices, AudioBufferSourceNodes leak memory because they are single-use, and Safari caps polyphony around 32 sources. Each of these shipped as a production bug before we understood the underlying constraint. The pattern: browser APIs have undocumented limits that only surface under real load. -->
+<!-- Three battle scars from Web Audio API: gain staging causes clipping with multiple voices, AudioBufferSourceNodes leak memory because they are single-use, and Safari caps polyphony around 32 sources. Each of these shipped as a production bug before we understood the underlying constraint. The pattern: browser APIs have undocumented limits that only surface under real load. Every one of these bugs meant someone, somewhere, was not hearing the same music. -->
 
 ---
 transition: slide-up
@@ -68,7 +68,9 @@ graph LR
   class UI,WS,KV,WS2,P svc
 ```
 
-Cloudflare Durable Objects as authoritative session state. Every mutation broadcasts to all connected players.
+Notice: all audio synthesis happens client-side. The Durable Object is a state relay, not an audio engine. This asymmetry is why latency stays under 50ms — the DO only needs to sync pattern data (tiny), not audio buffers (huge).
+
+<!-- The architecture looks like a standard hub-and-spoke but the insight is in what the DO does NOT do: it never touches audio. Every previous attempt at collaborative music tools tried to mix audio on the server. That path leads to unbounded latency. The DO syncs patterns (which steps are active, which instruments are loaded). Audio synthesis happens locally on each client via Web Audio API. -->
 
 ---
 layout: MaterialSlide
@@ -101,11 +103,11 @@ What persists and syncs. `{ tempo, swing, tracks }` in the Durable Object. If a 
 
 <v-click>
 
-A feature is not done until all three surfaces support it. We rolled back reverb and delay because they existed only in the API.
+A feature is not done until all three surfaces support it. We rolled back reverb and delay because they existed only in the API — two players would hear different effects.
 
 </v-click>
 
-<!-- The three-surface framework is the core design insight: API surface (what the code can do), UI surface (what users can control), and session state (what persists and syncs). A feature is incomplete if it exists in fewer than all three. We actually rolled back reverb and delay because they only had API support -- users could not control them and they did not sync across players. -->
+<!-- The three-surface framework is the core design insight. A feature is incomplete if it exists in fewer than all three surfaces. We actually rolled back reverb and delay because they only had API support — users couldn't control them and they didn't sync. The consequence: two players in the same room heard different music. That violates the core promise. -->
 
 <style>
 .card-grid > div {
@@ -139,9 +141,11 @@ setTimeout(() => {
 
 <v-click>
 
-Fix: use `alarm()` API for critical scheduled work. Alarms persist across hibernation cycles.
+Fix: use `alarm()` API for critical scheduled work. Alarms persist across hibernation cycles. Without this fix, players would reconnect to a room where the music had silently stopped.
 
 </v-click>
+
+<!-- The hibernation bug was the hardest to diagnose because it was intermittent. During development, the DO never hibernated (constant WebSocket activity). In production, idle rooms would hibernate, and when the next player joined, the scheduled broadcast was gone. The room was alive but the music was dead. Switching to alarm() fixed it because alarms are infrastructure-grade — they survive hibernation, eviction, and process restarts. -->
 
 ---
 layout: MaterialSlide
@@ -152,24 +156,22 @@ transition: fade
 
 <div class="chip-group">
 
-<v-click><MDChip label="XSS prevention" selected /></v-click>
-<v-click><MDChip label="Reconnection jitter" /></v-click>
-<v-click><MDChip label="Offline queues" /></v-click>
-<v-click><MDChip label="State hash mismatch" /></v-click>
-<v-click><MDChip label="Duplicate track IDs" /></v-click>
-<v-click><MDChip label="KV/DO divergence" /></v-click>
-<v-click><MDChip label="Connection storms" /></v-click>
-<v-click><MDChip label="Client timeouts" /></v-click>
+<MDChip label="XSS prevention" selected />
+<MDChip label="Reconnection jitter" />
+<MDChip label="Offline queues" />
+<MDChip label="State hash mismatch" />
+<MDChip label="Duplicate track IDs" />
+<MDChip label="KV/DO divergence" />
+<MDChip label="Connection storms" />
+<MDChip label="Client timeouts" />
 
 </div>
 
-<v-click>
-
 <MDCard variant="filled" style="margin-top: 1rem;">
-User-controlled fields (session names, player names) are attack surfaces. Track IDs generated client-side can collide. KV and Durable Object state can diverge after failed writes. Reconnection without jitter causes thundering herds. Every lesson was earned in production.
+User-controlled fields (session names, player names) are attack surfaces. Track IDs generated client-side can collide. KV and Durable Object state can diverge after failed writes. Reconnection without jitter causes thundering herds. Every one of these bugs meant someone was hearing different music — or no music at all.
 </MDCard>
 
-</v-click>
+<!-- Eight production bugs, each discovered after deployment. The chips are shown statically because their individual revelation isn't the point — the density is. The summary card ties them back to the through-line: every bug is a way the "everyone hears the same music" promise can break. -->
 
 ---
 layout: MaterialSlide
@@ -180,51 +182,39 @@ transition: slide-up
 
 <div class="metric-row">
 
-<v-click>
 <MDSurface :level="1">
 <div style="text-align: center;">
 <div style="font-family: var(--deck-font-display); font-size: 2.2rem; font-weight: 800; color: var(--deck-primary);">64</div>
 <div style="font-size: 0.82rem; color: var(--deck-muted);">Instruments</div>
 </div>
 </MDSurface>
-</v-click>
 
-<v-click>
 <MDSurface :level="1">
 <div style="text-align: center;">
 <div style="font-family: var(--deck-font-display); font-size: 2.2rem; font-weight: 800; color: var(--deck-primary);">10</div>
 <div style="font-size: 0.82rem; color: var(--deck-muted);">Simultaneous players</div>
 </div>
 </MDSurface>
-</v-click>
 
-<v-click>
 <MDSurface :level="1">
 <div style="text-align: center;">
 <div style="font-family: var(--deck-font-display); font-size: 2.2rem; font-weight: 800; color: var(--deck-primary);">18</div>
 <div style="font-size: 0.82rem; color: var(--deck-muted);">Lessons learned</div>
 </div>
 </MDSurface>
-</v-click>
 
-<v-click>
 <MDSurface :level="1">
 <div style="text-align: center;">
 <div style="font-family: var(--deck-font-display); font-size: 2.2rem; font-weight: 800; color: var(--deck-primary);">0</div>
 <div style="font-size: 0.82rem; color: var(--deck-muted);">Server-side audio</div>
 </div>
 </MDSurface>
-</v-click>
 
 </div>
 
-<v-click>
+The zero is the most important number. All audio synthesis happens client-side. The server is a state relay. This is why everyone can hear the same music — the DO syncs patterns, not audio.
 
-All audio synthesis happens client-side. The server is a state relay. This keeps latency under 50ms for real-time collaboration.
-
-</v-click>
-
-<!-- 64 instruments, 10 simultaneous players, 18 lessons learned, and zero server-side audio. The last number is the most important: all synthesis is client-side. The server is purely a state relay. This architecture choice keeps latency under 50ms and means we never need to mix audio on the server. The tradeoff is that every client must be capable of audio synthesis, which limits us on low-powered mobile devices. -->
+<!-- 64 instruments, 10 players, 18 lessons, 0 server-side audio. The metrics are shown statically — their individual revelation adds no meaning. The zero-server-audio number deserves emphasis: it's the architectural decision that makes the latency target achievable. If audio went through the server, round-trip latency would exceed 100ms and the groove would fall apart. The tradeoff: every client must be capable of synthesis, which limits low-powered mobile devices. -->
 
 ---
 transition: fade
@@ -252,6 +242,8 @@ An 8x8 step sequencer grid. Each row is an instrument. Each column is a beat. Cl
 
 </div>
 
+<!-- The grid is visual evidence — this is what the actual UI looks like. 64 cells, 16 labeled with standard drum machine abbreviations (BD=bass drum, SD=snare, HH=hi-hat, etc). The sentence at the bottom echoes the through-line: "Everyone hears the change." -->
+
 ---
 layout: MaterialSlide
 transition: slide-left
@@ -275,11 +267,13 @@ Audio effects touch session state, WebSocket protocol, server validation, and UI
 
 </div>
 
-<!-- Three takeaways for the audience: (1) Align all surfaces -- API, UI, and session state must agree or the feature is incomplete. (2) Defer high-integration work -- audio effects that touch every layer should wait until the core is stable. (3) Test the spec, not your mental model -- 100% coverage means nothing if the tests encode the wrong behavior. These apply to any real-time collaborative system, not just audio. -->
+<!-- Three takeaways: (1) Align all surfaces — the three-surface framework applies to any collaborative system. (2) Defer high-integration work — features that touch every layer are the riskiest. (3) Test the spec — coverage metrics are vanity metrics if the tests encode wrong assumptions. These lessons cost weeks of debugging each. -->
 
 ---
 layout: end
 transition: fade
 ---
 
-# Play together
+# Everyone hears the same music
+
+<!-- The closing resolves the opening. "10 players. 64 instruments. One room. Everyone hears the same music." → "Everyone hears the same music." After 10 slides of bugs, war stories, and architectural battles, the promise is kept. The through-line survives every complication. That's the payoff. -->

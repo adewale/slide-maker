@@ -14,7 +14,7 @@ fonts:
 
 A thumbnail bug, a wrong turn, and the 60x speedup hiding in plain sight.
 
-<!-- This is a debugging detective story. We start with a mystery -- broken thumbnails -- follow a false trail that wastes days, then find the real culprit hiding in plain sight. The punchline: the fix was simpler, faster, and better than the original approach. Set the tone as investigative, not instructional. -->
+<!-- This is a debugging detective story. We start with a mystery — broken thumbnails — follow a false trail that wastes days, then find the real culprit hiding in plain sight. The punchline: the fix was simpler, faster, and better than the original approach. The through-line is "start at the source" — a debugging rule we violated, paid for, and learned. Set the tone as investigative, not instructional. -->
 
 ---
 layout: TufteSlide
@@ -31,9 +31,9 @@ The file contained **44 embedded JPEG previews** at different sizes. A 2.1MB ful
 
 <Sidenote number="1">DNG (Digital Negative) files contain multiple embedded JPEG previews at various sizes. The largest is typically full or near-full resolution, intended for fast display without RAW decoding.</Sidenote>
 
-<Sidenote number="2">The quality pipeline detects upscaling: if the source image is only 160x120, it refuses to generate 256, 512, and 1024px thumbnails.</Sidenote>
+<Sidenote number="2">The quality pipeline detects upscaling: if the source image is only 160x120, it refuses to generate 256, 512, and 1024px thumbnails. This is the correct behavior — upscaling produces blurry results.</Sidenote>
 
-<!-- The key revelation: the DNG file contained 44 embedded JPEG previews, including a 2.1MB full-resolution one at 9504x6320. But our code grabbed the first one it found -- a tiny 160x120 thumbnail. The quality pipeline then correctly refused to upscale from 160x120, so larger thumbnail sizes were never generated. The clue was right there in the "upscale warning" log line. -->
+<!-- The key revelation: the DNG file contained 44 embedded JPEG previews, including a 2.1MB full-resolution one at 9504x6320. But our code grabbed the first one it found — a tiny 160x120 thumbnail. The quality pipeline then correctly refused to upscale from 160x120, so larger thumbnail sizes were never generated. The clue was in the "upscale warning" log line — we ignored it for three days. -->
 
 ---
 layout: TufteSlide
@@ -60,9 +60,9 @@ Then the thumbnails turned completely black. We had removed `isBlackImage()` det
 
 ::sidenote::
 
-<Sidenote number="3">The instinct to fix what you can see first is strong. The UI was broken, so we fixed the UI. But the data was wrong at the source.</Sidenote>
+<Sidenote number="3">The instinct to fix what you can see first is strong. The UI was broken, so we fixed the UI. But the data was wrong at the source. Three days of work at the wrong layer.</Sidenote>
 
-<!-- We debugged backwards -- starting at the display layer and working toward the source. Three attempted fixes, three failures. We fixed the web UI fallback, fixed database queries, assumed "8 thumbnails generated" meant success. Then the thumbnails turned completely black because we removed black-image detection trusting the pipeline. The lesson: debugging in the wrong order does not just waste time, it can make things worse. -->
+<!-- We debugged backwards — starting at the display layer and working toward the source. Three attempted fixes, three failures. We fixed the web UI fallback, fixed database queries, assumed "8 thumbnails generated" meant success. Then the thumbnails turned completely black because we removed black-image detection trusting the pipeline. The pattern: debugging in the wrong order doesn't just waste time — it can make things worse. If we'd started at the source (exiftool on the DNG file), we'd have found the answer in 30 seconds. -->
 
 ---
 transition: slide-up
@@ -98,7 +98,7 @@ return jpeg.Decode(bytes.NewReader(largestJPEG)), nil
 
 <v-mark v-click type="highlight" color="rgba(45, 95, 138, 0.15)">The critical line: `if jpegSize > largestSize`</v-mark>
 
-<!-- This is the key moment of the talk. The Magic Move transition shows the code transformation: from a naive first-match algorithm that returns the first JPEG marker it finds (the tiny 160x120 thumbnail) to a largest-match algorithm that scans all embedded JPEGs and returns the biggest one (9504x6320). One conditional -- `if jpegSize > largestSize` -- is the entire fix. Let the code transition speak for itself. -->
+<!-- The Magic Move transition is the climax. The code transforms from a naive first-match algorithm (returns the first JPEG marker, which is the tiny 160x120 thumbnail) to a largest-match algorithm (scans all embedded JPEGs and returns the biggest one, 9504x6320). One conditional — `if jpegSize > largestSize` — is the entire fix. Let the code transition speak for itself. The audience should feel the simplicity of the fix after the complexity of the false trail. -->
 
 ---
 layout: TufteSlide
@@ -135,7 +135,7 @@ The embedded JPEG extraction is **60x faster** than full RAW decoding. Equal or 
 
 ::sidenote::
 
-<Sidenote number="4">The full pipeline with fallback costs 1600ms per file. Direct embedded JPEG extraction costs 20ms. For 100K photos, that is 44 hours vs 33 minutes.</Sidenote>
+<Sidenote number="4">The full pipeline with fallback costs 1600ms per file. Direct embedded JPEG extraction costs 20ms. For 100K photos, that is 44 hours vs 33 minutes. The performance gain was an accident — we were fixing a correctness bug, not optimizing.</Sidenote>
 
 <style>
 .small-multiples > div {
@@ -168,13 +168,15 @@ When data is wrong, always start debugging at the **source**, never at the displ
 
 </div>
 
-Start at number one. Work your way down. Never start at six and work backwards.
+Start at number one. Work your way down. Never start at six and work backwards — that cost us three days.
 
 ::sidenote::
 
-<Sidenote number="5">A single exiftool command would have revealed the answer immediately: `exiftool -a -G1 -s file.DNG | grep -i preview` shows PreviewImageLength: 2,170,368 bytes.</Sidenote>
+<Sidenote number="5">A single exiftool command would have revealed the answer immediately: `exiftool -a -G1 -s file.DNG | grep -i preview` shows PreviewImageLength: 2,170,368 bytes. Thirty seconds vs three days.</Sidenote>
 
-<Sidenote number="6">"8 thumbnails generated" does not mean "8 good quality thumbnails." Verify outputs. Do not trust counts.</Sidenote>
+<Sidenote number="6">"8 thumbnails generated" does not mean "8 good quality thumbnails." Verify outputs by looking at them. Do not trust counts.</Sidenote>
+
+<!-- The rule is the through-line crystallized. "Start at the source" is a debugging principle we violated (started at the display layer), paid for (three days of wasted work), and learned. The numbered list is an ordered protocol — not "choose the most convenient layer" but "always start at 1, always work down." The sidenotes add the specific evidence: exiftool in 30 seconds vs three days of wrong-layer debugging. -->
 
 ---
 layout: TufteSlide
@@ -191,11 +193,11 @@ transition: fade
 
 ::sidenote::
 
-<Sidenote number="7">Visual inspection over metrics. "Generated 8 thumbnails" told us nothing. Opening the file and looking at it would have caught the bug immediately.</Sidenote>
+<Sidenote number="7">Visual inspection over metrics. "Generated 8 thumbnails" told us nothing. Opening the file and looking at it would have caught the bug immediately. Always verify outputs with your eyes, not your test suite.</Sidenote>
 
-<Sidenote number="8">Diagnostic logging proactively. After adding [EMBED] and [RAW] log prefixes, every future bug became immediately visible in the output stream.</Sidenote>
+<Sidenote number="8">Diagnostic logging proactively. After adding [EMBED] and [RAW] log prefixes, every future bug became immediately visible in the output stream. The 30-second investment in log formatting saved hours of future debugging.</Sidenote>
 
-<!-- Five transferable principles: (1) State machines over hierarchies -- data determines valid transitions, not your assumptions. (2) Simple over complex -- embedded JPEG extraction was 60x faster than full RAW decode with zero dependencies. (3) Test at the right layer -- we added web UI tests when the bug lived in the decode layer. (4) Visual inspection over metrics -- "8 thumbnails generated" told us nothing; opening the file would have caught it instantly. (5) Diagnostic logging proactively -- log prefixes like [EMBED] and [RAW] make future bugs self-diagnosing. These apply far beyond image processing. -->
+<!-- Five transferable principles, each earned through failure: (1) State machines over hierarchies — data determines valid transitions, not your assumptions. (2) Simple over complex — embedded JPEG extraction was 60x faster than full RAW decode with zero dependencies. (3) Test at the right layer — we added web UI tests when the bug lived in the decode layer. (4) Visual inspection over metrics — "8 thumbnails generated" told us nothing; opening the file would have caught it instantly. (5) Diagnostic logging proactively — log prefixes like [EMBED] and [RAW] make future bugs self-diagnosing. These apply far beyond image processing. -->
 
 ---
 layout: section
@@ -204,6 +206,8 @@ transition: slide-left
 
 # Start at the source
 
+<!-- The section header repeats the through-line one final time before the closing sequence. At this point in the deck, the audience has seen the cost of not starting at the source (three days wasted, black thumbnails), the evidence of the fix (one conditional), and the general principle (six-layer debugging protocol). "Start at the source" has gained meaning with each appearance. -->
+
 ---
 layout: center
 transition: fade
@@ -211,13 +215,15 @@ transition: fade
 
 # Sometimes the simple solution is 100x better than the complex solution
 
-It is 60x faster. Equal or better quality. Avoids compatibility issues. Reduces complexity. We spent significant time implementing LibRaw integration when embedded preview extraction would have been faster, simpler, and often higher quality.
+It is 60x faster. Equal or better quality. Avoids compatibility issues. Reduces complexity. The bug was never in the code — it was in the assumption that first-match was good enough.
+
+<!-- The penultimate slide reframes the entire story. The "60x speedup hiding in plain sight" from the cover is revealed as an accident — we were fixing a correctness bug, not optimizing. The simple solution (scan for the largest JPEG) was not just faster but better in every dimension. The lesson: sometimes the right fix at the right layer is also the fastest, simplest, and most correct. -->
 
 ---
 layout: end
 transition: fade
 ---
 
-# Debug at the Source
+# The bug was never in the code. It was in the assumption.
 
-Olsen -- local-first photo indexing
+<!-- The closing resolves the opening subtitle: "A thumbnail bug, a wrong turn, and the 60x speedup hiding in plain sight." The assumption was that first-match extraction would find the right JPEG. It didn't. The code was correct — it faithfully returned the first match. The assumption was wrong — the first match wasn't the best match. "Debug at the source" isn't just about which layer to start in. It's about questioning the assumptions that shape the code in the first place. -->

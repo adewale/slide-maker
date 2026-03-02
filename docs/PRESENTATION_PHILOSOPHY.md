@@ -46,6 +46,9 @@ Never open with an agenda slide or table of contents. Open with a question, an e
 ### 14. Closings: resonance, not courtesy
 Never close with "Thank you", "Questions?", or a URL. Circle back to the opening provocation. Let the final slide linger. Declare something worth remembering. The last slide is the one they photograph.
 
+### 15. Rules produce structure, not substance
+A deck that passes every structural check can still say nothing. The checklist catches missing pieces; only the presenter's genuine insight makes the deck worth giving. Structure without substance is a skeleton — anatomically correct and entirely lifeless.
+
 ## How these affect compilation
 
 These principles influence the compiler at several points:

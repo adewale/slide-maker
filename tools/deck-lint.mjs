@@ -570,6 +570,56 @@ function lintDeck(deckDir) {
     }
   }
 
+  // ─── 9. Closing slide check ──────────────────────────────────────
+
+  if (slides.length > 0) {
+    const lastSlide = slides[slides.length - 1];
+    const lastFm = lastSlide.frontmatter || '';
+    const lastBody = lastSlide.body || '';
+    const isEndLayout = /layout\s*:\s*end/i.test(lastFm);
+    const hasCodeBlock = /```/.test(lastBody);
+    if (isEndLayout && hasCodeBlock) {
+      warns.push('closing slide contains install command — should echo opening question/metaphor instead');
+    }
+  }
+
+  // ─── 10. v-click density check ─────────────────────────────────
+
+  const contentSlides = slides.filter(s => {
+    const fm = s.frontmatter || '';
+    return !/layout\s*:\s*(cover|end)/i.test(fm);
+  });
+
+  if (contentSlides.length > 0) {
+    const vclickSlides = contentSlides.filter(s => {
+      const full = (s.frontmatter || '') + '\n' + s.body;
+      return /v-click|<v-clicks>/.test(full);
+    });
+    const density = vclickSlides.length / contentSlides.length;
+    if (density > 0.5) {
+      warns.push(`v-click density ${Math.round(density * 100)}% — consider whether all reveals serve rhetorical purpose`);
+    }
+  }
+
+  // ─── 11. Mermaid annotation check ──────────────────────────────
+
+  for (const slide of slides) {
+    const body = slide.body || '';
+    if (/```mermaid/.test(body)) {
+      // Check if there's meaningful text after the mermaid block
+      const afterMermaid = body.replace(/```mermaid[\s\S]*?```/g, '').trim();
+      // Remove HTML tags, frontmatter-like lines, and blank lines
+      const meaningfulText = afterMermaid
+        .replace(/<[^>]+>/g, '')
+        .replace(/^(layout|transition|class)\s*:.*/gm, '')
+        .replace(/^<!--[\s\S]*?-->/gm, '')
+        .trim();
+      if (meaningfulText.length < 10) {
+        warns.push(`slide ${slide.index}: Mermaid diagram without insight annotation — add explanation of what to notice`);
+      }
+    }
+  }
+
   return { name, errors, warns, info };
 }
 

@@ -23,6 +23,7 @@ Optimize for:
 - No same layout for every content slide — alternate between built-in layouts
 - No blanket `.slidev-layout { background }` overrides when using a non-default theme — let the theme control its own backgrounds
 - No hardcoded colors in scoped styles — always reference `var(--deck-*)` tokens. Literal hex/rgb values in `<style scoped>` blocks bypass the token system and cause palette drift.
+- No "install command" closings — the final slide must resonate with the opening question/metaphor, not end with `npm install` or `git clone`. Installation belongs in presenter notes or a penultimate "Get started" slide, never the last word.
 
 ## Inputs
 
@@ -118,7 +119,7 @@ Rules:
 - minimal frontmatter
 - clean Markdown
 - no wrapper soup
-- notes as end-of-slide comments
+- notes as end-of-slide comments — must add information the audience cannot see (the story behind the slide, the objection to anticipate, the specific example to give). Notes that merely restate slide content are useless. Minimum: 2 sentences per content slide, each containing information not on the slide.
 - one idea per slide — if you need to scroll, split it
 - use `<v-clicks>` on bullet lists for progressive reveal
 - vary layouts across the deck — alternate between content, section dividers, facts, quotes
@@ -209,6 +210,8 @@ Wrap bullet lists in `<v-clicks>` for progressive reveal:
 </v-clicks>
 ```
 Use `v-click` on individual elements. Use `v-click.hide` to hide elements. Use `v-after` for simultaneous reveal with previous click.
+
+**v-click restraint:** Use v-clicks only when reveal order serves a rhetorical purpose (building an argument step-by-step, punchline timing, before/after contrast). Never v-click an entire list just to animate it — if all items have equal weight, show them together. Aim for <40% of slides using v-click.
 
 #### Code diff display
 
@@ -399,10 +402,14 @@ The through-line is how the deck holds together — not a tagline, but a concept
 - **Decorative metaphor** — the metaphor sounds nice but does no analytical work. "Like a river" tells you nothing.
 - **Competing through-lines** — two conceptual threads fight for attention. Pick one. The other is a sub-theme at best.
 
+### War stories
+Every deck of 10+ slides must include at least one war story — a specific moment where something broke, a false trail was followed, or a constraint was discovered. War stories are concrete ("The thumbnail cache was 2.3 GB"), not abstract ("We encountered challenges"). Place war stories after the thesis slides and before the synthesis to create dialectical tension.
+
 ### Closing slides
 - End with a memorable takeaway or thesis statement
 - Never close with "Thanks", "Questions?", or a bare URL
 - The final impression should reinforce the deck's core insight
+- The closing must echo or resolve the opening question/metaphor — not be a disconnected install command
 
 ### Presentation philosophy
 These compilation-affecting rules come from the full [PRESENTATION_PHILOSOPHY.md](../docs/PRESENTATION_PHILOSOPHY.md):
@@ -440,6 +447,9 @@ These compilation-affecting rules come from the full [PRESENTATION_PHILOSOPHY.md
 ### Layout collision prevention
 - For slides with both text and diagrams, use absolute positioning (`class: absolute`) or dedicated diagram-only slides
 - Prefer diagram-only slides over cramming text and diagrams together
+
+### Insight annotations
+Every Mermaid diagram must reveal something non-obvious. If a diagram merely restates what the text says ("Request → Server → Database"), replace it with a text slide. Good diagrams expose hidden relationships, surprising dependencies, or counterintuitive flows. Add a one-line insight annotation below the diagram explaining what to notice.
 
 ### Custom SVG diagram escalation
 When Mermaid can't achieve the needed visual (rounded cards, gradient borders, branded styling):
@@ -572,6 +582,7 @@ A compiled deck passes when:
 - no slide overflows the viewport (7 bullet max, 8 code line max, 60 char bullet max)
 - at least one slide uses hover-interactive elements (data cards, code blocks, or comparison grids)
 - no `<style scoped>` block uses literal hex/rgb for `background` or `color` properties — must use `var(--deck-*)` token variables
+- closing slide echoes or resolves the opening question/metaphor — not an install command
 - (project decks) through-line appears in at least 3 slides, gaining new meaning each time
 - (project decks) source materials section lists at least 2 digested documents
 - (project decks) at least 1 visual evidence slide with real screenshot or terminal output (no placeholders)
