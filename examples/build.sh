@@ -24,10 +24,10 @@ declare -a DECKS=(
   "geist-fabrik:geist-fabrik"
   "olsen:olsen"
   "tasche:tasche"
-  "sumi-e:sumi-e"
+
   "tufte:tufte"
-  "material:material"
   "durable-objects:durable-objects"
+  "extensions:extensions"
 )
 
 for entry in "${DECKS[@]}"; do
@@ -39,11 +39,32 @@ for entry in "${DECKS[@]}"; do
 
   cd "$ROOT/$dir"
 
-  npx slidev build --base "/$name/" --out "$OUT/$name"
+  # BASE_PREFIX allows serving under a subpath (e.g. /slide-maker for GitHub Pages)
+  npx slidev build --base "${BASE_PREFIX:-}/$name/" --out "$OUT/$name"
 done
 
-# Copy menu page
+# Copy menu page and prevent Jekyll processing
 cp "$ROOT/index.html" "$OUT/index.html"
+touch "$OUT/.nojekyll"
+
+# Generate serve.json for SPA routing (presenter mode, slide navigation)
+{
+  echo '{'
+  echo '  "rewrites": ['
+  first=true
+  for entry in "${DECKS[@]}"; do
+    name="${entry##*:}"
+    if [ "$first" = true ]; then
+      first=false
+    else
+      echo ','
+    fi
+    printf '    { "source": "/%s/**", "destination": "/%s/index.html" }' "$name" "$name"
+  done
+  echo ''
+  echo '  ]'
+  echo '}'
+} > "$OUT/serve.json"
 
 echo ""
 echo "Done. All decks built to examples/_build/"

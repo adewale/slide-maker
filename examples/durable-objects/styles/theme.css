@@ -2,6 +2,8 @@
   font-family: var(--deck-font-body);
   color: var(--deck-fg);
   background: var(--deck-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3 {
@@ -16,11 +18,18 @@ h1 {
   color: var(--deck-fg);
 }
 
+h2 {
+  font-size: 1.5rem;
+  line-height: 1.33;
+  letter-spacing: -0.01em;
+}
+
 h3 {
   color: var(--deck-accent);
-  font-size: 1rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-weight: 600;
   margin-bottom: 0.5rem;
 }
 
@@ -31,10 +40,11 @@ strong {
 code {
   font-family: var(--deck-font-mono);
   color: var(--deck-accent-alt);
-  background: rgba(255, 102, 51, 0.08);
+  background: rgba(255, 72, 1, 0.05);
   padding: 0.15em 0.4em;
-  border-radius: 4px;
-  font-size: 0.9em;
+  border: 1px solid var(--deck-border-light);
+  border-radius: 0.5rem;
+  font-size: 0.875em;
 }
 
 ol, ul {
@@ -50,9 +60,9 @@ ul li::marker {
   color: var(--deck-accent);
 }
 
-/* Click animations — cloudflare preset */
+/* Click animations — 0.2s per design language */
 .slidev-vclick-target {
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .slidev-vclick-hidden {
@@ -66,18 +76,19 @@ ul li::marker {
   flex-direction: column;
   justify-content: center;
   padding: 4rem;
-  background: var(--deck-surface);
+  background: var(--deck-bg);
 }
 
 .slidev-layout.cover h1 {
-  font-size: 3.5rem;
-  letter-spacing: -0.03em;
+  font-size: 3.75rem;
+  letter-spacing: -0.02em;
 }
 
 .slidev-layout.cover p {
-  font-size: 1.15rem;
+  font-size: 1.125rem;
   color: var(--deck-muted);
   margin-top: 1rem;
+  line-height: 1.56;
 }
 
 /* Center / Statement */
@@ -96,7 +107,7 @@ ul li::marker {
   max-width: 60%;
   margin: 1rem auto 0;
   text-align: center;
-  font-size: 1.1rem;
+  font-size: 1.125rem;
   line-height: 1.6;
 }
 
@@ -104,26 +115,27 @@ ul li::marker {
 .slidev-layout.fact h1 {
   font-size: 7rem;
   color: var(--deck-accent);
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
 }
 
 .slidev-layout.fact p:first-of-type {
-  font-size: 1.1rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   color: var(--deck-muted);
+  font-weight: 600;
   margin-top: -0.5rem;
 }
 
 .slidev-layout.fact p:last-of-type {
-  font-size: 1.15rem;
+  font-size: 1.125rem;
   margin-top: 2rem;
   color: var(--deck-fg);
 }
 
-/* Section */
+/* Section — inverted dark panel */
 .slidev-layout.section {
-  background: var(--deck-fg);
+  background: var(--deck-panel-chrome);
   color: var(--deck-bg);
 }
 
@@ -134,31 +146,32 @@ ul li::marker {
 }
 
 .slidev-layout.section p {
-  color: rgba(245, 241, 235, 0.6);
-  font-size: 1.15rem;
+  color: rgba(255, 251, 245, 0.6);
+  font-size: 1.125rem;
   margin-top: 0.75rem;
 }
 
-/* End */
+/* End — inverted dark panel */
 .slidev-layout.end {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  background: var(--deck-fg);
+  background: var(--deck-panel-chrome);
   color: var(--deck-bg);
 }
 
 .slidev-layout.end h1 {
   font-size: 3.5rem;
+  letter-spacing: -0.02em;
   color: var(--deck-bg);
 }
 
 .slidev-layout.end p {
   color: var(--deck-accent);
   font-family: var(--deck-font-mono);
-  font-size: 1.2rem;
+  font-size: 1.125rem;
   margin-top: 1rem;
 }
 
@@ -185,35 +198,61 @@ ul li::marker {
   font-size: 1rem;
 }
 
-/* Cards — Cloudflare style */
+/* Cards — warm parchment design language */
 .cf-card {
   background: white;
   border: 1px solid var(--deck-border);
   border-radius: var(--deck-radius);
   padding: 1.25rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.15s;
 }
 
 .cf-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 16px rgba(246, 130, 31, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(82, 16, 0, 0.15);
   border-color: var(--deck-accent);
 }
 
+/* Badges — pill with accent tint */
 .cf-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
   font-family: var(--deck-font-mono);
   font-size: 0.75rem;
-  padding: 0.2em 0.6em;
+  padding: 0.375rem 0.875rem;
   border-radius: 9999px;
-  background: rgba(255, 102, 51, 0.1);
+  background: rgba(255, 72, 1, 0.1);
   color: var(--deck-accent);
   font-weight: 600;
+  letter-spacing: 0.025em;
 }
 
-/* Code blocks on light background */
+/* Step indicators */
+.cf-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.cf-step-primary {
+  background: var(--deck-accent);
+  color: white;
+}
+
+.cf-step-secondary {
+  background: rgba(82, 16, 0, 0.1);
+  color: var(--deck-fg);
+}
+
+/* Code blocks — warm bordered on light bg */
 :deep(.slidev-code) {
   border: 1px solid var(--deck-border);
   border-radius: var(--deck-radius);
@@ -222,16 +261,33 @@ ul li::marker {
 /* Background treatments — dot pattern + glow */
 .cf-dots {
   background-image: radial-gradient(circle, rgba(82, 16, 0, 0.15) 1px, transparent 1px);
-  background-size: 20px 20px;
+  background-size: 24px 24px;
 }
 
 .cf-glow {
-  background-image: radial-gradient(ellipse at 30% 50%, rgba(255, 102, 51, 0.15) 0%, transparent 60%);
+  background-image: radial-gradient(ellipse at 30% 50%, rgba(255, 72, 1, 0.15) 0%, transparent 60%);
 }
 
 .cf-dots-glow {
   background-image:
     radial-gradient(circle, rgba(82, 16, 0, 0.15) 1px, transparent 1px),
-    radial-gradient(ellipse at 30% 50%, rgba(255, 102, 51, 0.15) 0%, transparent 60%);
-  background-size: 20px 20px, 100% 100%;
+    radial-gradient(ellipse at 30% 50%, rgba(255, 72, 1, 0.15) 0%, transparent 60%);
+  background-size: 24px 24px, 100% 100%;
+}
+
+/* Dark panel — "dark islands in a light sea" */
+.cf-panel {
+  background: var(--deck-panel-content);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--deck-radius);
+  box-shadow: 0 20px 40px -12px rgba(82, 16, 0, 0.25),
+              0 0 0 1px rgba(255, 255, 255, 0.05),
+              inset 0 1px rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.cf-panel-chrome {
+  background: var(--deck-panel-chrome);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.75rem 1rem;
 }

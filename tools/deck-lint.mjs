@@ -44,6 +44,8 @@ const REQUIRED_FILES = [
   'styles/index.css',
   'styles/tokens.css',
   'styles/theme.css',
+  'global-bottom.vue',
+  'setup/mermaid-renderer.ts',
 ];
 
 const REQUIRED_TOKENS_DEFAULT = ['--deck-bg', '--deck-fg', '--deck-accent', '--deck-muted'];
@@ -263,6 +265,248 @@ function checkOverflow(md) {
 
   return warnings;
 }
+
+/**
+ * Parse Mermaid options from the fenced code block annotation.
+ * E.g., " {theme: 'dark', scale: 0.65}" → { theme: 'dark', scale: 0.65 }
+ */
+function parseMermaidOptions(annotation) {
+  const opts = {};
+  const themeMatch = annotation.match(/theme\s*:\s*['"]?([^'",}\s]+)['"]?/);
+  if (themeMatch) opts.theme = themeMatch[1];
+  const scaleMatch = annotation.match(/scale\s*:\s*([\d.]+)/);
+  if (scaleMatch) opts.scale = parseFloat(scaleMatch[1]);
+  return opts;
+}
+
+/**
+ * Count approximate node count in a Mermaid graph/flowchart diagram.
+ * Returns 0 for non-flowchart types (skipping the node-count check).
+ */
+function countMermaidNodes(code) {
+  const lines = code.split('\n');
+  const firstLine = lines.find(l => l.trim())?.trim() || '';
+  const type = firstLine.split(/[\s{]/)[0].toLowerCase();
+  if (type !== 'graph' && type !== 'flowchart') return 0;
+
+  const nodeIds = new Set();
+  const SKIP_RE = /^(%%|style\s|classDef\s|class\s|click\s|linkStyle\s|subgraph\s|end$)/;
+  const KEYWORDS = new Set(['subgraph', 'end', 'direction', 'TB', 'TD', 'BT', 'RL', 'LR']);
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || SKIP_RE.test(trimmed)) continue;
+    if (/^(graph|flowchart)\s/i.test(trimmed)) continue;
+    const stripped = trimmed
+      .replace(/\["[^"]*"\]/g, '').replace(/\("[^"]*"\)/g, '')
+      .replace(/\{"[^"]*"\}/g, '').replace(/\|[^|]*\|/g, '');
+    for (const m of stripped.matchAll(/\b([A-Za-z]\w*)\b/g)) {
+      if (!KEYWORDS.has(m[1])) nodeIds.add(m[1]);
+    }
+  }
+  return nodeIds.size;
+}
+
+/**
+ * Approximate luminance of a hex color (0 = black, 1 = white).
+ */
+function hexLuminance(hex) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  if (hex.length < 6) return 0.5; // fallback for malformed
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+
+/**
+ * Validate Mermaid diagram syntax for common issues that cause rendering failures.
+ * Returns an array of warning strings.
+ */
+function checkMermaidSyntax(code, slideIndex) {
+  const warnings = [];
+  const lines = code.split('\n');
+
+  // Detect diagram type from first non-empty line
+  const firstLine = lines.find(l => l.trim())?.trim() || '';
+  const diagramType = firstLine.split(/[\s{]/)[0].toLowerCase();
+
+  // ── Unquoted special characters in node IDs ──
+  // Mermaid node IDs with / | \ < > break parsing unless quoted in ["..."]
+  // Note: & is valid Mermaid syntax (parallel connections), so we don't flag it
+  const BREAKING_CHARS = /[/\\|<>]/;
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+    // Skip non-content lines
+    if (!trimmed || trimmed.startsWith('%%') || trimmed.startsWith('style ') ||
+        trimmed.startsWith('class ') || trimmed.startsWith('classDef ') ||
+        trimmed.startsWith('click ') || trimmed.startsWith('linkStyle ')) continue;
+    // Skip the diagram type declaration line
+    if (i === lines.indexOf(lines.find(l => l.trim()))) continue;
+
+    // Strip quoted node labels ["..."], ("..."), {"..."} — these are safe
+    const withoutQuoted = trimmed
+      .replace(/\["[^"]*"\]/g, '___Q___')
+      .replace(/\("[^"]*"\)/g, '___Q___')
+      .replace(/\{"[^"]*"\}/g, '___Q___');
+
+    // Strip edge labels |text| — valid Mermaid link label syntax
+    const withoutEdgeLabels = withoutQuoted.replace(/\|[^|]*\|/g, '');
+
+    // Also strip arrow syntax (-->, ---, -.-, ==>)
+    const withoutArrows = withoutEdgeLabels.replace(/[-=.]+>/g, ' ').replace(/[-=.]{2,}/g, ' ');
+
+    // Check remaining text for node IDs containing breaking characters
+    // Match word tokens that look like node IDs
+    const tokens = withoutArrows.split(/\s+/).filter(t => t.length > 0 && t !== '___Q___');
+    for (const token of tokens) {
+      // Strip trailing brackets
+      const id = token.replace(/[\[({}\])]+$/, '').replace(/^[\[({}\])]+/, '');
+      if (id && BREAKING_CHARS.test(id)) {
+        warnings.push(`slide ${slideIndex}: Mermaid node ID "${id}" contains "${id.match(BREAKING_CHARS)[0]}" — wrap in ["..."] to prevent parse errors`);
+      }
+    }
+  }
+
+  // ── Unbalanced brackets in node labels ──
+  const bracketPairs = [['[', ']'], ['(', ')'], ['{', '}']];
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+    if (!trimmed || trimmed.startsWith('%%') || trimmed.startsWith('style ') ||
+        trimmed.startsWith('classDef ') || trimmed.startsWith('class ')) continue;
+    for (const [open, close] of bracketPairs) {
+      const openCount = (trimmed.match(new RegExp('\\' + open, 'g')) || []).length;
+      const closeCount = (trimmed.match(new RegExp('\\' + close, 'g')) || []).length;
+      if (openCount !== closeCount && openCount > 0) {
+        warnings.push(`slide ${slideIndex}: Mermaid syntax — unbalanced "${open}${close}" on line: ${trimmed.slice(0, 60)}`);
+      }
+    }
+  }
+
+  // ── Mindmap-specific syntax issues ──
+  // Mindmaps use indentation-based trees, not flowchart bracket notation ["..."]
+  if (diagramType === 'mindmap') {
+    for (let i = 0; i < lines.length; i++) {
+      const trimmed = lines[i].trim();
+      if (!trimmed || trimmed.startsWith('%%')) continue;
+      if (i === lines.indexOf(lines.find(l => l.trim()))) continue; // skip diagram type line
+      if (/\["[^"]*"\]/.test(trimmed)) {
+        warnings.push(`slide ${slideIndex}: Mermaid mindmap uses flowchart bracket syntax ["..."] — mindmaps only support plain text, (rounded), ((cloud)), or [square] node shapes`);
+        break; // one warning per diagram is enough
+      }
+    }
+  }
+
+  // ── Emoji in node labels ──
+  const EMOJI_RE = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}]/u;
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+    if (!trimmed || trimmed.startsWith('%%')) continue;
+    if (EMOJI_RE.test(trimmed)) {
+      warnings.push(`slide ${slideIndex}: Mermaid diagram contains emoji — use plain text in node labels`);
+      break;
+    }
+  }
+
+  // ── Style/classDef: explicit color + contrast ──
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+    const styleMatch = trimmed.match(/^(style|classDef)\s+(\S+)\s+(.*)/);
+    if (!styleMatch) continue;
+    const [, directive, name, props] = styleMatch;
+    const hasFill = /(?:^|[,\s])fill\s*:/.test(props);
+    const hasColor = /(?:^|[,\s])color\s*:/.test(props);
+
+    if (hasFill && !hasColor) {
+      warnings.push(`slide ${slideIndex}: Mermaid ${directive} "${name}" has fill but no explicit color — text may be invisible`);
+      continue;
+    }
+
+    if (hasFill && hasColor) {
+      const fillHex = props.match(/(?:^|[,\s])fill\s*:\s*(#[0-9a-fA-F]{3,8})/)?.[1];
+      const colorHex = props.match(/(?:^|[,\s])color\s*:\s*(#[0-9a-fA-F]{3,8})/)?.[1];
+      if (fillHex && colorHex) {
+        const fillLum = hexLuminance(fillHex);
+        const textLum = hexLuminance(colorHex);
+        // Thresholds: 0.65 avoids flagging medium-brightness accent colors
+        // (#ca8a04, #f6821f, #ff6633) which are valid dark fills per COMPILER_RULES
+        if (fillLum > 0.65 && textLum > 0.65) {
+          warnings.push(`slide ${slideIndex}: Mermaid node "${name}" — light fill (${fillHex}) with light text (${colorHex}) may fail contrast`);
+        }
+        if (fillLum < 0.2 && textLum < 0.2) {
+          warnings.push(`slide ${slideIndex}: Mermaid node "${name}" — dark fill (${fillHex}) with dark text (${colorHex}) may fail contrast`);
+        }
+      }
+    }
+  }
+
+  // ── Unstyled nodes in flowcharts ──
+  // Mermaid default colors are unreliable — nodes without explicit styling
+  // often render as invisible blobs, especially with theme: 'dark'
+  if (diagramType === 'graph' || diagramType === 'flowchart') {
+    const hasStyleDirective = lines.some(l => /^\s*(style|classDef)\s/.test(l));
+    const nodeCount = countMermaidNodes(code);
+    if (nodeCount > 0 && !hasStyleDirective) {
+      warnings.push(`slide ${slideIndex}: Mermaid flowchart has ${nodeCount} nodes but no style/classDef — nodes may be unreadable (add explicit fill and color)`);
+    }
+  }
+
+  // ── Missing diagram type ──
+  const KNOWN_TYPES = [
+    'graph', 'flowchart', 'sequencediagram', 'classdiagram', 'statediagram',
+    'statediagram-v2', 'erdiagram', 'gantt', 'pie', 'journey', 'gitgraph',
+    'mindmap', 'timeline', 'quadrantchart', 'xychart-beta', 'block-beta',
+    'sankey-beta', 'packet-beta',
+  ];
+  if (!KNOWN_TYPES.includes(diagramType)) {
+    warnings.push(`slide ${slideIndex}: Mermaid diagram type "${diagramType}" not recognized — may fail to render`);
+  }
+
+  return warnings;
+}
+
+/**
+ * Extract Sources: blocks from HTML comments in a slide body.
+ * Returns array of source strings (e.g., "https://..." or "file:...").
+ */
+function extractSources(body) {
+  const sources = [];
+  const commentBlocks = [...body.matchAll(/<!--([\s\S]*?)-->/g)];
+  for (const block of commentBlocks) {
+    const comment = block[1];
+    // Find the Sources: section within the comment
+    const sourcesMatch = comment.match(/Sources:\s*\n([\s\S]*?)$/i);
+    if (!sourcesMatch) continue;
+    const lines = sourcesMatch[1].split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('- ')) {
+        sources.push(trimmed.slice(2).trim());
+      }
+    }
+  }
+  return sources;
+}
+
+/**
+ * Determine whether a slide needs Sources: citations.
+ * Exempt layouts (cover, section, end) return false.
+ * Slides with presenter notes (HTML comments) return true.
+ */
+function slideNeedsSources(fm, body) {
+  const fmStr = fm || '';
+  // Exempt layouts
+  if (/layout\s*:\s*(cover|section|end)\b/i.test(fmStr)) return false;
+  // Check for HTML comments (presenter notes)
+  if (/<!--[\s\S]*?-->/.test(body)) return true;
+  return false;
+}
+
+const WAR_STORY_KEYWORDS = /\b(broke|failed|bug|incident|crashed|retreated|regressed|outage|mistake|wrong|disaster|emergency|panic|surprise|surprised|unexpected|2\.3\s*GB)\b/i;
+
+// High-signal terms for internal consistency checking
+const CONSISTENCY_TERMS = ['unicode', 'ascii', 'emoji', 'gpu', 'stateless', 'stateful'];
 
 // ── Deck Linter ───────────────────────────────────────────────────
 
@@ -617,6 +861,147 @@ function lintDeck(deckDir) {
       if (meaningfulText.length < 10) {
         warns.push(`slide ${slide.index}: Mermaid diagram without insight annotation — add explanation of what to notice`);
       }
+    }
+  }
+
+  // ─── 12. Mermaid syntax and options validation ─────────────────────
+
+  for (const slide of slides) {
+    const body = slide.body || '';
+    const mermaidBlocks = [...body.matchAll(/```mermaid([^\n]*)\n([\s\S]*?)```/g)];
+    for (const block of mermaidBlocks) {
+      const annotation = block[1];
+      const code = block[2];
+
+      // Content syntax checks
+      const mermaidIssues = checkMermaidSyntax(code, slide.index);
+      for (const issue of mermaidIssues) {
+        warns.push(issue);
+      }
+
+      // Options: theme and scale must be explicit
+      const opts = parseMermaidOptions(annotation);
+      if (!opts.theme) {
+        warns.push(`slide ${slide.index}: Mermaid diagram missing explicit theme — add {theme: 'base'} or {theme: 'neutral'}`);
+      }
+      if (opts.scale == null) {
+        warns.push(`slide ${slide.index}: Mermaid diagram missing explicit scale — add {scale: 0.85}`);
+      }
+
+      // Node count vs scale (flowcharts only)
+      if (opts.scale != null) {
+        const nodeCount = countMermaidNodes(code);
+        if (nodeCount >= 6 && opts.scale > 0.8) {
+          warns.push(`slide ${slide.index}: Mermaid diagram has ${nodeCount} nodes at scale ${opts.scale} — consider scale 0.7–0.8 for 6+ nodes`);
+        }
+      }
+    }
+  }
+
+  // ─── 13. Source citation coverage ──────────────────────────────
+
+  for (const slide of slides) {
+    const body = slide.body || '';
+    const fm = slide.frontmatter || '';
+    if (slideNeedsSources(fm, body)) {
+      const sources = extractSources(body);
+      if (sources.length === 0) {
+        warns.push(`slide ${slide.index}: has presenter notes but no Sources: block`);
+      } else {
+        // Validate format: entries must start with https:// or file:
+        for (const src of sources) {
+          if (!src.startsWith('https://') && !src.startsWith('file:')) {
+            warns.push(`slide ${slide.index}: source "${src.slice(0, 50)}" must start with https:// or file:`);
+          }
+        }
+      }
+    }
+  }
+
+  // Also check cover slide (slide 1) — only if it has notes and isn't exempt
+  if (coverMatch) {
+    const coverBody = coverMatch[1];
+    if (/<!--[\s\S]*?-->/.test(coverBody)) {
+      const coverSources = extractSources(coverBody);
+      // Cover is exempt unless subtitle is factual — we warn gently
+      // Skip cover check by default (exempt layout)
+    }
+  }
+
+  // ─── 14. War story sourcing ──────────────────────────────────
+
+  for (const slide of slides) {
+    const body = slide.body || '';
+    const fm = slide.frontmatter || '';
+    const fullContent = fm + '\n' + body;
+
+    // Check if slide has war-story keywords in notes
+    const commentBlocks = [...body.matchAll(/<!--([\s\S]*?)-->/g)];
+    for (const block of commentBlocks) {
+      const noteText = block[1];
+      // Strip the Sources: section from the note text before checking keywords
+      const noteWithoutSources = noteText.replace(/Sources:\s*\n[\s\S]*$/i, '');
+      if (WAR_STORY_KEYWORDS.test(noteWithoutSources)) {
+        const sources = extractSources(body);
+        if (sources.length === 0) {
+          warns.push(`slide ${slide.index}: war-story language in notes but no source citations`);
+        }
+      }
+    }
+
+    // Also check slide body text for war-story keywords
+    const bodyWithoutComments = body.replace(/<!--[\s\S]*?-->/g, '');
+    if (WAR_STORY_KEYWORDS.test(bodyWithoutComments)) {
+      const sources = extractSources(body);
+      if (sources.length === 0) {
+        warns.push(`slide ${slide.index}: war-story language in slide body but no source citations`);
+      }
+    }
+  }
+
+  // ─── 15. Internal consistency ────────────────────────────────
+
+  // Build a map of term usage: { term: [{ slide, positive, negative }] }
+  const termUsage = {};
+  for (const term of CONSISTENCY_TERMS) {
+    termUsage[term] = [];
+  }
+
+  for (const slide of slides) {
+    const body = slide.body || '';
+    const bodyWithoutComments = body.replace(/<!--[\s\S]*?-->/g, '');
+    const bodyLower = bodyWithoutComments.toLowerCase();
+
+    for (const term of CONSISTENCY_TERMS) {
+      if (!bodyLower.includes(term)) continue;
+
+      // Check for negation patterns
+      const negationRe = new RegExp(`\\b(no|without|zero|never|not|non-?)\\s+${term}\\b`, 'i');
+      const positiveRe = new RegExp(`\\b${term}\\b`, 'i');
+
+      const isNegated = negationRe.test(bodyWithoutComments);
+      const isPositive = positiveRe.test(bodyWithoutComments) && !isNegated;
+
+      if (isNegated || isPositive) {
+        termUsage[term].push({
+          slide: slide.index,
+          negative: isNegated,
+          positive: isPositive,
+        });
+      }
+    }
+  }
+
+  // Flag contradictions
+  for (const term of CONSISTENCY_TERMS) {
+    const usages = termUsage[term];
+    const negatives = usages.filter(u => u.negative);
+    const positives = usages.filter(u => u.positive);
+
+    if (negatives.length > 0 && positives.length > 0) {
+      const negSlides = negatives.map(u => u.slide).join(', ');
+      const posSlides = positives.map(u => u.slide).join(', ');
+      warns.push(`internal contradiction: slide ${negSlides} negates "${term}" but slide ${posSlides} uses it positively`);
     }
   }
 

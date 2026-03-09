@@ -42,6 +42,29 @@ This means a cloudflare-preset deck for a project with green branding would stil
 
 Scoped styles (`<style scoped>`) must reference token variables (`var(--deck-bg)`, `var(--deck-fg)`, etc.), not override them with literal hex or rgb values. If a slide needs a palette variant (e.g., inverted section divider), define the variant as an additional CSS custom property in `styles/tokens.css` and reference that variable. Direct hex/rgb values in scoped styles are a token bypass and will be flagged by `tools/deck-lint.mjs`.
 
+## Font weight configuration
+
+Each preset specifies which Google Fonts weights to load. Include these in the `fonts.weights` frontmatter field to avoid loading unnecessary weights (slower) or missing weights (broken rendering).
+
+| Preset | Weights | Italic |
+|--------|---------|--------|
+| `editorial-dark` | `'300,400,600,700,900'` | yes |
+| `swiss-minimal` | `'400,500,600,700'` | no |
+| `bold-modern` | `'400,500,700'` | no |
+| `tufte-data` | `'400,500'` | yes |
+| `cloudflare` | `'400,500,600,700'` | no |
+| `material-design` | `'300,400,500,600,700'` | no |
+
+Example frontmatter:
+```yaml
+fonts:
+  sans: Playfair Display
+  serif: Source Sans 3
+  mono: JetBrains Mono
+  weights: '300,400,600,700,900'
+  italic: true
+```
+
 ## editorial-dark
 
 Mood: serious, modern, restrained, high-trust.
@@ -255,48 +278,56 @@ Best for:
 
 ## cloudflare
 
-Mood: warm, practical, developer-friendly, workshop-ready.
+Mood: warm, practical, developer-friendly, workshop-ready. "Warm parchment, not cold white."
 
-Palette:
-- `#f5f1eb` warm beige background
-- `#521000` deep brown foreground
-- `#ff6633` Cloudflare orange (primary accent)
-- `#b45309` amber (secondary accent, code highlights)
-- `#fffbf5` content surface (cards, elevated areas)
-- `#ebd5c1` warm border
-- muted: `rgba(82, 16, 0, 0.6)`
+Palette (from Cloudflare Developer Starter Kit design language v3):
+- `#fffbf5` warm cream background (page base)
+- `#fff7ed` alternate section background (surface)
+- `#521000` deep brown foreground (burned sienna)
+- `#ff4801` Cloudflare orange (primary accent — CTAs, active states, links)
+- `#e54100` accent hover state
+- `#7a4a3a` clay brown (muted text)
+- `#ebd5c1` warm tan border
+- `#f5e6d8` light border (inner dividers)
+- `#1c120b` dark panel chrome (code block headers, section dividers)
+- `#231710` dark panel content (code block backgrounds)
+- `#ffffff` card surface (deliberate contrast against cream)
 
 Typography:
-- display: **Work Sans** (clean geometric sans, warm character)
-- body: **DM Sans** (low-contrast geometric, excellent readability)
-- mono: **IBM Plex Mono** (technical, structured)
+- sans: **Inter** weights 400, 500, 600, 700 (Cloudflare's own sans-serif)
+- mono: **JetBrains Mono** weights 300, 400, 500, 600
+- letter-spacing: headlines `-0.02em`, section headings `-0.01em`, overlines/labels `0.05em`, badges `0.025em`
+- font-smoothing: antialiased on both webkit and moz
 - avoid: serif fonts — this preset demands clean sans-serif
 
 Layout tendencies:
-- white cards with warm borders on beige background
-- orange accent badges and highlights
-- code-heavy slides with bordered code blocks
-- two-column comparisons (Agent vs AIChatAgent pattern)
-- inverted section dividers (dark bg, light text)
-- step-by-step workflow slides
+- white cards with warm borders on cream background
+- orange accent badges and step indicators
+- "dark islands in a light sea" — code blocks invert to dark browns (`#1c120b` chrome, `#231710` content), drawing the eye with warm brown shadow
+- two-column comparisons
+- inverted section dividers (dark panel chrome bg, cream text)
+- step-by-step workflow slides with numbered indicators (`.cf-step`)
 
 Background treatments:
-- dot pattern: `radial-gradient(circle, rgba(82, 16, 0, 0.15) 1px, transparent 1px) / 20px 20px`
-- gradient glow: `radial-gradient(ellipse at 30% 50%, rgba(255, 102, 51, 0.15) 0%, transparent 60%)`
+- dot pattern: `radial-gradient(circle, rgba(82, 16, 0, 0.15) 1px, transparent 1px) / 24px 24px`
+- gradient glow: `radial-gradient(ellipse at 30% 50%, rgba(255, 72, 1, 0.15) 0%, transparent 60%)`
 - combine dot + glow for high-impact section dividers
 - Use `.cf-dots`, `.cf-glow`, `.cf-dots-glow` utility classes in theme.css
+- Dark panel shadow (signature): `0 20px 40px -12px rgba(82,16,0,0.25)` — warm brown, not neutral black
 
 Motion:
-- medium reveals with slight translateY
-- morph-fade for transitions between conceptual shifts
-- wipe-right for progression slides
+- transition base: `0.2s cubic-bezier(0.4, 0, 0.2, 1)` — fast, workshop-friendly
+- v-click: `0.2s` with `translateY(6px)` fade-in
+- active press: `scale(0.98)` feedback
+- morph-fade for conceptual shifts
+- wipe-right for progression
 - iris for dramatic section reveals
 
 Interaction:
-- hover: card lift `translateY(-3px)` + lava glow border — `box-shadow: 0 4px 16px rgba(246,130,31,0.2)` and `border-color: var(--deck-accent)`
-- cursor: `pointer` on cards and code blocks
-- spotlight: dim siblings to 35% — orange accent on focused item stands out strongly
-- keep hover transitions at 0.2s ease — responsive, workshop-friendly
+- hover: card lift `translateY(-2px)` + warm shadow `box-shadow: 0 4px 16px rgba(82,16,0,0.15)` and `border-color: var(--deck-accent)`
+- spotlight: dim siblings to 35%
+- focus ring: `ring-2 ring-accent ring-offset-2`
+- keep all hover transitions at 0.2s
 
 Transition vocabulary: `slide-left`, `fade`, `iris`, `morph-fade`, `wipe-right`
 - Workshop-ready. Full vocabulary. Prefer `slide-left` as the global default.

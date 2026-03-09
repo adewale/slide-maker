@@ -63,6 +63,8 @@ case "$PRESET" in
   editorial-dark)
     theme="default"
     color_schema="dark"
+    preset_weights="300,400,600,700,900"
+    preset_italic="true"
     font_sans="Playfair Display"
     font_serif="Source Sans 3"
     font_mono="JetBrains Mono"
@@ -87,6 +89,8 @@ case "$PRESET" in
   swiss-minimal)
     theme="default"
     color_schema="light"
+    preset_weights="400,500,600,700"
+    preset_italic="false"
     font_sans="Plus Jakarta Sans"
     font_serif="Figtree"
     font_mono="JetBrains Mono"
@@ -111,6 +115,8 @@ case "$PRESET" in
   bold-modern)
     theme="default"
     color_schema="dark"
+    preset_weights="400,500,700"
+    preset_italic="false"
     font_sans="Bebas Neue"
     font_serif="DM Sans"
     font_mono="JetBrains Mono"
@@ -135,6 +141,8 @@ case "$PRESET" in
   sumi-e)
     theme="seriph"
     color_schema="light"
+    preset_weights="400,500,600,700"
+    preset_italic="true"
     font_sans="Crimson Pro"
     font_serif="Zen Old Mincho"
     font_mono="JetBrains Mono"
@@ -159,6 +167,8 @@ case "$PRESET" in
   tufte-data)
     theme="seriph"
     color_schema="light"
+    preset_weights="400,500"
+    preset_italic="true"
     font_sans="Source Sans 3"
     font_serif="EB Garamond"
     font_mono="Source Code Pro"
@@ -183,6 +193,8 @@ case "$PRESET" in
   cloudflare)
     theme="default"
     color_schema="light"
+    preset_weights="400,500,600,700"
+    preset_italic="false"
     font_sans="Work Sans"
     font_serif="DM Sans"
     font_mono="IBM Plex Mono"
@@ -207,6 +219,8 @@ case "$PRESET" in
   material-design)
     theme="default"
     color_schema="light"
+    preset_weights="300,400,500,600,700"
+    preset_italic="false"
     font_sans="Plus Jakarta Sans"
     font_serif="Outfit"
     font_mono="Roboto Mono"
@@ -580,6 +594,7 @@ fi
 cat > "$DECK_DIR/styles/index.css" << 'INDEXCSS'
 @import './tokens.css';
 @import './theme.css';
+@import './transitions.css';
 INDEXCSS
 
 # ─── Generate slides.md ───────────────────────────────────────
@@ -593,6 +608,8 @@ fonts:
   sans: ${font_sans}
   serif: ${font_serif}
   mono: ${font_mono}
+  weights: '${preset_weights}'
+  italic: ${preset_italic}
 transition: ${transition}
 layout: cover
 ---
@@ -706,6 +723,265 @@ cat > "$DECK_DIR/deck.spec.md" << SPECMD
 - title: Thank You
 SPECMD
 
+# ─── Generate universal files (keyboard help, shortcuts, transitions) ──
+
+mkdir -p "$DECK_DIR/setup" "$DECK_DIR/composables"
+
+cat > "$DECK_DIR/composables/useHelp.ts" << 'USEHELP'
+import { ref } from 'vue'
+
+export const showHelp = ref(false)
+
+export function toggleHelp() {
+  showHelp.value = !showHelp.value
+}
+USEHELP
+
+cat > "$DECK_DIR/setup/shortcuts.ts" << 'SHORTCUTS'
+import { defineShortcutsSetup } from '@slidev/types'
+import { toggleHelp } from '../composables/useHelp'
+
+export default defineShortcutsSetup((_, base) => {
+  return [
+    ...base,
+    {
+      key: '?',
+      fn: () => toggleHelp(),
+      autoRepeat: false,
+    },
+    {
+      key: 'p',
+      fn: () => {
+        const base = import.meta.env.BASE_URL || '/'
+        window.open(`${base}presenter/`, '_blank')
+      },
+      autoRepeat: false,
+    },
+  ]
+})
+SHORTCUTS
+
+cat > "$DECK_DIR/components/KeyboardHelp.vue" << 'KBHELP'
+<script setup lang="ts">
+import { onKeyStroke } from '@vueuse/core'
+import { toggleHelp } from '../composables/useHelp'
+
+onKeyStroke('Escape', () => toggleHelp())
+</script>
+
+<template>
+  <Teleport to="body">
+    <div class="help-backdrop" @click.self="toggleHelp()">
+      <div class="help-panel">
+        <h2 class="help-title">Keyboard Shortcuts</h2>
+        <div class="help-grid">
+          <div class="help-column">
+            <h3>Navigation</h3>
+            <div class="help-row">
+              <kbd>&#8594;</kbd> / <kbd>Space</kbd>
+              <span>Next slide</span>
+            </div>
+            <div class="help-row">
+              <kbd>&#8592;</kbd>
+              <span>Previous slide</span>
+            </div>
+            <div class="help-row">
+              <kbd>&#8593;</kbd>
+              <span>Previous click</span>
+            </div>
+            <div class="help-row">
+              <kbd>&#8595;</kbd>
+              <span>Next click</span>
+            </div>
+            <div class="help-row">
+              <kbd>Home</kbd>
+              <span>First slide</span>
+            </div>
+            <div class="help-row">
+              <kbd>End</kbd>
+              <span>Last slide</span>
+            </div>
+          </div>
+
+          <div class="help-column">
+            <h3>View</h3>
+            <div class="help-row">
+              <kbd>o</kbd>
+              <span>Slide overview</span>
+            </div>
+            <div class="help-row">
+              <kbd>d</kbd>
+              <span>Toggle dark mode</span>
+            </div>
+            <div class="help-row">
+              <kbd>f</kbd>
+              <span>Fullscreen</span>
+            </div>
+            <div class="help-row">
+              <kbd>g</kbd>
+              <span>Go to slide</span>
+            </div>
+            <div class="help-row">
+              <kbd>Esc</kbd>
+              <span>Close overlays</span>
+            </div>
+          </div>
+
+          <div class="help-column">
+            <h3>Tools</h3>
+            <div class="help-row">
+              <kbd>p</kbd>
+              <span>Presenter mode</span>
+            </div>
+            <div class="help-row">
+              <kbd>?</kbd>
+              <span>Toggle this panel</span>
+            </div>
+            <div class="help-row">
+              <kbd>e</kbd>
+              <span>Pen / drawing</span>
+            </div>
+            <div class="help-row">
+              <kbd>u</kbd>
+              <span>Pen color</span>
+            </div>
+            <div class="help-row">
+              <kbd>Delete</kbd>
+              <span>Clear drawings</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Teleport>
+</template>
+
+<style scoped>
+.help-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.help-panel {
+  background: rgba(30, 30, 40, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 2rem 2.5rem;
+  max-width: 720px;
+  width: 90vw;
+}
+
+.help-title {
+  font-family: var(--deck-font-display, sans-serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #f0eef5;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.help-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.help-column h3 {
+  font-family: var(--deck-font-display, sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--deck-accent, #a78bfa);
+  margin-bottom: 0.75rem;
+}
+
+.help-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+  color: rgba(240, 238, 245, 0.7);
+}
+
+.help-row span {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.6em;
+  padding: 0.15em 0.45em;
+  font-family: var(--deck-font-mono, monospace);
+  font-size: 0.75rem;
+  color: #f0eef5;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .help-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+</style>
+KBHELP
+
+cat > "$DECK_DIR/global-top.vue" << 'GLOBALTOP'
+<script setup lang="ts">
+import { showHelp } from './composables/useHelp'
+import KeyboardHelp from './components/KeyboardHelp.vue'
+</script>
+
+<template>
+  <KeyboardHelp v-if="showHelp" />
+</template>
+GLOBALTOP
+
+cat > "$DECK_DIR/global-bottom.vue" << 'GLOBALBOTTOM'
+<template>
+  <div v-if="!['cover', 'end'].includes($nav.currentLayout)" class="deck-footer">
+    <span class="deck-footer-title">{{ $slidev.configs.title }}</span>
+    <span class="deck-footer-page">{{ $nav.currentPage }} / {{ $nav.total }}</span>
+  </div>
+</template>
+<style scoped>
+.deck-footer {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between;
+  padding: 0.5rem 1.5rem;
+  font-family: var(--deck-font-body, sans-serif);
+  font-size: 0.65rem; color: var(--deck-muted);
+  pointer-events: none; z-index: 1;
+}
+</style>
+GLOBALBOTTOM
+
+cat > "$DECK_DIR/setup/mermaid-renderer.ts" << 'MERMAIDRENDERER'
+import { defineMermaidRendererSetup } from '@slidev/types'
+import { renderMermaid } from 'beautiful-mermaid'
+
+export default defineMermaidRendererSetup(() => {
+  return (code, _options) => renderMermaid(code)
+})
+MERMAIDRENDERER
+
+cp "$ROOT/../slide-maker/styles/transitions.css" "$DECK_DIR/styles/transitions.css"
+
 # ─── Update build.sh DECKS array ──────────────────────────────
 
 BUILD_FILE="$EXAMPLES/build.sh"
@@ -734,7 +1010,13 @@ echo "  examples/$DECK_NAME/deck.spec.md"
 echo "  examples/$DECK_NAME/styles/index.css"
 echo "  examples/$DECK_NAME/styles/tokens.css"
 echo "  examples/$DECK_NAME/styles/theme.css"
-echo "  examples/$DECK_NAME/components/     (empty)"
+echo "  examples/$DECK_NAME/styles/transitions.css"
+echo "  examples/$DECK_NAME/composables/useHelp.ts"
+echo "  examples/$DECK_NAME/setup/shortcuts.ts"
+echo "  examples/$DECK_NAME/setup/mermaid-renderer.ts"
+echo "  examples/$DECK_NAME/components/KeyboardHelp.vue"
+echo "  examples/$DECK_NAME/global-top.vue"
+echo "  examples/$DECK_NAME/global-bottom.vue"
 echo ""
 echo "Next steps:"
 echo "  1. Edit deck.spec.md — fill in purpose, audience, tone, and slide plan"

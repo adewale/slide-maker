@@ -1,13 +1,16 @@
 :root {
-  --deck-bg: #f5f1eb;
+  --deck-bg: #fffbf5;
   --deck-fg: #521000;
-  --deck-accent: #ff6633;
-  --deck-accent-alt: #b45309;
-  --deck-muted: rgba(82, 16, 0, 0.6);
-  --deck-surface: #fffbf5;
+  --deck-accent: #ff4801;
+  --deck-accent-alt: #e54100;
+  --deck-muted: #7a4a3a;
+  --deck-surface: #fff7ed;
   --deck-border: #ebd5c1;
-  --deck-font-display: 'Work Sans', sans-serif;
-  --deck-font-body: 'DM Sans', sans-serif;
-  --deck-font-mono: 'IBM Plex Mono', monospace;
-  --deck-radius: 10px;
+  --deck-border-light: #f5e6d8;
+  --deck-panel-chrome: #1c120b;
+  --deck-panel-content: #231710;
+  --deck-font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --deck-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --deck-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --deck-radius: 0.75rem;
 }

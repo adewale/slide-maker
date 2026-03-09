@@ -163,6 +163,17 @@ Optional:
 - layout: cover
 - title: What Are Durable Objects For?
 - subtitle: What happens when you give a function a name, a memory, and a mailbox?
+
+### Slide 5
+- kind: war-story
+- layout: default
+- title: The Alarm That Fired Twice
+- body: Hibernation woke the object, but the alarm had already re-triggered — two instances racing on the same state.
+- sources:
+  - file:LESSONS_LEARNED.md — hibernation double-alarm incident
+  - https://github.com/user/project/blob/main/src/alarm.ts — alarm handler with idempotency guard
+- notes:
+  - This broke production for 4 hours before we added the idempotency check.
 ```
 
 ## Meta
@@ -194,10 +205,17 @@ Fields (each with a path and parenthetical summary):
 - `architecture` — technical architecture doc (structural understanding — how pieces connect)
 - `lessons-learned` — post-project reflections (storytelling gold — what surprised, what broke)
 - `screenshots` — visual evidence from the running project (proof it works)
+- `specs` — feature/API/design specifications (scope boundaries — inclusions and exclusions)
+- `research` — research and decision documents (decision archaeology — why X not Y)
+- `wrangler` — `wrangler.jsonc` or similar infrastructure config (topology — bindings, services, routes)
+- `package` — `package.json` (dependency map, script surface area)
+- `config` — CI, build, deploy configuration files (operational posture — how the project ships)
 
 Rules:
 - Every field is optional, but the section should contain at least 2 sources.
 - Summaries are parenthetical — short enough to scan but specific enough to recall what each source contributed.
+- Every source in the Source Materials section should be cited by at least one slide's `sources` field.
+- Per-slide `sources` entries must trace back to a document listed in this section (or be a direct URL to the same project).
 
 ## Through-Line
 
@@ -260,6 +278,7 @@ Optional:
 - `image` — path to a screenshot or visual evidence (project decks)
 - `alt` — alt text for the image (required when `image` is set)
 - `notes`
+- `sources` — list of URLs or `file:` repo-relative paths that evidence the slide's claims
 - `component`
 - `props`
 

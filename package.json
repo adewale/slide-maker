@@ -2,16 +2,19 @@
   "name": "project2slides",
   "private": true,
   "scripts": {
-    "build": "bash examples/build.sh"
+    "build": "bash examples/build.sh",
+    "dev": "npm run build && npx serve examples/_build -l 3030",
+    "serve": "npx serve examples/_build -l 3030"
   },
   "dependencies": {
     "@iconify-json/carbon": "^1.2.19",
     "@iconify-json/logos": "^1.2.10",
     "@iconify-json/mdi": "^1.2.3",
-    "@slidev/cli": "^51",
+    "@slidev/cli": "^52",
     "@slidev/theme-apple-basic": "latest",
     "@slidev/theme-default": "latest",
-    "@slidev/theme-seriph": "latest"
+    "@slidev/theme-seriph": "latest",
+    "beautiful-mermaid": "^1.1.3"
   },
   "devDependencies": {
     "pixelmatch": "^7.1.0",

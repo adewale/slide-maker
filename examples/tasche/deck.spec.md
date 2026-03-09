@@ -2,12 +2,29 @@
 
 ## Meta
 - title: Tasche
-- purpose: showcase the project
-- audience: developers and self-hosters
-- tone: serious, warm, trustworthy
-- target-length: 8
+- purpose: showcase a read-later service that archives articles permanently on Cloudflare Workers Python
+- audience: developers building on Cloudflare Workers
+- tone: precise, calm, determined
+- target-length: 12
 - notes: yes
 - style-preset: editorial-dark
+- project-url: https://github.com/adewale/tasche
+
+## Source Materials
+- readme: README.md (features, deploy model, architecture table, cost, data flow summary)
+- changelog: CHANGELOG.md (bookmarklet pivot from cross-origin fetch to popup, browser extension removal, Readability Service Binding, Preact rewrite, security fixes)
+- lessons-learned: LESSONS_LEARNED.md (36 lessons — FFI boundary layer, bookmarklet SameSite pivot, runtime gap, lxml unavailability, Pyodide cold start, implement-audit loop stats)
+- specs: specs/tasche-spec.md (core promise "your articles survive", what gets archived table, content storage philosophy, processing pipeline, TTS idempotency)
+
+## Through-Line
+- concept: "Your articles survive"
+- type: design-rule
+- appears-in:
+  - slide 1: cover — subtitle hints at the survival promise
+  - slide 3: default — the archive promise: what gets saved per article
+  - slide 5: section — through-line named explicitly
+  - slide 6: default — anatomy of a saved article shows the survival mechanism
+  - slide 11: center — resolution: your articles survive because every format is portable
 
 ## Design Tokens
 - colors:
@@ -16,8 +33,8 @@
   - accent: "#fb923c"
   - muted: "rgba(245, 240, 235, 0.5)"
 - typography:
-  - display: Inter Tight
-  - body: Inter
+  - display: Playfair Display
+  - body: Source Sans 3
   - mono: JetBrains Mono
 - motion:
   - preset: restrained-fade
@@ -26,10 +43,11 @@
 - prefer-builtins: true
 - builtins:
   - cover
-  - center
   - statement
+  - section
   - default
-  - two-cols
+  - center
+  - two-cols-header
   - fact
   - end
 - custom-layouts: []
@@ -43,68 +61,105 @@
 ### Slide 1
 - kind: cover
 - layout: cover
-- transition: fade
 - title: Tasche
-- subtitle: Self-hosted read-it-later on Cloudflare.
-- notes: yes
+- subtitle: A read-later service where your articles survive.
 
 ### Slide 2
-- kind: why-statement
+- kind: opening-tension
 - layout: statement
-- transition: slide-left
-- title: Read-later services own your data
-- body: Pocket, Instapaper, Omnivore store articles on their servers. When they shut down, your library vanishes. You need a self-hosted alternative.
+- transition: fade
+- title: Read-later services own your data. What happens when they shut down?
+- sources:
+  - https://github.com/adewale/tasche/blob/main/specs/tasche-spec.md — section 1.1: "Your Articles Survive" core promise
 
 ### Slide 3
-- kind: code
+- kind: archive-promise
 - layout: default
-- transition: slide-up
-- title: Article extraction pipeline
-- body: Python async pipeline — fetch, extract, archive to R2, index to D1 FTS5.
-- notes: yes
+- transition: slide-left
+- title: The archive promise
+- body: What gets saved per article — original HTML, markdown, images as WebP, metadata, three deduplicated URLs, optional TTS audio
+- sources:
+  - https://github.com/adewale/tasche/blob/main/specs/tasche-spec.md — section 1.2: "What Gets Archived" table
+  - https://github.com/adewale/tasche/blob/main/README.md — data flow description
 
 ### Slide 4
-- kind: architecture-diagram
+- kind: war-story
+- layout: default
+- transition: slide-up
+- title: The FFI boundary
+- body: Magic Move — Python bytes to R2 fails with PyProxy, fix with to_js() conversion
+- sources:
+  - https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md — lesson 29: Python bytes cannot cross FFI boundary to R2
+  - https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md — lesson 30: FFI boundary is bidirectional
+
+### Slide 5
+- kind: section-divider
+- layout: section
+- transition: iris
+- title: Your articles survive
+
+### Slide 6
+- kind: anatomy
+- layout: default
+- transition: slide-left
+- title: Anatomy of a saved article
+- body: 14-step pipeline — fetch, redirect resolution, Readability extraction via JS Worker, image download and WebP conversion, dual-format storage, FTS5 indexing
+- sources:
+  - https://github.com/adewale/tasche/blob/main/specs/tasche-spec.md — section 1.2: archived assets table
+  - https://github.com/adewale/tasche/blob/main/README.md — data flow description
+  - https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md — lesson 32: Readability Service Binding solution
+
+### Slide 7
+- kind: process
+- layout: two-cols-header
+- transition: wipe-right
+- title: Implement then Audit
+- left: Implementation phases — foundation, auth, CRUD, pipeline, search, TTS, frontend, observability, hardening
+- right: Audit results — 17 iterations, 909 tests, phases 8-9 passed first attempt
+- sources:
+  - https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md — Implement-Audit Loop Summary and Final Stats
+
+### Slide 8
+- kind: war-story
+- layout: default
+- transition: slide-up
+- title: The bookmarklet pivot
+- body: Cross-origin fetch with SameSite=Lax cookies fails silently. Fix: window.open() popup with same-origin request.
+- sources:
+  - https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md — lessons 17-18: SameSite cookies and fix-the-pattern-not-the-policy
+  - https://github.com/adewale/tasche/blob/main/CHANGELOG.md — bookmarklet rewritten entry
+
+### Slide 9
+- kind: architecture
 - layout: default
 - transition: slide-left
 - title: The Cloudflare stack
-- body: Mermaid graph — PWA to Python Worker to D1, R2, Queues, KV, Workers AI.
-- features:
-  - v-motion with initial opacity 0 and y offset
+- body: Mermaid diagram — PWA to Python Worker to D1, R2, KV, Queues, JS Worker (Readability), Workers AI
+- sources:
+  - https://github.com/adewale/tasche/blob/main/README.md — architecture table
+  - https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md — lesson 32: Service Binding to JS Worker
 
-### Slide 5
-- kind: two-cols
-- layout: two-cols
-- transition: fade
-- title: Storage layer / Processing layer
-- body:
-  - left: D1, FTS5 (v-mark underline), R2
-  - right: Queues, Workers AI, KV
-- features:
-  - v-mark on FTS5
-  - hover-lift interaction on list items
-
-### Slide 6
-- kind: design-insight
-- layout: center
-- transition: slide-up
-- title: Cloudflare stack = $5/month for unlimited articles
-- body: D1 for metadata, R2 for content, Queues for async, AI for TTS. One platform.
-- features:
-  - v-mark circle on $5/month
-- notes: yes
-
-### Slide 7
+### Slide 10
 - kind: fact
 - layout: fact
 - transition: fade
-- title: $5
-- subtitle: per month vs $120/year Pocket Premium
-- body: Your data, your rules. Self-hosted on Cloudflare Workers Paid plan.
+- title: "$5/month"
+- subtitle: Workers Paid plan. Your own D1, R2, KV, Queues, AI. Zero vendor lock-in.
+- sources:
+  - https://github.com/adewale/tasche/blob/main/README.md — Cost section
 
-### Slide 8
+### Slide 11
+- kind: through-line-resolution
+- layout: center
+- transition: morph-fade
+- title: Your articles survive because every format is portable
+- body: D1 exports as SQLite. R2 speaks S3. The archive outlasts the platform.
+- sources:
+  - https://github.com/adewale/tasche/blob/main/specs/tasche-spec.md — section 1.1: core promise
+  - https://github.com/adewale/tasche/blob/main/README.md — architecture and data portability
+
+### Slide 12
 - kind: end
 - layout: end
-- transition: slide-left
-- title: Deploy in 5 minutes
-- body: git clone && uv run pywrangler deploy
+- transition: fade
+- title: The original got paywalled. The domain expired. Doesn't matter -- you saved it.

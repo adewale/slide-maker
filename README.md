@@ -39,14 +39,14 @@ The `slide-maker/` directory is self-contained:
 
 ## Example decks
 
-The `examples/` directory contains 14 complete decks built with this skill:
+The `examples/` directory contains 10 complete decks built with this skill:
 
 ```bash
 cd examples && bash build.sh    # build all decks
 npx serve examples/_build       # serve at http://localhost:3000
 ```
 
-See individual decks: `demo/`, `vaders/`, `cloudflare/`, `sumi-e/`, `tufte/`, `material/`, and more.
+See individual decks: `demo/`, `vaders/`, `planet-cf/`, `sumi-e/`, `tufte/`, `durable-objects/`, and more.
 
 ## Tools
 
@@ -62,4 +62,4 @@ The `tools/` directory contains development utilities:
 
 ## Lessons learned
 
-See [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md) for hard-won insights from building 14 decks with this skill.
+See [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md) for hard-won insights from building decks with this skill.

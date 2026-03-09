@@ -2,12 +2,30 @@
 
 ## Meta
 - title: Claude History Explorer
-- purpose: showcase the project
-- audience: developers and Claude Code users
-- tone: serious, modern, developer-focused
-- target-length: 8
+- purpose: showcase a CLI tool that earns trust through radical transparency and read-only guarantees
+- audience: developers and Claude users interested in conversation data exploration
+- tone: calm, confident, transparent
+- target-length: 10
 - notes: yes
 - style-preset: editorial-dark
+- project-url: https://github.com/adewale/claude-history-explorer
+
+## Source Materials
+- readme: README.md (features, commands, installation, streaming JSONL, read-only design)
+- trust: TRUST.md (5 trust guarantees — read-only, no network, open source, minimal deps, scoped reads)
+- changelog: CHANGELOG.md (v0.1.0 initial release — 10 commands, story generation, concurrent detection)
+- architecture: docs/ARCHITECTURE.md (3-layer architecture — data models, business logic, CLI; streaming JSONL; read-only data access pattern)
+
+## Through-Line
+- concept: "Read-only means zero risk"
+- type: design-rule
+- appears-in:
+  - slide 1: cover — subtitle introduces the read-only guarantee
+  - slide 2: statement — tension about trusting tools with conversation data
+  - slide 3: default — 5 trust guarantees, read-only is first
+  - slide 5: section — through-line named explicitly
+  - slide 8: default — minimal deps reinforce read-only (no file/network libraries)
+  - slide 10: end — resolution echoes read-only promise
 
 ## Design Tokens
 - colors:
@@ -16,8 +34,8 @@
   - accent: "#38bdf8"
   - muted: "rgba(226, 232, 240, 0.5)"
 - typography:
-  - display: Inter Tight
-  - body: Inter
+  - display: Playfair Display
+  - body: Source Sans 3
   - mono: JetBrains Mono
 - motion:
   - preset: restrained-fade
@@ -26,10 +44,9 @@
 - prefer-builtins: true
 - builtins:
   - cover
-  - center
   - statement
+  - section
   - default
-  - two-cols
   - fact
   - end
 - custom-layouts: []
@@ -44,69 +61,83 @@
 - kind: cover
 - layout: cover
 - title: Claude History Explorer
-- subtitle: Search and visualize your Claude Code conversation history.
-- notes: yes
+- subtitle: Read-only exploration of your Claude Code conversations.
 
 ### Slide 2
-- kind: why-statement
+- kind: opening-tension
 - layout: statement
-- transition: slide-left
-- title: JSONL files are where Claude conversations go to die
-- body: Raw JSONL logs are unreadable — thousands of lines, no search, no structure. You need a tool to explore them.
+- transition: fade
+- title: Your conversations contain proprietary code, architecture decisions, and accidental secrets
+- body: Any tool that reads them must earn trust before it runs.
+- sources:
+  - https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — the trust question and threat model
 
 ### Slide 3
+- kind: trust-guarantees
+- layout: default
+- transition: slide-up
+- title: Five guarantees
+- body: v-clicks list of 5 trust guarantees from TRUST.md — read-only, no network, open source, minimal deps, scoped reads
+- sources:
+  - https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — all 5 guarantees with enforcement and verification methods
+
+### Slide 4
 - kind: code
 - layout: default
 - transition: slide-up
-- title: Search in action
-- body: Python CLI example showing `che search` with context output
-- notes: yes
-
-### Slide 4
-- kind: two-cols
-- layout: two-cols
-- transition: fade
-- title: What it does / Design principles
-- body:
-  - left:
-    - bullet: Story generation — narratives about work patterns
-    - bullet: Concurrent detection — find parallel instance usage
-    - bullet: Regex search across all conversations
-    - bullet: Multiple exports — JSON, Markdown, plain text
-  - right:
-    - bullet: Read-only by design (v-mark underline)
-    - bullet: Never modifies history files
-    - bullet: Local-first, no network
-    - bullet: Fast — streams JSONL lazily
-- interactive: hover-accent on design principles list items
+- title: Read-only enforcement
+- body: Code showing verification — grep for write ops, no write imports, automated static analysis test
+- sources:
+  - https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — Guarantee #1 enforcement details
+  - https://github.com/adewale/claude-history-explorer/blob/main/docs/ARCHITECTURE.md — read-only data access pattern
 
 ### Slide 5
-- kind: architecture
-- layout: default
-- transition: slide-left
-- title: How data flows
-- body: Mermaid graph LR — JSONL Files -> Parser -> Conversations -> Search / Stats / Stories
-- motion: v-motion fade-up on diagram
+- kind: section-divider
+- layout: section
+- transition: iris
+- title: Read-only means zero risk
 
 ### Slide 6
-- kind: fact
-- layout: fact
-- transition: slide-up
-- title: "1,200 lines of JSONL"
-- subtitle: becomes a 3-second search
-- body: 9 commands. All read-only. Your data never leaves your machine.
+- kind: feature
+- layout: default
+- transition: slide-left
+- title: Stories from conversations
+- body: Story generation pipeline — session discovery, pattern analysis, personality classification, narrative output
+- sources:
+  - https://github.com/adewale/claude-history-explorer/blob/main/README.md — story command with brief/detailed/timeline formats
+  - https://github.com/adewale/claude-history-explorer/blob/main/docs/ARCHITECTURE.md — story generation pipeline
 
 ### Slide 7
-- kind: design-insight
-- layout: center
-- transition: fade
-- title: Read-only by design means zero risk
-- body: When you never modify source files, you can experiment freely. No backup needed. No undo anxiety.
+- kind: feature
+- layout: default
+- transition: slide-left
+- title: Concurrent Claude detection
+- body: Streaming JSONL parsing, overlapping session detection, lazy loading for performance
+- sources:
+  - https://github.com/adewale/claude-history-explorer/blob/main/README.md — concurrent Claude detection and streaming JSONL
+  - https://github.com/adewale/claude-history-explorer/blob/main/docs/ARCHITECTURE.md — streaming JSONL and lazy loading performance
 
 ### Slide 8
+- kind: deps
+- layout: default
+- transition: slide-up
+- title: Three dependencies
+- body: click (CLI), rich (formatting), sparklines (charts) — all formatting, no file/network ops
+- sources:
+  - https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — Guarantee #4 minimal dependencies table
+  - https://github.com/adewale/claude-history-explorer/blob/main/docs/ARCHITECTURE.md — core dependencies section
+
+### Slide 9
+- kind: fact
+- layout: fact
+- transition: fade
+- title: "~2,600 lines"
+- subtitle: of Python. Small enough to audit in an afternoon.
+- sources:
+  - https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — Guarantee #3: "Total: ~2,600 lines of Python"
+
+### Slide 10
 - kind: end
 - layout: end
 - transition: fade
-- title: Explore your history
-- body: uv tool install .
-- notes: yes
+- title: You don't have to trust us. The code is small enough to read.
