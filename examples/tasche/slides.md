@@ -1,6 +1,7 @@
 ---
 theme: seriph
 title: Tasche
+selectable: true
 colorSchema: dark
 transition: fade
 layout: cover

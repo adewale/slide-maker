@@ -1,6 +1,7 @@
 ---
 theme: default
 title: What Are Durable Objects For?
+selectable: true
 colorSchema: light
 fonts:
   sans: Inter

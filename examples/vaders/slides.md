@@ -1,6 +1,7 @@
 ---
 theme: default
 title: Vaders
+selectable: true
 colorSchema: dark
 fonts:
   sans: Space Grotesk

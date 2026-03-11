@@ -1,6 +1,7 @@
 ---
 theme: default
 title: Slide Maker
+selectable: true
 colorSchema: dark
 fonts:
   sans: Outfit

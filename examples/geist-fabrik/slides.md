@@ -1,6 +1,7 @@
 ---
 theme: seriph
 title: Geist Fabrik
+selectable: true
 colorSchema: dark
 transition: fade
 layout: cover

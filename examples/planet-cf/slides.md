@@ -1,6 +1,7 @@
 ---
 theme: apple-basic
 title: Planet CF
+selectable: true
 colorSchema: light
 transition: slide-left
 layout: cover

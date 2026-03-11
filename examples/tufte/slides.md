@@ -1,6 +1,7 @@
 ---
 theme: seriph
 title: Debug at the Source
+selectable: true
 colorSchema: light
 transition: fade
 layout: cover

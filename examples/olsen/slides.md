@@ -1,6 +1,7 @@
 ---
 theme: apple-basic
 title: Olsen
+selectable: true
 colorSchema: light
 transition: slide-left
 layout: cover

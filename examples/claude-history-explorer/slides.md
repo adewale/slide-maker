@@ -1,6 +1,7 @@
 ---
 theme: seriph
 title: Claude History Explorer
+selectable: true
 colorSchema: dark
 transition: fade
 layout: cover

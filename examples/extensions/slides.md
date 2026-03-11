@@ -1,6 +1,7 @@
 ---
 theme: default
 title: Extensions
+selectable: true
 colorSchema: dark
 fonts:
   sans: Bebas Neue
