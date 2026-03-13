@@ -1,0 +1,57 @@
+/* ─── Reusable Hover & Interaction Patterns ─── */
+
+/* ── Hover lift for cards ── */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* ── Spotlight group — dim siblings on hover ── */
+.spotlight-group > * {
+  transition: opacity 0.3s ease, filter 0.3s ease;
+  cursor: pointer;
+}
+.spotlight-group:hover > *:not(:hover) {
+  opacity: 0.3;
+  filter: blur(1px);
+}
+
+/* ── Scale reveal for data elements ── */
+.hover-scale {
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+.hover-scale:hover {
+  transform: scale(1.03);
+}
+
+/* ── Accent border on hover ── */
+.hover-accent {
+  transition: border-color 0.2s ease;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.hover-accent:hover {
+  border-color: var(--deck-accent);
+}
+
+/* ── Hover glow — subtle accent shadow ── */
+.hover-glow {
+  transition: box-shadow 0.2s ease;
+  cursor: pointer;
+}
+.hover-glow:hover {
+  box-shadow: 0 0 16px rgba(34, 211, 238, 0.25);
+}
+
+/* ── Hover dim — reduce opacity to signal non-focus ── */
+.hover-dim {
+  transition: opacity 0.2s ease;
+}
+.hover-dim:hover {
+  opacity: 0.7;
+}
