@@ -6,7 +6,7 @@
 - audience: developers who debug production systems
 - tone: scholarly, dense, evidence-driven
 - target-length: 10
-- notes: no
+- notes: yes
 - style-preset: tufte-data
 
 ## Design Tokens

@@ -52,7 +52,7 @@ When justified: `styles/tokens.css`, `styles/theme.css`, `layouts/*.vue`, `compo
 - Split dense material across slides instead of cramming
 - Remove dead abstractions when updating
 - Never bypass the token system with hardcoded colors in `<style scoped>` blocks — use `var(--deck-*)` variables exclusively
-- When notes are requested, keep them slide-local and delivery-oriented using Slidev note comments
+- When notes are requested, keep them slide-local and delivery-oriented using Slidev note comments (see COMPILER_RULES.md § Notes for quality criteria and click marker sync)
 
 ## Workflow
 

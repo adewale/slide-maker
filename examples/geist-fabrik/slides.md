@@ -60,7 +60,19 @@ Geists come in two forms, chosen by what kind of thinking they need to do:
 
 </v-clicks>
 
-<!-- The 57 default geists span 10 pattern categories: temporal analysis, semantic similarity, graph analysis, clustering, metadata-driven, contrarian, creative transformation, recency, extraction (harvesters), and Tracery-only. The two-form design is deliberate: code geists handle objective analysis (finding orphans, computing similarity scores), while Tracery geists handle subjective provocation (asking "What contradicts [[note]]?"). This split emerged from the first lesson learned — see next slide.
+<!-- Geists come in two forms, chosen by what kind of thinking they need to do.
+
+[click] Code geists use Python with the VaultContext API — they handle objective analysis like finding orphans, computing similarity scores, and graph traversal.
+
+[click] Tracery geists are declarative YAML grammars — they handle subjective provocation. "What contradicts [[note]]?" is a question, not a computation.
+
+[click] Code when you need computation (graphs, stats) — the distinction is about what kind of thinking the geist does.
+
+[click] Grammars when you need provocation (questions) — this split emerged from a hard lesson about algorithmic failure, covered next.
+
+[click] 48 code geists + 9 Tracery ship by default — spanning 10 pattern categories from temporal analysis to creative transformation.
+
+[click] Users create custom geists without writing Python — Tracery YAML grammars make the system extensible by anyone who can ask a good question.
 
 Sources:
 - https://github.com/adewale/geist_fabrik/blob/main/README.md — 57 default geists (48 code + 9 Tracery), extensibility
@@ -89,7 +101,15 @@ text = f"[[{title}]] exists — what about '{opposite}'?"
 
 </v-clicks>
 
-<!-- This is the war story. The initial Contradictor implementation was a classic oracle approach — the system tries to know the answer. It worked only for titles with specific patterns like "Benefits of X" or "Advantages of Y." For most note titles (dates, names, abstract concepts), it produced useless tautologies. The 100+ lines of code were an attempt to poorly compute what a simple question handles effortlessly. This is the through-line in action: a poorly-computed answer.
+<!-- This is the war story. The initial Contradictor implementation was a classic oracle approach — the system tries to know the answer.
+
+[click] "Benefits of Morning Routines" to "Costs of..." — this works. Titles with specific patterns like "Benefits of X" or "Advantages of Y" had computable opposites.
+
+[click] "Evergreen notes" to "The opposite of Evergreen notes" — useless tautology. The pattern matching fails for abstract concepts.
+
+[click] "Meeting with Sarah" to "The opposite of Meeting with Sarah" — even worse. Names, dates, and most real note titles produce nothing useful.
+
+[click] Success rate: roughly 10% — 100+ lines of code were an attempt to poorly compute what a simple question handles effortlessly. This is the through-line in action.
 
 Sources:
 - https://github.com/adewale/geist_fabrik/blob/main/LESSONS_LEARNED.md — "Muses, Not Oracles: The Case for Asking Over Answering," contradictor implementation, 10% success rate -->
@@ -127,7 +147,15 @@ suggestion:
 
 </v-clicks>
 
-<!-- The Tracery version asks "What contradicts [[note]]?" — a question that works universally because the user generates the answer, not the system. The user produces multiple possible opposites, not just one computed guess. This is the through-line proven: a well-asked question (13 lines, 100% success) beats a poorly-computed answer (100+ lines, 10% success). The muse approach is not just philosophically preferable — it is measurably superior.
+<!-- 13 lines of YAML replaced 100+ lines of Python. The Tracery version asks "What contradicts [[note]]?"
+
+[click] Works for any note title, regardless of content — the question works universally because the user generates the answer, not the system.
+
+[click] Opens possibility space instead of closing it — the user produces multiple possible opposites, not just one computed guess.
+
+[click] Forces active cognitive engagement — the human brain is doing the creative work, which is exactly what a muse should enable.
+
+[click] Success rate: 100% — the through-line proven. A well-asked question (13 lines) beats a poorly-computed answer (100+ lines). Measurably superior.
 
 Sources:
 - https://github.com/adewale/geist_fabrik/blob/main/LESSONS_LEARNED.md — question approach YAML, 100% success rate, "Why Questions Win" analysis -->

@@ -58,7 +58,17 @@ transition: slide-left
 
 </v-clicks>
 
-<!-- The sprite system uses braille characters and Unicode box-drawing elements — not plain ASCII. Each alien type (squid, crab, octopus) has a distinct two-line sprite pattern with two animation frames. The UFO uses color cycling: rotating through a palette of six colors every 5 ticks, the classic Amiga technique that creates compelling animation without per-pixel rendering. Barriers have per-segment health tracked on the server, with colors shifting as they degrade. The dissolve effect uses a braille particle system where dying entities scatter into fragments that fall with simulated gravity.
+<!-- The sprite system uses braille characters and Unicode box-drawing elements — not plain ASCII.
+
+[click] 7-wide animated braille sprites — each alien type (squid, crab, octopus) has a distinct two-line sprite pattern with two animation frames.
+
+[click] Color cycling for UFO rainbow effect — rotating through a palette of six colors every 5 ticks. The classic Amiga technique that creates compelling animation without per-pixel rendering.
+
+[click] Per-health colors on destructible barriers — per-segment health tracked on the server, with colors shifting as they degrade.
+
+[click] Dissolve particle system — dying entities scatter into braille fragments that fall with simulated gravity.
+
+[click] Directional shrapnel for explosions — different explosion patterns for aliens, players, and barriers.
 
 Sources:
 - https://github.com/adewale/vaders/blob/main/CHANGELOG.md — braille pixel art sprites, dissolve effects, explosion effects, barrier health colors, UFO color cycling
@@ -175,7 +185,15 @@ transition: wipe-right
 
 </v-clicks>
 
-<!-- Terminals render character cells with one foreground and one background color. There is no sub-pixel rendering, no partial transparency, no smooth gradients. But color cycling — the classic Amiga technique of rotating through a color palette — creates compelling visual effects. The UFO cycles through six colors every 5 ticks. Barriers shift color as health decreases. Aliens alternate between two animation frames. Movement is inherently "chunky" — entities jump by whole character cells. Aliens move 2 cells every 18 ticks, which looks correct for the genre. The lesson: accept terminal constraints as features, not bugs. Chunky movement and solid colors ARE the Space Invaders aesthetic.
+<!-- Terminals render character cells with one foreground and one background color. The lesson: accept terminal constraints as features, not bugs.
+
+[click] Gradients and per-pixel effects — impossible. No sub-pixel rendering, no partial transparency.
+
+[click] Smooth sub-cell animation — impossible. Movement is inherently chunky. Entities jump by whole character cells.
+
+[click] Complex background patterns — impossible. One background color per cell. Period.
+
+[click] Anti-aliasing or transparency — impossible. But the constraint is the advantage: chunky movement and solid colors ARE the Space Invaders aesthetic. Aliens move 2 cells every 18 ticks, which looks correct for the genre. Color cycling creates compelling animation without any of these capabilities.
 
 Sources:
 - https://github.com/adewale/vaders/blob/main/Lessons_learned.md — section 1: what works (color cycling, box-drawing, multi-line sprites) and what does NOT work (gradients, sub-pixel, smooth animation, complex backgrounds)
@@ -240,7 +258,15 @@ function playSound(path: string): void {
 
 </v-clicks>
 
-<!-- The audio system avoids FFI entirely. Instead of native bindings or Web Audio (which doesn't exist in a terminal), Vaders spawns the system's command-line audio player (afplay on macOS, aplay on Linux) as a subprocess. Advantages: no native dependencies, works with WAV/MP3, fire-and-forget. Disadvantages: ~5-10ms subprocess overhead, no per-sound volume control. Rapid-fire gameplay needs debouncing — a 50ms minimum interval per sound type prevents audio spam during intense moments. The critical gotcha: spawned audio processes outlive the parent if not explicitly killed. The MusicManager registers cleanup handlers for exit, SIGINT, and SIGTERM. Startup verification checks that the audio player binary exists and sound files are present.
+<!-- The audio system avoids FFI entirely — no native bindings, no Web Audio.
+
+[click] Fire-and-forget: 5-10ms latency — the system spawns afplay (macOS) or aplay (Linux) as a subprocess. Works with WAV/MP3, no native dependencies.
+
+[click] Debounce at 50ms to prevent audio spam — rapid-fire gameplay needs this. A 50ms minimum interval per sound type prevents overlapping SFX during intense moments.
+
+[click] Kill spawned processes on exit — the critical gotcha. Spawned audio processes outlive the parent if not explicitly killed. MusicManager registers cleanup handlers for exit, SIGINT, and SIGTERM.
+
+[click] Separate toggles: M for SFX, N for music — independent control lets players keep the soundtrack while muting repetitive sound effects. Startup verification checks that the audio player binary exists.
 
 Sources:
 - https://github.com/adewale/vaders/blob/main/Lessons_learned.md — section 7: system audio player approach, process cleanup, debouncing, startup verification, separate mute toggles -->
@@ -264,7 +290,15 @@ Server tests verified events were *sent*. The client silently dropped them.
 
 The collision story is worse. Server treated `player.x` as left edge. Client treated it as center. Bullets appeared 2 columns off.
 
-<!-- This is the war story. All server-side unit tests passed — they verified that events were sent via ws.send(). But the client's WebSocket handler only processed 'sync', 'error', and 'pong' messages. The 'event' message type was silently dropped. The game_over event with victory/defeat result never reached the UI. 620+ tests were green while the game was functionally broken for end-game state. The fix: add event handling to useGameConnection.ts, then add integration tests that verify the full client-server flow. Separately, a coordinate system mismatch caused visual bugs: the server treated player.x as the center of the sprite, but collision code added SPRITE_WIDTH/2 as an offset — placing bullets 2 columns off-center. The lesson: entity-specific collision functions (checkAlienHit, checkPlayerHit) encode coordinate conventions and are harder to misuse than generic functions with offset parameters.
+<!-- This is the war story. All server-side unit tests passed. The game was functionally broken.
+
+[click] Server: expect(ws.send).toHaveBeenCalledWith(...) passes — unit tests verified events were sent via ws.send(). The server did its job.
+
+[click] Client: if (msg.type === 'event') not handled — the WebSocket handler only processed 'sync', 'error', and 'pong'. The 'event' type was silently dropped.
+
+[click] 620+ tests green, game_over never reaches UI — the game was functionally broken for end-game state. Victory and defeat results never displayed.
+
+[click] Fix: integration tests across the protocol boundary — add event handling to useGameConnection.ts, then add tests that verify the full client-server flow. Separately, a coordinate system mismatch placed bullets 2 columns off-center.
 
 Sources:
 - https://github.com/adewale/vaders/blob/main/Lessons_learned.md — section 9: unit tests don't catch client-side protocol issues, event handling fix

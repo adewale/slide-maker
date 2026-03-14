@@ -62,7 +62,15 @@ transition: slide-up
 - Native Slidev Markdown
 - The building you present
 
-<!-- The dual-layer architecture solves both failure modes. The spec layer prevents generic output by forcing visual direction choices before compilation. The presentation layer prevents brittle output by compiling to native Slidev Markdown, not custom HTML. Edit the spec to change direction. Edit slides.md to change content. Neither breaks the other.
+<!-- The dual-layer architecture solves both failure modes.
+
+[click] deck.spec.md captures intent — the spec layer prevents generic output by forcing visual direction choices before compilation. You decide what the deck looks like before writing a single slide.
+
+[click] Structure, tokens, boundaries — these are planning concerns, not presentation concerns. The spec holds them so the slides don't have to.
+
+[click] Visual direction decided here, not in slides — this is the anti-generic mechanism. By the time compilation starts, the deck already has a voice.
+
+[click] The blueprint you edit first — edit the spec to change direction. Edit slides.md to change content. Neither breaks the other. The presentation layer prevents brittle output by compiling to native Slidev Markdown, not custom HTML.
 
 Sources:
 - file:slide-maker/DECK_SPEC.md — planning schema with required sections (Meta, Design Tokens, Layout System, Slides)
@@ -98,7 +106,17 @@ transition: fade
 
 </div>
 
-<!-- Each level is annotated with its relationship to the generic/brittle tension. Markdown is resilient but can be generic — presets fix that. Built-in layouts add structure without fragility. Custom layouts and components are justified complexity. Inline HTML is the brittle zone.
+<!-- Each level is annotated with its relationship to the generic/brittle tension.
+
+[click] Markdown is resilient but can be generic — presets fix that. Always start here because it never breaks when you edit content.
+
+[click] Built-in layouts add structure without fragility — cover, section, center, fact, end. These are free complexity.
+
+[click] Custom layouts are justified only when a structure repeats across multiple slides. This is where you start paying a maintenance cost.
+
+[click] Custom components are justified only when a block has props and reuse. Higher cost, but contained.
+
+[click] Inline HTML is the brittle zone — last resort. This is where generated decks break most often. Every line of inline HTML is a maintenance liability.
 
 Sources:
 - file:slide-maker/COMPILER_RULES.md — "Decide implementation level per slide" section defining the five-level escalation -->
@@ -234,7 +252,19 @@ transition: fade
 
 Each click reveals the next priority. The fade communicates the hierarchy — the top matters most.
 
-<!-- The priority order resolves the generic/brittle tension. Editability first (anti-brittle). Clarity second (anti-generic). Restraint last — a reminder that the temptation to add complexity is the enemy of both goals. The opacity gradient makes the ranking visceral rather than just listed.
+<!-- The priority order resolves the generic/brittle tension. The opacity gradient makes the ranking visceral rather than just listed.
+
+[click] Editability first — the anti-brittle priority. If you can't edit the deck without breaking it, nothing else matters.
+
+[click] Clarity second — the anti-generic priority. The deck must communicate clearly, not just exist.
+
+[click] Coherence — every slide serves the argument. No orphan slides, no filler.
+
+[click] Native Slidev — stay on the platform. Don't fight the tool.
+
+[click] Reuse — shared components, shared presets, shared transitions.
+
+[click] Restraint last — a reminder that the temptation to add complexity is the enemy of both goals. Less is almost always more.
 
 Sources:
 - file:slide-maker/COMPILER_RULES.md — "Goals" section listing the six optimization priorities -->

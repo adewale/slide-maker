@@ -1,3 +1,4 @@
+---
 layout: section
 transition: flip-x
 ---

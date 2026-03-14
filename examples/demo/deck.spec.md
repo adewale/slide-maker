@@ -6,7 +6,7 @@
 - audience: developers and Claude Code users
 - tone: assertive, energetic, approachable
 - target-length: 11
-- notes: no
+- notes: yes
 - style-preset: bold-modern
 
 ## Design Tokens

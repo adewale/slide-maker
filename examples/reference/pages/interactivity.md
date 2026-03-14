@@ -1,3 +1,4 @@
+---
 layout: section
 transition: iris
 ---
@@ -24,7 +25,17 @@ Wrap a list in `<v-clicks>` to reveal items one at a time on click.
 
 </v-clicks>
 
-<!-- v-clicks is the primary interactivity mechanism. It wraps any list to make each item appear sequentially. The acceptance checklist requires bullet lists to use v-clicks for progressive reveal. But restraint matters — not every list needs it.
+<!-- v-clicks is the primary interactivity mechanism. It wraps any list to make each item appear sequentially.
+
+[click] First item appears on first click — the audience focuses on one point before seeing the next.
+
+[click] Second item on second click — progressive reveal prevents the audience from reading ahead.
+
+[click] Third item on third click — each point gets its own moment.
+
+[click] The audience focuses on each point — this is the pedagogical purpose. Information arrives at the pace of your delivery.
+
+[click] Aim for fewer than 40% of slides using v-clicks — restraint matters. Not every list needs progressive reveal. The acceptance checklist requires bullet lists to use v-clicks, but overuse creates click fatigue.
 
 Sources:
 - file:slide-maker/COMPILER_RULES.md — v-click usage rules and 40% budget -->
@@ -47,7 +58,17 @@ Each type draws attention differently.
 
 </v-clicks>
 
-<!-- v-mark renders Rough Notation annotations over text. Five types: highlight, underline, strike, box, circle. The color prop accepts any CSS color value. The at="N" prop delays the annotation until click N. strike is for rejected options, highlight for key terms, circle for stats.
+<!-- v-mark renders Rough Notation annotations over text. Five types, each with a semantic purpose.
+
+[click] Highlight — soft background wash for key phrases. Use for terms you want to emphasize without interrupting reading flow.
+
+[click] Underline — emphasis without obscuring text. Cleaner than highlight for single words.
+
+[click] Strikethrough — for ideas being rejected or superseded. Use in before/after comparisons.
+
+[click] Box — border around a term for definition or focus. Good for technical terminology.
+
+[click] Circle — draws a hand-drawn circle, best on numbers and stats. The at="N" prop delays the annotation until click N.
 
 Sources:
 - file:slide-maker/COMPILER_RULES.md — v-mark variants with semantic meanings -->

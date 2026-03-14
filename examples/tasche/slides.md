@@ -59,7 +59,19 @@ When you save a URL, Tasche creates a complete, self-contained archive. Your art
 
 </v-clicks>
 
-<!-- The dual-format storage philosophy is key: HTML preserves the author's intent (formatting, images, layout), while Markdown is ideal for FTS5 search, AI processing, and the clean reader view. Images are downloaded at save time because they disappear faster than text -- CDN expiry, hotlink protection, domain death. The three-URL deduplication catches the same article saved via Twitter t.co links, newsletter tracking URLs, and direct shares. WebP conversion saves roughly 30% storage versus original formats.
+<!-- The dual-format storage philosophy is key.
+
+[click] Clean HTML preserves the author's intent — formatting, images, layout. This is the archival format.
+
+[click] Markdown is ideal for FTS5 search, AI processing, and the clean reader view. Dual-format means you get both fidelity and utility.
+
+[click] Images are downloaded at save time because they disappear faster than text — CDN expiry, hotlink protection, domain death. WebP conversion saves roughly 30% storage versus original formats.
+
+[click] Three-URL deduplication catches the same article saved via Twitter t.co links, newsletter tracking URLs, and direct shares.
+
+[click] Full-page screenshot as archival fallback — when extraction fails, you still have a visual record.
+
+[click] TTS audio generated on demand via Workers AI — listen to your articles when you can't read them.
 
 Sources:
 - https://github.com/adewale/tasche/blob/main/specs/tasche-spec.md -- section 1.2: "What Gets Archived" table with all asset types
@@ -120,7 +132,19 @@ A 14-step pipeline runs asynchronously via Queues for each saved URL:
 
 The Readability extraction runs in a separate JS Worker because `python-readability` calls `js.eval()`, which V8 isolates block.
 
-<!-- The Service Binding pattern solves a fundamental constraint: every Python content extraction library with high-quality output (Trafilatura F1=0.958, Newspaper4k F1=0.949, Goose3 F1=0.896) requires lxml, a C extension unavailable in Pyodide/WebAssembly. Rather than use a lower-quality pure-Python alternative, Tasche deploys a separate JavaScript Worker that bundles @mozilla/readability and linkedom. The Python Worker calls it via Service Binding RPC, which is in-process communication at 1-5ms latency, not a network call. BeautifulSoup is the fallback if the JS Worker is unavailable.
+<!-- A 14-step pipeline runs asynchronously via Queues for each saved URL.
+
+[click] Fetch and resolve — follow redirects, capture the final URL. This is step 1 of the pipeline.
+
+[click] Extract — the JS Worker runs Mozilla Readability via Service Binding. Every Python extraction library with high-quality output (Trafilatura, Newspaper4k, Goose3) requires lxml, a C extension unavailable in Pyodide. The Service Binding is in-process communication at 1-5ms latency.
+
+[click] Download images — convert to WebP, enforce size limits. Images disappear faster than text.
+
+[click] Store dual format — clean HTML and Markdown to R2. HTML preserves layout, Markdown enables search.
+
+[click] Index — FTS5 full-text search across title, excerpt, content.
+
+[click] Deduplicate — check original, final, and canonical URLs. Catches the same article saved via t.co links, tracking URLs, and direct shares.
 
 Sources:
 - https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- lesson 32: python-readability cannot run in Workers, Service Binding solution
@@ -163,7 +187,29 @@ transition: wipe-right
 
 </v-clicks>
 
-<!-- Each phase was implemented by one sub-agent and audited by a separate sub-agent. If the audit failed, fixes were applied and the audit re-run. The cleanest phase was Observability (wide events middleware) -- it passed on first review because the pattern is self-contained with clear inputs and outputs. The messiest was the Frontend PWA: 4 HIGH and 7 MEDIUM issues including XSS via javascript: URLs in the markdown renderer, a bookmarklet that used location.origin (wrong context), and missing PWA icons. The article processing pipeline (processing.py and routes.py) was the perpetual hotspot with 41 combined modifications across all commits.
+<!-- Each phase was implemented by one sub-agent and audited by a separate sub-agent.
+
+[click] Foundation, FFI wrappers, and auth — the base layer. Safe* wrappers quarantine every JS boundary.
+
+[click] Article CRUD and URL validation — basic operations, but URL handling is surprisingly complex.
+
+[click] 14-step processing pipeline — the core. processing.py was the perpetual hotspot with 41 modifications.
+
+[click] FTS5 search, tags, and TTS — the features that make saved articles useful.
+
+[click] Preact PWA frontend — the messiest phase. 4 HIGH and 7 MEDIUM issues including XSS via javascript: URLs.
+
+[click] Observability and edge hardening — the cleanest phase. Passed on first review because wide events middleware is self-contained.
+
+[click] 17 audit iterations total — if the audit failed, fixes were applied and the audit re-run.
+
+[click] 909 tests (877 unit + 32 integration) — comprehensive coverage across the full stack.
+
+[click] Phases 8-9 passed on first attempt — by this point, the patterns were established.
+
+[click] 17 edge cases hardened in phase 9 — the final polish.
+
+[click] Fix-to-feature ratio: 1:2.1 — for every fix, two features shipped cleanly.
 
 Sources:
 - https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- Implement-Audit Loop Summary: all 9 phase summaries
@@ -188,7 +234,15 @@ The bookmarklet used cross-origin `fetch()` with `credentials: 'include'`. With 
 
 The lesson: fix the integration pattern, not the security policy.
 
-<!-- The initial fix was weakening CORS to accept all origins -- addressing the symptom, not the cause. The spec already described bookmarklets using window.open(), but the implementation used fetch() for a perceived smoother UX. The popup approach is simpler (a standalone 2KB HTML page), more resilient (immune to CSP and cookie issues), and updatable server-side. The browser extension directory was deleted entirely because it had the same cross-origin problem and added maintenance burden with no advantage over the popup. This pattern applies broadly: dedicated lightweight pages beat loading the full SPA for transient interactions.
+<!-- The bookmarklet used cross-origin fetch() with SameSite=Lax cookies. The browser silently drops the session cookie. Every save failed with no error.
+
+[click] First instinct: open CORS to .* — addressing the symptom, not the cause. The initial fix was weakening security to mask a design flaw.
+
+[click] Correct fix: window.open() popup with a dedicated /bookmarklet page. Same-origin request, no cookie issues. The spec already described this approach.
+
+[click] Same-origin request, shows "Saved!", auto-closes. The popup approach is simpler (a standalone 2KB HTML page), more resilient (immune to CSP and cookie issues), and updatable server-side.
+
+[click] Browser extension deleted — zero maintenance burden. It had the same cross-origin problem and added maintenance burden with no advantage over the popup.
 
 Sources:
 - https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- lesson 17: SameSite cookies break cross-origin bookmarklets

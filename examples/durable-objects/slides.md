@@ -54,7 +54,13 @@ But a Worker forgets you the moment it responds.
 
 The platform gives you speed and scale. It doesn't give you identity.
 
-<!-- Workers are extraordinary for stateless compute. The gap becomes visible only when you try to build something that needs to remember, coordinate, or persist between requests — which is most interesting applications.
+<!-- Workers are extraordinary for stateless compute. The gap becomes visible only when you try to build something that needs to remember.
+
+[click] Need real-time sync? Workers can't hold WebSocket state — each request is isolated. You can't broadcast to other connections because you can't see them.
+
+[click] Need per-entity memory? Workers share nothing between requests — there's no "this user's session" or "this game's state." Every invocation starts from zero.
+
+[click] Need coordination? Workers race against each other — two concurrent requests to the same resource can read stale state and overwrite each other.
 
 Sources:
 - https://developers.cloudflare.com/workers/ — Workers platform overview
@@ -79,7 +85,15 @@ Problems that fall between stateless compute and shared storage:
 
 Durable Objects fill this gap. One per entity. Single-threaded. Named.
 
-<!-- Each bullet is a real product requirement from the case studies later in this deck. The 16ms game sync is Vaders. The per-entity music session is Keyboardia. The "no race conditions" is the killer feature — single-threaded execution means coordination is free.
+<!-- Each bullet is a real product requirement from the case studies later in this deck.
+
+[click] Real-time sync — the 16ms game sync requirement comes from Vaders. 4 players need the same game state within one frame.
+
+[click] Per-entity state — each Keyboardia music session holds its own pattern and tempo. The state belongs to the session, not to a shared database row.
+
+[click] Long-lived connections — a WebSocket that outlives a single request. Workers can't hold a connection open; DOs can.
+
+[click] Coordination without contention — no row locks, no race conditions. Single-threaded execution means coordination is free. This is the killer feature.
 
 Sources:
 - https://github.com/adewale/vaders/blob/main/docs/server-architecture.md — 30Hz game loop with full state broadcast
@@ -107,7 +121,15 @@ Worker B's write lands second. Worker A's edit vanishes.
 
 One Durable Object per document. Single-threaded. Problem gone.
 
-<!-- The race condition illustrates the fundamental problem that Workers + D1 cannot solve: per-entity coordination without contention. Moving to one DO per document eliminates the entire category of bug — not by solving concurrency, but by removing it.
+<!-- The race condition illustrates the fundamental problem that Workers + D1 cannot solve.
+
+[click] Optimistic locking? Adds retries, complexity, and user-visible conflicts — you're solving the problem by making the user deal with it.
+
+[click] Row-level locks? D1 is SQLite — there's a single-writer constraint. You can't have concurrent writers by design.
+
+[click] CRDTs? Now you're building a distributed systems library — massive complexity for what should be a simple editing operation.
+
+One DO per document eliminates the entire category of bug — not by solving concurrency, but by removing it. Single-threaded execution means coordination is free.
 
 Sources:
 - https://developers.cloudflare.com/durable-objects/best-practices/ — single-threaded execution prevents data races

@@ -1,3 +1,4 @@
+---
 layout: section
 transition: iris
 ---
@@ -26,7 +27,17 @@ Heading, body text, and bullet points.
 
 </v-clicks>
 
-<!-- The default layout is the most common. It supports headings, paragraphs, bullet lists, numbered lists, bold, italic, inline code, and links. v-clicks wraps the list for progressive reveal. The escalation ladder says: start here, only reach for a custom layout when default cannot express the structure.
+<!-- The default layout is the most common. Start here; only reach for a custom layout when default cannot express the structure.
+
+[click] Bold text signals emphasis — maps to var(--deck-accent) for visual consistency with the preset.
+
+[click] Inline code uses the mono font — accent-alt background makes it stand out in prose.
+
+[click] Italic text for softer emphasis — terminology, foreign words, or gentle stress.
+
+[click] Numbered lists use accent-colored markers — for ordered sequences where position matters.
+
+[click] Bullet depth stays shallow — two levels maximum. If you need deeper nesting, the slide needs splitting.
 
 Sources:
 - file:slide-maker/COMPILER_RULES.md — escalation ladder: Markdown first

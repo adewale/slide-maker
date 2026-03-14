@@ -6,7 +6,7 @@
 - audience: developers building on Cloudflare Workers who need coordination, state, or real-time sync
 - tone: practical, curious, workshop-style
 - target-length: 26
-- notes: no
+- notes: yes
 - style-preset: cloudflare
 - project-url: https://developers.cloudflare.com/durable-objects/
 

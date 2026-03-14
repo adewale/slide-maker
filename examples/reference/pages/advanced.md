@@ -1,3 +1,4 @@
+---
 layout: section
 transition: iris
 ---
@@ -151,7 +152,19 @@ transition: slide-left
 
 </v-clicks>
 
-<!-- These 6 principles (from 15 total) most directly affect compilation. "One idea per slide" drives the density guardrails. "Sustained metaphor" drives the through-line system. "Decks are arguments" drives narrative arc. The remaining 9 principles cover ALL CAPS emphasis, cross-disciplinary references, named frameworks, and data as bold text assertions.
+<!-- These 6 principles (from 15 total) most directly affect compilation.
+
+[click] One idea per slide — drives the density guardrails. 1-3 lines max. If you're scrolling, split it.
+
+[click] Sustained metaphor — drives the through-line system. The through-line does analytical work, not decoration.
+
+[click] Decks are arguments, not outlines — drives narrative arc. Thesis, complication, synthesis.
+
+[click] Text-dominant — images only when demonstrative, never decorative. No stock photos.
+
+[click] Provocative openings — never an agenda slide. Question, epigraph, or bold claim. Hook immediately.
+
+[click] Resonant closings — never "Questions?" or "Thank you." Circle back to the opening and resolve it. The remaining 9 principles cover ALL CAPS emphasis, cross-disciplinary references, named frameworks, and data as bold text assertions.
 
 Sources:
 - file:docs/PRESENTATION_PHILOSOPHY.md — 15 rhetorical principles

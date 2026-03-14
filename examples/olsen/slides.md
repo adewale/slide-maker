@@ -99,7 +99,19 @@ for path := range workChannel {
 }
 ```
 
-<!-- The worker pool uses Go's goroutine + channel pattern. The main thread walks the filesystem and sends file paths into a buffered channel of size 100. N worker goroutines pull paths and run the full 8-step pipeline: EXIF extraction, image decode, thumbnail generation (4 sizes), color palette extraction (k-means), perceptual hash (pHash), file hash (SHA-256), metadata inference (time of day, season, conditions), and transactional database insert. Mutex-protected statistics track progress. Hash-based resume means re-running after a crash skips already-processed files — because source files are read-only, a file's hash is guaranteed stable.
+<!-- The worker pool uses Go's goroutine + channel pattern. N workers consume paths in parallel.
+
+[click] Scanner finds DNG, JPEG, BMP files recursively — the main thread walks the filesystem and sends file paths into the work channel.
+
+[click] Buffered work channel (size: 100) — large enough to keep workers busy without loading the entire file list into memory.
+
+[click] Configurable worker count (default: 4) — scales to available CPU cores. 8 workers on M3 Max gives 15-25 photos/sec.
+
+[click] Hash-based resume skips already-processed files — because source files are read-only, a file's hash is guaranteed stable. Re-running after a crash picks up where it left off.
+
+[click] Per-file timeout: 60 seconds — prevents a single corrupt file from blocking the entire batch.
+
+[click] Failed files logged, never block the batch — mutex-protected statistics track progress. The pipeline is resilient to individual file failures.
 
 Sources:
 - https://github.com/adewale/olsen/blob/main/docs/architecture.md — worker pool pattern, concurrency model, processing pipeline
@@ -141,7 +153,15 @@ stateDiagram-v2
 
 </v-clicks>
 
-<!-- The state machine model replaced an earlier hierarchical model that cleared "child" filters when a "parent" changed (e.g., changing year cleared month). The new model preserves ALL filters during transitions and lets SQL compute which facet values have results given current filters. Values with count=0 are rendered as disabled. The key insight from the spec: "Faceted navigation isn't about taxonomy and hierarchies. It's about exploration and valid state transitions through actual data." Available facets: Year, Month, Day, Color (11 Berlin-Kay), Time of Day, Season, Camera, Lens, Focal Category, Shooting Condition, In Burst.
+<!-- Faceted navigation as a state machine. The key insight: "It's about exploration and valid state transitions through actual data."
+
+[click] SQL computes valid facet values per state — the state machine model replaced a hierarchical model that cleared "child" filters when a "parent" changed. Now SQL determines what's valid.
+
+[click] Disabled options visible but not clickable — values with count=0 are rendered as disabled. The user sees the full possibility space while being guided to valid paths.
+
+[click] Filters preserved across transitions — the new model preserves ALL filters. No more losing your month selection when changing year.
+
+[click] No hardcoded hierarchies — data determines paths. Available facets: Year, Month, Day, Color (11 Berlin-Kay), Time of Day, Season, Camera, Lens, Focal Category, Shooting Condition, In Burst.
 
 Sources:
 - https://github.com/adewale/olsen/blob/main/specs/facet_state_machine.spec — state machine model, "never zero results" guarantee, filter preservation vs. hierarchical clearing
@@ -207,7 +227,15 @@ entries, _ := exif.GetFlatExifData(rawExif)
 
 </v-clicks>
 
-<!-- The EXIF extraction uses dsoprea/go-exif/v3 which parses IFD entries from byte buffers. No write operations exist in the extraction path — os.Open() opens with O_RDONLY, and the EXIF library reads from the byte slice. After extraction, the indexer infers additional metadata: time of day (from DateTaken hour), season (from month), focal length category (wide/normal/telephoto/super-telephoto), and shooting conditions (from ISO, aperture, shutter speed combinations). This is the read-only guarantee applied at the lowest level: the file descriptor itself is read-only.
+<!-- The EXIF extraction uses dsoprea/go-exif/v3. No write operations exist — os.Open() opens with O_RDONLY.
+
+[click] Camera make, model, lens, focal length — the equipment metadata. Parsed from IFD entries in byte buffers.
+
+[click] Exposure: ISO, aperture, shutter speed — the technical settings. Combined, these reveal shooting conditions.
+
+[click] Location: latitude, longitude, altitude — GPS coordinates when available. Enables geographic faceted search.
+
+[click] Inferred: time of day, season, conditions — the indexer computes additional metadata from raw values. Time of day from DateTaken hour, season from month, focal length category (wide/normal/telephoto), shooting conditions from ISO+aperture+shutter combinations. This is the read-only guarantee applied at the lowest level: the file descriptor itself is read-only.
 
 Sources:
 - https://github.com/adewale/olsen/blob/main/docs/architecture.md — processing pipeline, read-only enforcement via O_RDONLY, EXIF extraction step

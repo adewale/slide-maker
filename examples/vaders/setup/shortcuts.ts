@@ -12,8 +12,9 @@ export default defineShortcutsSetup((_, base) => {
     {
       key: 'p',
       fn: () => {
-        const base = import.meta.env.BASE_URL || '/'
-        window.open(`${base}presenter/`, '_blank')
+        const b = import.meta.env.BASE_URL || '/'
+        const isHash = location.hash.startsWith('#')
+        window.open(isHash ? `${b}#/presenter` : `${b}presenter/`, '_blank')
       },
       autoRepeat: false,
     },

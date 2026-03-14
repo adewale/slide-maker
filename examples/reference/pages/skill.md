@@ -1,3 +1,4 @@
+---
 layout: section
 transition: iris
 ---
@@ -40,7 +41,21 @@ graph LR
 
 </v-clicks>
 
-<!-- The Skill's workflow enforces direction-before-content. Visual identity is a planning concern decided at step 4, before a single slide is written at step 6. This prevents the generic failure mode where styling is applied after compilation.
+<!-- The Skill's workflow enforces direction-before-content. Visual identity is decided at step 4, before a single slide is written at step 6.
+
+[click] Mode — new deck or update to existing. This determines which workflow branches apply.
+
+[click] Sources — gather README, ARCHITECTURE, CHANGELOG, LESSONS_LEARNED. The raw material the deck is built from.
+
+[click] Intake — normalize title, goal, audience, tone, target length. Establish what the deck needs to accomplish.
+
+[click] Direction — offer 2-3 visual directions in words only. No slides yet. This is the anti-generic mechanism.
+
+[click] Spec — write deck.spec.md before any slides. The blueprint that prevents both generic and brittle output.
+
+[click] Compile — generate slides, styles, layouts, components. This is where the actual presentation is built.
+
+[click] Validate — spec matches slides, density controlled, abstractions justified. The final quality gate.
 
 Sources:
 - file:slide-maker/SKILL.md — workflow steps 1-7
@@ -109,7 +124,21 @@ transition: slide-up
 
 </v-click>
 
-<!-- Phases 1-7 run on every deck. Phases 8-10 are conditional — custom layouts only for recurring structures, custom components only for blocks with props and reuse, dead code pruning only when updating. The escalation ladder in phase 3 is the anti-brittle mechanism.
+<!-- Phases 1-7 run on every deck. Phases 8-10 are conditional.
+
+[click] Gather sources — read project docs, extract facts and stories. The raw material.
+
+[click] Normalize spec — resolve meta, tokens, slide and layout inventory. Establish the planning layer.
+
+[click] Decide level — the escalation ladder per slide. Markdown first. This is the anti-brittle mechanism.
+
+[click] Write headmatter — theme, fonts, colorSchema, transition. The Slidev configuration block.
+
+[click] Write slides — clean Markdown, one idea per slide, v-clicks on lists. The core compilation.
+
+[click] Write tokens — --deck-bg, --deck-fg, --deck-accent, --deck-muted. The design system foundation.
+
+[click] Write theme — typography, color application, v-click animations. Tokens applied to layout classes.
 
 Sources:
 - file:slide-maker/COMPILER_RULES.md — phases 1-10 specification -->
@@ -167,7 +196,17 @@ Plus **timeline**, **through-line-echo** (resurfaces the deck's thread mid-deck,
 
 </v-click>
 
-<!-- Each kind has a default implementation level: cover maps to built-in cover, section to built-in section. Escalate only when the kind repeats enough to justify a custom layout. The decision rule: prefer plain Markdown, then built-in layout, then one local custom layout, then one local custom component.
+<!-- 14 canonical slide kinds, each with a default implementation level.
+
+[click] cover / end — opening and closing frames. These bookend the argument.
+
+[click] section — chapter breaks that create visual rhythm. Use iris transition.
+
+[click] default-content — the workhorse explanatory slide. 80% of all slides.
+
+[click] center-statement / fact / quote-pull — single-idea emphasis. Different weights for different rhetorical purposes.
+
+[click] split-insight / comparison — side-by-side reasoning. When two ideas need juxtaposition.
 
 Sources:
 - file:slide-maker/SLIDE_KINDS.md — canonical kinds and escalation rules
@@ -225,7 +264,15 @@ Slides alternate in a rhythm: **section divider**, 2-3 **content slides**, then 
 
 </v-click>
 
-<!-- The narrative arc comes from PRESENTATION_PHILOSOPHY.md: "Decks are arguments, not outlines." Structure follows dialectical progression: thesis, complication, synthesis. Every slide either advances the argument or provides evidence. Provocative openings, resonant closings — never an agenda slide, never "Questions?"
+<!-- Every deck follows a four-part story structure. "Decks are arguments, not outlines."
+
+[click] Tension — open with a problem, contradiction, or surprising fact. Never an agenda slide. Provocative openings only.
+
+[click] Exploration — walk through the journey, showing real decisions. This is where war stories and evidence live.
+
+[click] Insight — present a counterintuitive finding or unexpected result. The "aha" moment the deck builds toward.
+
+[click] Resolution — close with a memorable takeaway. Never "Questions?" or "Thank you." Circle back to the opening tension and resolve it.
 
 Sources:
 - file:slide-maker/COMPILER_RULES.md — narrative arc: tension, exploration, insight, resolution
@@ -315,7 +362,21 @@ The acceptance checklist:
 
 </v-clicks>
 
-<!-- The full checklist has 30+ items covering structure, animation, color methodology, storytelling, and project-specific requirements. Project decks add: through-line in 3+ slides, 2+ source materials digested, 1+ visual evidence slide, project colors override preset palette. Every factual slide needs a Sources: block.
+<!-- The acceptance checklist has 30+ items. These seven are the most commonly failed.
+
+[click] No generic stock phrases, no ad-hoc transitions — the most basic quality gate.
+
+[click] At least 3 different layout types used — prevents visual monotony.
+
+[click] Bullet lists use v-clicks for progressive reveal — pacing the audience.
+
+[click] At least 1 v-motion element, 1 hover-interactive element — minimum interactivity.
+
+[click] Mermaid nodes: light fills get dark text, dark fills get light text — readability in diagrams.
+
+[click] No slide overflows (7 bullets, 8 code lines, 60 char bullets) — density guardrails.
+
+[click] Closing echoes or resolves the opening — narrative coherence. The full checklist adds project-specific requirements: through-line in 3+ slides, 2+ source materials digested, project colors override preset palette.
 
 Sources:
 - file:slide-maker/COMPILER_RULES.md — acceptance checklist (full list) -->

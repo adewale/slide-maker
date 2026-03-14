@@ -1,3 +1,4 @@
+---
 layout: section
 transition: iris
 ---
@@ -32,7 +33,21 @@ Plus **flip-x**, **flip-y**, **cube**, **swing**, **blur**, and **glide** for 3D
 
 </v-click>
 
-<!-- The transition grammar assigns semantic meaning to each transition. This is not cosmetic — it is a language. fade for reflection, iris for new chapters, wipe-right for comparison. The default transition in frontmatter should be the most common one in the deck.
+<!-- The transition grammar assigns semantic meaning to each transition. This is not cosmetic — it is a language.
+
+[click] fade — reflection, pause, denouement. The gentlest transition. Use for closing thoughts and philosophical moments.
+
+[click] slide-left — progression, forward momentum. The default workhorse for moving the argument forward.
+
+[click] slide-up — reveal, elevation. Something new is being uncovered or elevated in importance.
+
+[click] iris — new chapter, section entry. The circular clip-path reveal signals a structural break.
+
+[click] morph-fade — conceptual shift. Scale + opacity + blur signals that the frame of reference is changing.
+
+[click] wipe-right / wipe-up — comparison, before/after. Directional wipe signals side-by-side reasoning.
+
+[click] zoom-in / zoom-out — focus or defocus. Draws attention in or releases it. The default transition in frontmatter should be the most common one in the deck.
 
 Sources:
 - file:slide-maker/COMPILER_RULES.md — transition grammar with semantic meanings -->

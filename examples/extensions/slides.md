@@ -52,7 +52,17 @@ Vue components available to every deck — no external libraries.
 
 </v-clicks>
 
-<!-- Five visual effect components in slide-maker/components/ adapt to any preset via currentColor and --deck-* tokens. GlassCard and CornerCard are the most reused. Each component has a shallow prop API — no unnecessary state. ImageFX wraps standard CSS filters so no external library is needed.
+<!-- Five visual effect components in slide-maker/components/ adapt to any preset via currentColor and --deck-* tokens.
+
+[click] GlassCard — glassmorphism panel with blur, opacity, border props. One of the two most reused visual components.
+
+[click] ImageFX — wraps standard CSS filters so no external library is needed. Duotone, vignette, grain, grayscale, sepia.
+
+[click] RevealPath — CSS offset-path entrance with configurable path and delay. Use for dramatic single-element reveals.
+
+[click] ShadowStack — multi-layer box-shadow with named presets: subtle, dramatic, glow, neon, long.
+
+[click] CornerCard — decorative corner marks with size, thickness, color props. The other most reused component alongside GlassCard.
 
 Sources:
 - file:slide-maker/COMPILER_RULES.md — animation component catalog with prop signatures -->
@@ -77,7 +87,21 @@ Eight components for word-sized charts, inspired by Tufte's principles.
 
 </v-clicks>
 
-<!-- Eight data visualization components provide word-sized charts that embed directly in slide content. All use currentColor by default. SmallMultiples is a CSS grid container for arranging multiple Sparklines, MicroBars, or other components in a comparable grid. These were added to give project decks inline data presentation without external charting libraries.
+<!-- Eight data visualization components provide word-sized charts that embed directly in slide content. All use currentColor by default.
+
+[click] Sparkline — inline SVG trend line for time-series data. The most frequently used data viz component.
+
+[click] MicroBar — horizontal bars for categorical comparisons. Simple and effective for showing relative magnitudes.
+
+[click] SlopeChart — before/after with connecting lines showing change. Great for improvement narratives.
+
+[click] BulletBar — progress bar with target marker. Actual vs expected at a glance.
+
+[click] DotStrip — horizontal dot plot for distributions. Shows spread and clustering.
+
+[click] WinLoss — binary outcome sequence for streaks and test results. Pass/fail at a glance.
+
+[click] DataTable — minimal styled table, bottom borders only. No zebra striping, no vertical lines. SmallMultiples is a CSS grid container for arranging these components in a comparable grid.
 
 Sources:
 - file:slide-maker/COMPILER_RULES.md — data visualization component catalog with props and use cases
@@ -201,7 +225,21 @@ Each of seven presets generates `tokens.css` + `theme.css`.
 
 </v-clicks>
 
-<!-- Presets are directions, not skins. Each controls typography, color, motion curves, v-click animation style, and layout tendencies. A "serious" deck uses different v-click animations than an "energetic" one. editorial-dark fades in; bold-modern scales and slides; swiss-minimal shifts laterally. The preset name describes visual intent, not the project using it.
+<!-- Presets are directions, not skins. Each controls typography, color, motion curves, v-click animation style, and layout tendencies.
+
+[click] editorial-dark — Playfair Display + Source Sans 3. Deep blue. Narrative tone. Fades in.
+
+[click] swiss-minimal — Plus Jakarta Sans + Figtree. White. Structured. Shifts laterally.
+
+[click] bold-modern — Bebas Neue + DM Sans. Near-black. High contrast. Scales and slides.
+
+[click] sumi-e — Zen Old Mincho + Crimson Pro. Warm paper. Ink-wash aesthetic.
+
+[click] tufte-data — EB Garamond. Cream. Data-dense, scholarly. The data communication preset.
+
+[click] cloudflare — Work Sans + DM Sans. Warm white. Cloudflare brand colors and workshop tone.
+
+[click] material-design — Outfit + Plus Jakarta Sans. M3 tokens. Systematic and component-driven.
 
 Sources:
 - file:slide-maker/STYLE_PRESETS.md — complete preset definitions with palette, typography, motion, and interaction patterns -->
@@ -226,7 +264,21 @@ Scaffolding, validation, and comparison.
 
 </v-clicks>
 
-<!-- deck-lint checks structural rules: overflow guards (7 bullets, 8 code lines, 60 char bullets), source citation coverage, war story evidence, internal consistency, scoped style token bypass, and Mermaid annotation requirements. style-audit verifies that no deck uses hardcoded hex values where --deck-* tokens should appear.
+<!-- Scaffolding, validation, and comparison — seven scripts that catch problems before the audience does.
+
+[click] new-deck.sh — scaffolds a complete deck from any preset. Generates all 7 scaffold files plus styles.
+
+[click] deck-lint.mjs — validates structure, overflow, sources, and quality. Checks overflow guards (7 bullets, 8 code lines, 60 char bullets), source citations, and Mermaid annotations.
+
+[click] style-audit.mjs — audits CSS token usage across decks. Verifies no hardcoded hex values where --deck-* tokens should appear.
+
+[click] deck-preview.mjs — quick text preview of slide content. Useful for reviewing without launching the dev server.
+
+[click] deck-diff.mjs — diffs two versions of a deck. Shows what changed between iterations.
+
+[click] compare-decks.mjs — side-by-side comparison of multiple decks. Spots inconsistencies across the collection.
+
+[click] build-and-verify.sh — full build pipeline with post-build checks. The final gate before deployment.
 
 Sources:
 - file:tools/deck-lint.mjs — structural validator with source citation checks

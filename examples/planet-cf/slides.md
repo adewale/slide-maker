@@ -142,7 +142,15 @@ transition: wipe-right
 
 </v-clicks>
 
-<!-- Mock-based tests verify logic but cannot catch FFI type mismatches. The SafeD1, SafeVectorize, and SafeAI wrappers exist specifically because mocks are pure Python while production returns JsProxy. The solution: two-tier testing. Mock tests for logic verification (fast, no network). E2E tests against real infrastructure via wrangler dev --remote, running against actual Cloudflare bindings at http://localhost:8787. The E2E tests catch JsProxy issues that mocks fundamentally cannot simulate.
+<!-- Mock-based tests verify logic but cannot catch FFI type mismatches.
+
+[click] D1 returns JsProxy objects — MockD1 returns Python dicts. All tests green, but production returns 500 errors because business logic receives JsProxy instead of dict.
+
+[click] AI results need .to_py() conversion — MockAI returns pure Python lists. Real Workers AI returns JsProxy arrays that break iteration.
+
+[click] Vectorize returns JsProxy matches — MockVectorize returns all vectors as Python objects. Real Vectorize needs explicit conversion at the boundary.
+
+[click] 500 errors on every query — the solution is two-tier testing. Mock tests for logic (fast). E2E tests against real infrastructure via wrangler dev --remote to catch JsProxy issues mocks fundamentally cannot simulate.
 
 Sources:
 - https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — section 3: "Mocks Don't Catch JsProxy Issues"
@@ -173,7 +181,13 @@ if query_lower == title_lower:
 # Priority 3: keyword-only (by date)
 ```
 
-<!-- Pure semantic search misses exact keyword matches. Searching "context" doesn't find articles with "context" in the title if they're not semantically similar to the query vector. Hybrid search combines Vectorize for conceptual similarity with D1 LIKE for keyword matching. The three-tier ranking ensures searching for a specific title always returns that article first. Bidirectional matching is critical: both "what the day-to-day looks like" (exact) and "what the day-to-day looks like now" (query contains title) find the right article.
+<!-- Pure semantic search misses exact keyword matches. Searching "context" doesn't find articles with "context" in the title if they're not semantically similar.
+
+[click] Exact title match — score 1.0, highest priority. Searching for a specific title always returns that article first. Bidirectional: both "what the day-to-day looks like" (exact) and "what the day-to-day looks like now" (query contains title) match.
+
+[click] Semantic similarity — Vectorize cosine distance, ranked by score. This is where the conceptual understanding lives, but it misses exact keywords.
+
+[click] Keyword fallback — D1 LIKE query, ranked by date. The safety net that catches what semantic search misses. Three tiers together ensure no relevant result is lost.
 
 Sources:
 - https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — section 5: "Hybrid Search Beats Pure Semantic"
