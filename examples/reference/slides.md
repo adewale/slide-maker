@@ -60,7 +60,15 @@ src: ./pages/dataviz.md
 ---
 
 ---
+src: ./pages/components.md
+---
+
+---
 src: ./pages/transitions.md
+---
+
+---
+src: ./pages/ecosystem.md
 ---
 
 ---

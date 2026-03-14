@@ -134,3 +134,64 @@ Seven presets, each controlling typography, color, motion, and layout tendencies
 
 Sources:
 - file:slide-maker/STYLE_PRESETS.md — seven preset definitions -->
+
+---
+transition: slide-left
+---
+
+# Sequence Diagrams Reveal Hidden Round-Trips
+
+```mermaid {scale: 0.85}
+sequenceDiagram
+  participant U as User
+  participant S as Skill Agent
+  participant P as Spec Builder
+  participant C as Compiler
+  participant D as Slide Deck
+
+  U->>S: Natural-language brief
+  S->>P: Structured spec (JSON)
+  P->>P: Source-grounding pass
+  P-->>S: Grounded spec
+  S->>C: Compile command
+  C->>C: Layout + theme resolution
+  C->>D: Rendered slides
+  D-->>U: Live preview link
+```
+
+Five actors, but the surprise is the internal loop: the Spec Builder re-enters itself for source-grounding before handing off to the Compiler.
+
+<!-- sequenceDiagram is ideal for showing request/response flows, API call chains, and multi-actor protocols. Participants are declared with `participant` aliases. Solid arrows (->>)  are calls; dashed arrows (-->>)  are returns. Keep to 6-8 interactions to avoid vertical overflow. Beautiful Mermaid themes the diagram automatically from deck tokens.
+
+Also supported but less frequently used in presentations: classDiagram (class hierarchies), erDiagram (entity-relationship models), and xychart-beta (bar/line charts). Use those when the content demands them.
+
+Sources:
+- file:slide-maker/COMPILER_RULES.md — Mermaid guidelines: supported diagram types
+- file:slide-maker/COMPILER_RULES.md — diagram insight annotations required -->
+
+---
+transition: flip-y
+---
+
+# Slides Have a Lifecycle Most Presenters Ignore
+
+```mermaid {scale: 0.85}
+stateDiagram-v2
+  [*] --> Draft
+  Draft --> Compiled : skill compiles spec
+  Compiled --> Validated : lint + contrast pass
+  Validated --> Delivered : presenter approves
+  Validated --> Draft : lint failures
+  Delivered --> Draft : post-talk revision
+  Delivered --> [*]
+```
+
+The backward edges matter most: validation failures return to Draft, not to Compiled, because structural fixes require a full recompile.
+
+<!-- stateDiagram-v2 is the right choice for lifecycle, workflow, and finite-state-machine diagrams. The [*] symbol marks start and end states. Backward transitions (Validated --> Draft) highlight recovery paths that audiences often overlook. Keep to 4-6 states to stay readable at presentation scale.
+
+Also supported but less common in slide contexts: classDiagram, erDiagram, and xychart-beta — reach for them when your content is specifically about class hierarchies, data models, or charted metrics.
+
+Sources:
+- file:slide-maker/COMPILER_RULES.md — Mermaid guidelines: supported diagram types
+- file:slide-maker/COMPILER_RULES.md — diagram insight annotations required -->

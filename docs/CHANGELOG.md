@@ -35,11 +35,11 @@ Initial release of the slide-maker skill and monorepo.
 - `styles/transitions.css` — shared transition library
 - `components/` — reusable Vue components (GlassCard, ImageFX, ShadowStack, RevealPath)
 
-### Example Decks (11)
-- demo (slide-maker intro), vaders, planet-cf, claude-history-explorer, geist-fabrik, olsen, tasche, tufte, durable-objects, extensions, reference
+### Example Decks (10)
+- demo (slide-maker intro), vaders, planet-cf, claude-history-explorer, geist-fabrik, olsen, tasche, tufte, durable-objects, reference
 
 ### Tools
-- `build.sh` — build all 11 decks to static output
+- `build.sh` — build all 10 decks to static output
 - `build-and-verify.sh` — post-build smoke test (tokens, selectors, fonts, slide counts)
 - `deck-lint.mjs` — structural validator for deck directories
 - `style-audit.mjs` — CSS-in-build verifier

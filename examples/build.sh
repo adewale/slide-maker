@@ -27,7 +27,6 @@ declare -a DECKS=(
 
   "tufte:tufte"
   "durable-objects:durable-objects"
-  "extensions:extensions"
   "reference:reference"
 )
 

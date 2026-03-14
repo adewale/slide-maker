@@ -42,7 +42,6 @@ declare -a DECKS=(
   "tasche:tasche"
   "tufte:tufte"
   "durable-objects:durable-objects"
-  "extensions:extensions"
   "reference:reference"
 )
 
