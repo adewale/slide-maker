@@ -1111,7 +1111,9 @@ function printSummary(results) {
 function main() {
   const args = process.argv.slice(2);
   const toolsDir = resolve(import.meta.dirname || '.');
-  const examplesDir = resolve(toolsDir, '..', 'examples');
+  const repoRoot = resolve(toolsDir, '..');
+  const examplesDir = resolve(repoRoot, 'examples');
+  const decksDir = resolve(repoRoot, 'decks');
 
   let deckDirs;
 
@@ -1126,8 +1128,10 @@ function main() {
       return resolved;
     });
   } else {
-    // Auto-discover all decks in examples/
-    deckDirs = discoverDecks(examplesDir);
+    // Auto-discover decks in both examples/ (core) and decks/ (local)
+    const coreDirs = discoverDecks(examplesDir);
+    const localDirs = existsSync(decksDir) ? discoverDecks(decksDir) : [];
+    deckDirs = [...coreDirs, ...localDirs];
     if (deckDirs.length === 0) {
       console.error(`${C.red}No decks found (no subdirectories with slides.md)${C.reset}`);
       process.exit(1);

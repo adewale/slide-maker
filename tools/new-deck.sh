@@ -12,7 +12,7 @@ set -euo pipefail
 # ────────────────────────────────────────────────────────────────
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-EXAMPLES="$ROOT/../examples"
+DECKS_ROOT="$ROOT/../decks"
 
 VALID_PRESETS="editorial-dark swiss-minimal bold-modern sumi-e tufte-data cloudflare material-design"
 
@@ -49,10 +49,10 @@ if [[ "$preset_valid" == "false" ]]; then
   exit 1
 fi
 
-DECK_DIR="$EXAMPLES/$DECK_NAME"
+DECK_DIR="$DECKS_ROOT/$DECK_NAME"
 
 if [[ -d "$DECK_DIR" ]]; then
-  echo "Error: directory '$DECK_NAME' already exists in examples/."
+  echo "Error: directory '$DECK_NAME' already exists in decks/."
   exit 1
 fi
 
@@ -982,21 +982,24 @@ MERMAIDRENDERER
 
 cp "$ROOT/../slide-maker/styles/transitions.css" "$DECK_DIR/styles/transitions.css"
 
-# ─── Update build.sh DECKS array ──────────────────────────────
+# ─── Update build.sh LOCAL_DECKS array ────────────────────────
 
-BUILD_FILE="$EXAMPLES/build.sh"
+BUILD_FILE="$ROOT/../examples/build.sh"
 
 if [[ -f "$BUILD_FILE" ]]; then
   if grep -q "\"${DECK_NAME}:${DECK_NAME}\"" "$BUILD_FILE"; then
-    echo "Note: '$DECK_NAME' is already in build.sh DECKS array."
+    echo "Note: '$DECK_NAME' is already in build.sh LOCAL_DECKS array."
   else
-    # Insert new entry before the closing ) of the DECKS array
-    sed -i '' "/^)$/i\\
-\\  \"${DECK_NAME}:${DECK_NAME}\"" "$BUILD_FILE"
-    echo "Added '${DECK_NAME}:${DECK_NAME}' to build.sh DECKS array."
+    # Insert new entry before the closing ) of the LOCAL_DECKS array
+    # Find the last entry in LOCAL_DECKS and add after it
+    sed -i '' "/^# Build local decks/i\\
+" "$BUILD_FILE" 2>/dev/null || true
+    # Simpler: just append to LOCAL_DECKS
+    sed -i '' "s|\"durable-objects:durable-objects\"|\"durable-objects:durable-objects\"\n  \"${DECK_NAME}:${DECK_NAME}\"|" "$BUILD_FILE"
+    echo "Added '${DECK_NAME}:${DECK_NAME}' to build.sh LOCAL_DECKS array."
   fi
 else
-  echo "Warning: build.sh not found at $BUILD_FILE — skipping DECKS update."
+  echo "Warning: build.sh not found at $BUILD_FILE — skipping LOCAL_DECKS update."
 fi
 
 # ─── Done ──────────────────────────────────────────────────────
@@ -1005,21 +1008,21 @@ echo ""
 echo "Deck '$DECK_NAME' created successfully with preset '$PRESET'."
 echo ""
 echo "Files created:"
-echo "  examples/$DECK_NAME/slides.md"
-echo "  examples/$DECK_NAME/deck.spec.md"
-echo "  examples/$DECK_NAME/styles/index.css"
-echo "  examples/$DECK_NAME/styles/tokens.css"
-echo "  examples/$DECK_NAME/styles/theme.css"
-echo "  examples/$DECK_NAME/styles/transitions.css"
-echo "  examples/$DECK_NAME/composables/useHelp.ts"
-echo "  examples/$DECK_NAME/setup/shortcuts.ts"
-echo "  examples/$DECK_NAME/setup/mermaid-renderer.ts"
-echo "  examples/$DECK_NAME/components/KeyboardHelp.vue"
-echo "  examples/$DECK_NAME/global-top.vue"
-echo "  examples/$DECK_NAME/global-bottom.vue"
+echo "  decks/$DECK_NAME/slides.md"
+echo "  decks/$DECK_NAME/deck.spec.md"
+echo "  decks/$DECK_NAME/styles/index.css"
+echo "  decks/$DECK_NAME/styles/tokens.css"
+echo "  decks/$DECK_NAME/styles/theme.css"
+echo "  decks/$DECK_NAME/styles/transitions.css"
+echo "  decks/$DECK_NAME/composables/useHelp.ts"
+echo "  decks/$DECK_NAME/setup/shortcuts.ts"
+echo "  decks/$DECK_NAME/setup/mermaid-renderer.ts"
+echo "  decks/$DECK_NAME/components/KeyboardHelp.vue"
+echo "  decks/$DECK_NAME/global-top.vue"
+echo "  decks/$DECK_NAME/global-bottom.vue"
 echo ""
 echo "Next steps:"
 echo "  1. Edit deck.spec.md — fill in purpose, audience, tone, and slide plan"
 echo "  2. Edit slides.md — build your slides"
-echo "  3. Preview:  cd examples/$DECK_NAME && npx slidev"
+echo "  3. Preview:  cd decks/$DECK_NAME && npx slidev"
 echo "  4. Build:    cd examples && bash build.sh"

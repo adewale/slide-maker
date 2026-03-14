@@ -16,7 +16,9 @@ set -euo pipefail
 ###############################################################################
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-EXAMPLES="$ROOT/../examples"
+REPO_ROOT="$ROOT/.."
+EXAMPLES="$REPO_ROOT/examples"
+DECKS_DIR="$REPO_ROOT/decks"
 BUILD="$EXAMPLES/_build"
 
 # ── Colors ───────────────────────────────────────────────────────────────────
@@ -32,8 +34,13 @@ else
 fi
 
 # ── Decks — mirrors build.sh ────────────────────────────────────────────────
-declare -a DECKS=(
+# Core decks (in examples/)
+declare -a CORE_DECKS=(
   "demo:slide-maker"
+  "reference:reference"
+)
+# Local decks (in decks/)
+declare -a LOCAL_DECKS=(
   "vaders:vaders"
   "planet-cf:planet-cf"
   "claude-history-explorer:claude-history-explorer"
@@ -42,8 +49,9 @@ declare -a DECKS=(
   "tasche:tasche"
   "tufte:tufte"
   "durable-objects:durable-objects"
-  "reference:reference"
 )
+# Combined for the main loop
+declare -a DECKS=("${CORE_DECKS[@]}" "${LOCAL_DECKS[@]}")
 
 # ── Counters ─────────────────────────────────────────────────────────────────
 total=0
@@ -72,8 +80,12 @@ for entry in "${DECKS[@]}"; do
   dir="${entry%%:*}"
   name="${entry##*:}"
 
-  # Resolve source directory
-  src="$EXAMPLES/$dir"
+  # Resolve source directory (core decks in examples/, local decks in decks/)
+  if [[ -d "$EXAMPLES/$dir" ]]; then
+    src="$EXAMPLES/$dir"
+  else
+    src="$DECKS_DIR/$dir"
+  fi
 
   build_dir="$BUILD/$name"
   deck_fail=0

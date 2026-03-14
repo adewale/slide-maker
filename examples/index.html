@@ -5,17 +5,19 @@
     bash build.sh          # builds all decks to _build/
     npx serve _build       # serve at http://localhost:3000
 
-  Dev servers (individual):
-    npx slidev --port 3030                          # Slide Maker (root)
-    cd vaders && npx slidev --port 3031             # Vaders
-    cd planet-cf && npx slidev --port 3032          # Planet CF
-    cd claude-history-explorer && npx slidev --port 3033  # Claude History Explorer
-    cd geist-fabrik && npx slidev --port 3034       # GeistFabrik
-    cd olsen && npx slidev --port 3035              # Olsen
-    cd tasche && npx slidev --port 3036             # Tasche
-    cd tufte && npx slidev --port 3037              # Debug at the Source
-    cd durable-objects && npx slidev --port 3038    # Durable Objects
-    cd reference && npx slidev --port 3039          # Reference
+  Dev servers (core — from examples/):
+    cd demo && npx slidev --port 3030               # Slide Maker
+    cd reference && npx slidev --port 3031           # Reference
+
+  Dev servers (local — from decks/):
+    cd vaders && npx slidev --port 3032              # Vaders
+    cd planet-cf && npx slidev --port 3033           # Planet CF
+    cd claude-history-explorer && npx slidev --port 3034  # Claude History Explorer
+    cd geist-fabrik && npx slidev --port 3035        # GeistFabrik
+    cd olsen && npx slidev --port 3036               # Olsen
+    cd tasche && npx slidev --port 3037              # Tasche
+    cd tufte && npx slidev --port 3038               # Debug at the Source
+    cd durable-objects && npx slidev --port 3039     # Durable Objects
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -50,6 +52,22 @@
       margin-top: 0.5rem;
       color: #71717a;
       font-size: 1rem;
+    }
+
+    .section-label {
+      max-width: 72rem;
+      margin: 2.5rem auto 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #52525b;
+      border-bottom: 1px solid #27272a;
+      padding-bottom: 0.5rem;
+    }
+
+    .section-label:first-of-type {
+      margin-top: 0;
     }
 
     .grid {
@@ -138,6 +156,7 @@
     <p>10 Slidev decks. Pick one to present.</p>
   </header>
 
+  <div class="section-label">Core</div>
   <div class="grid">
     <div class="card" style="--accent: #a78bfa">
       <h2>Slide Maker</h2>
@@ -148,6 +167,18 @@
       </div>
     </div>
 
+    <div class="card" style="--accent: #64748b">
+      <h2>Reference</h2>
+      <div class="desc">Every feature. One deck. A comprehensive reference for all Slide Maker capabilities.</div>
+      <div class="meta">
+        <span class="tag">reference</span>
+        <a href="reference/">View deck</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Decks</div>
+  <div class="grid">
     <div class="card" style="--accent: #39ff14">
       <h2>Vaders</h2>
       <div class="desc">Multiplayer TUI Space Invaders. 1-4 players. Cloudflare Durable Objects.</div>
@@ -201,6 +232,7 @@
         <a href="tasche/">View deck</a>
       </div>
     </div>
+
     <div class="card" style="--accent: #2d5f8a">
       <h2>Debug at the Source</h2>
       <div class="desc">A debugging detective story. Dense prose, sidenotes, and sparklines.</div>
@@ -216,15 +248,6 @@
       <div class="meta">
         <span class="tag">cloudflare</span>
         <a href="durable-objects/">View deck</a>
-      </div>
-    </div>
-
-    <div class="card" style="--accent: #64748b">
-      <h2>Reference</h2>
-      <div class="desc">Every feature. One deck. A comprehensive reference for all Slide Maker capabilities.</div>
-      <div class="meta">
-        <span class="tag">reference</span>
-        <a href="reference/">View deck</a>
       </div>
     </div>
   </div>
