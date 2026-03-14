@@ -1,6 +1,7 @@
 ---
 theme: apple-basic
 title: Planet CF
+routerMode: hash
 selectable: true
 colorSchema: light
 transition: slide-left
@@ -41,7 +42,7 @@ Sources:
 transition: slide-left
 ---
 
-# The Cloudflare stack
+# Six Cloudflare services replace a traditional backend
 
 <div v-motion
   :initial="{ opacity: 0, y: 40 }"
@@ -76,7 +77,7 @@ Sources:
 transition: slide-up
 ---
 
-# The boundary problem
+# JsProxy objects break every Python assumption
 
 ````md magic-move
 ```python
@@ -123,14 +124,10 @@ transition: wipe-right
 
 ### Mock tests
 
-<v-clicks>
-
 - `MockD1` returns Python dicts
 - `MockAI` returns `[0.1, 0.1, ...]`
 - `MockVectorize` returns all vectors
 - All tests green
-
-</v-clicks>
 
 ::right::
 
@@ -155,9 +152,9 @@ Sources:
 transition: slide-left
 ---
 
-# Hybrid search
+# Pure semantic search misses exact keyword matches
 
-Three-tier ranking makes exact matches instant and semantic matches discoverable:
+Three-tier ranking fixes this — exact title match first, then cosine similarity, then keyword fallback:
 
 <v-clicks>
 
@@ -225,7 +222,7 @@ Sources:
 transition: slide-left
 ---
 
-# Smart defaults
+# Deploy should be one command with zero configuration
 
 <div class="spotlight-group">
 

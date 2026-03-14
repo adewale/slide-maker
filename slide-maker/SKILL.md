@@ -18,6 +18,7 @@ Consult these during execution:
 - [STYLE_PRESETS.md](STYLE_PRESETS.md) — visual direction presets (editorial-dark, swiss-minimal, bold-modern, sumi-e, tufte-data, cloudflare, material-design)
 - [PROJECT_DECK_RUBRIC.md](../docs/PROJECT_DECK_RUBRIC.md) — scoring guide for project decks (source material depth, through-line, visual evidence)
 - [PRESENTATION_PHILOSOPHY.md](../docs/PRESENTATION_PHILOSOPHY.md) — rhetorical principles (one idea per slide, sustained metaphor, dialectical progression)
+- [LLM_TELLS.md](../docs/LLM_TELLS.md) — telltale signals of AI-generated decks (negative examples to avoid)
 
 ## Scope
 

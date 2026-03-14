@@ -2,6 +2,7 @@
 theme: seriph
 title: Geist Fabrik
 selectable: true
+routerMode: hash
 colorSchema: dark
 transition: fade
 layout: cover
@@ -135,7 +136,7 @@ Sources:
 transition: slide-left
 ---
 
-# Computation vs. questions
+# Questions beat algorithms on every metric
 
 <div class="spotlight-group">
 
@@ -159,7 +160,7 @@ Sources:
 transition: slide-left
 ---
 
-# API consistency
+# One breaking change fixed seven geists at once
 
 A bug in `semantic_neighbours` revealed a two-pattern API:
 
@@ -193,7 +194,7 @@ Sources:
 transition: slide-left
 ---
 
-# Embeddings and semantic sampling
+# Sampling beats ranking because ranking converges
 
 <v-motion
   :initial="{ opacity: 0, y: 40 }"
@@ -211,14 +212,10 @@ graph LR
 
 </v-motion>
 
-<v-clicks>
-
 - **all-MiniLM-L6-v2** — 384 dimensions, local
-- **Sample, don't rank** — weighted random draw
+- **Sample, don't rank** — weighted random draw from similarity distribution
 - Ranking always surfaces the same popular notes
 - Sampling produces genuine surprise
-
-</v-clicks>
 
 <!-- The architecture uses sentence-transformers with all-MiniLM-L6-v2 for 384-dimensional embeddings, computed locally with no API calls. The critical design choice is sampling vs ranking. Ranking produces the same top-K notes every time — convergent behavior. Sampling draws from a probability distribution weighted by semantic distance — divergent behavior. This is the muse principle at the algorithm level: the system deliberately introduces controlled randomness to avoid preferential attachment to popular notes.
 

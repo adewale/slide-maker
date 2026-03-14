@@ -2,6 +2,7 @@
 theme: seriph
 title: Slide Maker Reference
 selectable: true
+routerMode: hash
 colorSchema: dark
 transition: slide-left
 layout: cover
@@ -51,9 +52,9 @@ Seven built-in. Two custom. Each with a distinct purpose.
 transition: slide-left
 ---
 
-# Default Content Layout
+# Default Layout Does 80% of the Work
 
-The workhorse. Heading, body text, and bullet points.
+Heading, body text, and bullet points.
 
 <v-clicks>
 
@@ -611,9 +612,9 @@ transition: iris
 transition: morph-fade
 ---
 
-# Transition Catalog
+# Each Transition Carries Semantic Meaning
 
-Each transition carries a semantic meaning in the grammar.
+Not cosmetic — a grammar.
 
 <v-clicks>
 
@@ -642,9 +643,9 @@ Sources:
 transition: slide-left
 ---
 
-# Hover Interactions
+# Six Hover Patterns, No JavaScript
 
-Six reusable CSS patterns from `interactions.css`.
+Reusable CSS from `interactions.css`.
 
 <div class="spotlight-group" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 1.5rem;">
 
@@ -831,11 +832,9 @@ Sources:
 transition: fade
 ---
 
-# Anti-Patterns
+# The Skill Rejects These Patterns
 
-Things the Skill must never produce.
-
-<v-clicks>
+Every item here has appeared in a generated deck at least once.
 
 - No generic stock phrases ("Let's dive in", "In conclusion")
 - No ad-hoc transitions — each type has a fixed semantic meaning
@@ -843,8 +842,6 @@ Things the Skill must never produce.
 - No hardcoded hex in `<style scoped>` — use `var(--deck-*)` only
 - No "install command" closings — resolve the opening instead
 - No blanket `.slidev-layout { background }` overrides on themed decks
-
-</v-clicks>
 
 <!-- Anti-patterns are the negative space of the Skill. They define what a generated deck should never look like. The most common failure: every slide uses the default layout with the same transition, producing visual monotony. The hardcoded hex rule prevents palette drift when presets change.
 
@@ -899,7 +896,7 @@ transition: slide-up
 
 The through-line is the conceptual thread that holds the deck together. It must come from the source material, not be imposed on it.
 
-Five types, each with a different rhetorical shape:
+Five types, each a different rhetorical shape:
 
 - **Question** — posed early, answered repeatedly
 - **Metaphor** — concrete image mapping to abstract concept
@@ -996,9 +993,7 @@ Density guardrails, the acceptance checklist, and the priority stack.
 transition: slide-left
 ---
 
-# Density Guardrails
-
-<v-clicks>
+# Hard Limits Prevent Overflow
 
 - **7 bullets maximum** per slide — split if exceeded
 - **8 code lines maximum** per code block — truncate or split
@@ -1006,13 +1001,7 @@ transition: slide-left
 - **One idea per slide** — if you need to scroll, split it
 - **3-5 bullets is normal** — one strong stat beats six weak ones
 
-</v-clicks>
-
-<v-click>
-
 If the slide needs tiny text, the slide needs redesigning.
-
-</v-click>
 
 <!-- Density guardrails prevent the most common slide failure: cramming too much onto one screen. These are hard limits, not suggestions. The overflow guard runs during phase 5 (write slides) and again during validation. Mermaid diagrams have their own limits: 8 nodes for flowcharts, 12 for mindmaps, 6 for timelines.
 
@@ -1024,9 +1013,9 @@ Sources:
 transition: fade
 ---
 
-# Acceptance Checklist
+# A Deck Passes When All of These Hold
 
-A compiled deck passes when:
+The acceptance checklist:
 
 <v-clicks>
 
@@ -1186,7 +1175,7 @@ transition: iris
 transition: slide-left
 ---
 
-# Rhetorical Principles
+# Six Principles That Shape Every Deck
 
 <v-clicks>
 

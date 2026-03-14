@@ -2,6 +2,7 @@
 theme: default
 title: What Are Durable Objects For?
 selectable: true
+routerMode: hash
 colorSchema: light
 fonts:
   sans: Inter
@@ -37,9 +38,9 @@ Sources:
 transition: slide-left
 ---
 
-# The serverless promise
+# Workers are fast and forgetful
 
-Cloudflare Workers run your code at the edge — 300+ cities, 0ms cold starts, auto-scaling.
+Cloudflare Workers run your code at the edge — auto-scaling, sub-millisecond cold starts.
 
 But a Worker forgets you the moment it responds.
 
@@ -63,9 +64,9 @@ Sources:
 transition: slide-left
 ---
 
-# The coordination gap
+# Neither Workers nor D1 solve coordination
 
-Problems that neither Workers nor D1 solve cleanly:
+Problems that fall between stateless compute and shared storage:
 
 <v-clicks>
 
@@ -214,7 +215,7 @@ transition: fade
 
 cold starts
 
-Millions of instances. Each one a named, stateful, connected entity.
+Each instance is a named, stateful, connected entity.
 
 <!-- Zero millisecond cold starts because DOs run on the same V8 isolate infrastructure as Workers. But unlike Workers, they persist state between requests.
 
@@ -564,14 +565,10 @@ transition: slide-left
 
 Agents can wake themselves — delayed, recurring, or at specific times.
 
-<v-clicks>
-
 - **Delayed** — `schedule(() => check(), { delay: "5m" })`
 - **Cron** — `schedule(() => report(), { cron: "0 9 * * 1" })`
 - **Interval** — `schedule(() => poll(), { interval: "30s" })`
 - **Specific date** — `schedule(() => remind(), { at: new Date("2025-03-15") })`
-
-</v-clicks>
 
 All scheduling survives hibernation. The agent sleeps at zero cost and wakes precisely when needed.
 

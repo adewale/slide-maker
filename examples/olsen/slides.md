@@ -2,6 +2,7 @@
 theme: apple-basic
 title: Olsen
 selectable: true
+routerMode: hash
 colorSchema: light
 transition: slide-left
 layout: cover
@@ -73,7 +74,7 @@ Sources:
 transition: slide-left
 ---
 
-# Worker pool
+# Hash-based resume means crashes are free
 
 File scanner walks the directory tree and feeds paths into a buffered channel. N workers consume in parallel.
 
@@ -82,7 +83,7 @@ File scanner walks the directory tree and feeds paths into a buffered channel. N
 - Scanner finds DNG, JPEG, BMP files recursively
 - Buffered work channel (size: 100)
 - Configurable worker count (default: 4)
-- Hash-based resume skips processed files
+- Hash-based resume skips already-processed files
 - Per-file timeout: 60 seconds
 - Failed files logged, never block the batch
 
@@ -150,19 +151,20 @@ Sources:
 transition: slide-left
 ---
 
-# Eleven colors
+# Berlin-Kay maps every photo to 11 universal color terms
 
-Berlin-Kay universal color categories classified from HSL color space. K-means extracts 5 dominant colors per photo from the 256px thumbnail.
+K-means extracts 5 dominant colors per photo from the 256px thumbnail, then classifies each into HSL-based categories.
 
 <v-clicks>
 
 - <v-mark at="1" color="#ca8a04" type="box">Achromatic: black, white, gray, B&W</v-mark>
 - Chromatic: red, orange, yellow, green, blue, purple, pink
 - Special: brown (dark orange, low lightness)
-- Saturation checked first — S < 10% is B&W
-- Hue-based classification only when S >= 10%
 
 </v-clicks>
+
+- Saturation checked first — S < 10% is B&W
+- Hue-based classification only when S >= 10%
 
 <div class="spotlight-group mt-2">
 
@@ -183,7 +185,7 @@ Sources:
 transition: zoom-in
 ---
 
-# What EXIF extraction looks like
+# All file access is O_RDONLY at the syscall level
 
 ```go {1-2|3-5|6-8|all}
 // All file access is O_RDONLY — read-only is enforced at the syscall level
@@ -215,7 +217,7 @@ Sources:
 transition: slide-left
 ---
 
-# Four sizes, one pass
+# Thumbnails decode the image once, resize four times
 
 <v-mark at="1" color="#ca8a04" type="box">
 
@@ -228,14 +230,10 @@ transition: slide-left
 
 </v-mark>
 
-<v-clicks>
-
 - Longest-edge constraint preserves aspect ratio
 - No square crops — landscape stays landscape
 - Generated in memory, stored as BLOBs in SQLite
 - Color extraction runs on the 256px thumbnail
-
-</v-clicks>
 
 <!-- Thumbnails constrain the longest edge rather than forcing square crops. A 6000x4000 landscape photo produces thumbnails at 64x43, 256x171, 512x341, and 1024x683 — the aspect ratio is always preserved. All four sizes are generated in a single pass during indexing: the image is decoded once into memory, then resized four times using Lanczos3 interpolation (via nfnt/resize). Thumbnails are stored as BLOBs in the thumbnails table, making the SQLite database fully self-contained for browsing without access to the original files. Per-photo thumbnail storage: approximately 187 KB across all four sizes.
 

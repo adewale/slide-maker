@@ -1,6 +1,7 @@
 ---
 theme: default
 title: Slide Maker
+routerMode: hash
 selectable: true
 colorSchema: dark
 fonts:
@@ -48,6 +49,7 @@ transition: slide-up
 
 - **deck.spec.md** captures intent
 - Structure, tokens, boundaries
+- Visual direction decided here, not in slides
 - The blueprint you edit first
 
 </v-clicks>
@@ -56,13 +58,9 @@ transition: slide-up
 
 ### Presentation layer
 
-<v-clicks>
-
 - **slides.md** is the compiled output
 - Native Slidev Markdown
 - The building you present
-
-</v-clicks>
 
 <!-- The dual-layer architecture solves both failure modes. The spec layer prevents generic output by forcing visual direction choices before compilation. The presentation layer prevents brittle output by compiling to native Slidev Markdown, not custom HTML. Edit the spec to change direction. Edit slides.md to change content. Neither breaks the other.
 
@@ -74,9 +72,9 @@ Sources:
 layout: section
 ---
 
-# The escalation ladder
+# Use the lowest level that works
 
-Use the lowest level that solves the slide cleanly — not the most impressive.
+Not the most impressive — the most maintainable.
 
 <!-- The section divider reframes the escalation ladder as an anti-brittle principle. "Not the most impressive" is the key qualifier — the temptation is always to reach for custom HTML because it looks better, but it breaks when content changes. -->
 
@@ -84,7 +82,7 @@ Use the lowest level that solves the slide cleanly — not the most impressive.
 transition: fade
 ---
 
-# Five levels of implementation
+# Start with Markdown and stop as soon as it works
 
 <div v-motion :initial="{ opacity: 0, x: -30 }" :enter="{ opacity: 1, x: 0, transition: { delay: 200, duration: 600 } }">
 
@@ -168,7 +166,7 @@ Sources:
 transition: slide-up
 ---
 
-# Seven visual directions
+# One skill, seven different-looking decks
 
 ```mermaid {theme: 'dark', scale: 0.6}
 graph TD
@@ -194,7 +192,7 @@ Sources:
 
 ---
 
-# Five-step workflow
+# Direction comes before content
 
 ```mermaid {theme: 'dark', scale: 0.9}
 graph LR

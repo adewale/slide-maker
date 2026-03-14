@@ -2,6 +2,7 @@
 theme: seriph
 title: Claude History Explorer
 selectable: true
+routerMode: hash
 colorSchema: dark
 transition: fade
 layout: cover
@@ -43,17 +44,13 @@ Sources:
 transition: slide-up
 ---
 
-# Five guarantees
-
-<v-clicks>
+# Every guarantee is independently testable
 
 - **Read-only by design** — never writes, modifies, or deletes history files
 - **No network calls** — your conversations never leave your machine
 - **Open source and auditable** — every line readable before you run it
 - **Minimal dependencies** — only click, rich, and sparklines
 - **Scoped reads** — only touches ~/.claude/projects/*.jsonl
-
-</v-clicks>
 
 <!-- Each guarantee is independently verifiable. Read-only: grep the codebase for write operations and find none. No network: check pyproject.toml for HTTP libraries and find none. Open source: the entire tool is four Python files. Minimal deps: three runtime libraries, all formatting-only. Scoped reads: the tool reads JSONL session files and nothing else — not your source code, not your .env, not your git history. The TRUST.md document provides exact verification commands for each guarantee.
 
@@ -125,16 +122,12 @@ Sources:
 transition: slide-left
 ---
 
-# Concurrent Claude detection
-
-<v-clicks>
+# Overlapping timestamps reveal parallel usage
 
 - Streaming JSONL — line-by-line, never loads full files
 - Overlapping session timestamps reveal parallel usage
 - Lazy loading — first results before last file is read
 - Generators for large result sets, constant memory
-
-</v-clicks>
 
 <div class="spotlight-group mt-6">
 
@@ -155,15 +148,11 @@ Sources:
 transition: slide-up
 ---
 
-# Three dependencies
-
-<v-clicks>
+# The dependency tree has no capability to exfiltrate data
 
 - **click** — CLI framework (30M+ weekly downloads)
 - **rich** — terminal formatting (20M+ weekly downloads)
 - **sparklines** — ASCII activity charts (100K+ weekly downloads)
-
-</v-clicks>
 
 All formatting. No file operations. No network operations. The tool works identically offline.
 

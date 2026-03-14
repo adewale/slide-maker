@@ -27,6 +27,8 @@ These compiler goals serve the broader project priorities defined in SKILL.md §
 - No hardcoded colors in scoped styles — always reference `var(--deck-*)` tokens. Literal hex/rgb values in `<style scoped>` blocks bypass the token system and cause palette drift.
 - No "install command" closings — the final slide must resonate with the opening question/metaphor, not end with `npm install` or `git clone`. Installation belongs in presenter notes or a penultimate "Get started" slide, never the last word.
 
+For the full catalog of AI-generated aesthetic tells to avoid, see [LLM_TELLS.md](../docs/LLM_TELLS.md).
+
 ## Inputs
 
 Required:

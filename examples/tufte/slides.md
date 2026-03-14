@@ -2,6 +2,7 @@
 theme: seriph
 title: Debug at the Source
 selectable: true
+routerMode: hash
 colorSchema: light
 transition: fade
 layout: cover
@@ -149,7 +150,7 @@ transition: fade
 
 <div style="margin-top: 2rem;">
 
-The embedded JPEG extraction is **dramatically faster** than full RAW decoding. Equal or better quality for thumbnail generation. No LibRaw dependency. No CGO. No JPEG-compressed monochrome edge cases.
+Embedded JPEG extraction runs at ~62ms per photo vs multi-second RAW decodes. Equal or better quality for thumbnail generation. No LibRaw dependency. No CGO. No JPEG-compressed monochrome edge cases.
 
 </div>
 
@@ -168,7 +169,7 @@ The embedded JPEG extraction is **dramatically faster** than full RAW decoding. 
 }
 </style>
 
-<!-- The performance data tells the story. Embedded JPEG extraction bypasses the entire RAW decode pipeline. The Olsen architecture documents ~62ms per photo processing time and 15-25 photos per second throughput using the embedded JPEG approach. LibRaw full decode was an order of magnitude slower with CGO compilation complexity.
+<!-- The performance data tells the story. Embedded JPEG extraction bypasses the entire RAW decode pipeline. The Olsen architecture documents ~62ms per photo processing time and 15-25 photos per second throughput. LibRaw full decode was an order of magnitude slower with CGO compilation complexity.
 
 Sources:
 - https://github.com/adewale/olsen/blob/main/docs/architecture.md — performance metrics: ~62ms per photo, 15-25 photos/sec with worker pool
@@ -213,11 +214,11 @@ layout: TufteSlide
 transition: fade
 ---
 
-# Five lessons
+# Every wrong-layer fix wasted days
 
 **State machines over hierarchies.** Faceted navigation is about valid state transitions, not hierarchical relationships. When we assumed "Year contains Month," we built a system that broke on the first edge case. The data determines valid transitions.
 
-**Simple over complex.** We spent significant time implementing full LibRaw RAW decode integration when embedded preview extraction would have been dramatically faster, equal quality, and zero dependencies.
+**Simple over complex.** We spent days on full LibRaw RAW decode integration when embedded preview extraction ran at ~62ms per photo, equal quality, and zero C dependencies.
 
 **Test at the right layer.** We added tests at the web UI layer when the bug lived in the RAW decode layer. Test the extraction mechanism directly; do not test the database query that displays its output.
 
@@ -247,11 +248,11 @@ layout: center
 transition: fade
 ---
 
-# Sometimes the simple solution is 100x better than the complex solution
+# The simple solution was faster, smaller, and correct
 
-It is dramatically faster. Equal or better quality. Avoids compatibility issues. Reduces complexity. The bug was never in the code — it was in the assumption that first-match was good enough.
+~62ms per photo. Zero C dependencies. Equal or better quality. The bug was never in the code — it was in the assumption that first-match was good enough.
 
-<!-- The penultimate slide reframes the story. The "60x speedup hiding in plain sight" from the cover was an accident — we were fixing a correctness bug, not optimizing. The simple solution (scan for the largest JPEG) was not just faster but better in every dimension.
+<!-- The penultimate slide reframes the story. The "60x speedup hiding in plain sight" from the cover was an accident — we were fixing a correctness bug, not optimizing. The simple solution (scan for the largest JPEG) ran at ~62ms per photo with zero C dependencies.
 
 Sources:
 - https://github.com/adewale/olsen/blob/main/docs/architecture.md — performance comparison showing embedded JPEG extraction dramatically outperforming RAW decode -->

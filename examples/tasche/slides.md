@@ -2,6 +2,7 @@
 theme: seriph
 title: Tasche
 selectable: true
+routerMode: hash
 colorSchema: dark
 transition: fade
 layout: cover
@@ -43,7 +44,7 @@ Sources:
 transition: slide-left
 ---
 
-# The archive promise
+# Every artifact is stored independently
 
 When you save a URL, Tasche creates a complete, self-contained archive. Your articles survive because every artifact is stored independently:
 

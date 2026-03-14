@@ -1,6 +1,7 @@
 ---
 theme: default
 title: Vaders
+routerMode: hash
 selectable: true
 colorSchema: dark
 fonts:
@@ -156,14 +157,10 @@ transition: wipe-right
 
 ### Works in a TUI
 
-<v-clicks>
-
 - Color cycling (Amiga palette rotation)
 - Braille and box-drawing sprites
 - Chunky cell-based movement
 - Solid foreground/background per cell
-
-</v-clicks>
 
 ::right::
 
@@ -188,9 +185,9 @@ Sources:
 transition: slide-up
 ---
 
-# Held-state networking
+# Movement and shooting need different network models
 
-Movement and shooting need different network models. The server is the truth for both.
+The server is the truth for both — but movement is continuous and shooting is discrete.
 
 ```ts
 // Movement: continuous held-key state
@@ -252,7 +249,7 @@ Sources:
 transition: slide-up
 ---
 
-# Testing across the wire
+# 620 tests passed while game_over never reached the UI
 
 Server tests verified events were *sent*. The client silently dropped them.
 
