@@ -40,7 +40,7 @@ This means a cloudflare-preset deck for a project with green branding would stil
 
 ## Scoped style rule
 
-Scoped styles (`<style scoped>`) must reference token variables (`var(--deck-bg)`, `var(--deck-fg)`, etc.), not override them with literal hex or rgb values. If a slide needs a palette variant (e.g., inverted section divider), define the variant as an additional CSS custom property in `styles/tokens.css` and reference that variable. Direct hex/rgb values in scoped styles are a token bypass and will be flagged by `tools/deck-lint.mjs`.
+Scoped styles must use `var(--deck-*)` tokens, not literal colors. See COMPILER_RULES.md § Anti-patterns.
 
 ## Font weight configuration
 

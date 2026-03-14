@@ -10,8 +10,12 @@ For each slide kind, prefer:
 2. built-in Slidev layout
 3. one local custom layout
 4. one local custom component
+5. inline HTML
 
+Do not skip levels without a real reason.
 Do not invent a new kind for a one-off slide.
+
+See COMPILER_RULES.md § 3 ("Decide implementation level per slide") for the full escalation rules.
 
 ## Kinds
 

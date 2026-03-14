@@ -2,6 +2,8 @@
 
 Scoring guide for evaluating and improving the visual quality and interest of any Slidev deck. For project-specific content scoring (motivation, real code, design insight), see `PROJECT_DECK_RUBRIC.md`.
 
+> This rubric scores decks against rules defined in COMPILER_RULES.md, STYLE_PRESETS.md, and PRESENTATION_PHILOSOPHY.md. For the authoritative rule definitions, see those files. This rubric defines the scoring criteria only.
+
 ---
 
 ## Part 1: Visual Interest Heuristics

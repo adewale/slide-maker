@@ -215,17 +215,28 @@ Sources:
 - file:slide-maker/COMPILER_RULES.md — compilation phases (Normalize, Decide level, Write headmatter, Write slides, Write tokens, Write theme) -->
 
 ---
-layout: fact
+layout: center
 transition: fade
 ---
 
-# 6
+# The priority stack
 
-Priorities in order
+<v-clicks>
 
-Editability, Clarity, Coherence, Native Slidev, Reuse, Restraint
+<div class="text-4xl font-bold tracking-tight leading-relaxed">
+<span class="opacity-100">Editability</span><br>
+<span class="opacity-75">Clarity</span><br>
+<span class="opacity-55">Coherence</span><br>
+<span class="opacity-40">Native Slidev</span><br>
+<span class="opacity-30">Reuse</span><br>
+<span class="opacity-20">Restraint</span>
+</div>
 
-<!-- The priority order resolves the generic/brittle tension. Editability first (anti-brittle). Clarity second (anti-generic). Restraint last — a reminder that the temptation to add complexity is the enemy of both goals.
+</v-clicks>
+
+Each click reveals the next priority. The fade communicates the hierarchy — the top matters most.
+
+<!-- The priority order resolves the generic/brittle tension. Editability first (anti-brittle). Clarity second (anti-generic). Restraint last — a reminder that the temptation to add complexity is the enemy of both goals. The opacity gradient makes the ranking visceral rather than just listed.
 
 Sources:
 - file:slide-maker/COMPILER_RULES.md — "Goals" section listing the six optimization priorities -->

@@ -2,11 +2,11 @@
 
 ## 1. The styles/index.css discovery rule
 
-**What happened:** Every deck in the monorepo (14 decks) had `styles/tokens.css` and `styles/theme.css` but no `styles/index.css`. Slidev only auto-loads `./style.css` or `./styles/index.css` as its global style entry point. Neither tokens nor theme styles were ever loaded into any build.
+**What happened:** Every deck in the monorepo (11 decks) had `styles/tokens.css` and `styles/theme.css` but no `styles/index.css`. Slidev only auto-loads `./style.css` or `./styles/index.css` as its global style entry point. Neither tokens nor theme styles were ever loaded into any build.
 
 **Why it wasn't caught:** Decks that appeared to work (sumi-e, material) had custom Vue components (layouts, global layers) whose scoped `<style>` blocks referenced `var(--deck-*)` tokens or hardcoded colors inline. Fonts loaded via the headmatter `fonts:` config, which Slidev processes separately. So decks looked "close enough" without any global styles actually loading.
 
-**The fix:** Create `styles/index.css` in every deck directory with `@import './tokens.css'; @import './theme.css';`. This is now documented in COMPILER_RULES.md as step 5b and enforced by `tools/deck-lint.mjs`.
+**The fix:** Create `styles/index.css` in every deck directory with `@import './tokens.css'; @import './theme.css';`. This is now documented in COMPILER_RULES.md as step 6b and enforced by `tools/deck-lint.mjs`.
 
 **The lesson:** Read the framework's actual auto-discovery mechanism, not what you assume it does. Slidev's directory structure documentation is explicit: `styles/index.css` is the entry point. The existence of a `styles/` directory with CSS files in it does nothing on its own.
 
@@ -14,7 +14,7 @@
 
 ## 2. Silent failures require verification tooling
 
-**What happened:** `build.sh` completed successfully for all 14 decks. No errors. No warnings. But the CSS was silently absent from every build. The only way to detect this was to grep the build output CSS for expected values.
+**What happened:** `build.sh` completed successfully for all 11 decks. No errors. No warnings. But the CSS was silently absent from every build. The only way to detect this was to grep the build output CSS for expected values.
 
 **The lesson:** A successful build is not a successful product. Post-build verification (`tools/style-audit.mjs`, `tools/build-and-verify.sh`) catches the gap between "the build ran" and "the build produced correct output." This is especially important in monorepos where configuration errors compound silently across all projects.
 
@@ -84,7 +84,7 @@ Similarly, Slidev auto-discovers:
 
 ## 8. Build tools should be built before features
 
-**What happened:** We built 14 decks, a transition library, animation components, a keyboard help panel, a presenter enhancement system, and a complete Cloudflare theme — all without any build verification tooling. The styles/index.css bug existed from the very first deck and was never caught.
+**What happened:** We built 11 decks, a transition library, animation components, a keyboard help panel, a presenter enhancement system, and a complete Cloudflare theme — all without any build verification tooling. The styles/index.css bug existed from the very first deck and was never caught.
 
 **The lesson:** Invest in tooling early:
 - `tools/new-deck.sh` before creating the second deck
@@ -92,7 +92,7 @@ Similarly, Slidev auto-discovers:
 - `tools/build-and-verify.sh` after the first build
 - `tools/style-audit.mjs` after the first themed deck
 
-The time spent building these tools is small compared to the time spent debugging a systemic issue across 14 projects.
+The time spent building these tools is small compared to the time spent debugging a systemic issue across 11 projects.
 
 ---
 
@@ -107,6 +107,7 @@ The time spent building these tools is small compared to the time spent debuggin
 | `tools/build-and-verify.sh` | Full post-build smoke test (tokens, fonts, counts) | After building |
 | `tools/deck-preview.mjs <deck>` | Screenshot all slides to contact sheet | For visual review |
 | `tools/deck-diff.mjs --left A --right B` | Pixel-diff two screenshot sets | For visual regression |
+| `tools/compare-decks.mjs` | Screenshot a reference URL and local build side-by-side, generate HTML comparison report | For comparing local deck against a live reference |
 
 ### Recommended workflow
 

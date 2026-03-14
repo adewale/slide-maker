@@ -49,8 +49,8 @@ Optional:
   - fg: "#111827"
   - accent: "#2563eb"
 - typography:
-  - display: Inter Tight
-  - body: Inter
+  - display: Plus Jakarta Sans
+  - body: DM Sans
 - motion:
   - preset: restrained-fade
 

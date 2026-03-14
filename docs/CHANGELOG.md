@@ -10,7 +10,7 @@ All notable changes to the slide-maker skill and its supporting tools.
 - **docs/ directory**: centralized documentation (`LESSONS_LEARNED.md`, `CHANGELOG.md`)
 
 ### Changed
-- Moved 14 example decks into `examples/` (root deck → `examples/demo/`)
+- Moved 11 example decks into `examples/` (root deck → `examples/demo/`)
 - Moved 7 dev scripts and `templates/` into `tools/`
 - Updated all script paths for the new directory structure
 - Updated `.gitignore` for `examples/_build/` and tool output directories
@@ -27,7 +27,7 @@ Initial release of the slide-maker skill and monorepo.
 
 ### Skill (`slide-maker/`)
 - `SKILL.md` — entry point defining create/update modes
-- `COMPILER_RULES.md` — 6-phase compilation pipeline with acceptance checklist
+- `COMPILER_RULES.md` — 10-phase compilation pipeline with acceptance checklist
 - `DECK_SPEC.md` — schema for `deck.spec.md` planning documents
 - `SLIDE_KINDS.md` — canonical slide types (cover, section, fact, quote, end, etc.)
 - `STYLE_PRESETS.md` — 7 visual presets (editorial-dark, swiss-minimal, bold-modern, sumi-e, tufte-data, cloudflare, material-design)
@@ -35,11 +35,11 @@ Initial release of the slide-maker skill and monorepo.
 - `styles/transitions.css` — shared transition library
 - `components/` — reusable Vue components (GlassCard, ImageFX, ShadowStack, RevealPath)
 
-### Example Decks (14)
-- demo (slide-maker intro), vaders, planet-cf, keyboardia, garten, claude-history-explorer, geist-fabrik, olsen, tasche, component-showcase, sumi-e, tufte, material, cloudflare
+### Example Decks (11)
+- demo (slide-maker intro), vaders, planet-cf, claude-history-explorer, geist-fabrik, olsen, tasche, tufte, durable-objects, extensions, reference
 
 ### Tools
-- `build.sh` — build all 14 decks to static output
+- `build.sh` — build all 11 decks to static output
 - `build-and-verify.sh` — post-build smoke test (tokens, selectors, fonts, slide counts)
 - `deck-lint.mjs` — structural validator for deck directories
 - `style-audit.mjs` — CSS-in-build verifier

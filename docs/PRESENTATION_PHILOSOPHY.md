@@ -2,7 +2,7 @@
 
 Rhetorical principles derived from [speakerdeck.com/adewale](https://speakerdeck.com/adewale). These shape how decks are structured, not just how they look.
 
-## 14 principles
+## 15 principles
 
 ### 1. One idea per slide
 1-3 lines of text maximum. If you're scrolling, split it. The slide is a frame for a single thought, not a container for paragraphs.

@@ -2,6 +2,8 @@
 
 Scoring guide for evaluating and improving Slidev decks that present GitHub/Git open-source projects. For general visual quality scoring, see `DECK_RUBRIC.md`.
 
+> This rubric extends DECK_RUBRIC.md with project-specific scoring criteria. For the authoritative rule definitions, see COMPILER_RULES.md (source material, through-line, visual evidence) and STYLE_PRESETS.md (project color override).
+
 ---
 
 ## Part 1: Content Rubric (11 axes, 1-5 each, max 55)

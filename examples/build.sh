@@ -28,6 +28,7 @@ declare -a DECKS=(
   "tufte:tufte"
   "durable-objects:durable-objects"
   "extensions:extensions"
+  "reference:reference"
 )
 
 for entry in "${DECKS[@]}"; do
@@ -47,7 +48,7 @@ done
 cp "$ROOT/index.html" "$OUT/index.html"
 touch "$OUT/.nojekyll"
 
-# Generate serve.json for SPA routing (presenter mode, slide navigation)
+# Generate serve.json for SPA routing (npx serve)
 {
   echo '{'
   echo '  "rewrites": ['
@@ -66,8 +67,18 @@ touch "$OUT/.nojekyll"
   echo '}'
 } > "$OUT/serve.json"
 
+# Generate _redirects for Cloudflare Pages / Workers Static Assets
+# Slidev uses HTML5 history routing — each deck needs SPA fallback
+{
+  for entry in "${DECKS[@]}"; do
+    name="${entry##*:}"
+    printf '/%s/*    /%s/index.html   200\n' "$name" "$name"
+  done
+} > "$OUT/_redirects"
+
 echo ""
 echo "Done. All decks built to examples/_build/"
 echo ""
 echo "  open examples/_build/index.html   # file:// (links won't work)"
 echo "  npx serve examples/_build         # http://localhost:3000"
+echo "  wrangler pages deploy examples/_build  # Cloudflare Pages"
