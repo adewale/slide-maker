@@ -29,7 +29,9 @@ const divider = () => console.log(`${DIM}${'─'.repeat(60)}${RESET}`);
 // ── Root paths ────────────────────────────────────────────────────────────────
 
 const TOOLS_DIR = new URL('.', import.meta.url).pathname.replace(/\/$/, '');
-const EXAMPLES_DIR = join(TOOLS_DIR, '..', 'examples');
+const REPO_ROOT = join(TOOLS_DIR, '..');
+const EXAMPLES_DIR = join(REPO_ROOT, 'examples');
+const DECKS_DIR = join(REPO_ROOT, 'decks');
 const BUILD_DIR = join(EXAMPLES_DIR, '_build');
 
 // ── CSS parsing helpers ───────────────────────────────────────────────────────
@@ -148,7 +150,10 @@ const BUILD_TO_SOURCE = { 'slide-maker': 'demo' };
 
 function auditDeck(deckName) {
   const sourceName = BUILD_TO_SOURCE[deckName] || deckName;
-  const sourceDir = join(EXAMPLES_DIR, sourceName);
+  // Core decks live in examples/, local decks in decks/
+  const examplesPath = join(EXAMPLES_DIR, sourceName);
+  const decksPath = join(DECKS_DIR, sourceName);
+  const sourceDir = existsSync(examplesPath) ? examplesPath : decksPath;
   const tokensPath = join(sourceDir, 'styles', 'tokens.css');
   const themePath = join(sourceDir, 'styles', 'theme.css');
   const buildAssetsDir = join(BUILD_DIR, deckName, 'assets');

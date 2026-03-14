@@ -2,7 +2,7 @@
 
 ## 1. The styles/index.css discovery rule
 
-**What happened:** Every deck in the monorepo (11 decks) had `styles/tokens.css` and `styles/theme.css` but no `styles/index.css`. Slidev only auto-loads `./style.css` or `./styles/index.css` as its global style entry point. Neither tokens nor theme styles were ever loaded into any build.
+**What happened:** Every deck in the monorepo (10 decks) had `styles/tokens.css` and `styles/theme.css` but no `styles/index.css`. Slidev only auto-loads `./style.css` or `./styles/index.css` as its global style entry point. Neither tokens nor theme styles were ever loaded into any build.
 
 **Why it wasn't caught:** Decks that appeared to work (sumi-e, material) had custom Vue components (layouts, global layers) whose scoped `<style>` blocks referenced `var(--deck-*)` tokens or hardcoded colors inline. Fonts loaded via the headmatter `fonts:` config, which Slidev processes separately. So decks looked "close enough" without any global styles actually loading.
 
@@ -14,7 +14,7 @@
 
 ## 2. Silent failures require verification tooling
 
-**What happened:** `build.sh` completed successfully for all 11 decks. No errors. No warnings. But the CSS was silently absent from every build. The only way to detect this was to grep the build output CSS for expected values.
+**What happened:** `build.sh` completed successfully for all 10 decks. No errors. No warnings. But the CSS was silently absent from every build. The only way to detect this was to grep the build output CSS for expected values.
 
 **The lesson:** A successful build is not a successful product. Post-build verification (`tools/style-audit.mjs`, `tools/build-and-verify.sh`) catches the gap between "the build ran" and "the build produced correct output." This is especially important in monorepos where configuration errors compound silently across all projects.
 
@@ -84,7 +84,7 @@ Similarly, Slidev auto-discovers:
 
 ## 8. Build tools should be built before features
 
-**What happened:** We built 11 decks, a transition library, animation components, a keyboard help panel, a presenter enhancement system, and a complete Cloudflare theme — all without any build verification tooling. The styles/index.css bug existed from the very first deck and was never caught.
+**What happened:** We built 10 decks, a transition library, animation components, a keyboard help panel, a presenter enhancement system, and a complete Cloudflare theme — all without any build verification tooling. The styles/index.css bug existed from the very first deck and was never caught.
 
 **The lesson:** Invest in tooling early:
 - `tools/new-deck.sh` before creating the second deck
