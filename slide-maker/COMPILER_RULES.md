@@ -678,34 +678,40 @@ Rules:
 
 ## Acceptance checklist
 
-A compiled deck passes when:
+### MUST (hard fail — blocks delivery)
+
+These items must all pass before a deck can be delivered:
+- no slide overflows the viewport (7 bullet max, 8 code line max, 60 char bullet max)
+- no emoji anywhere in slide content or diagrams
+- no `<style scoped>` block uses literal hex/rgb for `background` or `color` properties — must use `var(--deck-*)` token variables
+- `deck.spec.md` matches `slides.md` (spec-to-slides sync)
 - `slides.md` reads like a human-maintained deck
-- `deck.spec.md` matches it
 - layouts are few and purposeful
 - components are few and purposeful
 - styles are centralized
 - the project can be extended without rewrite
-- no emoji anywhere in slide content or diagrams
-- at least 3 different layout types used across the deck
-- bullet lists use `<v-clicks>` for progressive reveal
-- each transition type used in the deck has a consistent semantic meaning (see Transition grammar)
-- transition vocabulary matches the style preset's recommended set (see STYLE_PRESETS.md)
-- Mermaid diagram node labels use plain text, no emoji
 - text is legible on all slides (proper contrast between foreground and background)
 - Mermaid nodes: light fills have dark text, dark fills have light text (see Color methodology)
+- Mermaid diagram node labels use plain text, no emoji
 - narrative arc present: tension, exploration, insight, resolution (see Storytelling)
-- diagram scale set explicitly, node counts within limits (see Diagram guidelines)
-- v-click animation matches the deck's style preset (see Animation guidelines)
-- at least one `v-motion` element in the deck
-- no slide overflows the viewport (7 bullet max, 8 code line max, 60 char bullet max)
-- at least one slide uses hover-interactive elements (data cards, code blocks, or comparison grids)
-- no `<style scoped>` block uses literal hex/rgb for `background` or `color` properties — must use `var(--deck-*)` token variables
 - closing slide echoes or resolves the opening question/metaphor — not an install command
+- no slide contradicts another slide in the same deck (e.g., claiming "no Unicode" on one slide while showing Unicode on another)
+- every content slide with a factual claim, war story, or code example has a `Sources:` block in its presenter notes
+- war story slides cite specific evidence (file path, commit, screenshot, or incident) — not just the project repo URL
 - (project decks) through-line appears in at least 3 slides (ideally 5-6), gaining new meaning each time
 - (project decks) source materials section lists at least 2 digested documents
 - (project decks) at least 1 visual evidence slide with real screenshot or terminal output (no placeholders)
 - (project decks) project colors override preset palette when project-url is declared
-- every content slide with a factual claim, war story, or code example has a `Sources:` block in its presenter notes
-- war story slides cite specific evidence (file path, commit, screenshot, or incident) — not just the project repo URL
-- no slide contradicts another slide in the same deck (e.g., claiming "no Unicode" on one slide while showing Unicode on another)
 - (concept decks) source citations use `file:` prefix referencing real skill repo files
+
+### SHOULD (quality flag — does not block delivery)
+
+These items improve quality but do not block delivery:
+- at least one `v-motion` element in the deck
+- at least one slide uses hover-interactive elements (data cards, code blocks, or comparison grids)
+- at least 3 different layout types used across the deck
+- bullet lists use `<v-clicks>` for progressive reveal
+- each transition type used in the deck has a consistent semantic meaning (see Transition grammar)
+- transition vocabulary matches the style preset's recommended set (see STYLE_PRESETS.md)
+- diagram scale set explicitly, node counts within limits (see Diagram guidelines)
+- v-click animation matches the deck's style preset (see Animation guidelines)

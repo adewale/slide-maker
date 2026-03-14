@@ -7,7 +7,8 @@ import { extname } from 'path';
 
 const REFERENCE_URL = 'https://agents-deck.giftegwuenu.com';
 const LOCAL_PORT = 3987;
-const LOCAL_URL = `http://localhost:${LOCAL_PORT}/cloudflare`;
+const LOCAL_DECK = process.argv[2] || 'slide-maker';
+const LOCAL_URL = `http://localhost:${LOCAL_PORT}/${LOCAL_DECK}`;
 const TOOLS_DIR = import.meta.dirname;
 const BUILD_DIR = join(TOOLS_DIR, '..', 'examples', '_build');
 const OUT_DIR = join(TOOLS_DIR, '..', '_compare');
@@ -180,7 +181,7 @@ function generateReport(refCount, localCount) {
 </head>
 <body>
   <h1>Deck Comparison</h1>
-  <div class="subtitle">Reference (agents-deck.giftegwuenu.com &mdash; ${refCount} slides) vs Local (cloudflare &mdash; ${localCount} slides) &mdash; ${new Date().toISOString().slice(0, 10)}</div>
+  <div class="subtitle">Reference (agents-deck.giftegwuenu.com &mdash; ${refCount} slides) vs Local (${LOCAL_DECK} &mdash; ${localCount} slides) &mdash; ${new Date().toISOString().slice(0, 10)}</div>
 `;
 
   for (let i = 1; i <= max; i++) {

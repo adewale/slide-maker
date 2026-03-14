@@ -1,6 +1,6 @@
 ---
 name: slide-maker
-description: Create or update native Slidev deck projects with strong visual direction, readable Markdown, and minimal abstraction.
+description: Create or update native Slidev deck projects. Use when the user asks to create a presentation, slide deck, talk, or Slidev project.
 argument-hint: [goal or update instructions]
 ---
 
@@ -45,6 +45,7 @@ When justified: `styles/tokens.css`, `styles/theme.css`, `layouts/*.vue`, `compo
 
 ## Non-negotiable rules
 
+- Every slide must fit the viewport — no scrolling. If content overflows, split the slide.
 - Always leave behind a coherent deck project
 - Always use Markdown as the intermediate schema
 - Follow the escalation ladder: Markdown > built-in layout > custom layout > custom component > inline HTML. Do not skip levels without a real reason.
@@ -67,18 +68,28 @@ When the deck presents a project (has `project-url` or references a codebase):
 See COMPILER_RULES.md Phase 1 for the full source-material lookup table.
 
 ### 3. Intake
+→ Load PRESENTATION_PHILOSOPHY.md now.
+
 Normalize: title, goal, audience, presenter voice, target length, tone, source material, brand constraints, notes requirement, through-line (project decks), project-url (project decks), current constraints if updating.
 
 ### 4. Style direction
+→ Load STYLE_PRESETS.md now.
+
 Offer 2-3 directions in words only — preset/mood, typography, token direction, layout tendencies, motion character, expected abstraction density.
 
 ### 5. Write or revise `deck.spec.md`
+→ Load DECK_SPEC.md and SLIDE_KINDS.md now.
+
 Do this before implementation-heavy changes.
 
 ### 6. Compile the project
+→ Load COMPILER_RULES.md and SLIDEV_REFERENCE.md now.
+
 Generate or update: `slides.md`, styles, layouts, components, README if usage changed.
 
 ### 7. Validate
+→ Load COMPILER_RULES.md § Acceptance checklist and LLM_TELLS.md now.
+
 Check: spec-to-slides sync, slide density, Markdown editability, justified custom code, no unused abstractions.
 For the full 30+ item checklist, load COMPILER_RULES.md § Acceptance checklist.
 Project decks: through-line in 3+ slides (ideally 5-6), source materials cited, 1+ visual evidence slide, project colors override preset tokens.
@@ -106,3 +117,11 @@ Default: Option 1 for 2+ decks. For a single deck, just `slidev build` + deploy 
 - Regenerate gallery `index.html` and `_redirects` when decks are added/removed/renamed.
 - Atomic-deploy hosts: redeploy entire `_build/`. S3/R2: use `--sync`.
 - `build.sh` maintains the canonical deck list in its `DECKS` array — update it first when adding/removing decks.
+
+### Feedback loops
+- If the user rejects style direction → return to Phase 4.
+- If validation fails → fix issues, re-validate (max 2 cycles before asking user).
+- If spec changes after compile → update slides to match, re-validate.
+
+### Done condition
+The deck is complete when all MUST items in the acceptance checklist pass, the user has approved style direction, and `deck.spec.md` is in sync with `slides.md`.
