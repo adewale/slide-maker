@@ -21,6 +21,14 @@ graph LR
   D --> E["Spec"]
   E --> F["Compile"]
   F --> G["Validate"]
+  style A fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style B fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style C fill:#3b5f87,stroke:#3b5f87,color:#eceff4
+  style D fill:#3b5f87,stroke:#3b5f87,color:#eceff4
+  style E fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style F fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style G fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  linkStyle default stroke:#3b5f87,stroke-width:2px
 ```
 
 <v-clicks>

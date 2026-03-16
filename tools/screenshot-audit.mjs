@@ -45,32 +45,60 @@ const INFO = `${C.cyan}INFO${C.reset}`;
 async function analyseSlide(page, slideNum) {
   const issues = [];
 
-  // 1. Check for black-rectangle Mermaid rendering failures
-  //    Mermaid SVGs with nodes that have very dark fills and no visible text
+  // 1. Check for Mermaid rendering failures
+  //    Detect dark-filled shapes where text inside has insufficient contrast
   const mermaidIssues = await page.evaluate(() => {
     const problems = [];
-    const svgs = document.querySelectorAll('.slidev-layout svg, .slidev-layout .mermaid');
+
+    function parseLum(colorStr) {
+      const c = document.createElement('canvas');
+      c.width = c.height = 1;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = colorStr;
+      ctx.fillRect(0, 0, 1, 1);
+      const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+      const [rs, gs, bs] = [r, g, b].map(v => {
+        const s = v / 255;
+        return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+    }
+
+    function cr(l1, l2) {
+      return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    }
+
+    const svgs = document.querySelectorAll('.slidev-layout svg');
     for (const svg of svgs) {
-      const rects = svg.querySelectorAll('rect, circle, ellipse, polygon, path');
-      let darkNodeCount = 0;
+      // Check each shape that might be a Mermaid node
+      const shapes = svg.querySelectorAll('rect, circle, ellipse');
+      let badNodes = 0;
       let totalNodes = 0;
-      for (const r of rects) {
-        const style = getComputedStyle(r);
-        const fill = style.fill || r.getAttribute('fill') || '';
+      for (const shape of shapes) {
+        const r = shape.getBoundingClientRect();
+        if (r.width < 30 || r.height < 15) continue; // skip tiny decorative shapes
+        const fill = getComputedStyle(shape).fill || shape.getAttribute('fill') || '';
         if (!fill || fill === 'none' || fill === 'transparent') continue;
         totalNodes++;
-        // Check if fill is very dark (close to black)
-        const canvas = document.createElement('canvas');
-        canvas.width = canvas.height = 1;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = fill;
-        ctx.fillRect(0, 0, 1, 1);
-        const [r2, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-        const luminance = (0.299 * r2 + 0.587 * g + 0.114 * b) / 255;
-        if (luminance < 0.1) darkNodeCount++;
+
+        const fillLum = parseLum(fill);
+
+        // Find text elements near/inside this shape's parent group
+        const group = shape.closest('g') || shape.parentElement;
+        const texts = group ? group.querySelectorAll('text, tspan') : [];
+        for (const t of texts) {
+          const textFill = getComputedStyle(t).fill || t.getAttribute('fill') || '';
+          if (!textFill || textFill === 'none') continue;
+          const textLum = parseLum(textFill);
+          const ratio = cr(fillLum, textLum);
+          if (ratio < 2.0) {
+            badNodes++;
+            break; // one bad text per shape is enough
+          }
+        }
       }
-      if (totalNodes > 2 && darkNodeCount / totalNodes > 0.5) {
-        problems.push(`${darkNodeCount}/${totalNodes} SVG shapes are near-black — likely Mermaid rendering failure`);
+      if (totalNodes > 2 && badNodes > 0) {
+        problems.push(`${badNodes}/${totalNodes} SVG nodes have text with <2:1 contrast against fill — Mermaid rendering failure (add inline style directives)`);
       }
     }
     return problems;
