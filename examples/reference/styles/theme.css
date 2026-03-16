@@ -51,6 +51,17 @@ ul li::marker {
   color: var(--deck-accent-alt);
 }
 
+/* Code block contrast — Shiki's vitesse-light theme uses low-contrast
+   colors. Darken the code block bg so syntax tokens stand out. Also
+   raise dishonored (unfocused) line opacity from 0.5 to 0.8. */
+.slidev-layout .slidev-code {
+  background: #d8dce4 !important;
+}
+
+.slidev-layout .slidev-code-dishonored {
+  opacity: 0.8 !important;
+}
+
 /* Click animations */
 .slidev-vclick-target {
   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
