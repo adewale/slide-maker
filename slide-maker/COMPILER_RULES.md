@@ -566,7 +566,7 @@ Beautiful Mermaid's auto-theming does not work equally well for all diagram type
 
 | Diagram type | Inline `style` | Auto-theme (light bg) | Auto-theme (dark bg) | Recommendation |
 |-------------|---------------|----------------------|---------------------|----------------|
-| `graph` / `flowchart` | Yes | Good | Good (with styles, no edge labels) | **Use this.** Style every node + linkStyle default. Remove edge labels on dark bg (Mermaid renders them in black). |
+| `graph` / `flowchart` | Yes | Needs inline styles | Needs inline styles, no edge labels | **Use this.** Always add explicit `style` on every node + `linkStyle default`. Beautiful Mermaid's `color-mix()` auto-theming produces black boxes on both light and dark backgrounds. Never use edge labels (`-->|text|`) — they render as unthemeable black boxes. |
 | `sequenceDiagram` | No | Readable | **Unreadable** | **Avoid on dark backgrounds.** Convert to flowchart showing the same actor/message flow. |
 | `stateDiagram-v2` | No | Readable | **Unreadable** | **Avoid on dark backgrounds.** Convert to flowchart with circle nodes for start/end. |
 | `classDiagram` | No | Readable | Untested | Use with caution on dark backgrounds. |

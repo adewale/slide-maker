@@ -306,18 +306,20 @@ transition: slide-left
 
 # Server-authoritative architecture
 
-```mermaid {theme: 'base', scale: 0.85}
+```mermaid {scale: 0.85}
 graph LR
-  P1["Player 1"] -->|WS| DO["Game DO"]
-  P2["Player 2"] -->|WS| DO
-  P3["Player 3"] -->|WS| DO
-  DO -->|broadcast| P1 & P2 & P3
+  P1["Player 1"] --> DO["Game DO"]
+  P2["Player 2"] --> DO
+  P3["Player 3"] --> DO
+  DO --> P1 & P2 & P3
   style DO fill:#ff4801,stroke:#521000,color:#fff
   style P1 fill:#fff3e0,stroke:#ff4801,color:#521000
   style P2 fill:#fff3e0,stroke:#ff4801,color:#521000
   style P3 fill:#fff3e0,stroke:#ff4801,color:#521000
   linkStyle default stroke:#521000,stroke-width:2px
 ```
+
+Players send inputs (keystrokes) via WebSocket. The DO broadcasts full state back.
 
 Notice: all arrows from players carry only inputs (keystrokes). All arrows from the DO carry full state. Players never compute game logic — they render what the DO tells them. This prevents cheat clients.
 
