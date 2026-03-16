@@ -25,7 +25,7 @@ h2 {
 }
 
 h3 {
-  color: var(--deck-accent);
+  color: var(--deck-fg);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -34,12 +34,12 @@ h3 {
 }
 
 strong {
-  color: var(--deck-accent);
+  color: var(--deck-fg);
 }
 
 code {
   font-family: var(--deck-font-mono);
-  color: var(--deck-accent-alt);
+  color: var(--deck-fg);
   background: rgba(255, 72, 1, 0.05);
   padding: 0.15em 0.4em;
   border: 1px solid var(--deck-border-light);

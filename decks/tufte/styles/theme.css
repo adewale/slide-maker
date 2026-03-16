@@ -112,6 +112,7 @@ a {
   font-size: 3rem;
   font-weight: 400;
   margin-bottom: 0.75rem;
+  color: var(--deck-fg);
 }
 
 .slidev-layout.cover p {
