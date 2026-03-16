@@ -142,14 +142,13 @@ transition: slide-left
 
 ```mermaid {scale: 0.8}
 graph LR
-  U["User"] -->|"brief"| S["Skill Agent"]
-  S -->|"spec"| P["Spec Builder"]
-  P -->|"ground"| P
-  P -->|"grounded"| S
-  S -->|"compile"| C["Compiler"]
-  C -->|"resolve"| C
-  C -->|"render"| D["Slide Deck"]
-  D -.->|"preview"| U
+  U["User"] --> S["Skill Agent"]
+  S --> P["Spec Builder"]
+  P --> P
+  S --> C["Compiler"]
+  C --> C
+  C --> D["Slide Deck"]
+  D -.-> U
   style U fill:#0f1a2e,stroke:#22d3ee,color:#22d3ee
   style S fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
   style P fill:#0f1a2e,stroke:#22d3ee,color:#22d3ee
@@ -158,7 +157,7 @@ graph LR
   linkStyle default stroke:#22d3ee,stroke-width:2px
 ```
 
-Five actors, but the surprise is the self-loops: the Spec Builder re-enters itself for source-grounding, and the Compiler loops for layout resolution, before handing off.
+User briefs the Skill Agent, which sends a structured spec to the Spec Builder. The Builder re-enters itself for source-grounding. The Compiler loops for layout resolution, then renders the Slide Deck. The dashed return is the live preview link.
 
 <!-- sequenceDiagram is ideal for showing request/response flows, API call chains, and multi-actor protocols. Participants are declared with `participant` aliases. Solid arrows (->>)  are calls; dashed arrows (-->>)  are returns. Keep to 6-8 interactions to avoid vertical overflow. Beautiful Mermaid themes the diagram automatically from deck tokens.
 
@@ -177,11 +176,11 @@ transition: flip-y
 ```mermaid {scale: 0.85}
 graph LR
   S(("Start")) --> Draft
-  Draft -->|"compile"| Compiled
-  Compiled -->|"lint + contrast"| Validated
-  Validated -->|"approve"| Delivered
-  Validated -->|"lint fail"| Draft
-  Delivered -->|"revise"| Draft
+  Draft --> Compiled
+  Compiled --> Validated
+  Validated --> Delivered
+  Validated --> Draft
+  Delivered --> Draft
   Delivered --> E(("End"))
   style S fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
   style E fill:#22d3ee,stroke:#22d3ee,color:#0c0e14

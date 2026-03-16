@@ -547,7 +547,7 @@ For the full set of rhetorical principles, see [PRESENTATION_PHILOSOPHY.md](../d
 Every flowchart diagram must have:
 1. **Every node styled** — each node needs an explicit `style` directive with `fill`, `stroke`, and `color`. Unstyled nodes inherit Mermaid defaults that may not contrast with the deck background. If using `classDef`, every node must be assigned a class.
 2. **linkStyle default** — every flowchart must include `linkStyle default stroke:<color>,stroke-width:2px` where `<color>` contrasts with `--deck-bg`. Without this, arrow lines and edge labels may be invisible on both dark and light backgrounds.
-3. **Edge labels readable** — if edges use labels (`-->|label|`), the label text must be readable against the slide background. Beautiful Mermaid does not reliably theme edge label text.
+3. **No edge labels on dark backgrounds** — Mermaid renders edge label text (`-->|label|`) in its default color (black/dark gray), which is invisible on dark slide backgrounds. `linkStyle` only controls the arrow stroke, not the label text. On dark-background decks, remove edge labels and explain the flow in body text instead. Light-background decks can use edge labels safely.
 
 Example (complete flowchart on a dark background):
 ```
@@ -566,7 +566,7 @@ Beautiful Mermaid's auto-theming does not work equally well for all diagram type
 
 | Diagram type | Inline `style` | Auto-theme (light bg) | Auto-theme (dark bg) | Recommendation |
 |-------------|---------------|----------------------|---------------------|----------------|
-| `graph` / `flowchart` | Yes | Good | Good (with styles) | **Use this.** Style every node + linkStyle default. Fully reliable. |
+| `graph` / `flowchart` | Yes | Good | Good (with styles, no edge labels) | **Use this.** Style every node + linkStyle default. Remove edge labels on dark bg (Mermaid renders them in black). |
 | `sequenceDiagram` | No | Readable | **Unreadable** | **Avoid on dark backgrounds.** Convert to flowchart showing the same actor/message flow. |
 | `stateDiagram-v2` | No | Readable | **Unreadable** | **Avoid on dark backgrounds.** Convert to flowchart with circle nodes for start/end. |
 | `classDiagram` | No | Readable | Untested | Use with caution on dark backgrounds. |
