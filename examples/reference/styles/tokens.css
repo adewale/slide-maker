@@ -1,9 +1,9 @@
 :root {
-  --deck-bg: #0c0e14;
-  --deck-fg: #e4e8ef;
-  --deck-accent: #22d3ee;
-  --deck-accent-alt: #f472b6;
-  --deck-muted: rgba(228, 232, 239, 0.5);
+  --deck-bg: #eceff4;
+  --deck-fg: #2e3440;
+  --deck-accent: #3b5f87;
+  --deck-accent-alt: #994050;
+  --deck-muted: rgba(46, 52, 64, 0.45);
   --deck-font-display: 'Inter', sans-serif;
   --deck-font-body: 'Source Sans 3', sans-serif;
   --deck-font-mono: 'JetBrains Mono', monospace;

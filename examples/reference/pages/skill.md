@@ -13,7 +13,7 @@ transition: slide-left
 
 # Seven-Step Workflow
 
-```mermaid {theme: 'dark', scale: 0.8}
+```mermaid {scale: 0.8}
 graph LR
   A["Mode"] --> B["Sources"]
   B --> C["Intake"]
@@ -21,12 +21,6 @@ graph LR
   D --> E["Spec"]
   E --> F["Compile"]
   F --> G["Validate"]
-  classDef early fill:#0d3b4a,stroke:#22d3ee,color:#22d3ee
-  classDef mid fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
-  classDef late fill:#164e63,stroke:#22d3ee,color:#e4e8ef
-  class A,B early
-  class C,D mid
-  class E,F,G late
 ```
 
 <v-clicks>

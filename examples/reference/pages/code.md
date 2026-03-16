@@ -78,42 +78,36 @@ transition: cube
 
 # Diagrams
 
-Mermaid graphs with explicit styling.
+Beautiful Mermaid renders with deck palette tokens.
 
 ---
 transition: zoom-out
 ---
 
-# Mermaid: Left-to-Right Flow
+# The Escalation Ladder
 
-```mermaid {theme: 'dark', scale: 0.85}
+```mermaid {scale: 0.85}
 graph LR
   A["Markdown"] --> B["Built-in Layout"]
   B --> C["Custom Layout"]
   C --> D["Custom Component"]
   D --> E["Inline HTML"]
-  classDef low fill:#0d3b4a,stroke:#22d3ee,color:#22d3ee
-  classDef mid fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
-  classDef high fill:#831843,stroke:#f472b6,color:#f472b6
-  class A,B low
-  class C,D mid
-  class E high
 ```
 
-The escalation ladder: start at Markdown, escalate only when the lower level cannot express the structure.
+Start at Markdown, escalate only when the lower level cannot express the structure. Most slides never leave level 2.
 
-<!-- Mermaid diagrams require explicit color values on every node using classDef. Never rely on Mermaid's default theme colors. Use the deck's token colors as the source for classDef values. Light fills get dark text, dark fills get light text.
+<!-- Mermaid diagrams on light backgrounds use Beautiful Mermaid's auto-theming — no inline style directives needed. The renderer reads --deck-bg, --deck-fg, --deck-accent, and --deck-muted from CSS and derives all node fills, strokes, and text colors automatically via color-mix().
 
 Sources:
-- file:slide-maker/COMPILER_RULES.md — Mermaid guidelines: explicit colors, no defaults -->
+- file:slide-maker/COMPILER_RULES.md — Mermaid guidelines: diagram type reliability matrix -->
 
 ---
 transition: flip-y
 ---
 
-# Mermaid: Top-Down Tree
+# Six Presets, Six Personalities
 
-```mermaid {theme: 'dark', scale: 0.7}
+```mermaid {scale: 0.7}
 graph TD
   ROOT((Style Presets)) --> ED["editorial-dark"]
   ROOT --> SM["swiss-minimal"]
@@ -121,18 +115,14 @@ graph TD
   ROOT --> TD2["tufte-data"]
   ROOT --> CF["cloudflare"]
   ROOT --> MD["material-design"]
-  classDef hub fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
-  classDef leaf fill:#0d3b4a,stroke:#22d3ee,color:#e4e8ef
-  class ROOT hub
-  class ED,SM,BM,TD2,CF,MD leaf
 ```
 
-Six presets, each controlling typography, color, motion, and layout tendencies.
+Each preset controls typography, color, motion, and layout tendencies — the same content looks and feels different under each preset.
 
-<!-- Graph TD (top-down) works well for hierarchies and taxonomies. The double-parenthesis syntax creates a circle node. Square brackets create rectangles. Every node must have an explicit classDef.
+<!-- Graph TD (top-down) works well for hierarchies and taxonomies. The double-parenthesis syntax creates a circle node. On light backgrounds, Beautiful Mermaid auto-themes all nodes with no classDef needed.
 
 Sources:
-- file:slide-maker/STYLE_PRESETS.md — seven preset definitions -->
+- file:slide-maker/STYLE_PRESETS.md — six preset definitions -->
 
 ---
 transition: slide-left
@@ -141,30 +131,29 @@ transition: slide-left
 # Sequence Diagrams Reveal Hidden Round-Trips
 
 ```mermaid {scale: 0.8}
-graph LR
-  U["User"] --> S["Skill Agent"]
-  S --> P["Spec Builder"]
-  P --> P
-  S --> C["Compiler"]
-  C --> C
-  C --> D["Slide Deck"]
-  D -.-> U
-  style U fill:#0f1a2e,stroke:#22d3ee,color:#22d3ee
-  style S fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
-  style P fill:#0f1a2e,stroke:#22d3ee,color:#22d3ee
-  style C fill:#0f1a2e,stroke:#22d3ee,color:#22d3ee
-  style D fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
-  linkStyle default stroke:#22d3ee,stroke-width:2px
+sequenceDiagram
+  participant U as User
+  participant S as Skill Agent
+  participant P as Spec Builder
+  participant C as Compiler
+  participant D as Slide Deck
+
+  U->>S: Natural-language brief
+  S->>P: Structured spec
+  P->>P: Source-grounding pass
+  P-->>S: Grounded spec
+  S->>C: Compile command
+  C->>C: Layout + theme resolution
+  C->>D: Rendered slides
+  D-->>U: Live preview link
 ```
 
-User briefs the Skill Agent, which sends a structured spec to the Spec Builder. The Builder re-enters itself for source-grounding. The Compiler loops for layout resolution, then renders the Slide Deck. The dashed return is the live preview link.
+Five actors, but the surprise is the internal loop: the Spec Builder re-enters itself for source-grounding before handing off to the Compiler.
 
-<!-- sequenceDiagram is ideal for showing request/response flows, API call chains, and multi-actor protocols. Participants are declared with `participant` aliases. Solid arrows (->>)  are calls; dashed arrows (-->>)  are returns. Keep to 6-8 interactions to avoid vertical overflow. Beautiful Mermaid themes the diagram automatically from deck tokens.
-
-Also supported but less frequently used in presentations: classDiagram (class hierarchies), erDiagram (entity-relationship models), and xychart-beta (bar/line charts). Use those when the content demands them.
+<!-- sequenceDiagram works on light backgrounds with Beautiful Mermaid auto-theming. Solid arrows (->>)  are calls; dashed arrows (-->>)  are returns. On dark backgrounds, sequenceDiagram is unreliable — convert to flowchart instead (see diagram reliability matrix).
 
 Sources:
-- file:slide-maker/COMPILER_RULES.md — Mermaid guidelines: supported diagram types
+- file:slide-maker/COMPILER_RULES.md — Mermaid guidelines: diagram type reliability matrix
 - file:slide-maker/COMPILER_RULES.md — diagram insight annotations required -->
 
 ---
@@ -174,29 +163,20 @@ transition: flip-y
 # Slides Have a Lifecycle Most Presenters Ignore
 
 ```mermaid {scale: 0.85}
-graph LR
-  S(("Start")) --> Draft
-  Draft --> Compiled
-  Compiled --> Validated
-  Validated --> Delivered
-  Validated --> Draft
-  Delivered --> Draft
-  Delivered --> E(("End"))
-  style S fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
-  style E fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
-  style Draft fill:#0f1a2e,stroke:#22d3ee,color:#22d3ee
-  style Compiled fill:#0f1a2e,stroke:#22d3ee,color:#22d3ee
-  style Validated fill:#0f1a2e,stroke:#22d3ee,color:#22d3ee
-  style Delivered fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
-  linkStyle default stroke:#22d3ee,stroke-width:2px
+stateDiagram-v2
+  [*] --> Draft
+  Draft --> Compiled : skill compiles spec
+  Compiled --> Validated : lint + contrast pass
+  Validated --> Delivered : presenter approves
+  Validated --> Draft : lint failures
+  Delivered --> Draft : post-talk revision
+  Delivered --> [*]
 ```
 
 The backward edges matter most: validation failures return to Draft, not to Compiled, because structural fixes require a full recompile.
 
-<!-- stateDiagram-v2 is the right choice for lifecycle, workflow, and finite-state-machine diagrams. The [*] symbol marks start and end states. Backward transitions (Validated --> Draft) highlight recovery paths that audiences often overlook. Keep to 4-6 states to stay readable at presentation scale.
-
-Also supported but less common in slide contexts: classDiagram, erDiagram, and xychart-beta — reach for them when your content is specifically about class hierarchies, data models, or charted metrics.
+<!-- stateDiagram-v2 works on light backgrounds with Beautiful Mermaid auto-theming. The [*] symbol marks start and end states. On dark backgrounds, stateDiagram is unreliable — convert to flowchart instead (see diagram reliability matrix).
 
 Sources:
-- file:slide-maker/COMPILER_RULES.md — Mermaid guidelines: supported diagram types
+- file:slide-maker/COMPILER_RULES.md — Mermaid guidelines: diagram type reliability matrix
 - file:slide-maker/COMPILER_RULES.md — diagram insight annotations required -->

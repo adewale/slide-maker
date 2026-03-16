@@ -1,16 +1,15 @@
 ---
-theme: seriph
+theme: apple-basic
 title: Slide Maker Reference
 selectable: true
 routerMode: hash
-colorSchema: dark
+colorSchema: light
 transition: slide-left
 layout: cover
 fonts:
   sans: Inter
-  serif: Source Sans 3
   mono: JetBrains Mono
-  weights: '300,400,500,600,700'
+  weights: '400,500,600,700'
 ---
 
 # Slide Maker Reference
