@@ -1104,8 +1104,10 @@ function lintDeck(deckDir) {
 
   for (const slide of slides) {
     const body = slide.body || '';
-    const openCount = (body.match(/<!--/g) || []).length;
-    const closeCount = (body.match(/-->/g) || []).length;
+    // Strip fenced code blocks before counting — --> inside ```...``` is safe
+    const withoutCode = body.replace(/```[\s\S]*?```/g, '');
+    const openCount = (withoutCode.match(/<!--/g) || []).length;
+    const closeCount = (withoutCode.match(/-->/g) || []).length;
     if (closeCount > openCount) {
       warns.push(`slide ${slide.index}: HTML comment contains literal '-->' which breaks Slidev's comment parser — remove or encode the inner arrow`);
     }
