@@ -17,19 +17,19 @@ transition: slide-left
 
 <SmallMultiples :cols="4">
 <div>
-  <Sparkline :data="[10, 15, 12, 18, 22, 19, 25]" :width="90" :height="20" color="#22d3ee" />
+  <Sparkline :data="[10, 15, 12, 18, 22, 19, 25]" :width="90" :height="20" color="#3b5f87" />
   <div><strong>Rising</strong></div>
 </div>
 <div>
-  <Sparkline :data="[25, 22, 18, 15, 12, 10, 8]" :width="90" :height="20" color="#f472b6" />
+  <Sparkline :data="[25, 22, 18, 15, 12, 10, 8]" :width="90" :height="20" color="#994050" />
   <div><strong>Falling</strong></div>
 </div>
 <div>
-  <Sparkline :data="[15, 18, 14, 19, 13, 17, 16]" :width="90" :height="20" color="#22d3ee" />
+  <Sparkline :data="[15, 18, 14, 19, 13, 17, 16]" :width="90" :height="20" color="#3b5f87" />
   <div><strong>Volatile</strong></div>
 </div>
 <div>
-  <Sparkline :data="[15, 15, 16, 15, 15, 16, 15]" :width="90" :height="20" color="#22d3ee" />
+  <Sparkline :data="[15, 15, 16, 15, 15, 16, 15]" :width="90" :height="20" color="#3b5f87" />
   <div><strong>Stable</strong></div>
 </div>
 </SmallMultiples>
@@ -55,7 +55,7 @@ transition: slide-up
 
 **MicroBar** — categorical comparison
 
-<MicroBar :data="[{label: 'Build', value: 42}, {label: 'Test', value: 78}, {label: 'Deploy', value: 15}]" color="#22d3ee" />
+<MicroBar :data="[{label: 'Build', value: 42}, {label: 'Test', value: 78}, {label: 'Deploy', value: 15}]" color="#3b5f87" />
 
 </div>
 
@@ -73,7 +73,7 @@ transition: slide-up
 
 **SlopeChart** — before and after
 
-<SlopeChart :items="[{label: 'Build', start: 120, end: 45}, {label: 'Test', start: 90, end: 30}, {label: 'Deploy', start: 60, end: 15}]" startLabel="Before" endLabel="After" />
+<SlopeChart :items="[{label: 'Build', start: 95, end: 20}, {label: 'Test', start: 60, end: 45}, {label: 'Deploy', start: 10, end: 70}]" startLabel="Before" endLabel="After" />
 
 </div>
 

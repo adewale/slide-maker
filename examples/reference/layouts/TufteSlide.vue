@@ -54,7 +54,11 @@ defineProps({
 
 .tufte-margin :deep(p) {
   font-size: 0.82rem;
-  margin-bottom: 0.6rem;
+  margin-bottom: 1.2rem;
   max-width: 100%;
+}
+
+.tufte-margin :deep(> *) {
+  margin-bottom: 1.2rem;
 }
 </style>

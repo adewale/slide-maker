@@ -178,6 +178,7 @@ async function analyseSlide(page, slideNum) {
     // Get all visible text elements with bounding boxes
     const textEls = document.querySelectorAll('.slidev-layout h1, .slidev-layout h2, .slidev-layout h3, .slidev-layout p, .slidev-layout li, .slidev-layout span, .slidev-layout text, .slidev-layout tspan, .slidev-layout div');
     const boxes = [];
+    const elements = [];
     for (const el of textEls) {
       if (el.offsetWidth === 0 && el.offsetHeight === 0) continue;
       if (el.classList.contains('slidev-vclick-hidden')) continue;
@@ -188,6 +189,7 @@ async function analyseSlide(page, slideNum) {
       const r = el.getBoundingClientRect();
       if (r.width < 5 || r.height < 5) continue;
       boxes.push({ text: text.slice(0, 30), x: r.left, y: r.top, w: r.width, h: r.height, tag: el.tagName });
+      elements.push(el);
     }
 
     // Check for pairwise overlaps
@@ -196,13 +198,18 @@ async function analyseSlide(page, slideNum) {
         const a = boxes[i], b = boxes[j];
         // Skip if same text (duplicate elements)
         if (a.text === b.text) continue;
+        // Skip if one element's text contains the other's (parent/child)
+        if (a.text.includes(b.text) || b.text.includes(a.text)) continue;
+        // Skip if one element is an ancestor of the other
+        if (elements[i].contains(elements[j]) || elements[j].contains(elements[i])) continue;
         // Check bounding box overlap
         const overlapX = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x));
         const overlapY = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
         const overlapArea = overlapX * overlapY;
         const smallerArea = Math.min(a.w * a.h, b.w * b.h);
-        // Flag if overlap is >30% of the smaller element
-        if (smallerArea > 0 && overlapArea / smallerArea > 0.3) {
+        // Flag if overlap is >50% of the smaller element AND
+        // the overlap area is at least 200px (avoids tiny elements)
+        if (smallerArea > 0 && overlapArea > 200 && overlapArea / smallerArea > 0.5) {
           problems.push(`"${a.text}" overlaps "${b.text}" (${Math.round(overlapArea / smallerArea * 100)}% overlap)`);
           if (problems.length >= 5) return problems; // cap at 5
         }
