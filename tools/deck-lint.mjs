@@ -1100,7 +1100,18 @@ function lintDeck(deckDir) {
     }
   }
 
-  // ─── 15. Internal consistency ────────────────────────────────
+  // ─── 15. Broken HTML comments (nested -->) ─────────────────────
+
+  for (const slide of slides) {
+    const body = slide.body || '';
+    const openCount = (body.match(/<!--/g) || []).length;
+    const closeCount = (body.match(/-->/g) || []).length;
+    if (closeCount > openCount) {
+      warns.push(`slide ${slide.index}: HTML comment contains literal '-->' which breaks Slidev's comment parser — remove or encode the inner arrow`);
+    }
+  }
+
+  // ─── 16. Internal consistency ────────────────────────────────
 
   // Build a map of term usage: { term: [{ slide, positive, negative }] }
   const termUsage = {};

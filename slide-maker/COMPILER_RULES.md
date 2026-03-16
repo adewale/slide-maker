@@ -26,6 +26,7 @@ These compiler goals serve the broader project priorities defined in SKILL.md §
 - No blanket `.slidev-layout { background }` overrides when using a non-default theme — let the theme control its own backgrounds
 - No hardcoded colors in scoped styles — always reference `var(--deck-*)` tokens. Literal hex/rgb values in `<style scoped>` blocks bypass the token system and cause palette drift.
 - No "install command" closings — the final slide must resonate with the opening question/metaphor, not end with `npm install` or `git clone`. Installation belongs in presenter notes or a penultimate "Get started" slide, never the last word.
+- No `-->` arrow syntax inside HTML comments or presenter notes — Slidev's Markdown parser treats `-->` as a comment-close token, breaking the slide. Use prose ("A flows to B") or Unicode arrows instead.
 
 For the full catalog of AI-generated aesthetic tells to avoid, see [LLM_TELLS.md](../docs/LLM_TELLS.md).
 
@@ -545,9 +546,10 @@ For the full set of rhetorical principles, see [PRESENTATION_PHILOSOPHY.md](../d
 
 ### Node and link completeness (flowcharts)
 Every flowchart diagram must have:
-1. **Every node styled** — each node needs an explicit `style` directive with `fill`, `stroke`, and `color`. Unstyled nodes inherit Mermaid defaults that may not contrast with the deck background. If using `classDef`, every node must be assigned a class.
-2. **linkStyle default** — every flowchart must include `linkStyle default stroke:<color>,stroke-width:2px` where `<color>` contrasts with `--deck-bg`. Without this, arrow lines and edge labels may be invisible on both dark and light backgrounds.
-3. **No edge labels** — edge labels (`-->|label|`) render inside unthemeable boxes that Beautiful Mermaid fills with black. `linkStyle` controls the arrow stroke but not the label container. This fails on both dark and light backgrounds. Always remove edge labels and explain the flow in body text instead.
+1. **Every node styled — no exceptions** — each node needs an explicit `style` directive with `fill`, `stroke`, and `color`. Beautiful Mermaid's `color-mix()` auto-theming resolves to black in Slidev/Vite builds, so unstyled nodes are invisible on every background. If using `classDef`, every node must be assigned a class. There is no fallback — inline style on every node is the only path.
+2. **linkStyle default** — every flowchart must include `linkStyle default stroke:<color>,stroke-width:2px` where `<color>` contrasts with `--deck-bg`. Without this, arrow lines may be invisible on both dark and light backgrounds.
+3. **No edge labels** — edge labels (`-->|label|`) render inside unthemeable black boxes on all backgrounds. `linkStyle` controls the arrow stroke but not the label container. Never use them. Explain flow relationships in body text instead.
+4. **No cycles** — Mermaid cannot lay out backward edges cleanly; cycles produce tangled, unreadable graphs. Use linear left-to-right flow and describe feedback loops in prose below the diagram.
 
 Example (complete flowchart on a dark background):
 ```
@@ -562,24 +564,24 @@ graph LR
 
 ### Diagram type reliability matrix
 
-Beautiful Mermaid's auto-theming does not work equally well for all diagram types. The following matrix captures what works and what doesn't, based on real testing across dark and light backgrounds:
+Beautiful Mermaid's auto-theming **never works** — `color-mix()` resolves to black in Slidev/Vite builds. The matrix below captures what to use and what to avoid:
 
 | Diagram type | Inline `style` | Auto-theme (light bg) | Auto-theme (dark bg) | Recommendation |
 |-------------|---------------|----------------------|---------------------|----------------|
-| `graph` / `flowchart` | Yes | Needs inline styles | Needs inline styles, no edge labels | **Use this.** Always add explicit `style` on every node + `linkStyle default`. Beautiful Mermaid's `color-mix()` auto-theming produces black boxes on both light and dark backgrounds. Never use edge labels (`-->|text|`) — they render as unthemeable black boxes. |
+| `graph` / `flowchart` | Yes | Needs inline styles | Needs inline styles | **Use this.** Inline `style` on every node + `linkStyle default`. No edge labels (`-->|text|`) — they are unthemeable black boxes on all backgrounds. No cycles — backward edges produce tangled graphs; use linear flow + prose for feedback loops. |
 | `sequenceDiagram` | No | Readable | **Unreadable** | **Avoid on dark backgrounds.** Convert to flowchart showing the same actor/message flow. |
 | `stateDiagram-v2` | No | Readable | **Unreadable** | **Avoid on dark backgrounds.** Convert to flowchart with circle nodes for start/end. |
 | `classDiagram` | No | Readable | Untested | Use with caution on dark backgrounds. |
 | `erDiagram` | No | Readable | Untested | Use with caution on dark backgrounds. |
 | `xychart-beta` | No | Readable | Untested | Use with caution on dark backgrounds. |
 
-**Why auto-theming fails:** Beautiful Mermaid uses CSS `color-mix()` to derive node fills from `bg`/`fg` tokens. In practice, these computed fills resolve to black in many Slidev/Vite build contexts. Inline `style` directives on individual nodes are the only mechanism that reliably produces correct colors.
+**Why auto-theming fails:** Beautiful Mermaid uses CSS `color-mix()` to derive node fills from `bg`/`fg` tokens. In Slidev/Vite builds these computed fills resolve to black — not sometimes, always. Inline `style` directives on individual nodes are the only mechanism that produces correct colors.
 
 **Why CSS overrides don't work:** Beautiful Mermaid renders SVGs with inline styles baked into the SVG elements. CSS class selectors — even with `!important` — cannot reliably override these because Beautiful Mermaid uses different class names than stock Mermaid, and the SVG structure varies across Mermaid versions.
 
-**The reliable fix for flowcharts:** Add explicit `style` with `fill`, `stroke`, and `color` on every node, plus `linkStyle default`. Never use edge labels. Explain flow relationships in body text below the diagram.
+**The reliable fix for flowcharts:** Explicit `style` with `fill`, `stroke`, and `color` on every node, plus `linkStyle default`. No edge labels, no cycles. Explain flow relationships and feedback loops in body text below the diagram.
 
-**The reliable fix for non-flowchart types (sequence, state):** These don't support inline `style` directives. On dark backgrounds they are unreadable — convert to flowcharts. On light backgrounds (specifically `apple-basic` theme), Beautiful Mermaid's auto-theming happens to work for these types. Test with `screenshot-audit.mjs` to verify.
+**The reliable fix for non-flowchart types (sequence, state):** These don't support inline `style` directives. On dark backgrounds they are unreadable — convert to flowcharts. On light backgrounds (specifically `apple-basic` theme), Beautiful Mermaid's auto-theming happens to work for these types. Static linting catches missing styles, but only screenshot testing (`screenshot-audit.mjs`) catches actual rendering failures — always verify visually.
 
 ### Layout collision prevention
 - For slides with both text and diagrams, use absolute positioning (`class: absolute`) or dedicated diagram-only slides
