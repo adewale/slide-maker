@@ -78,7 +78,7 @@ transition: cube
 
 # Diagrams
 
-Beautiful Mermaid renders with deck palette tokens.
+Every node needs explicit inline styles. Auto-theming fails.
 
 ---
 transition: zoom-out
@@ -92,14 +92,20 @@ graph LR
   B --> C["Custom Layout"]
   C --> D["Custom Component"]
   D --> E["Inline HTML"]
+  style A fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style B fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style C fill:#3b5f87,stroke:#3b5f87,color:#eceff4
+  style D fill:#3b5f87,stroke:#3b5f87,color:#eceff4
+  style E fill:#994050,stroke:#994050,color:#eceff4
+  linkStyle default stroke:#3b5f87,stroke-width:2px
 ```
 
 Start at Markdown, escalate only when the lower level cannot express the structure. Most slides never leave level 2.
 
-<!-- Mermaid diagrams on light backgrounds use Beautiful Mermaid's auto-theming — no inline style directives needed. The renderer reads --deck-bg, --deck-fg, --deck-accent, and --deck-muted from CSS and derives all node fills, strokes, and text colors automatically via color-mix().
+<!-- Beautiful Mermaid's color-mix() auto-theming produces black boxes — always add explicit inline style directives on every node. The escalation ladder uses three tiers: light fill for simple levels, accent fill for moderate, accent-alt for the escape hatch.
 
 Sources:
-- file:slide-maker/COMPILER_RULES.md — Mermaid guidelines: diagram type reliability matrix -->
+- file:slide-maker/COMPILER_RULES.md — Mermaid guidelines: inline styles always required -->
 
 ---
 transition: flip-y
@@ -115,11 +121,19 @@ graph TD
   ROOT --> TD2["tufte-data"]
   ROOT --> CF["cloudflare"]
   ROOT --> MD["material-design"]
+  style ROOT fill:#3b5f87,stroke:#3b5f87,color:#eceff4
+  style ED fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style SM fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style BM fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style TD2 fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style CF fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style MD fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  linkStyle default stroke:#3b5f87,stroke-width:2px
 ```
 
 Each preset controls typography, color, motion, and layout tendencies — the same content looks and feels different under each preset.
 
-<!-- Graph TD (top-down) works well for hierarchies and taxonomies. The double-parenthesis syntax creates a circle node. On light backgrounds, Beautiful Mermaid auto-themes all nodes with no classDef needed.
+<!-- Graph TD (top-down) for hierarchies. Circle node for the hub, rectangles for leaves. Every node explicitly styled — Beautiful Mermaid auto-theming is unreliable.
 
 Sources:
 - file:slide-maker/STYLE_PRESETS.md — six preset definitions -->
@@ -128,32 +142,31 @@ Sources:
 transition: slide-left
 ---
 
-# Sequence Diagrams Reveal Hidden Round-Trips
+# The Compilation Pipeline
 
 ```mermaid {scale: 0.8}
-sequenceDiagram
-  participant U as User
-  participant S as Skill Agent
-  participant P as Spec Builder
-  participant C as Compiler
-  participant D as Slide Deck
-
-  U->>S: Natural-language brief
-  S->>P: Structured spec
-  P->>P: Source-grounding pass
-  P-->>S: Grounded spec
-  S->>C: Compile command
-  C->>C: Layout + theme resolution
-  C->>D: Rendered slides
-  D-->>U: Live preview link
+graph LR
+  U["User"] --> S["Skill Agent"]
+  S --> P["Spec Builder"]
+  P --> P
+  S --> C["Compiler"]
+  C --> C
+  C --> D["Slide Deck"]
+  D -.-> U
+  style U fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style S fill:#3b5f87,stroke:#3b5f87,color:#eceff4
+  style P fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style C fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style D fill:#3b5f87,stroke:#3b5f87,color:#eceff4
+  linkStyle default stroke:#3b5f87,stroke-width:2px
 ```
 
-Five actors, but the surprise is the internal loop: the Spec Builder re-enters itself for source-grounding before handing off to the Compiler.
+Five actors, two self-loops. The Spec Builder re-enters itself for source-grounding. The Compiler loops for layout resolution. The dashed return is the live preview.
 
-<!-- sequenceDiagram works on light backgrounds with Beautiful Mermaid auto-theming. Solid arrows (->>)  are calls; dashed arrows (-->>)  are returns. On dark backgrounds, sequenceDiagram is unreliable — convert to flowchart instead (see diagram reliability matrix).
+<!-- sequenceDiagram and stateDiagram-v2 produce black boxes with Beautiful Mermaid. Always use flowcharts with inline styles instead. Self-loop arrows show recursive processes.
 
 Sources:
-- file:slide-maker/COMPILER_RULES.md — Mermaid guidelines: diagram type reliability matrix
+- file:slide-maker/COMPILER_RULES.md — Mermaid guidelines: inline styles always required
 - file:slide-maker/COMPILER_RULES.md — diagram insight annotations required -->
 
 ---
@@ -163,20 +176,21 @@ transition: flip-y
 # Slides Have a Lifecycle Most Presenters Ignore
 
 ```mermaid {scale: 0.85}
-stateDiagram-v2
-  [*] --> Draft
-  Draft --> Compiled : skill compiles spec
-  Compiled --> Validated : lint + contrast pass
-  Validated --> Delivered : presenter approves
-  Validated --> Draft : lint failures
-  Delivered --> Draft : post-talk revision
-  Delivered --> [*]
+graph LR
+  S(("Start")) --> Draft --> Compiled --> Validated --> Delivered --> E(("End"))
+  style S fill:#3b5f87,stroke:#3b5f87,color:#eceff4
+  style E fill:#3b5f87,stroke:#3b5f87,color:#eceff4
+  style Draft fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style Compiled fill:#dde3ec,stroke:#3b5f87,color:#2e3440
+  style Validated fill:#994050,stroke:#994050,color:#eceff4
+  style Delivered fill:#3b5f87,stroke:#3b5f87,color:#eceff4
+  linkStyle default stroke:#3b5f87,stroke-width:2px
 ```
 
-The backward edges matter most: validation failures return to Draft, not to Compiled, because structural fixes require a full recompile.
+The backward edges matter most but can't be shown cleanly in Mermaid (cycles break the layout). Validation failures return to **Draft**, not to Compiled — structural fixes require a full recompile. Post-talk revisions also restart from Draft.
 
-<!-- stateDiagram-v2 works on light backgrounds with Beautiful Mermaid auto-theming. The [*] symbol marks start and end states. On dark backgrounds, stateDiagram is unreliable — convert to flowchart instead (see diagram reliability matrix).
+<!-- stateDiagram-v2 produces black boxes — use flowcharts with circle nodes for start/end instead. Backward transitions highlight recovery paths that audiences overlook.
 
 Sources:
-- file:slide-maker/COMPILER_RULES.md — Mermaid guidelines: diagram type reliability matrix
+- file:slide-maker/COMPILER_RULES.md — Mermaid guidelines: inline styles always required
 - file:slide-maker/COMPILER_RULES.md — diagram insight annotations required -->
