@@ -4,11 +4,16 @@
 // Usage:  node screenshot-audit.mjs <base-url> [deck-name]
 //         node screenshot-audit.mjs http://localhost:3000 reference
 //
-// Takes a screenshot of every slide, then analyses each for:
-// 1. Black-rectangle Mermaid nodes (rendering failures)
-// 2. Text that is likely unreadable (low contrast regions)
-// 3. Slides that appear effectively empty (hidden v-click content)
-// 4. Content that overflows the viewport
+// Checks every slide at every v-click state for:
+// 1. Mermaid SVG text-vs-fill contrast (WCAG)
+// 2. Text contrast against effective background (WCAG AA)
+// 3. Text overlap (bounding box intersection)
+// 4. Content overflow (scrollHeight > viewport)
+// 5. v-click revealed content contrast (clicks through all states)
+// 6. Hover state contrast (spotlight-group, hover-lift elements)
+// 7. SVG stroke visibility (lines, polylines, circles vs background)
+// 8. Multiple viewport sizes (1280x720, 1024x768)
+// 9. Empty/blank slide detection
 //
 // Requires: playwright (npm install playwright)
 
@@ -18,8 +23,11 @@ import { join } from 'path';
 
 // ── Config ─────────────────────────────────────────────────────
 
-const VIEWPORT = { width: 1280, height: 720 };
-const WAIT_MS = 2000; // wait for Mermaid/animations
+const VIEWPORTS = [
+  { width: 1280, height: 720, label: '720p' },
+  { width: 1024, height: 768, label: '1024' },
+];
+const WAIT_MS = 1500;
 const OUT_DIR = '/tmp/slide-audit';
 
 // ── Terminal colours ──────────────────────────────────────────
@@ -36,376 +44,251 @@ const WARN = `${C.bgYellow}${C.bold}${C.white} WARN ${C.reset}`;
 const PASS = `${C.bgGreen}${C.bold}${C.white} PASS ${C.reset}`;
 const INFO = `${C.cyan}INFO${C.reset}`;
 
-// ── Pixel analysis helpers ────────────────────────────────────
+// ── Shared contrast helpers (injected into page.evaluate) ──────
 
-/**
- * Analyse a screenshot buffer for visual issues.
- * Uses Playwright's page.evaluate to inspect the live DOM.
- */
-async function analyseSlide(page, slideNum) {
-  const issues = [];
+const CONTRAST_HELPERS = `
+  function parseLum(colorStr) {
+    const c = document.createElement('canvas');
+    c.width = c.height = 1;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = colorStr;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+    const [rs, gs, bs] = [r, g, b].map(v => {
+      const s = v / 255;
+      return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+  }
+  function cr(l1, l2) {
+    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+  }
+  function findBg(el) {
+    let bgEl = el;
+    while (bgEl) {
+      const bs = getComputedStyle(bgEl);
+      const bgColor = bs.backgroundColor;
+      if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') return bgColor;
+      bgEl = bgEl.parentElement;
+    }
+    return null;
+  }
+`;
 
-  // 1. Check for Mermaid rendering failures
-  //    Detect dark-filled shapes where text inside has insufficient contrast
-  const mermaidIssues = await page.evaluate(() => {
+// ── Check: Mermaid SVG text-vs-fill contrast ──────────────────
+
+async function checkMermaidContrast(page) {
+  return page.evaluate(new Function(`
+    ${CONTRAST_HELPERS}
     const problems = [];
-
-    function parseLum(colorStr) {
-      const c = document.createElement('canvas');
-      c.width = c.height = 1;
-      const ctx = c.getContext('2d');
-      ctx.fillStyle = colorStr;
-      ctx.fillRect(0, 0, 1, 1);
-      const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-      const [rs, gs, bs] = [r, g, b].map(v => {
-        const s = v / 255;
-        return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
-      });
-      return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
-    }
-
-    function cr(l1, l2) {
-      return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
-    }
-
     const svgs = document.querySelectorAll('.slidev-layout svg');
     for (const svg of svgs) {
-      // Check each shape that might be a Mermaid node
       const shapes = svg.querySelectorAll('rect, circle, ellipse');
-      let badNodes = 0;
-      let totalNodes = 0;
+      let badNodes = 0, totalNodes = 0;
       for (const shape of shapes) {
         const r = shape.getBoundingClientRect();
-        if (r.width < 30 || r.height < 15) continue; // skip tiny decorative shapes
+        if (r.width < 30 || r.height < 15) continue;
         const fill = getComputedStyle(shape).fill || shape.getAttribute('fill') || '';
         if (!fill || fill === 'none' || fill === 'transparent') continue;
         totalNodes++;
-
         const fillLum = parseLum(fill);
-
-        // Find text elements near/inside this shape's parent group
         const group = shape.closest('g') || shape.parentElement;
         const texts = group ? group.querySelectorAll('text, tspan') : [];
         for (const t of texts) {
           const textFill = getComputedStyle(t).fill || t.getAttribute('fill') || '';
           if (!textFill || textFill === 'none') continue;
-          const textLum = parseLum(textFill);
-          const ratio = cr(fillLum, textLum);
-          if (ratio < 2.0) {
-            badNodes++;
-            break; // one bad text per shape is enough
-          }
+          if (cr(fillLum, parseLum(textFill)) < 2.0) { badNodes++; break; }
         }
       }
       if (totalNodes > 2 && badNodes > 0) {
-        problems.push(`${badNodes}/${totalNodes} SVG nodes have text with <2:1 contrast against fill — Mermaid rendering failure (add inline style directives)`);
+        problems.push(badNodes + '/' + totalNodes + ' SVG nodes have text with <2:1 contrast against fill');
       }
     }
     return problems;
-  });
-  for (const m of mermaidIssues) {
-    issues.push({ severity: 'CRITICAL', message: m });
-  }
+  `));
+}
 
-  // 2. Check for effectively empty slides (all content hidden by v-click)
-  const contentCheck = await page.evaluate(() => {
-    const layout = document.querySelector('.slidev-layout');
-    if (!layout) return { empty: false, reason: '' };
-    const text = layout.innerText?.trim() || '';
-    // Count visible text characters (excluding just the title)
-    const lines = text.split('\n').filter(l => l.trim());
-    // Only count hidden v-click elements within the current slide's layout
-    const hiddenInSlide = layout.querySelectorAll('.slidev-vclick-hidden').length;
-    if (lines.length <= 1 && hiddenInSlide > 0) {
-      return { empty: true, reason: `only title visible, ${hiddenInSlide} elements hidden behind v-click` };
-    }
-    return { empty: false, reason: '' };
-  });
-  if (contentCheck.empty) {
-    issues.push({ severity: 'INFO', message: contentCheck.reason });
-  }
+// ── Check: Text contrast (WCAG AA) ───────────────────────────
 
-  // 3. Check for text contrast issues by sampling text elements
-  const contrastIssues = await page.evaluate(() => {
+async function checkTextContrast(page) {
+  return page.evaluate(new Function(`
+    ${CONTRAST_HELPERS}
     const problems = [];
-
-    function getLuminance(r, g, b) {
-      const [rs, gs, bs] = [r, g, b].map(c => {
-        const s = c / 255;
-        return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
-      });
-      return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
-    }
-
-    function parseColor(str) {
-      const canvas = document.createElement('canvas');
-      canvas.width = canvas.height = 1;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = str;
-      ctx.fillRect(0, 0, 1, 1);
-      const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-      return { r, g, b, luminance: getLuminance(r, g, b) };
-    }
-
-    function contrastRatio(l1, l2) {
-      const lighter = Math.max(l1, l2);
-      const darker = Math.min(l1, l2);
-      return (lighter + 0.05) / (darker + 0.05);
-    }
-
-    // Sample text elements
-    const textEls = document.querySelectorAll('.slidev-layout h1, .slidev-layout h2, .slidev-layout h3, .slidev-layout p, .slidev-layout li, .slidev-layout span, .slidev-layout strong, .slidev-layout code');
+    const textEls = document.querySelectorAll('.slidev-layout h1, .slidev-layout h2, .slidev-layout h3, .slidev-layout p, .slidev-layout li, .slidev-layout span, .slidev-layout strong, .slidev-layout code, .slidev-layout td, .slidev-layout th');
     for (const el of textEls) {
       if (el.offsetWidth === 0 || el.offsetHeight === 0) continue;
       if (el.classList.contains('slidev-vclick-hidden')) continue;
-      // Skip all elements inside code blocks — Shiki syntax highlighting
-      // colors are controlled by the syntax theme, not deck tokens.
-      // Flagging individual syntax tokens is noise; the fix is choosing
-      // a higher-contrast Shiki theme, not editing CSS per-token.
       if (el.closest('.slidev-code, .shiki, pre > code')) continue;
       const text = el.innerText?.trim();
       if (!text || text.length < 2) continue;
-
       const style = getComputedStyle(el);
-      const fg = parseColor(style.color);
-
-      // Walk up to find the effective background
-      let bgEl = el;
-      let bg = null;
-      while (bgEl) {
-        const bgStyle = getComputedStyle(bgEl);
-        const bgColor = bgStyle.backgroundColor;
-        if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
-          bg = parseColor(bgColor);
-          break;
-        }
-        bgEl = bgEl.parentElement;
-      }
-      if (!bg) continue; // transparent all the way up
-
-      const ratio = contrastRatio(fg.luminance, bg.luminance);
+      const fgLum = parseLum(style.color);
+      const bg = findBg(el);
+      if (!bg) continue;
+      const bgLum = parseLum(bg);
+      const ratio = cr(fgLum, bgLum);
       const fontSize = parseFloat(style.fontSize);
       const isBold = parseInt(style.fontWeight) >= 700;
       const isLarge = fontSize >= 24 || (fontSize >= 18.66 && isBold);
       const threshold = isLarge ? 3.0 : 4.5;
-
       if (ratio < threshold) {
         const snippet = text.slice(0, 40) + (text.length > 40 ? '...' : '');
-        problems.push(`"${snippet}" — ${ratio.toFixed(1)}:1 (need ${threshold}:1, ${isLarge ? 'large' : 'body'} text)`);
+        problems.push('"' + snippet + '" — ' + ratio.toFixed(1) + ':1 (need ' + threshold + ':1, ' + (isLarge ? 'large' : 'body') + ' text)');
       }
     }
     return problems;
-  });
-  for (const c of contrastIssues) {
-    issues.push({ severity: 'WARN', message: c });
-  }
+  `));
+}
 
-  // 4. Check for overlapping text elements
-  const overlapIssues = await page.evaluate(() => {
+// ── Check: Text overlap ──────────────────────────────────────
+
+async function checkOverlap(page) {
+  return page.evaluate(() => {
     const problems = [];
-    // Get all visible text elements with bounding boxes
     const textEls = document.querySelectorAll('.slidev-layout h1, .slidev-layout h2, .slidev-layout h3, .slidev-layout p, .slidev-layout li, .slidev-layout span, .slidev-layout text, .slidev-layout tspan, .slidev-layout div');
-    const boxes = [];
-    const elements = [];
+    const boxes = [], elements = [];
     for (const el of textEls) {
       if (el.offsetWidth === 0 && el.offsetHeight === 0) continue;
       if (el.classList.contains('slidev-vclick-hidden')) continue;
       const text = el.innerText?.trim() || el.textContent?.trim() || '';
       if (text.length < 2) continue;
-      // Skip if this element contains other text elements (only check leaf text nodes)
       if (el.querySelector('h1, h2, h3, p, li, span:not(:empty)')) continue;
       const r = el.getBoundingClientRect();
       if (r.width < 5 || r.height < 5) continue;
-      boxes.push({ text: text.slice(0, 30), x: r.left, y: r.top, w: r.width, h: r.height, tag: el.tagName });
+      boxes.push({ text: text.slice(0, 30), x: r.left, y: r.top, w: r.width, h: r.height });
       elements.push(el);
     }
-
-    // Check for pairwise overlaps
     for (let i = 0; i < boxes.length; i++) {
       for (let j = i + 1; j < boxes.length; j++) {
         const a = boxes[i], b = boxes[j];
-        // Skip if same text (duplicate elements)
         if (a.text === b.text) continue;
-        // Skip if one element's text contains the other's (parent/child)
         if (a.text.includes(b.text) || b.text.includes(a.text)) continue;
-        // Skip if one element is an ancestor of the other
         if (elements[i].contains(elements[j]) || elements[j].contains(elements[i])) continue;
-        // Check bounding box overlap
         const overlapX = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x));
         const overlapY = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
         const overlapArea = overlapX * overlapY;
         const smallerArea = Math.min(a.w * a.h, b.w * b.h);
-        // Flag if overlap is >50% of the smaller element AND
-        // the overlap area is at least 200px (avoids tiny elements)
         if (smallerArea > 0 && overlapArea > 200 && overlapArea / smallerArea > 0.5) {
-          problems.push(`"${a.text}" overlaps "${b.text}" (${Math.round(overlapArea / smallerArea * 100)}% overlap)`);
-          if (problems.length >= 5) return problems; // cap at 5
+          problems.push('"' + a.text + '" overlaps "' + b.text + '" (' + Math.round(overlapArea / smallerArea * 100) + '%)');
+          if (problems.length >= 5) return problems;
         }
       }
     }
     return problems;
   });
-  for (const o of overlapIssues) {
-    issues.push({ severity: 'WARN', message: o });
-  }
+}
 
-  // 5. Check for content overflow (content extending beyond viewport)
-  const overflow = await page.evaluate((vh) => {
+// ── Check: Content overflow ──────────────────────────────────
+
+async function checkOverflow(page, viewportHeight) {
+  return page.evaluate((vh) => {
     const layout = document.querySelector('.slidev-layout');
     if (!layout) return false;
-    return layout.scrollHeight > vh + 10; // 10px tolerance
-  }, VIEWPORT.height);
-  if (overflow) {
-    issues.push({ severity: 'WARN', message: 'content overflows viewport — needs split or reduction' });
-  }
+    return layout.scrollHeight > vh + 10;
+  }, viewportHeight);
+}
 
+// ── Check: SVG stroke visibility (#7) ─────────────────────────
+
+async function checkSvgStrokes(page) {
+  return page.evaluate(new Function(`
+    ${CONTRAST_HELPERS}
+    const problems = [];
+    const strokes = document.querySelectorAll('.slidev-layout svg line, .slidev-layout svg polyline, .slidev-layout svg path');
+    let invisibleCount = 0;
+    for (const el of strokes) {
+      const r = el.getBoundingClientRect();
+      if (r.width < 10 && r.height < 10) continue;
+      const style = getComputedStyle(el);
+      const stroke = style.stroke || el.getAttribute('stroke') || '';
+      if (!stroke || stroke === 'none' || stroke === 'transparent') continue;
+      const strokeWidth = parseFloat(style.strokeWidth || el.getAttribute('stroke-width') || '1');
+      if (strokeWidth < 0.5) continue;
+      const bg = findBg(el.closest('svg') || el);
+      if (!bg) continue;
+      const ratio = cr(parseLum(stroke), parseLum(bg));
+      if (ratio < 1.5) invisibleCount++;
+    }
+    if (invisibleCount > 0) {
+      return [invisibleCount + ' SVG stroke(s) have <1.5:1 contrast against background'];
+    }
+    return [];
+  `));
+}
+
+// ── Check: Hover states (#6) ──────────────────────────────────
+
+async function checkHoverStates(page) {
+  const issues = [];
+  const hoverTargets = await page.evaluate(() => {
+    const targets = [];
+    const els = document.querySelectorAll('.slidev-layout .spotlight-group > *, .slidev-layout .hover-lift, .slidev-layout .cf-card, .slidev-layout [class*="hover"]');
+    for (const el of els) {
+      const r = el.getBoundingClientRect();
+      if (r.width > 10 && r.height > 10) {
+        targets.push({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+      }
+    }
+    return targets.slice(0, 5); // cap at 5 to avoid slow scans
+  });
+
+  for (const target of hoverTargets) {
+    await page.mouse.move(target.x, target.y);
+    await page.waitForTimeout(300); // let CSS transitions settle
+    const contrastProblems = await checkTextContrast(page);
+    for (const p of contrastProblems) {
+      issues.push('on hover: ' + p);
+    }
+    // Move mouse away to reset
+    await page.mouse.move(0, 0);
+    await page.waitForTimeout(100);
+  }
   return issues;
 }
 
-/**
- * Pixel-level analysis of the screenshot.
- * Samples the actual rendered pixels to catch issues DOM analysis misses:
- * - Large solid-black regions (Mermaid rendering failures)
- * - Near-uniform slides (broken rendering or blank slides)
- * - Color banding / unexpected dominant colors
- */
-async function analysePixels(page, slideNum) {
-  const issues = [];
+// ── v-click advancement (#1) ──────────────────────────────────
 
-  const pixelData = await page.evaluate(({ w, h }) => {
-    // Render the viewport to a canvas and sample pixels
-    const canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-
-    // We can't use drawWindow in Playwright, so sample visible elements
-    // Instead, probe specific regions by creating test elements
+async function getClickCount(page) {
+  return page.evaluate(() => {
     const layout = document.querySelector('.slidev-layout');
-    if (!layout) return { regions: [] };
+    if (!layout) return 0;
+    return layout.querySelectorAll('.slidev-vclick-target').length;
+  });
+}
 
-    const rect = layout.getBoundingClientRect();
-    const regions = [];
+async function advanceClick(page) {
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(400);
+}
 
-    // Sample a grid of points across the slide content area
-    const gridSize = 10;
-    const samples = [];
-    for (let row = 0; row < gridSize; row++) {
-      for (let col = 0; col < gridSize; col++) {
-        const x = rect.left + (rect.width * (col + 0.5)) / gridSize;
-        const y = rect.top + (rect.height * (row + 0.5)) / gridSize;
-        const el = document.elementFromPoint(x, y);
-        if (el) {
-          const style = getComputedStyle(el);
-          // Walk up for background
-          let bgEl = el;
-          let bgColor = 'rgba(0,0,0,0)';
-          while (bgEl) {
-            const bs = getComputedStyle(bgEl);
-            if (bs.backgroundColor && bs.backgroundColor !== 'rgba(0, 0, 0, 0)' && bs.backgroundColor !== 'transparent') {
-              bgColor = bs.backgroundColor;
-              break;
-            }
-            bgEl = bgEl.parentElement;
-          }
-          samples.push({
-            x: Math.round(x), y: Math.round(y),
-            fg: style.color,
-            bg: bgColor,
-            tag: el.tagName.toLowerCase(),
-            hasText: (el.innerText?.trim().length || 0) > 0,
-          });
-        }
-      }
-    }
+// ── Main analysis for one slide at one viewport ───────────────
 
-    // Detect large uniform dark regions (potential Mermaid black boxes)
-    // Check SVG elements specifically
-    const svgElements = document.querySelectorAll('.slidev-layout svg rect, .slidev-layout svg circle, .slidev-layout svg path');
-    const darkShapes = [];
-    for (const shape of svgElements) {
-      const r = shape.getBoundingClientRect();
-      if (r.width < 20 || r.height < 10) continue; // skip tiny elements
-      const fill = getComputedStyle(shape).fill || shape.getAttribute('fill') || '';
-      if (!fill || fill === 'none') continue;
+async function analyseSlideState(page, slideNum, clickState, vpLabel, vpHeight) {
+  const issues = [];
+  const prefix = vpLabel !== '720p' ? `[${vpLabel}] ` : '';
+  const clickPrefix = clickState > 0 ? `[click ${clickState}] ` : '';
+  const tag = prefix + clickPrefix;
 
-      // Parse the fill color
-      const testCanvas = document.createElement('canvas');
-      testCanvas.width = testCanvas.height = 1;
-      const ctx = testCanvas.getContext('2d');
-      ctx.fillStyle = fill;
-      ctx.fillRect(0, 0, 1, 1);
-      const [rv, gv, bv, av] = ctx.getImageData(0, 0, 1, 1).data;
-      const lum = (0.2126 * rv + 0.7152 * gv + 0.0722 * bv) / 255;
+  // Mermaid SVG contrast
+  const mermaid = await checkMermaidContrast(page);
+  for (const m of mermaid) issues.push({ severity: 'CRITICAL', message: tag + m });
 
-      if (lum < 0.05 && av > 200) {
-        // Check if there's visible text inside this shape
-        const parent = shape.closest('g') || shape.parentElement;
-        const texts = parent?.querySelectorAll('text, tspan') || [];
-        let hasVisibleText = false;
-        for (const t of texts) {
-          const ts = getComputedStyle(t);
-          const tFill = ts.fill || t.getAttribute('fill') || '';
-          if (tFill && tFill !== 'none') {
-            const tc = document.createElement('canvas');
-            tc.width = tc.height = 1;
-            const tctx = tc.getContext('2d');
-            tctx.fillStyle = tFill;
-            tctx.fillRect(0, 0, 1, 1);
-            const [tr, tg, tb] = tctx.getImageData(0, 0, 1, 1).data;
-            const tLum = (0.2126 * tr + 0.7152 * tg + 0.0722 * tb) / 255;
-            // Text on black needs to be light
-            if (tLum > 0.3) hasVisibleText = true;
-          }
-        }
-        darkShapes.push({
-          width: Math.round(r.width),
-          height: Math.round(r.height),
-          area: Math.round(r.width * r.height),
-          hasVisibleText,
-          luminance: lum,
-        });
-      }
-    }
+  // Text contrast
+  const contrast = await checkTextContrast(page);
+  for (const c of contrast) issues.push({ severity: 'WARN', message: tag + c });
 
-    // Detect if the slide is mostly one color (blank/broken)
-    const bgCounts = {};
-    for (const s of samples) {
-      const key = s.bg;
-      bgCounts[key] = (bgCounts[key] || 0) + 1;
-    }
-    const dominantBg = Object.entries(bgCounts).sort((a, b) => b[1] - a[1])[0];
-    const uniformity = dominantBg ? dominantBg[1] / samples.length : 0;
+  // Overlap
+  const overlap = await checkOverlap(page);
+  for (const o of overlap) issues.push({ severity: 'WARN', message: tag + o });
 
-    return { samples, darkShapes, uniformity, dominantBg: dominantBg?.[0] };
-  }, { w: VIEWPORT.width, h: VIEWPORT.height });
-
-  // Analyse dark shapes (potential black Mermaid boxes)
-  if (pixelData.darkShapes && pixelData.darkShapes.length > 0) {
-    const totalDarkArea = pixelData.darkShapes.reduce((s, d) => s + d.area, 0);
-    const noText = pixelData.darkShapes.filter(d => !d.hasVisibleText);
-    if (noText.length > 2 && totalDarkArea > 5000) {
-      issues.push({
-        severity: 'CRITICAL',
-        message: `${noText.length} large black shapes without visible text (total ${totalDarkArea}px area) — likely Mermaid rendering failure`,
-      });
-    } else if (noText.length > 0) {
-      issues.push({
-        severity: 'WARN',
-        message: `${noText.length} dark shape(s) without visible text — check Mermaid rendering`,
-      });
-    }
+  // Overflow
+  if (await checkOverflow(page, vpHeight)) {
+    issues.push({ severity: 'WARN', message: tag + 'content overflows viewport' });
   }
 
-  // Detect near-blank slides (>95% one background color, no text content)
-  if (pixelData.uniformity > 0.95) {
-    const hasAnyText = pixelData.samples?.some(s => s.hasText) || false;
-    if (!hasAnyText) {
-      issues.push({
-        severity: 'WARN',
-        message: `slide appears blank — ${Math.round(pixelData.uniformity * 100)}% uniform background`,
-      });
-    }
-  }
+  // SVG strokes
+  const strokes = await checkSvgStrokes(page);
+  for (const s of strokes) issues.push({ severity: 'WARN', message: tag + s });
 
   return issues;
 }
@@ -426,59 +309,105 @@ async function main() {
 
   console.log(`${C.bold}${C.cyan}screenshot-audit${C.reset}  ${C.dim}Visual quality checker for Slidev decks${C.reset}`);
   console.log(`${C.dim}target: ${deckUrl}${C.reset}`);
+  console.log(`${C.dim}viewports: ${VIEWPORTS.map(v => v.label).join(', ')}${C.reset}`);
   console.log('');
 
   mkdirSync(OUT_DIR, { recursive: true });
 
   const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: VIEWPORT });
+  const primaryVP = VIEWPORTS[0];
+  const page = await browser.newPage({ viewport: primaryVP });
 
-  // Discover slide count by navigating to slide 1 and reading total
+  // Discover slide count
   await page.goto(`${deckUrl}/#/1`, { waitUntil: 'networkidle', timeout: 15000 }).catch(() => {});
   await page.waitForTimeout(1500);
-
   const totalSlides = await page.evaluate(() => {
-    // Slidev exposes slide count in the nav
-    const nav = document.querySelector('.slidev-nav-total, [class*="total"]');
-    if (nav) return parseInt(nav.textContent);
-    // Fallback: check the footer
     const footer = document.body.innerText.match(/\/ (\d+)/);
     if (footer) return parseInt(footer[1]);
     return 0;
   });
-
   if (!totalSlides) {
     console.error(`${C.red}Could not determine slide count. Is the server running?${C.reset}`);
     await browser.close();
     process.exit(1);
   }
 
-  console.log(`${C.dim}scanning ${totalSlides} slides...${C.reset}`);
+  console.log(`${C.dim}scanning ${totalSlides} slides × ${VIEWPORTS.length} viewports, with v-click + hover checks...${C.reset}`);
   console.log('');
 
   const results = [];
   let critCount = 0, warnCount = 0, infoCount = 0, passCount = 0;
 
   for (let i = 1; i <= totalSlides; i++) {
+    const allIssues = [];
+
+    // ── Primary viewport: full analysis with v-clicks and hover ──
+    await page.setViewportSize(primaryVP);
     await page.goto(`${deckUrl}/#/${i}`, { waitUntil: 'networkidle', timeout: 15000 }).catch(() => {});
     await page.waitForTimeout(WAIT_MS);
 
-    // Screenshot
+    // Screenshot at click 0
     const screenshotPath = join(OUT_DIR, `slide-${String(i).padStart(2, '0')}.png`);
     await page.screenshot({ path: screenshotPath });
 
-    // Analyse: DOM-level checks + pixel-level checks
-    const domIssues = await analyseSlide(page, i);
-    const pixelIssues = await analysePixels(page, i);
-    const issues = [...domIssues, ...pixelIssues];
-    results.push({ slide: i, issues, screenshot: screenshotPath });
+    // Check at click 0
+    const click0Issues = await analyseSlideState(page, i, 0, primaryVP.label, primaryVP.height);
+    allIssues.push(...click0Issues);
 
-    if (issues.length === 0) {
+    // Blind spot #1: Advance through v-clicks and check each state
+    const clickTargets = await getClickCount(page);
+    if (clickTargets > 0) {
+      const maxClicks = Math.min(clickTargets, 10); // cap to avoid infinite loops
+      for (let c = 1; c <= maxClicks; c++) {
+        await advanceClick(page);
+        // Check if we're still on the same slide (ArrowRight may navigate to next slide)
+        const currentSlide = await page.evaluate(() => {
+          const footer = document.body.innerText.match(/(\d+) \/ \d+/);
+          return footer ? parseInt(footer[1]) : 0;
+        });
+        if (currentSlide !== i) break; // moved to next slide, stop clicking
+        const clickIssues = await analyseSlideState(page, i, c, primaryVP.label, primaryVP.height);
+        allIssues.push(...clickIssues);
+      }
+    }
+
+    // Blind spot #6: Check hover states
+    // Navigate back to the slide fresh for hover testing
+    await page.goto(`${deckUrl}/#/${i}`, { waitUntil: 'networkidle', timeout: 15000 }).catch(() => {});
+    await page.waitForTimeout(800);
+    const hoverIssues = await checkHoverStates(page);
+    for (const h of hoverIssues) allIssues.push({ severity: 'WARN', message: h });
+
+    // ── Blind spot #5: Secondary viewport ──
+    for (let v = 1; v < VIEWPORTS.length; v++) {
+      const vp = VIEWPORTS[v];
+      await page.setViewportSize(vp);
+      await page.goto(`${deckUrl}/#/${i}`, { waitUntil: 'networkidle', timeout: 15000 }).catch(() => {});
+      await page.waitForTimeout(800);
+      const vpIssues = await analyseSlideState(page, i, 0, vp.label, vp.height);
+      allIssues.push(...vpIssues);
+    }
+
+    // Deduplicate issues (same message from different click states)
+    const seen = new Set();
+    const uniqueIssues = [];
+    for (const issue of allIssues) {
+      // Strip click/viewport prefix for dedup
+      const key = issue.message.replace(/^\[(click \d+|1024|720p)\] /g, '').replace(/^\[(click \d+|1024|720p)\] /g, '');
+      if (!seen.has(key)) {
+        seen.add(key);
+        uniqueIssues.push(issue);
+      }
+    }
+
+    results.push({ slide: i, issues: uniqueIssues, screenshot: screenshotPath });
+
+    if (uniqueIssues.length === 0) {
       passCount++;
       process.stdout.write(`${C.green}.${C.reset}`);
     } else {
-      const hasCrit = issues.some(i => i.severity === 'CRITICAL');
-      const hasWarn = issues.some(i => i.severity === 'WARN');
+      const hasCrit = uniqueIssues.some(i => i.severity === 'CRITICAL');
+      const hasWarn = uniqueIssues.some(i => i.severity === 'WARN');
       if (hasCrit) { critCount++; process.stdout.write(`${C.red}X${C.reset}`); }
       else if (hasWarn) { warnCount++; process.stdout.write(`${C.yellow}!${C.reset}`); }
       else { infoCount++; process.stdout.write(`${C.cyan}i${C.reset}`); }
@@ -504,7 +433,7 @@ async function main() {
   // Summary
   console.log('');
   console.log(`${C.bold}${'═'.repeat(50)}${C.reset}`);
-  console.log(`${C.bold}Summary${C.reset}  ${totalSlides} slides scanned`);
+  console.log(`${C.bold}Summary${C.reset}  ${totalSlides} slides × ${VIEWPORTS.length} viewports`);
   console.log('');
   if (passCount > 0) console.log(`  ${C.green}${C.bold}${passCount}${C.reset}${C.green} passing${C.reset}`);
   if (critCount > 0) console.log(`  ${C.red}${C.bold}${critCount}${C.reset}${C.red} critical${C.reset}`);
@@ -513,11 +442,12 @@ async function main() {
   console.log('');
   console.log(`${C.dim}Screenshots saved to ${OUT_DIR}/${C.reset}`);
 
-  // Write JSON report
   const report = {
     url: deckUrl,
     timestamp: new Date().toISOString(),
     totalSlides,
+    viewports: VIEWPORTS.map(v => v.label),
+    checksPerSlide: ['mermaid-svg-contrast', 'text-contrast-wcag-aa', 'text-overlap', 'content-overflow', 'svg-stroke-visibility', 'v-click-states', 'hover-states', 'responsive-breakpoints'],
     summary: { pass: passCount, critical: critCount, warnings: warnCount, info: infoCount },
     slides: results.map(r => ({ slide: r.slide, issues: r.issues, screenshot: r.screenshot })),
   };
