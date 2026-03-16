@@ -18,11 +18,12 @@ A feed aggregator built on Cloudflare Python Workers.
 
 github.com/adewale/planet\_cf
 
-<!-- Planet CF collects developer blog posts from hundreds of personal sites into a single searchable index. Built on Cloudflare's Python Workers platform: D1 for storage, Vectorize for semantic search, Queues for feed processing, Workers AI for embeddings. The through-line is "quarantine the boundary" — every hard lesson from this project traces back to the JS/Python FFI edge.
+<!-- Planet CF collects developer blog posts from hundreds of personal sites into a single searchable index. Built on Cloudflare's Python Workers platform: D1 for storage, Vectorize for semantic search, Queues for feed processing, Workers AI for embeddings, Workers Static Assets for CSS/JS/fonts at the edge. Supports multi-instance deployment — Planet Python (500+ feeds), Planet Mozilla (190 feeds), and custom instances via one-command CLI tooling. The through-line is "quarantine the boundary" — every hard lesson from this project traces back to the JS/Python FFI edge. 21 documented FFI lessons and counting.
 
 Sources:
 - https://github.com/adewale/planet_cf — project repository
-- https://github.com/adewale/planet_cf/blob/main/README.md — project overview -->
+- https://github.com/adewale/planet_cf/blob/main/README.md — project overview
+- https://github.com/adewale/planet_cf/blob/main/docs/MULTI_INSTANCE.md — multi-instance deployment -->
 
 ---
 layout: statement
@@ -42,7 +43,7 @@ Sources:
 transition: slide-left
 ---
 
-# Six Cloudflare services replace a traditional backend
+# Seven Cloudflare services replace a traditional backend
 
 <div v-motion
   :initial="{ opacity: 0, y: 40 }"
@@ -52,25 +53,26 @@ transition: slide-left
 graph LR
   C["Cron Trigger"] --> Q["Queues"]
   Q --> F["Feed Fetcher"]
-  F --> D1["D1 + FTS5"]
+  F --> D1["D1"]
   F --> V["Vectorize"]
   F --> AI["Workers AI"]
   UI["Web UI"] --> D1 & V
+  SA["Static Assets"] -.-> UI
   classDef trigger fill:#ff4801,stroke:#ff4801,color:#fff
   classDef svc fill:#fff3e0,stroke:#ff4801,color:#7c2d12
   class C trigger
-  class Q,F,D1,V,AI,UI svc
+  class Q,F,D1,V,AI,UI,SA svc
   linkStyle default stroke:#521000,stroke-width:2px
 ```
 
 </div>
 
-The Web UI queries both D1 and Vectorize independently — chronological browsing and semantic search are two separate discovery paths.
+The Web UI queries both D1 and Vectorize independently — chronological browsing and semantic search are two separate discovery paths. Static assets (CSS, JS, fonts) are served at the edge without booting the Python Worker.
 
-<!-- Architecture: Cron fires hourly, enqueues each feed as a separate queue message. Queue consumer fetches with 30s HTTP timeout and 60s processing timeout. Failed messages retry or go to a dead-letter queue. D1 stores entries with FTS5 for keyword search. Vectorize stores 768-dimension embeddings for semantic search. Workers AI generates embeddings using bge-base-en-v1.5 with CLS pooling. Edge cache: 1-hour TTL. Static asset TTFB: 15-90ms. Worker cold start: 1000-1400ms.
+<!-- Architecture: Cron fires hourly, enqueues each feed as a separate queue message. Queue consumer fetches with 30s HTTP timeout and 60s processing timeout. Failed messages retry or go to a dead-letter queue. D1 stores entries; keyword search uses LIKE queries with proper escaping. Vectorize stores 768-dimension embeddings for semantic search. Workers AI generates embeddings using bge-base-en-v1.5 with CLS pooling. Workers Static Assets serve CSS, JS, fonts, and images at the edge — no Pyodide cold start, TTFB 15-90ms. Edge cache: 1-hour TTL for HTML. Worker cold start: 1000-1400ms. Seven services total: Workers (Python), D1, Vectorize, Workers AI, Queues, Cron Triggers, Workers Static Assets.
 
 Sources:
-- https://github.com/adewale/planet_cf/blob/main/docs/ARCHITECTURE.md — system overview, data flow, performance metrics
+- https://github.com/adewale/planet_cf/blob/main/docs/ARCHITECTURE.md — system overview, data flow, two-tier serving, performance metrics
 - https://github.com/adewale/planet_cf/blob/main/README.md — Cloudflare resource setup and feature list -->
 
 ---
@@ -150,11 +152,12 @@ transition: wipe-right
 
 [click] Vectorize returns JsProxy matches — MockVectorize returns all vectors as Python objects. Real Vectorize needs explicit conversion at the boundary.
 
-[click] 500 errors on every query — the solution is two-tier testing. Mock tests for logic (fast). E2E tests against real infrastructure via wrangler dev --remote to catch JsProxy issues mocks fundamentally cannot simulate.
+[click] 500 errors on every query — the solution is two-tier testing. Mock tests for logic (fast). E2E tests against real infrastructure via wrangler dev --remote to catch JsProxy issues mocks fundamentally cannot simulate. A third tier uses Pyodide fakes — lightweight fake JsProxy, JsNull, and JsUndefined classes that run in CPython but catch the "is None" trap where JsNull is not None (lesson 20-21).
 
 Sources:
 - https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — section 3: "Mocks Don't Catch JsProxy Issues"
-- https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — section 16: "Search Accuracy Requires Real Infrastructure Tests" -->
+- https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — section 16: "Search Accuracy Requires Real Infrastructure Tests"
+- https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — sections 20-21: Two-Tier FFI Testing and JsNull trap -->
 
 ---
 transition: slide-left
@@ -259,6 +262,32 @@ Sources:
 - https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — section 8: "Feed Dates Can Be Missing or Malformed" -->
 
 ---
+transition: slide-left
+---
+
+# One codebase, five planets
+
+```bash
+./scripts/deploy_instance.sh planet-python   # 500+ feeds
+./scripts/deploy_instance.sh planet-mozilla   # 190 feeds
+```
+
+<v-clicks>
+
+- Each instance gets its own D1, Vectorize, and Queues
+- `full` mode adds semantic search and OAuth admin
+- `create_instance.py` provisions all resources
+- One deploy script: D1, Vectorize, queues, secrets
+
+</v-clicks>
+
+<!-- Multi-instance deployment is a major architectural feature. The examples/ directory contains five ready-to-deploy instances: default (minimal lite-mode), planet-cloudflare (full-featured), planet-python (500+ feeds, lite mode), planet-mozilla (190 feeds, lite mode), and test-planet (CI/E2E). Each instance has its own wrangler.jsonc, config.yaml, assets/, and templates/. The deploy_instance.sh script is idempotent — it safely skips resources that already exist. INSTANCE_MODE controls whether Vectorize/OAuth are enabled ("full") or disabled ("lite"). Per-instance theming supports custom CSS, logos, and template overrides. The create_instance.py script can clone from an example or create from scratch with --deploy to provision everything in one command.
+
+Sources:
+- https://github.com/adewale/planet_cf/blob/main/docs/MULTI_INSTANCE.md — multi-instance deployment guide
+- https://github.com/adewale/planet_cf/blob/main/README.md — examples directory and deploy scripts -->
+
+---
 layout: center
 transition: morph-fade
 ---
@@ -269,10 +298,10 @@ transition: morph-fade
 
 Convert foreign types at the edge. Let the core be pure.
 
-<!-- The through-line resolves here. JsProxy conversion (lessons 1-2), mock failures (lesson 3), filesystem absence (lesson 4), hybrid search edge (lesson 5), date handling (lesson 8), SSRF protection (lesson 7), session management (lesson 9) — each is a boundary problem. SafeD1, SafeVectorize, SafeAI, EmbeddedLoader, _to_py_safe, _is_js_undefined, _to_d1_value — each is a boundary quarantine. The pattern: identify where foreign types cross into your domain, convert immediately at the edge, and never let the foreign types leak deeper into business logic.
+<!-- The through-line resolves here. JsProxy conversion (lessons 1-2), mock failures (lesson 3), filesystem absence (lesson 4), hybrid search edge (lesson 5), date handling (lesson 8), SSRF protection (lesson 7), session management (lesson 9), two-tier FFI testing with Pyodide fakes (lesson 20), the JsNull/JsUndefined triple-null trap (lesson 21) — each is a boundary problem. SafeD1, SafeVectorize, SafeAI, EmbeddedLoader, _to_py_safe, _is_js_undefined, _to_d1_value — each is a boundary quarantine. The pattern: identify where foreign types cross into your domain, convert immediately at the edge, and never let the foreign types leak deeper into business logic.
 
 Sources:
-- https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — all 19 lessons trace to boundary management
+- https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — all 21 lessons trace to boundary management
 - https://github.com/adewale/planet_cf/blob/main/docs/ARCHITECTURE.md — boundary layer architecture diagram -->
 
 ---

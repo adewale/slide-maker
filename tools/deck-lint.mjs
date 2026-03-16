@@ -49,7 +49,9 @@ const REQUIRED_FILES = [
 ];
 
 const REQUIRED_TOKENS_DEFAULT = ['--deck-bg', '--deck-fg', '--deck-accent', '--deck-muted'];
-const REQUIRED_TOKENS_THEMED = ['--deck-fg'];
+// All themes need all 4 tokens — Beautiful Mermaid reads --deck-bg and --deck-muted
+// for auto-theming regardless of which Slidev theme is in use
+const REQUIRED_TOKENS_THEMED = ['--deck-bg', '--deck-fg', '--deck-accent', '--deck-muted'];
 const THEMED_THEMES = ['seriph', 'apple-basic'];
 const REQUIRED_TOKENS = [
 ];
@@ -308,16 +310,62 @@ function countMermaidNodes(code) {
 }
 
 /**
- * Approximate luminance of a hex color (0 = black, 1 = white).
+ * Parse a hex color string to [r, g, b] in 0-255 range.
+ * Handles #rgb, #rrggbb, #rrggbbaa.
  */
-function hexLuminance(hex) {
+function parseHex(hex) {
   hex = hex.replace('#', '');
   if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
-  if (hex.length < 6) return 0.5; // fallback for malformed
-  const r = parseInt(hex.slice(0, 2), 16);
-  const g = parseInt(hex.slice(2, 4), 16);
-  const b = parseInt(hex.slice(4, 6), 16);
-  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  if (hex.length < 6) return null;
+  return [
+    parseInt(hex.slice(0, 2), 16),
+    parseInt(hex.slice(2, 4), 16),
+    parseInt(hex.slice(4, 6), 16),
+  ];
+}
+
+/**
+ * WCAG 2.1 relative luminance of a hex color.
+ * Uses the sRGB linearization formula, not the naive weighted average.
+ * Returns 0 (black) to 1 (white).
+ */
+function relativeLuminance(hex) {
+  const rgb = parseHex(hex);
+  if (!rgb) return 0.5;
+  const [r, g, b] = rgb.map(c => {
+    const s = c / 255;
+    return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/**
+ * WCAG 2.1 contrast ratio between two hex colors.
+ * Returns a value >= 1. Higher is more contrast.
+ * WCAG AA requires 4.5:1 for normal text, 3:1 for large text.
+ */
+function contrastRatio(hex1, hex2) {
+  const l1 = relativeLuminance(hex1);
+  const l2 = relativeLuminance(hex2);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+/**
+ * Backward-compatible luminance (used by existing fill/text contrast heuristic).
+ */
+function hexLuminance(hex) {
+  const rgb = parseHex(hex);
+  if (!rgb) return 0.5;
+  return (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
+}
+
+/**
+ * Format a contrast ratio for display: "4.5:1"
+ */
+function formatRatio(ratio) {
+  return `${ratio.toFixed(1)}:1`;
 }
 
 /**
@@ -427,15 +475,9 @@ function checkMermaidSyntax(code, slideIndex) {
       const fillHex = props.match(/(?:^|[,\s])fill\s*:\s*(#[0-9a-fA-F]{3,8})/)?.[1];
       const colorHex = props.match(/(?:^|[,\s])color\s*:\s*(#[0-9a-fA-F]{3,8})/)?.[1];
       if (fillHex && colorHex) {
-        const fillLum = hexLuminance(fillHex);
-        const textLum = hexLuminance(colorHex);
-        // Thresholds: 0.65 avoids flagging medium-brightness accent colors
-        // (#ca8a04, #f6821f, #ff6633) which are valid dark fills per COMPILER_RULES
-        if (fillLum > 0.65 && textLum > 0.65) {
-          warnings.push(`slide ${slideIndex}: Mermaid node "${name}" — light fill (${fillHex}) with light text (${colorHex}) may fail contrast`);
-        }
-        if (fillLum < 0.2 && textLum < 0.2) {
-          warnings.push(`slide ${slideIndex}: Mermaid node "${name}" — dark fill (${fillHex}) with dark text (${colorHex}) may fail contrast`);
+        const ratio = contrastRatio(fillHex, colorHex);
+        if (ratio < 3.0) {
+          warnings.push(`slide ${slideIndex}: Mermaid node "${name}" — ${colorHex} on ${fillHex} = ${formatRatio(ratio)} (WCAG AA needs 3:1 for large text)`);
         }
       }
     }
@@ -449,6 +491,28 @@ function checkMermaidSyntax(code, slideIndex) {
     const nodeCount = countMermaidNodes(code);
     if (nodeCount > 0 && !hasStyleDirective) {
       warnings.push(`slide ${slideIndex}: Mermaid flowchart has ${nodeCount} nodes but no style/classDef — nodes may be unreadable (add explicit fill and color)`);
+    }
+
+    // ── CRAP Contrast: linkStyle default required ──
+    const hasLinkStyle = lines.some(l => /^\s*linkStyle\s+(default|[\d])/.test(l));
+    if (nodeCount > 1 && !hasLinkStyle) {
+      warnings.push(`slide ${slideIndex}: Mermaid flowchart missing linkStyle default — arrow lines may be invisible on the slide background`);
+    }
+
+    // ── CRAP Contrast: classDef assignment completeness ──
+    // Every defined classDef must be assigned to at least one node
+    const classDefNames = new Set();
+    const assignedClasses = new Set();
+    for (const line of lines) {
+      const cdMatch = line.trim().match(/^classDef\s+(\S+)\s/);
+      if (cdMatch) classDefNames.add(cdMatch[1]);
+      const assignMatch = line.trim().match(/^class\s+(.+?)\s+(\S+)\s*$/);
+      if (assignMatch) assignedClasses.add(assignMatch[2]);
+    }
+    for (const cd of classDefNames) {
+      if (!assignedClasses.has(cd)) {
+        warnings.push(`slide ${slideIndex}: Mermaid classDef "${cd}" defined but never assigned to any node`);
+      }
     }
   }
 
@@ -627,6 +691,43 @@ function lintDeck(deckDir) {
       }
     }
 
+    // ─── 4b. Token contrast verification (WCAG AA) ──────────
+
+    // Extract token hex values from the CSS
+    function extractTokenValue(css, tokenName) {
+      const re = new RegExp(`${tokenName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*:\\s*([^;]+);`);
+      const m = css.match(re);
+      if (!m) return null;
+      const val = m[1].trim();
+      // Only check hex colors — skip rgba, var() references, font families
+      if (/^#[0-9a-fA-F]{3,8}$/.test(val)) return val;
+      return null;
+    }
+
+    const bgHex = extractTokenValue(tokensCss, '--deck-bg');
+    const fgHex = extractTokenValue(tokensCss, '--deck-fg');
+    const accentHex = extractTokenValue(tokensCss, '--deck-accent');
+
+    if (bgHex && fgHex) {
+      const ratio = contrastRatio(bgHex, fgHex);
+      if (ratio < 4.5) {
+        errors.push(`WCAG AA fail: --deck-fg (${fgHex}) on --deck-bg (${bgHex}) = ${formatRatio(ratio)} (need 4.5:1)`);
+      } else {
+        info.push(`contrast --deck-fg on --deck-bg: ${formatRatio(ratio)}`);
+      }
+    }
+
+    if (bgHex && accentHex) {
+      const ratio = contrastRatio(bgHex, accentHex);
+      if (ratio < 3.0) {
+        errors.push(`WCAG AA fail: --deck-accent (${accentHex}) on --deck-bg (${bgHex}) = ${formatRatio(ratio)} (need 3:1 for large text)`);
+      } else if (ratio < 4.5) {
+        warns.push(`WCAG AA marginal: --deck-accent (${accentHex}) on --deck-bg (${bgHex}) = ${formatRatio(ratio)} (passes 3:1 for large text, fails 4.5:1 for body)`);
+      } else {
+        info.push(`contrast --deck-accent on --deck-bg: ${formatRatio(ratio)}`);
+      }
+    }
+
     // ─── 5. Token usage across deck files ─────────────────────
 
     // Collect var() references from all relevant files in the deck
@@ -677,7 +778,11 @@ function lintDeck(deckDir) {
     // Any other .vue or .css files at the deck root
     collectVarRefsFromDir(deckDir, ['.vue', '.css']);
 
-    const unreferenced = tokens.filter(t => !usedVars.has(t));
+    // Required tokens are always consumed (Beautiful Mermaid reads --deck-bg,
+    // --deck-fg, --deck-accent, --deck-muted via getComputedStyle at runtime)
+    // so only warn about unreferenced non-required tokens.
+    const requiredSet = new Set(REQUIRED_TOKENS_DEFAULT);
+    const unreferenced = tokens.filter(t => !usedVars.has(t) && !requiredSet.has(t));
     if (unreferenced.length > 0) {
       for (const t of unreferenced) {
         warns.push(`token ${t} defined in tokens.css but not referenced in any deck file`);
@@ -695,6 +800,20 @@ function lintDeck(deckDir) {
       for (const sel of REQUIRED_THEME_SELECTORS) {
         if (!hasSelector(themeCss, sel)) {
           warns.push(`theme.css missing expected selector: ${sel}`);
+        }
+      }
+
+      // ── CRAP Alignment: cover layout must set explicit alignment ──
+      if (hasSelector(themeCss, '.slidev-layout.cover') || /\.slidev-layout\.cover\b/.test(themeCss)) {
+        const coverBlock = themeCss.match(/\.slidev-layout\.cover\s*\{([^}]+)\}/);
+        if (coverBlock) {
+          const coverProps = coverBlock[1];
+          if (!/align-items\s*:/.test(coverProps)) {
+            warns.push('CRAP alignment: .slidev-layout.cover missing align-items — cover text alignment may conflict with theme defaults');
+          }
+          if (!/text-align\s*:/.test(coverProps)) {
+            warns.push('CRAP alignment: .slidev-layout.cover missing text-align — cover text alignment may conflict with theme defaults');
+          }
         }
       }
     }

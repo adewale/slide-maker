@@ -1,5 +1,7 @@
 :root {
+  --deck-bg: #ffffff;
   --deck-fg: #18181b;
-  --deck-accent: #ca8a04;
+  --deck-accent: #9a6b03;
+  --deck-muted: rgba(24, 24, 27, 0.45);
   --deck-font-mono: 'JetBrains Mono', monospace;
 }

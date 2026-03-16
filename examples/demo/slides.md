@@ -184,21 +184,21 @@ Sources:
 transition: slide-up
 ---
 
-# One skill, seven different-looking decks
+# One skill, six different-looking decks
 
 ```mermaid {theme: 'dark', scale: 0.6}
 graph TD
   SP((Style Presets)) --> ED["editorial-dark: Serious"]
   SP --> SM["swiss-minimal: Precise"]
   SP --> BM["bold-modern: Energetic"]
-  SP --> SE["sumi-e: Spacious"]
   SP --> TD2["tufte-data: Scholarly"]
   SP --> CF["cloudflare: Workshop"]
   SP --> MD["material-design: Systematic"]
   classDef hub fill:#a78bfa,stroke:#a78bfa,color:#0a0a0f
   classDef leaf fill:#1e1e2e,stroke:#a78bfa,color:#f0f0f5
   class SP hub
-  class ED,SM,BM,SE,TD2,CF,MD leaf
+  class ED,SM,BM,TD2,CF,MD leaf
+  linkStyle default stroke:#a78bfa,stroke-width:2px
 ```
 
 Each preset controls typography, color, motion, and layout tendencies — the same content looks and feels different under each preset. This is how one skill produces decks that don't look generated.
@@ -206,7 +206,7 @@ Each preset controls typography, color, motion, and layout tendencies — the sa
 <!-- Presets are not skins applied after the fact. They're directions — they influence which layouts get chosen, how transitions behave, and what the typography communicates. A "serious" deck uses different v-click animations than an "energetic" one. editorial-dark fades in; bold-modern scales and slides.
 
 Sources:
-- file:slide-maker/STYLE_PRESETS.md — seven preset definitions with palette, typography, motion, interaction patterns -->
+- file:slide-maker/STYLE_PRESETS.md — six preset definitions with palette, typography, motion, interaction patterns -->
 
 ---
 
@@ -221,6 +221,7 @@ graph LR
   class A light
   class B,C mid
   class D,E dark
+  linkStyle default stroke:#a78bfa,stroke-width:2px
 ```
 
 Notice: "Direction" comes before "Spec" — the visual identity decision is made before any slides are written. This is the anti-generic mechanism. By the time compilation starts, the deck already has a voice.

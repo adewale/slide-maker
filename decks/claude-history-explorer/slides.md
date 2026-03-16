@@ -20,10 +20,10 @@ Read-only exploration of your Claude Code conversations.
 
 github.com/adewale/claude-history-explorer
 
-<!-- Claude History Explorer is a Python CLI that turns the raw JSONL files Claude Code writes to ~/.claude/projects/ into searchable conversations, statistics, and narrative stories about your development journey. The core design rule: the tool never writes to, modifies, or deletes your history files. Read-only means zero risk.
+<!-- Claude History Explorer is a Python CLI that turns the raw JSONL files Claude Code writes to ~/.claude/projects/ into searchable conversations, statistics, narrative stories, and shareable annual summaries about your development journey. Ten commands across eleven modules — from regex search to a full Wrapped annual review with heatmaps, trait scores, and token tracking. The core design rule: the tool never writes to, modifies, or deletes your history files. Read-only means zero risk.
 
 Sources:
-- https://github.com/adewale/claude-history-explorer/blob/main/README.md — project overview and feature list
+- https://github.com/adewale/claude-history-explorer/blob/main/README.md — project overview, 10 commands, and feature list
 - https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — read-only guarantee and trust model -->
 
 ---
@@ -49,10 +49,10 @@ transition: slide-up
 - **Read-only by design** — never writes, modifies, or deletes history files
 - **No network calls** — your conversations never leave your machine
 - **Open source and auditable** — every line readable before you run it
-- **Minimal dependencies** — only click, rich, and sparklines
+- **Minimal dependencies** — click, rich, sparklines, msgpack, and pyperclip
 - **Scoped reads** — only touches ~/.claude/projects/*.jsonl
 
-<!-- Each guarantee is independently verifiable. Read-only: grep the codebase for write operations and find none. No network: check pyproject.toml for HTTP libraries and find none. Open source: the entire tool is four Python files. Minimal deps: three runtime libraries, all formatting-only. Scoped reads: the tool reads JSONL session files and nothing else — not your source code, not your .env, not your git history. The TRUST.md document provides exact verification commands for each guarantee.
+<!-- Each guarantee is independently verifiable. Read-only: grep the codebase for write operations and find none. No network: check pyproject.toml for HTTP libraries and find none. Open source: the entire tool is eleven Python modules. Minimal deps: five runtime libraries — three for formatting (click, rich, sparklines), one for compact binary encoding (msgpack, used by the Wrapped feature), and one for clipboard access (pyperclip). None perform network I/O. Scoped reads: the tool reads JSONL session files and nothing else — not your source code, not your .env, not your git history. The TRUST.md document provides exact verification commands for each guarantee.
 
 Sources:
 - https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — all five guarantees with enforcement methods and verification commands -->
@@ -106,6 +106,8 @@ graph LR
   style B fill:#38bdf8,stroke:#38bdf8,color:#0a0a0f
   style C fill:#1e3a5f,stroke:#38bdf8,color:#38bdf8
   style D fill:#1e3a5f,stroke:#38bdf8,color:#38bdf8
+  style E fill:#1e3a5f,stroke:#38bdf8,color:#38bdf8
+  linkStyle default stroke:#38bdf8,stroke-width:2px
 ```
 
 </div>
@@ -148,34 +150,61 @@ Sources:
 transition: slide-up
 ---
 
+# Wrapped — your year in Claude Code
+
+```bash
+claude-history wrapped -y 2025 -n "Ade"
+# Generates a shareable URL with your annual stats
+# All data encoded in the URL — nothing stored on any server
+```
+
+- Activity heatmaps, session distributions, and streak tracking
+- Ten behavioral trait scores (delegation, focus, burst vs. steady, and more)
+- Token usage aggregation by model
+- Decode any URL to inspect exactly what it contains: `claude-history wrapped --decode "https://..."`
+
+<!-- The wrapped command generates a shareable annual summary — like Spotify Wrapped for your Claude Code usage. It computes heatmaps (7x24 activity grid), ten behavioral trait scores (agent delegation, session depth, focus concentration, circadian consistency, weekend ratio, burst-vs-steady, context switching, message verbosity, tool diversity, response intensity), session duration distributions, project co-occurrence graphs, timeline events (streaks, gaps, milestones), session fingerprints, and token usage broken down by model. All of this is packed into a single URL using msgpack + base64url encoding — V3 format with RLE compression for the heatmap. The URL points to a Cloudflare Workers site that renders the visualization, but the CLI itself makes zero network calls. You choose whether to share.
+
+Sources:
+- https://github.com/adewale/claude-history-explorer/blob/main/README.md — wrapped command with --year, --name, --raw, --decode options
+- https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — "The Wrapped Feature: Additional Privacy Model" section
+- https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/wrapped.py — V3 wrapped generation, encoding, trait computation -->
+
+---
+transition: slide-up
+---
+
 # The dependency tree has no capability to exfiltrate data
 
 - **click** — CLI framework (30M+ weekly downloads)
 - **rich** — terminal formatting (20M+ weekly downloads)
 - **sparklines** — ASCII activity charts (100K+ weekly downloads)
+- **msgpack** — compact binary encoding for Wrapped URLs (50M+ weekly downloads)
+- **pyperclip** — clipboard copy for Wrapped URLs (5M+ weekly downloads)
 
-All formatting. No file operations. No network operations. The tool works identically offline.
+No HTTP libraries. No network operations. The tool works identically offline.
 
-<!-- The dependency choice is deliberate and trust-reinforcing. None of the three dependencies touch files or network — they only format terminal output. No requests, no httpx, no urllib, no aiohttp. You can verify by checking pyproject.toml or running the tool with network disabled. The TRUST.md document links to the GitHub repos for all three dependencies. This is another layer of the read-only guarantee: even if you don't trust the project code, the dependency tree has no capability to exfiltrate data.
+<!-- The dependency choice is deliberate and trust-reinforcing. The original three dependencies (click, rich, sparklines) handle CLI and formatting. The Wrapped feature added two more: msgpack for compact binary encoding of annual stats into URL-safe strings, and pyperclip for one-click clipboard copy. None of the five touch network — no requests, no httpx, no urllib, no aiohttp. You can verify by checking pyproject.toml or running the tool with network disabled. This is another layer of the read-only guarantee: even if you don't trust the project code, the dependency tree has no capability to exfiltrate data.
 
 Sources:
-- https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — Guarantee #4: minimal dependencies table with download counts and GitHub links
-- https://github.com/adewale/claude-history-explorer/blob/main/docs/ARCHITECTURE.md — core dependencies: click, rich, sparklines -->
+- https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — Guarantee #4: minimal dependencies
+- https://github.com/adewale/claude-history-explorer/blob/main/docs/ARCHITECTURE.md — core dependencies
+- https://github.com/adewale/claude-history-explorer/blob/main/pyproject.toml — 5 runtime dependencies: click, rich, sparklines, msgpack, pyperclip -->
 
 ---
 layout: fact
 transition: fade
 ---
 
-# <v-mark at="1" color="#38bdf8" type="circle">~2,600</v-mark> lines
+# <v-mark at="1" color="#38bdf8" type="circle">~4,600</v-mark> lines
 
-of Python. Four files. Small enough to audit in an afternoon.
+of Python across eleven modules. Still auditable in a day.
 
-<!-- The entire codebase is four files: __init__.py (version metadata), constants.py (analysis thresholds), history.py (data models, parsing, statistics, story generation), and cli.py (command implementations). At roughly 2,600 lines total, a developer can read every line in a single sitting. This is Guarantee #3 from TRUST.md: open source and auditable. The small surface area is itself a trust mechanism — there is nowhere for malicious behavior to hide in a codebase this size.
+<!-- The codebase grew from four files to eleven focused modules: models.py (data classes), parser.py (JSONL parsing), projects.py (project discovery), stats.py (statistics), stories.py (narrative generation), wrapped.py (annual summary with heatmaps, trait scores, and token tracking), utils.py (shared helpers), constants.py (thresholds), history.py (backward-compatible re-exports), __init__.py (package metadata), and cli.py (10 commands). At roughly 4,600 lines total, the largest single module is cli.py at ~1,600 lines. The wrapped module alone is ~950 lines — the biggest feature addition. Still small enough to audit in a focused day.
 
 Sources:
-- https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — Guarantee #3: "Total: ~2,600 lines of Python. Small enough to audit in an afternoon."
-- https://github.com/adewale/claude-history-explorer/blob/main/docs/ARCHITECTURE.md — module structure: 4 files in claude_history_explorer/ -->
+- https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — Guarantee #3: open source and auditable
+- https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/ — 11 modules totaling ~4,600 lines -->
 
 ---
 layout: end
@@ -184,7 +213,7 @@ transition: fade
 
 # You don't have to trust us. The code is small enough to read.
 
-<!-- The closing resolves the opening tension. "Your conversations contain proprietary code, architecture decisions, and accidental secrets" — the trust question. The answer: read-only means zero risk, and the code is small enough to verify that guarantee yourself. This is the final form of the through-line: read-only is not just a design decision, it is a trust mechanism that makes verification possible. The line is a direct quote from TRUST.md's summary: "You don't have to trust us."
+<!-- The closing resolves the opening tension. "Your conversations contain proprietary code, architecture decisions, and accidental secrets" — the trust question. The answer: read-only means zero risk, and even at ~4,600 lines across eleven modules the code is small enough to verify that guarantee yourself. The Wrapped feature adds shareable annual summaries but maintains the same trust contract: the CLI makes no network calls, and every Wrapped URL is decodable so you can inspect the data before sharing. This is the final form of the through-line: read-only is not just a design decision, it is a trust mechanism that makes verification possible.
 
 Sources:
 - https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — closing summary: "You don't have to trust us. The code is small enough to read, the guarantees are testable, and the Wrapped URLs are decodable. Verify everything yourself." -->

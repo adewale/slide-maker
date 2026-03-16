@@ -76,8 +76,8 @@ Problems that fall between stateless compute and shared storage:
 
 <v-clicks>
 
-- **Real-time sync** — 4 players need the same game state within 16ms
-- **Per-entity state** — each music session holds its own pattern and tempo
+- **Real-time sync** — 4 players need the same game state within 33ms (one 30Hz frame)
+- **Per-entity state** — each music session holds its own tracks, patterns, and tempo
 - **Long-lived connections** — a WebSocket that outlives a single request
 - **Coordination without contention** — no row locks, no race conditions
 
@@ -87,9 +87,9 @@ Durable Objects fill this gap. One per entity. Single-threaded. Named.
 
 <!-- Each bullet is a real product requirement from the case studies later in this deck.
 
-[click] Real-time sync — the 16ms game sync requirement comes from Vaders. 4 players need the same game state within one frame.
+[click] Real-time sync — the 33ms game sync requirement comes from Vaders. 4 players need the same game state within one 30Hz frame.
 
-[click] Per-entity state — each Keyboardia music session holds its own pattern and tempo. The state belongs to the session, not to a shared database row.
+[click] Per-entity state — each Keyboardia music session holds its own tracks (up to 16), patterns, tempo, swing, and per-step parameter locks. The state belongs to the session, not to a shared database row.
 
 [click] Long-lived connections — a WebSocket that outlives a single request. Workers can't hold a connection open; DOs can.
 
@@ -313,6 +313,10 @@ graph LR
   P3["Player 3"] -->|WS| DO
   DO -->|broadcast| P1 & P2 & P3
   style DO fill:#ff4801,stroke:#521000,color:#fff
+  style P1 fill:#fff3e0,stroke:#ff4801,color:#521000
+  style P2 fill:#fff3e0,stroke:#ff4801,color:#521000
+  style P3 fill:#fff3e0,stroke:#ff4801,color:#521000
+  linkStyle default stroke:#521000,stroke-width:2px
 ```
 
 Notice: all arrows from players carry only inputs (keystrokes). All arrows from the DO carry full state. Players never compute game logic — they render what the DO tells them. This prevents cheat clients.
@@ -338,36 +342,40 @@ transition: slide-left
 
 # The problem
 
-10 musicians collaborating in real-time. Each has their own time signature.
+Up to 10 musicians collaborating in real-time. Each track has its own loop length.
 
-- **Polyrhythm** — Player A is in 4/4, Player B is in 7/8, Player C is in 5/4
-- Latency must be **<50ms** or the groove falls apart
-- Audio is latency-sensitive — it cannot round-trip through a server
-- Session state must survive disconnects
+- **Polyrhythm** — Track A loops at 16 steps, Track B at 7, Track C at 5 — independent cycles over a shared clock
+- Audio is latency-sensitive — it **cannot** round-trip through a server
+- Pattern sync must be fast enough that edits feel instant across all clients
+- Session state must survive disconnects and hibernation
 
-<!-- Audio latency is the hard constraint. At 120 BPM, a sixteenth note is 125ms. If round-trip latency exceeds ~50ms, musicians perceive the delay. Audio CANNOT go through the server. The DO must coordinate patterns without touching audio.
+<!-- The polyrhythm model uses per-track step counts (4, 8, 16, 32, or 64 steps) rather than time signatures. At 120 BPM a sixteenth note is 125ms. Audio synthesis happens locally via Web Audio API with a 25ms scheduler tick and 100ms lookahead — the server never touches audio. The DO only coordinates pattern state: which steps are active, tempo, swing, and track parameters.
 
 Sources:
+- https://github.com/nicholasgasior/keyboardia — Keyboardia step sequencer
 - https://developers.cloudflare.com/durable-objects/api/websockets/ — WebSocket Hibernation enabling persistent musician connections -->
 
 ---
 transition: slide-up
 ---
 
-# The DO pattern — session relay with KV backup
+# The DO pattern — event-driven relay with debounced KV backup
 
-The DO relays pattern state. Audio never touches the server.
+The DO relays pattern state on every edit. Audio never touches the server.
 
-- **Session hub** — one DO per jam session, holds all player patterns
-- **Relay, not render** — pattern changes broadcast, audio rendered locally
-- **KV backup** — on disconnect, player state writes to KV. Rejoin restores.
-- **Zero server-side audio** — the DO manages coordination, not computation
+- **Session hub** — one DO per session, holds tracks, tempo, swing, and player map
+- **Event-driven broadcast** — each toggle/edit broadcasts immediately to all clients
+- **Debounced KV persistence** — alarm fires every 5s to save state to KV; also saves when last player leaves
+- **R2 sample storage** — user-recorded samples upload to R2, URL broadcast to all players
+- **State hash verification** — clients periodically send state hashes; mismatches trigger a full snapshot resync
 
-<!-- The key architectural decision is what the DO does NOT do: it doesn't touch audio. The insight is that you only need to sync the pattern — which notes are active at which steps. Audio synthesis happens locally via Web Audio API. The DO is a coordination hub, not an audio engine.
+<!-- The key architectural decision is what the DO does NOT do: it doesn't touch audio. The insight is that you only need to sync the pattern — which notes are active at which steps. Audio synthesis happens locally via Web Audio API with a 25ms lookahead scheduler. Unlike Vaders' alarm-driven game loop, Keyboardia's DO is event-driven: edits arrive via WebSocket, the DO mutates state and broadcasts the delta immediately. Alarms are only used for debounced KV persistence (5s delay), not for a tick loop.
 
 Sources:
+- https://github.com/nicholasgasior/keyboardia — Keyboardia architecture
 - https://developers.cloudflare.com/durable-objects/ — coordination primitive for session management
-- https://developers.cloudflare.com/kv/ — KV for backup state on disconnect -->
+- https://developers.cloudflare.com/kv/ — KV for persistent session state
+- https://developers.cloudflare.com/r2/ — R2 for sample storage -->
 
 ---
 layout: two-cols
@@ -376,23 +384,28 @@ transition: wipe-right
 
 # What the DO handles
 
-- Session membership (join/leave)
-- Pattern state (which steps are active)
-- Tempo and time signature sync
-- Broadcast on pattern change
-- KV backup on disconnect
+- Session membership (join/leave/identity)
+- Pattern state (steps, parameter locks, mute/solo)
+- Tempo, swing, and per-track step count sync
+- Broadcast deltas on every edit
+- Debounced KV persistence via alarms
+- State hash verification and snapshot resync
+- Cursor/presence sharing between players
+- R2 sample upload coordination
 
 ::right::
 
 # What the client handles
 
-- Audio synthesis (Web Audio API)
-- Local playback and scheduling
-- Instrument rendering
-- Step sequencer UI
-- Latency compensation
+- Audio synthesis (Web Audio API + 19 synth presets)
+- Lookahead scheduling (25ms tick, 100ms lookahead)
+- Sample playback with pitch shifting
+- Clock sync (server offset calculation)
+- Step sequencer UI and parameter lock editing
+- Mic recording via MediaRecorder
+- Offline queue for edits during disconnect
 
-<!-- This split is the entire architecture. The line between server and client is drawn at the boundary between coordination (DO) and computation (client). Everything shared goes through the DO. Everything fast stays local.
+<!-- This split is the entire architecture. The line between server and client is drawn at the boundary between coordination (DO) and computation (client). Everything shared goes through the DO. Everything fast stays local. The client's audio scheduler uses Web Audio API's precise timing — scheduling notes 100ms ahead with a 25ms polling interval — so audio timing is sub-millisecond accurate regardless of network latency.
 
 Sources:
 - https://developers.cloudflare.com/durable-objects/ — DO as coordination primitive, not compute engine -->
@@ -470,25 +483,27 @@ transition: glide
 ```ts
 export class MyAgent extends Agent {
   // Lifecycle
-  async onStart() { }        // DO created or woken
-  async onConnect(conn) { }   // WebSocket connected
-  async onMessage(conn, msg) { } // message received
-  async onClose(conn) { }     // WebSocket closed
+  onStart() { }               // instance wakes
+  onConnect(conn, ctx) { }    // WebSocket connected
+  onMessage(conn, msg) { }    // message received
+  onClose(conn, code, reason, wasClean) { }
+  onError(conn, error) { }    // WebSocket error
+  onRequest(request) { }      // HTTP request
+  onStateChanged(state, source) { } // state change
 
   // State — SQLite-backed, real-time sync to clients
   setState(newState)           // persists + broadcasts
+  sql`SELECT ...`             // query embedded SQLite
 
-  // Communication
-  broadcast(data)              // send to all connected clients
-
-  // Orchestration
-  async schedule(callback, delay)  // delayed execution
+  // Scheduling
+  schedule(callback, delay)    // one-off delayed task
+  scheduleEvery(callback, interval) // recurring task
 }
 ```
 
-Lifecycle hooks, persistent state, broadcast, and scheduling — all in one class.
+Lifecycle hooks, persistent state, SQL, and scheduling — all in one class.
 
-<!-- The API surface reveals how thin the abstraction is. onStart maps to the DO's constructor/alarm wake. onConnect/onMessage/onClose map to WebSocket handlers. setState wraps ctx.storage with automatic client broadcast. The Agent class doesn't add new capabilities — it makes existing DO capabilities accessible.
+<!-- The API surface reveals how thin the abstraction is. onStart maps to the DO's constructor/alarm wake. onConnect/onMessage/onClose/onError map to WebSocket handlers. setState wraps ctx.storage with automatic client broadcast. The sql tagged template gives direct SQLite access. schedule() and scheduleEvery() wrap DO alarms with ergonomic syntax. The Agent class doesn't add new capabilities — it makes existing DO capabilities accessible.
 
 Sources:
 - https://developers.cloudflare.com/agents/api-reference/agents-api/ — complete Agent API reference -->
@@ -557,27 +572,31 @@ transition: slide-up
 
 # Durable workflows
 
-`AgentWorkflow` chains steps with automatic checkpointing. Each `step.do()` runs at-most-once — if the workflow crashes, it resumes from the last completed step.
+Cloudflare Workflows chains steps with automatic checkpointing. Each `step.do()` runs at-most-once — if the workflow crashes, it resumes from the last completed step.
 
 ```ts
-const workflow = new AgentWorkflow();
-workflow.addStep("fetch-data", async (step) => {
-  return await step.do("fetch", { retries: 3 }, async () => {
-    return await fetchExternalAPI();
-  });
-});
-workflow.addStep("process", async (step) => {
-  const approval = await step.waitForEvent("approval");
-  return await processData(step.previousResult);
-});
+export class MyWorkflow extends WorkflowEntrypoint {
+  async run(event, step) {
+    const data = await step.do("fetch", { retries: { limit: 3 } },
+      async () => await fetchExternalAPI()
+    );
+    const approval = await step.waitForEvent("approval");
+    await step.sleep("5 minutes");
+    return await step.do("process",
+      async () => processData(data, approval)
+    );
+  }
+}
 ```
 
 - **Checkpointed** — `step.do()` is at-most-once, crash-safe
-- **Configurable retries** — per-step retry policies
-- **Human-in-the-loop** — `waitForEvent()` durably pauses
+- **Configurable retries** — per-step retry policies with backoff
+- **Human-in-the-loop** — `step.waitForEvent()` durably pauses for external signals
+
+<!-- Cloudflare Workflows is a separate product from the Agents SDK but built on the same Durable Object infrastructure. Both use DO persistence for crash recovery. Workflows are ideal for multi-step pipelines (data processing, approval chains) while Agents are for interactive, conversational workloads.
 
 Sources:
-- https://developers.cloudflare.com/agents/api-reference/agent-workflow/ — AgentWorkflow API -->
+- https://developers.cloudflare.com/workflows/ — Cloudflare Workflows API -->
 
 ---
 transition: slide-left
@@ -585,19 +604,19 @@ transition: slide-left
 
 # Scheduling modes
 
-Agents can wake themselves — delayed, recurring, or at specific times.
+Agents can wake themselves — delayed, recurring, or on a cron schedule.
 
-- **Delayed** — `schedule(() => check(), { delay: "5m" })`
-- **Cron** — `schedule(() => report(), { cron: "0 9 * * 1" })`
-- **Interval** — `schedule(() => poll(), { interval: "30s" })`
-- **Specific date** — `schedule(() => remind(), { at: new Date("2025-03-15") })`
+- **One-off** — `schedule(callback, delay)` — execute after a delay
+- **Recurring** — `scheduleEvery(callback, interval)` — repeat on an interval or cron
+- **Manage** — `getSchedules()` to list, `cancelSchedule(id)` to remove
+- **Stay alive** — `keepAlive()` keeps the instance warm between scheduled tasks
 
 All scheduling survives hibernation. The agent sleeps at zero cost and wakes precisely when needed.
 
-<!-- Scheduling wraps DO alarms with human-readable syntax. The key property: scheduled callbacks survive hibernation. An agent that schedules a Monday morning report will wake up Monday at 9am even if it's been hibernated all weekend.
+<!-- Scheduling wraps DO alarms with ergonomic methods. The key property: scheduled callbacks survive hibernation. An agent that schedules a Monday morning report will wake up Monday at 9am even if it's been hibernated all weekend. This is the same alarm primitive that Vaders uses for its 30Hz game loop and Keyboardia uses for debounced KV saves, but exposed at a higher abstraction level.
 
 Sources:
-- https://developers.cloudflare.com/agents/api-reference/agents-api/#schedule — schedule API with delay, cron, interval modes -->
+- https://developers.cloudflare.com/agents/api-reference/agents-api/ — schedule and scheduleEvery API -->
 
 ---
 transition: slide-up
@@ -605,27 +624,23 @@ transition: slide-up
 
 # MCP server pattern
 
-An agent can expose its capabilities via Model Context Protocol — making it callable by other AI tools, IDEs, and agents.
+Agents can expose their tools via Model Context Protocol — making them callable by other AI systems, IDEs, and agents.
 
-```ts
-export class MyAgent extends Agent {
-  get mcpServer() {
-    return new McpServer({
-      tools: this.tools,
-      resources: this.getResources(),
-    });
-  }
-}
-```
+<v-clicks>
 
-- **Tools as MCP tools** — agent capabilities become callable
-- **Resources as MCP resources** — agent state becomes readable
-- **Composable** — agents can call other agents' MCP servers
+- **Deploy as remote MCP server** — agent tools become callable over HTTP
+- **Tools + resources** — expose capabilities and state to external clients
+- **Composable** — agents call other agents' MCP endpoints
+- **IDE integration** — Claude Desktop, Cursor, and other MCP clients connect directly
 
-<!-- The MCP server pattern inverts the agent's role. Instead of the agent calling tools, external systems call the agent AS a tool. This enables agent composition — a planning agent calls a research agent's MCP server.
+</v-clicks>
+
+The same DO that holds state and handles WebSockets also serves as an MCP endpoint.
+
+<!-- The MCP server pattern inverts the agent's role. Instead of the agent calling tools, external systems call the agent AS a tool. Cloudflare supports building and deploying remote MCP servers that run on Workers and Durable Objects. This enables agent composition — a planning agent calls a research agent's MCP server — and IDE integration where developer tools connect directly to agent capabilities.
 
 Sources:
-- https://developers.cloudflare.com/agents/model-context-protocol/ — MCP integration
+- https://developers.cloudflare.com/agents/model-context-protocol/ — MCP integration on Cloudflare
 - https://modelcontextprotocol.io/ — MCP specification -->
 
 ---

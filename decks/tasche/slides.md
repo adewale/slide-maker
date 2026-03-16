@@ -54,7 +54,7 @@ When you save a URL, Tasche creates a complete, self-contained archive. Your art
 - **Markdown** for search indexing and reader mode
 - **All images** downloaded and converted to WebP
 - **Three deduplicated URLs** -- original, final, canonical
-- **Full-page screenshot** as archival fallback
+- **Thumbnail** from og:image for article cards
 - **TTS audio** generated on demand via Workers AI
 
 </v-clicks>
@@ -69,7 +69,7 @@ When you save a URL, Tasche creates a complete, self-contained archive. Your art
 
 [click] Three-URL deduplication catches the same article saved via Twitter t.co links, newsletter tracking URLs, and direct shares.
 
-[click] Full-page screenshot as archival fallback — when extraction fails, you still have a visual record.
+[click] Thumbnail extracted from the page's og:image meta tag, converted to WebP, and stored in R2. Used as a visual preview on article cards in the library view.
 
 [click] TTS audio generated on demand via Workers AI — listen to your articles when you can't read them.
 
@@ -86,17 +86,27 @@ transition: slide-up
 ````md magic-move
 ```python
 await r2.put(key, audio_bytes)
-# TypeError: not 'ArrayBuffer'
+# TypeError: bytes → PyProxy, not ArrayBuffer
 ```
 ```python
-await r2.put(key, to_js(audio_bytes))
-# Uint8Array -- R2 accepts it
+await d1.bind(None)
+# D1_TYPE_ERROR: None → undefined, not null
+```
+```python
+await queue.send({"id": 1, "url": url})
+# TypeError: dict → Map, not Object
+```
+```python
+# Fix: centralized Safe* wrappers in wrappers.py
+await safe_r2.put(key, audio_bytes)   # to_js_bytes()
+await safe_d1.bind(d1_null())         # explicit null
+await safe_queue.send(msg)            # _to_js_value()
 ```
 ````
 
-The FFI boundary is bidirectional: JS-to-Python reads and Python-to-JS writes both need explicit conversion.
+Three production bugs, one root cause: Python types that aren't primitives need explicit conversion before crossing the Pyodide FFI to Cloudflare bindings.
 
-<!-- This was discovered across three separate production bugs. Python `bytes` cross the Pyodide FFI as an opaque PyProxy that R2 rejects. Python `None` becomes JS `undefined` (not `null`), which D1 rejects. Python `dict` becomes a Map, which Queue `.send()` rejects. The fix is a centralized boundary layer in `wrappers.py` with Safe* wrapper classes (SafeD1, SafeR2, SafeKV, SafeQueue, SafeAI) that handle both read and write conversions. Unit tests cannot catch these failures because mocks accept any Python type -- only a live smoke test on the real Cloudflare runtime reveals them.
+<!-- All three bugs are shown in the magic-move sequence. Python `bytes` cross the Pyodide FFI as an opaque PyProxy that R2 rejects. Python `None` becomes JS `undefined` (not `null`), which D1 rejects. Python `dict` becomes a Map, which Queue `.send()` rejects. The fix is a centralized boundary layer in `wrappers.py` with Safe* wrapper classes (SafeD1, SafeR2, SafeKV, SafeQueue, SafeAI, SafeReadability) that handle both read and write conversions. Unit tests cannot catch these failures because mocks accept any Python type -- only a live smoke test on the real Cloudflare runtime reveals them. Lesson 37 details how all 100 `test_wrappers.py` tests ran with `HAS_PYODIDE = False`, exercising only the CPython fallback path -- the actual production code had zero test coverage until JS-type fakes were introduced.
 
 Sources:
 - https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- lesson 29: Python bytes cannot cross FFI boundary to R2
@@ -193,7 +203,7 @@ transition: wipe-right
 
 [click] Article CRUD and URL validation — basic operations, but URL handling is surprisingly complex.
 
-[click] 14-step processing pipeline — the core. processing.py was the perpetual hotspot with 41 modifications.
+[click] 14-step processing pipeline — the core. processing.py (20 modifications) and routes.py (21 modifications) together were the perpetual hotspot with 41 changes across 53 commits.
 
 [click] FTS5 search, tags, and TTS — the features that make saved articles useful.
 
@@ -266,13 +276,15 @@ graph TD
   classDef hub fill:#fb923c,stroke:#fb923c,color:#0a0a0f
   classDef svc fill:#2a1a08,stroke:#fb923c,color:#fb923c
   class API hub
+  class PWA,JS,D1,R2,Q,KV,AI svc
+  linkStyle default stroke:#fb923c,stroke-width:2px
 ```
 
 </div>
 
 Seven Cloudflare services. Every data format is portable -- D1 is SQLite, R2 is S3-compatible, KV is key-value.
 
-<!-- The JS Worker is the Readability Service Binding -- an in-process RPC call, not a network hop. Queues decouple the save response from the 14-step processing pipeline: the API returns immediately while the queue consumer fetches, extracts, converts images, and indexes. Workers AI provides TTS with configurable models (MeloTTS default, Deepgram Aura-2 available). The PWA frontend is a Preact SPA built with Vite, served as Workers Static Assets with offline support via a service worker with 4 named caches. The architecture is intentionally all-Cloudflare for operational simplicity, but the data portability guarantee means the exit strategy is always available.
+<!-- The JS Worker is the Readability Service Binding -- an in-process RPC call, not a network hop. Queues decouple the save response from the 14-step processing pipeline: the API returns immediately while the queue consumer fetches, extracts, converts images, and indexes. Workers AI provides TTS with configurable models (Deepgram Aura-2 default, MeloTTS available). The switch from MeloTTS happened because MeloTTS returns WAV (~49MB per article) despite documenting MP3 output, while Aura-2 returns actual MP3 (~2MB) -- a 25x reduction (lesson 66). The PWA frontend is a Preact SPA built with Vite, served as Workers Static Assets with offline support via a service worker with 4 named caches. The architecture is intentionally all-Cloudflare for operational simplicity, but the data portability guarantee means the exit strategy is always available.
 
 Sources:
 - https://github.com/adewale/tasche/blob/main/README.md -- architecture table with all 6 service bindings

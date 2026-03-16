@@ -20,7 +20,7 @@ A well-asked question is better than a poorly-computed answer.
 
 github.com/adewale/geist\_fabrik
 
-<!-- GeistFabrik (German for "spirit factory") is a Python-based divergence engine for Obsidian vaults. It generates creative suggestions through 57 geists — specialized reasoning patterns that act as muses, not oracles. The through-line: "A well-asked question is better than a poorly-computed answer" — this provocation threads through the entire deck, gaining meaning as we see algorithmic failure and question-based success.
+<!-- GeistFabrik (German for "spirit factory") is a Python-based divergence engine for Obsidian vaults. It generates creative suggestions through 45 geists — specialized reasoning patterns that act as muses, not oracles. The through-line: "A well-asked question is better than a poorly-computed answer" — this provocation threads through the entire deck, gaining meaning as we see algorithmic failure and question-based success.
 
 Sources:
 - https://github.com/adewale/geist_fabrik/blob/main/README.md — project overview and philosophy
@@ -55,7 +55,7 @@ Geists come in two forms, chosen by what kind of thinking they need to do:
 - **Tracery geists** — declarative YAML grammars
 - Code when you need computation (graphs, stats)
 - Grammars when you need provocation (questions)
-- 48 code geists + 9 Tracery ship by default
+- 36 code geists + 9 Tracery ship by default
 - Users create custom geists without writing Python
 
 </v-clicks>
@@ -70,12 +70,12 @@ Geists come in two forms, chosen by what kind of thinking they need to do:
 
 [click] Grammars when you need provocation (questions) — this split emerged from a hard lesson about algorithmic failure, covered next.
 
-[click] 48 code geists + 9 Tracery ship by default — spanning 10 pattern categories from temporal analysis to creative transformation.
+[click] 36 code geists + 9 Tracery ship by default — spanning 10 pattern categories from temporal analysis to creative transformation.
 
 [click] Users create custom geists without writing Python — Tracery YAML grammars make the system extensible by anyone who can ask a good question.
 
 Sources:
-- https://github.com/adewale/geist_fabrik/blob/main/README.md — 57 default geists (48 code + 9 Tracery), extensibility
+- https://github.com/adewale/geist_fabrik/blob/main/README.md — 45 default geists (36 code + 9 Tracery), extensibility
 - https://github.com/adewale/geist_fabrik/blob/main/docs/GEIST_CATALOG.md — 10 pattern categories, classification by mechanism -->
 
 ---
@@ -234,8 +234,12 @@ graph LR
   E --> S["Semantic Sampling"]
   S --> G["Geist"]
   G --> N["Session Note"]
+  style V fill:#2a1f08,stroke:#f59e0b,color:#f59e0b
+  style E fill:#2a1f08,stroke:#f59e0b,color:#f59e0b
+  style S fill:#2a1f08,stroke:#f59e0b,color:#f59e0b
   style G fill:#f59e0b,stroke:#f59e0b,color:#0a0a0f
   style N fill:#2a1f08,stroke:#f59e0b,color:#f59e0b
+  linkStyle default stroke:#f59e0b,stroke-width:2px
 ```
 
 </v-motion>
@@ -252,19 +256,48 @@ Sources:
 - https://github.com/adewale/geist_fabrik/blob/main/README.md — sentence-transformers, local processing, deterministic randomness -->
 
 ---
+transition: slide-left
+---
+
+# Recent: faster engine, sharper labels, new geists
+
+<v-clicks>
+
+- **16% faster** overall session execution, geist phase **56% faster**
+- Vectorized similarity via sklearn — **5.4x speedup** on embedding operations
+- **KeyBERT cluster labeling** replaces TF-IDF for richer semantic cluster names
+- New geists: **creation\_burst** (detect creative bursts) and **burst\_evolution** (track how burst-day notes evolve)
+- Removed **congruence\_mirror** — O(L) scaling caused timeouts on large vaults
+
+</v-clicks>
+
+<!-- Performance optimizations delivered measurable gains: session execution went from 16.8s to 14.1s (16% faster), the geist phase from 4.8s to 2.1s (56% faster), and similarity computations got a 5.4x speedup by migrating to sklearn's vectorized cosine_similarity. Database queries improved too — orphan queries are 85.6% faster with composite indexing.
+
+KeyBERT cluster labeling uses semantic similarity to cluster centroids, producing multi-word phrase labels like "knowledge management systems" instead of single keywords. Configurable via config.yaml — users can revert to TF-IDF if preferred.
+
+Two new temporal burst geists: creation_burst detects days with 3+ notes created and asks what sparked the productivity; burst_evolution tracks how those burst-day notes have evolved over time using embedding drift analysis.
+
+congruence_mirror was removed after profiling revealed O(L) scaling that caused 60+ second timeouts on vaults with 10,000+ notes. Its functionality is partially covered by bridge_builder and hidden_hub.
+
+Sources:
+- https://github.com/adewale/geist_fabrik/blob/main/CHANGELOG.md — performance optimizations, new geists, congruence_mirror removal, KeyBERT labeling
+- https://github.com/adewale/geist_fabrik/blob/main/STATUS.md — performance measurements and helper functions -->
+
+---
 layout: fact
 transition: fade
 ---
 
-# <v-mark at="1" color="#f59e0b" type="circle">611</v-mark>
+# <v-mark at="1" color="#f59e0b" type="circle">513</v-mark>
 
-tests passing. 57 geists. Zero cloud dependencies.
+tests passing. 45 geists. Zero cloud dependencies.
 
-<!-- 611 tests (505 unit + 106 integration) at 100% pass rate. 57 default geists (48 code + 9 Tracery). The zero cloud dependency guarantee is architectural — all processing happens locally using sentence-transformers for embeddings. Your vault never leaves your machine. The project is at version 0.9.0, roughly 99% complete, with 13,500 lines of code across 16 source modules. Mypy strict and Ruff linting both pass.
+<!-- 513 tests (422 unit + 91 integration) at 100% pass rate. 45 default geists (36 code + 9 Tracery). The zero cloud dependency guarantee is architectural — all processing happens locally using sentence-transformers for embeddings. Your vault never leaves your machine. The project is at version 0.9.0, roughly 99% complete, with 13,500 lines of code across 16 source modules. Mypy strict and Ruff linting both pass. Recent performance work delivered 16% faster overall session execution and 56% faster geist execution.
 
 Sources:
-- https://github.com/adewale/geist_fabrik/blob/main/README.md — 611 tests, 57 geists, 100% local processing
-- https://github.com/adewale/geist_fabrik/blob/main/STATUS.md — 505 unit + 106 integration, version 0.9.0, 13,500 LOC -->
+- https://github.com/adewale/geist_fabrik/blob/main/README.md — project overview, geist counts, 100% local processing
+- https://github.com/adewale/geist_fabrik/blob/main/STATUS.md — 422 unit + 91 integration tests, version 0.9.0, 13,500 LOC
+- https://github.com/adewale/geist_fabrik/blob/main/CHANGELOG.md — 513 total tests, performance improvements -->
 
 ---
 layout: center

@@ -118,17 +118,16 @@ graph TD
   ROOT((Style Presets)) --> ED["editorial-dark"]
   ROOT --> SM["swiss-minimal"]
   ROOT --> BM["bold-modern"]
-  ROOT --> SE["sumi-e"]
   ROOT --> TD2["tufte-data"]
   ROOT --> CF["cloudflare"]
   ROOT --> MD["material-design"]
   classDef hub fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
   classDef leaf fill:#0d3b4a,stroke:#22d3ee,color:#e4e8ef
   class ROOT hub
-  class ED,SM,BM,SE,TD2,CF,MD leaf
+  class ED,SM,BM,TD2,CF,MD leaf
 ```
 
-Seven presets, each controlling typography, color, motion, and layout tendencies.
+Six presets, each controlling typography, color, motion, and layout tendencies.
 
 <!-- Graph TD (top-down) works well for hierarchies and taxonomies. The double-parenthesis syntax creates a circle node. Square brackets create rectangles. Every node must have an explicit classDef.
 
@@ -141,25 +140,25 @@ transition: slide-left
 
 # Sequence Diagrams Reveal Hidden Round-Trips
 
-```mermaid {scale: 0.85}
-sequenceDiagram
-  participant U as User
-  participant S as Skill Agent
-  participant P as Spec Builder
-  participant C as Compiler
-  participant D as Slide Deck
-
-  U->>S: Natural-language brief
-  S->>P: Structured spec (JSON)
-  P->>P: Source-grounding pass
-  P-->>S: Grounded spec
-  S->>C: Compile command
-  C->>C: Layout + theme resolution
-  C->>D: Rendered slides
-  D-->>U: Live preview link
+```mermaid {scale: 0.8}
+graph LR
+  U["User"] -->|"brief"| S["Skill Agent"]
+  S -->|"spec"| P["Spec Builder"]
+  P -->|"ground"| P
+  P -->|"grounded"| S
+  S -->|"compile"| C["Compiler"]
+  C -->|"resolve"| C
+  C -->|"render"| D["Slide Deck"]
+  D -.->|"preview"| U
+  style U fill:#0f1a2e,stroke:#22d3ee,color:#22d3ee
+  style S fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
+  style P fill:#0f1a2e,stroke:#22d3ee,color:#22d3ee
+  style C fill:#0f1a2e,stroke:#22d3ee,color:#22d3ee
+  style D fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
+  linkStyle default stroke:#22d3ee,stroke-width:2px
 ```
 
-Five actors, but the surprise is the internal loop: the Spec Builder re-enters itself for source-grounding before handing off to the Compiler.
+Five actors, but the surprise is the self-loops: the Spec Builder re-enters itself for source-grounding, and the Compiler loops for layout resolution, before handing off.
 
 <!-- sequenceDiagram is ideal for showing request/response flows, API call chains, and multi-actor protocols. Participants are declared with `participant` aliases. Solid arrows (->>)  are calls; dashed arrows (-->>)  are returns. Keep to 6-8 interactions to avoid vertical overflow. Beautiful Mermaid themes the diagram automatically from deck tokens.
 
@@ -176,14 +175,21 @@ transition: flip-y
 # Slides Have a Lifecycle Most Presenters Ignore
 
 ```mermaid {scale: 0.85}
-stateDiagram-v2
-  [*] --> Draft
-  Draft --> Compiled : skill compiles spec
-  Compiled --> Validated : lint + contrast pass
-  Validated --> Delivered : presenter approves
-  Validated --> Draft : lint failures
-  Delivered --> Draft : post-talk revision
-  Delivered --> [*]
+graph LR
+  S(("Start")) --> Draft
+  Draft -->|"compile"| Compiled
+  Compiled -->|"lint + contrast"| Validated
+  Validated -->|"approve"| Delivered
+  Validated -->|"lint fail"| Draft
+  Delivered -->|"revise"| Draft
+  Delivered --> E(("End"))
+  style S fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
+  style E fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
+  style Draft fill:#0f1a2e,stroke:#22d3ee,color:#22d3ee
+  style Compiled fill:#0f1a2e,stroke:#22d3ee,color:#22d3ee
+  style Validated fill:#0f1a2e,stroke:#22d3ee,color:#22d3ee
+  style Delivered fill:#22d3ee,stroke:#22d3ee,color:#0c0e14
+  linkStyle default stroke:#22d3ee,stroke-width:2px
 ```
 
 The backward edges matter most: validation failures return to Draft, not to Compiled, because structural fixes require a full recompile.

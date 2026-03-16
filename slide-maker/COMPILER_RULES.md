@@ -249,7 +249,6 @@ Transitions are semantic — each one carries a fixed meaning within a deck. Cho
 - Each transition must mean the same thing every time it appears in a deck. If `iris` means "new chapter" on slide 5, it must mean "new chapter" on slide 12.
 - The global default (headmatter `transition:`) should be the deck's most common transition — usually `slide-left` (progression-heavy) or `fade` (reflective).
 - Never use a transition for its visual novelty. Choose it for its semantic meaning.
-- Sumi-e exception: `fade` only is intentional — contemplative decks use a single "breath" transition.
 
 **Element animations** (within a slide — how content appears):
 
@@ -544,6 +543,42 @@ For the full set of rhetorical principles, see [PRESENTATION_PHILOSOPHY.md](../d
 - Do not add `{theme: 'base'}`, `{theme: 'dark'}`, or `{theme: 'neutral'}` to mermaid code blocks — these are stock Mermaid options that Beautiful Mermaid ignores.
 - For inline `style` directives on specific nodes, continue using explicit hex colors with proper contrast (see Color methodology).
 
+### Node and link completeness (flowcharts)
+Every flowchart diagram must have:
+1. **Every node styled** — each node needs an explicit `style` directive with `fill`, `stroke`, and `color`. Unstyled nodes inherit Mermaid defaults that may not contrast with the deck background. If using `classDef`, every node must be assigned a class.
+2. **linkStyle default** — every flowchart must include `linkStyle default stroke:<color>,stroke-width:2px` where `<color>` contrasts with `--deck-bg`. Without this, arrow lines and edge labels may be invisible on both dark and light backgrounds.
+3. **Edge labels readable** — if edges use labels (`-->|label|`), the label text must be readable against the slide background. Beautiful Mermaid does not reliably theme edge label text.
+
+Example (complete flowchart on a dark background):
+```
+graph LR
+  A["Input"] --> B["Process"]
+  B --> C["Output"]
+  style A fill:#1e3a5f,stroke:#38bdf8,color:#38bdf8
+  style B fill:#38bdf8,stroke:#38bdf8,color:#0a0a0f
+  style C fill:#1e3a5f,stroke:#38bdf8,color:#38bdf8
+  linkStyle default stroke:#38bdf8,stroke-width:2px
+```
+
+### Diagram type reliability matrix
+
+Beautiful Mermaid's auto-theming does not work equally well for all diagram types. The following matrix captures what works and what doesn't, based on real testing across dark and light backgrounds:
+
+| Diagram type | Inline `style` | Auto-theme (light bg) | Auto-theme (dark bg) | Recommendation |
+|-------------|---------------|----------------------|---------------------|----------------|
+| `graph` / `flowchart` | Yes | Good | Good (with styles) | **Use this.** Style every node + linkStyle default. Fully reliable. |
+| `sequenceDiagram` | No | Readable | **Unreadable** | **Avoid on dark backgrounds.** Convert to flowchart showing the same actor/message flow. |
+| `stateDiagram-v2` | No | Readable | **Unreadable** | **Avoid on dark backgrounds.** Convert to flowchart with circle nodes for start/end. |
+| `classDiagram` | No | Readable | Untested | Use with caution on dark backgrounds. |
+| `erDiagram` | No | Readable | Untested | Use with caution on dark backgrounds. |
+| `xychart-beta` | No | Readable | Untested | Use with caution on dark backgrounds. |
+
+**Why CSS overrides don't work:** Beautiful Mermaid renders SVGs with inline styles baked into the SVG elements. CSS class selectors — even with `!important` — cannot reliably override these because Beautiful Mermaid may use different class names than stock Mermaid, and the SVG structure varies across Mermaid versions.
+
+**The reliable fix:** Convert non-flowchart diagrams to flowcharts on dark-background decks. Flowcharts support inline `style` directives and `linkStyle`, giving full control over contrast. A sequenceDiagram showing `A ->> B: message` can be represented as `A -->|"message"| B` in a flowchart. A stateDiagram with `[*] --> Draft` can use `S(("Start")) --> Draft`.
+
+**Light-background decks** can safely use sequenceDiagram and stateDiagram-v2 — Beautiful Mermaid's defaults are readable on light backgrounds.
+
 ### Layout collision prevention
 - For slides with both text and diagrams, use absolute positioning (`class: absolute`) or dedicated diagram-only slides
 - Prefer diagram-only slides over cramming text and diagrams together
@@ -559,6 +594,85 @@ When Mermaid can't achieve the needed visual (rounded cards, gradient borders, b
    - Keep SVG inline in the slide (no external .svg files)
    - Prefer CSS Grid + styled `<div>` elements over raw `<svg>` when the diagram is a layout of cards/boxes
    - Add a comment on the slide explaining the escalation reason: `<!-- Custom SVG: Mermaid can't render rounded branded cards -->`
+
+## Visual design principles (CRAP)
+
+Every slide must satisfy Robin Williams' four design principles: **Contrast**, **Repetition**, **Alignment**, and **Proximity**. These are not aesthetic preferences — they are how the audience's eye finds structure and meaning. Each principle maps to concrete, verifiable rules.
+
+### Contrast — different things must look different
+
+The audience must instantly see what matters. Contrast is created by size, weight, color, and structural inversion.
+
+**Typographic hierarchy:**
+- h1 must be visibly larger than h2, which must be visibly larger than body text. A deck where h1 is 2rem and body is 1.05rem has a 1.9:1 ratio — sufficient. Below 1.5:1 the hierarchy disappears.
+- Headings and body text should differ in at least two properties (size + weight, size + family, weight + color). Same-family same-weight text at slightly different sizes looks like a mistake, not a hierarchy.
+
+**Color contrast:**
+- See Color methodology for WCAG AA ratios. CRAP adds: accent color must appear on fewer than 30% of text elements per slide. If everything is accented, nothing is.
+- Section dividers (`layout: section`) must visually invert the default slide — dark-on-light decks get light-on-dark sections, and vice versa. This structural contrast creates chapter rhythm.
+
+**Mermaid diagram contrast:**
+- Every node in a flowchart must have an explicit `style` directive with `fill`, `stroke`, and `color`. Unstyled nodes inherit Mermaid defaults that may not contrast with the deck background.
+- Every flowchart must include `linkStyle default stroke:<color>,stroke-width:2px` where `<color>` contrasts with `--deck-bg`. Without this, arrow lines may be invisible.
+- For sequenceDiagram and stateDiagram-v2: Beautiful Mermaid's auto-theming handles most styling, but dark-background decks should include CSS overrides for `.actor`, `.messageText`, `.statediagram-state rect`, and `.transition` elements (see reference deck's theme.css for the pattern).
+
+**Token completeness:**
+- All four required tokens (`--deck-bg`, `--deck-fg`, `--deck-accent`, `--deck-muted`) must be defined in `tokens.css`. Missing `--deck-bg` breaks Beautiful Mermaid auto-theming. Missing `--deck-muted` breaks subtitle and secondary text styling.
+
+### Repetition — consistent elements build trust
+
+When the same kind of thing always looks the same, the audience stops decoding formatting and starts absorbing content.
+
+**Token discipline:**
+- Every color in the deck must come from `var(--deck-*)` tokens. No hardcoded hex in scoped styles (existing rule, reinforced here as a repetition principle).
+- `--deck-accent` must be used for the same semantic purpose across all slides: emphasis, markers, interactive elements. If accent means "important" on slide 3, it must mean "important" on slide 10.
+
+**Transition consistency:**
+- Each transition type carries one semantic meaning per deck (see Transition grammar). `iris` always means "new chapter." `fade` always means "pause and absorb." Inconsistent transitions signal accidental formatting, not intentional structure.
+
+**v-mark consistency:**
+- Each v-mark type (underline, highlight, strike, circle, box) has one meaning per deck. If `strike` means "rejected approach" on slide 4, it must mean "rejected approach" on slide 8.
+
+**Structural repetition:**
+- List markers use accent colors consistently: `ol li::marker` uses `--deck-accent`, `ul li::marker` uses `--deck-accent` or `--deck-accent-alt`.
+- Code blocks use the same font family, background treatment, and border style throughout.
+- The footer chrome (global-bottom.vue) repeats on every content slide, reinforcing the deck's identity.
+
+### Alignment — every element connects to something
+
+Nothing on the slide should be placed arbitrarily. Every element must align to an explicit edge, grid, or center axis.
+
+**Layout-level alignment:**
+- Cover layouts must explicitly set `align-items` and `text-align` in theme.css. Relying on theme defaults causes conflicts when custom CSS partially overrides theme positioning (this caused the tufte cover misalignment).
+- Two-column layouts must use balanced column widths. Asymmetric columns are intentional (e.g., TufteSlide's 60/30 split); unintentional asymmetry from overflow is a bug.
+- Centered layouts (`center`, `statement`, `fact`) must center both headings and body text. A centered heading with left-aligned body text below it breaks the alignment axis.
+
+**Within-slide alignment:**
+- Bullet lists align to a single left edge. Mixed indentation levels signal a nested argument — limit to 2 levels maximum.
+- Code blocks and Mermaid diagrams should be full-width or explicitly constrained with matching margins. A diagram that's 60% width while text is 100% width creates an unanchored visual gap.
+- Tables align columns consistently: text left-aligned, numbers right-aligned.
+
+**Cross-slide alignment:**
+- Headings appear at the same vertical position across content slides. Theme.css controls this through consistent padding and margin on `.slidev-layout h1`.
+- Content starts at the same vertical offset. Slides where the body text starts at different heights feel unstable.
+
+### Proximity — related things group together
+
+Spatial distance signals conceptual distance. Things that belong together must be visually close. Things that don't must have clear separation.
+
+**One idea per slide** (existing rule, reinforced here). If a slide covers two ideas, split it. The slide boundary is the strongest proximity separator.
+
+**Within-slide grouping:**
+- A diagram and its annotation text must be adjacent — no unrelated content between them.
+- v-clicks items in the same `<v-clicks>` block must be conceptually related. Don't mix unrelated points in a single progressive reveal.
+- Tables and their context sentences should be within one `margin-top` of each other. A table floating far from its introduction looks orphaned.
+
+**Section boundaries:**
+- Section dividers (`layout: section`) create clear chapter breaks. Content after a section divider must belong to that chapter.
+- The structural rhythm pattern (section → 2-3 content slides → pause slide → repeat) uses proximity: content slides cluster within their section, separated from other sections by dividers.
+
+**Spacing tokens:**
+- Use consistent spacing values from theme.css. Ad-hoc `margin-top: 3.7rem` breaks the spacing rhythm. Prefer values that align to the deck's spacing scale (0.5rem increments).
 
 ## Content density limits
 
@@ -587,7 +701,6 @@ Use the preset-specific animation in each deck's `theme.css`, not the generic `t
 | `editorial-dark` | `opacity: 0` | `0.5s ease` |
 | `swiss-minimal` | `opacity: 0; translateX(-6px)` | `0.35s ease-out` |
 | `bold-modern` | `opacity: 0; scale(0.95) translateY(8px)` | `0.4s cubic-bezier(0.4,0,0.2,1)` |
-| `sumi-e` | `opacity: 0; translateX(12px)` | `0.6s cubic-bezier(0.4,0,0.2,1)` |
 | `tufte-data` | `opacity: 0` | `0.3s ease` |
 | `material-design` | `opacity: 0; scale(0.92)` | `0.4s cubic-bezier(0.05,0.7,0.1,1.0)` |
 
@@ -681,37 +794,124 @@ Rules:
 ### MUST (hard fail — blocks delivery)
 
 These items must all pass before a deck can be delivered:
+
+**Content density:**
 - no slide overflows the viewport (7 bullet max, 8 code line max, 60 char bullet max)
 - no emoji anywhere in slide content or diagrams
+
+**Token and style integrity:**
+- `tokens.css` defines all four required tokens: `--deck-bg`, `--deck-fg`, `--deck-accent`, `--deck-muted`
 - no `<style scoped>` block uses literal hex/rgb for `background` or `color` properties — must use `var(--deck-*)` token variables
+
+**Contrast (CRAP):**
+- text is legible on all slides (proper contrast between foreground and background — WCAG AA)
+- Mermaid nodes: every flowchart node has an explicit `style` with `fill`, `stroke`, and `color`
+- Mermaid links: every flowchart has `linkStyle default` with a stroke color that contrasts with `--deck-bg`
+- Mermaid classDef: every defined classDef is assigned to at least one node
+- Mermaid diagram node labels use plain text, no emoji
+- section dividers visually invert the default slide (dark-on-light or light-on-dark)
+- dark-background decks do not use sequenceDiagram or stateDiagram-v2 (convert to flowcharts — see Diagram type reliability matrix)
+
+**Alignment (CRAP):**
+- cover layout in theme.css explicitly sets `align-items` and `text-align` (no relying on theme defaults)
+- centered layouts (`center`, `statement`, `fact`) center both headings and body text consistently
+
+**Structural integrity:**
 - `deck.spec.md` matches `slides.md` (spec-to-slides sync)
 - `slides.md` reads like a human-maintained deck
 - layouts are few and purposeful
 - components are few and purposeful
 - styles are centralized
 - the project can be extended without rewrite
-- text is legible on all slides (proper contrast between foreground and background)
-- Mermaid nodes: light fills have dark text, dark fills have light text (see Color methodology)
-- Mermaid diagram node labels use plain text, no emoji
+
+**Narrative:**
 - narrative arc present: tension, exploration, insight, resolution (see Storytelling)
 - closing slide echoes or resolves the opening question/metaphor — not an install command
-- no slide contradicts another slide in the same deck (e.g., claiming "no Unicode" on one slide while showing Unicode on another)
+- no slide contradicts another slide in the same deck
 - every content slide with a factual claim, war story, or code example has a `Sources:` block in its presenter notes
 - war story slides cite specific evidence (file path, commit, screenshot, or incident) — not just the project repo URL
-- (project decks) through-line appears in at least 3 slides (ideally 5-6), gaining new meaning each time
-- (project decks) source materials section lists at least 2 digested documents
-- (project decks) at least 1 visual evidence slide with real screenshot or terminal output (no placeholders)
-- (project decks) project colors override preset palette when project-url is declared
-- (concept decks) source citations use `file:` prefix referencing real skill repo files
+
+**Project decks:**
+- through-line appears in at least 3 slides (ideally 5-6), gaining new meaning each time
+- source materials section lists at least 2 digested documents
+- at least 1 visual evidence slide with real screenshot or terminal output (no placeholders)
+- project colors override preset palette when project-url is declared
+
+**Concept decks:**
+- source citations use `file:` prefix referencing real skill repo files
 
 ### SHOULD (quality flag — does not block delivery)
 
 These items improve quality but do not block delivery:
+
+**Repetition (CRAP):**
+- `--deck-accent` used for the same semantic purpose on every slide (emphasis, markers, interactive elements)
+- each transition type used in the deck has a consistent semantic meaning (see Transition grammar)
+- each v-mark type has one meaning per deck (see Transition grammar § Element animations)
+- transition vocabulary matches the style preset's recommended set (see STYLE_PRESETS.md)
+- list markers use accent token colors consistently across all slides
+
+**Proximity (CRAP):**
+- structural rhythm pattern followed: section divider → 2-3 content slides → pause slide → repeat
+- diagrams and their annotation text are adjacent with no unrelated content between them
+- v-clicks items within a single block are conceptually related
+
+**Animation and interaction:**
 - at least one `v-motion` element in the deck
 - at least one slide uses hover-interactive elements (data cards, code blocks, or comparison grids)
+- v-click animation matches the deck's style preset (see Animation guidelines)
+
+**Layout variety:**
 - at least 3 different layout types used across the deck
 - bullet lists use `<v-clicks>` for progressive reveal
-- each transition type used in the deck has a consistent semantic meaning (see Transition grammar)
-- transition vocabulary matches the style preset's recommended set (see STYLE_PRESETS.md)
+
+**Diagrams:**
 - diagram scale set explicitly, node counts within limits (see Diagram guidelines)
-- v-click animation matches the deck's style preset (see Animation guidelines)
+
+## Enforcement and verification
+
+The CRAP principles and other acceptance criteria are enforced at three levels:
+
+### Level 1: Automated (deck-lint.mjs)
+
+These checks run automatically and produce errors or warnings:
+
+| Check | Principle | Severity |
+|-------|-----------|----------|
+| Required tokens present (`--deck-bg`, `--deck-fg`, `--deck-accent`, `--deck-muted`) | Contrast | Error |
+| Every flowchart node has explicit `style` with `color` | Contrast | Error |
+| Every flowchart has `linkStyle default` | Contrast | Error |
+| Every `classDef` is assigned to at least one node | Contrast | Error |
+| Bullet length <= 60 characters | Density | Error |
+| Bullet count <= 7 per slide | Density | Error |
+| Code lines <= 8 per block | Density | Error |
+| No hardcoded hex/rgb in scoped styles | Repetition | Error |
+| No emoji in slide content or Mermaid labels | — | Error |
+| Source citations present on factual slides | Narrative | Warning |
+| v-click density < 50% of slides | — | Warning |
+| Mermaid annotation text present (10+ chars) | Proximity | Warning |
+| Unstyled nodes in flowcharts | Contrast | Warning |
+
+### Level 2: Semi-automated (style-audit.mjs + visual spot-check)
+
+These require human judgment but are aided by tooling:
+
+| Check | Principle | How to verify |
+|-------|-----------|---------------|
+| Accent color used consistently across slides | Repetition | `style-audit.mjs` flags palette drift; human reviews semantic consistency |
+| Section dividers invert the default palette | Contrast | Visual: section slides should look structurally different from content slides |
+| Cover alignment explicitly set | Alignment | Grep theme.css for `.cover` selector; confirm `align-items` and `text-align` present |
+| Typographic hierarchy visible (h1 > h2 > body) | Contrast | Visual: headings must be obviously larger and heavier than body text |
+| Dark decks don't use sequenceDiagram/stateDiagram-v2 | Contrast | Grep slides.md for `sequenceDiagram\|stateDiagram` when colorSchema is dark |
+
+### Level 3: Manual review (presenter walkthrough)
+
+These require viewing the rendered deck:
+
+| Check | Principle | What to look for |
+|-------|-----------|------------------|
+| Headings at consistent vertical position across slides | Alignment | Click through slides rapidly — headings should not jump |
+| Related content grouped, unrelated content separated | Proximity | Each slide should have one clear focal group, not scattered elements |
+| Structural rhythm feels natural | Proximity | Section → content → pause pattern should create breathing room |
+| No orphaned elements | Proximity | Nothing should float without visual connection to other content |
+| Mermaid arrows and labels visible | Contrast | Every arrow line and edge label must be readable against the slide background |

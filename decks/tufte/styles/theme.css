@@ -103,6 +103,8 @@ a {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: flex-start;
+  text-align: left;
   padding: 8% 12%;
 }
 

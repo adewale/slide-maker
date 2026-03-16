@@ -18,7 +18,7 @@ Multiplayer TUI Space Invaders. 1-4 players. Cloudflare Durable Objects.
 
 github.com/adewale/vaders
 
-<!-- Vaders is a complete multiplayer Space Invaders clone built for the terminal — 120x36 character grid, braille pixel art sprites, real-time co-op for up to 4 players synchronized via a Cloudflare Durable Object running a pure game reducer at 30Hz. The through-line is "the server is the truth" — every design decision traces back to server-authoritative state: the pure reducer, the alarm loop, held-state networking, full-state sync. The server computes; clients render.
+<!-- Vaders is a complete multiplayer Space Invaders clone built for the terminal — 120x36 character grid, braille pixel art sprites, real-time co-op for up to 4 players synchronized via a Cloudflare Durable Object running a pure game reducer at 30Hz. Features include a twinkling starfield background with Amiga-style color cycling, 4 explosion effect variants, per-wave rainbow borders, respawn-at-death-position, wave progression with escalating difficulty, 5 entrance animation patterns, a spritesheet visualization tool, and 1,600+ tests including property-based testing with fast-check. The through-line is "the server is the truth" — every design decision traces back to server-authoritative state: the pure reducer, the alarm loop, held-state networking, full-state sync. The server computes; clients render.
 
 Sources:
 - https://github.com/adewale/vaders/blob/main/README.md — project overview, architecture, game modes
@@ -52,9 +52,9 @@ transition: slide-left
 
 - 7-wide animated braille sprites
 - Color cycling for UFO rainbow effect
-- Per-health colors on destructible barriers
-- Dissolve particle system for entity deaths
-- Directional shrapnel for explosions
+- Twinkling starfield with Amiga-style depth layers
+- 4 explosion variants: dissolve, shimmer, shrapnel, UFO multi-phase
+- Per-wave rainbow borders with snake trails and heartbeat pulse
 
 </v-clicks>
 
@@ -64,15 +64,15 @@ transition: slide-left
 
 [click] Color cycling for UFO rainbow effect — rotating through a palette of six colors every 5 ticks. The classic Amiga technique that creates compelling animation without per-pixel rendering.
 
-[click] Per-health colors on destructible barriers — per-segment health tracked on the server, with colors shifting as they degrade.
+[click] Twinkling starfield — three depth layers (far blue, mid purple, near grey-blue) with desynchronized coprime cycle periods (28, 20, 15 ticks) and spatial phase offsets via hash-based distribution. Brightness ramps create natural scintillation without per-pixel rendering.
 
-[click] Dissolve particle system — dying entities scatter into braille fragments that fall with simulated gravity.
+[click] 4 explosion variants — dissolve (alien death, braille fragments scatter outward), shimmer (barrier hit, brief flash), shrapnel (player death, directional debris with gravity arcs), and UFO multi-phase (flash, expanding ring, sparks, tumbling fragments).
 
-[click] Directional shrapnel for explosions — different explosion patterns for aliens, players, and barriers.
+[click] Per-wave rainbow borders — 8-color palette cycling through waves (red, orange, yellow, green, cyan, blue, indigo, magenta). Animated braille border with snake trails orbiting the perimeter, heartbeat pulse modulating density, and radial ripple expanding from center.
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/CHANGELOG.md — braille pixel art sprites, dissolve effects, explosion effects, barrier health colors, UFO color cycling
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — section 1: color cycling technique, Unicode box-drawing sprites, multi-line sprite readability -->
+- https://github.com/adewale/vaders/blob/main/CHANGELOG.md — braille pixel art sprites, dissolve effects, explosion effects, barrier health colors, UFO color cycling, starfield, per-wave border colors
+- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — section 1: color cycling technique, Unicode box-drawing sprites; section 11: starfield depth layers, Amiga color cycling techniques -->
 
 ---
 transition: slide-up
@@ -96,18 +96,18 @@ function gameReducer(
 ```ts
 // Each tick: a deterministic pipeline
 function tickReducer(state: GameState): ReducerResult {
-  // 1. Move players (apply held input)
-  // 2. Move bullets (up for players, down for aliens)
-  // 3. Collision detection (6 entity pairs)
-  // 4. Alien movement (periodic, reverse at walls)
+  // 1. Move players (apply held input + respawn)
+  // 2. Move aliens (periodic, reverse at walls)
+  // 3. Move bullets (up for players, down for aliens)
+  // 4. Collision detection (5 phases)
   // 5. Alien shooting (seeded RNG)
-  // 6. Cleanup dead entities
+  // 6. UFO spawning and movement
   // 7. Check end conditions
 }
 ```
 ````
 
-<!-- The game reducer is the architectural core. All state changes flow through a single pure function: gameReducer(state, action) returns { state, events, persist, scheduleAlarm }. The state machine guard (canTransition) prevents race conditions — inputs that don't apply in the current game status are silently dropped. The tickReducer runs at 30Hz during gameplay and processes a fixed pipeline: player movement, bullet movement, six collision detection pairs, alien movement, alien shooting via seeded RNG, entity cleanup, and end conditions. Seeded RNG (stored in GameState as rngSeed) ensures identical gameplay given identical inputs — essential for debugging. The reducer uses structuredClone at the start of each action for immutability.
+<!-- The game reducer is the architectural core. All state changes flow through a single pure function: gameReducer(state, action) returns { state, events, persist, scheduleAlarm }. The state machine guard (canTransition) prevents race conditions — inputs that don't apply in the current game status are silently dropped. The tickReducer runs at 30Hz during gameplay and processes a fixed pipeline: (1) player movement and respawn checks, (2) alien movement with wall reversal, (3) bullet movement, (4) five collision detection phases (player-bullets vs aliens, vs UFO, alien-bullets vs players, all bullets vs barriers, aliens vs barriers), (5) alien shooting via seeded RNG, (6) UFO spawning and movement, (7) end conditions. Seeded RNG (stored in GameState as rngSeed) ensures identical gameplay given identical inputs — essential for debugging. The reducer uses structuredClone at the start of each action for immutability.
 
 Sources:
 - https://github.com/adewale/vaders/blob/main/Lessons_learned.md — section 2: pure reducer pattern, seeded RNG, state machine transitions
@@ -144,6 +144,7 @@ graph LR
   classDef dim fill:#1a3a1a,stroke:#39ff14,color:#39ff14
   class A,C green
   class B,D,E,F dim
+  linkStyle default stroke:#39ff14,stroke-width:2px
 ```
 
 </div>
@@ -169,8 +170,8 @@ transition: wipe-right
 
 - Color cycling (Amiga palette rotation)
 - Braille and box-drawing sprites
+- Starfield with depth-layered twinkle
 - Chunky cell-based movement
-- Solid foreground/background per cell
 
 ::right::
 
@@ -191,12 +192,12 @@ transition: wipe-right
 
 [click] Smooth sub-cell animation — impossible. Movement is inherently chunky. Entities jump by whole character cells.
 
-[click] Complex background patterns — impossible. One background color per cell. Period.
+[click] Complex background patterns — impossible. One background color per cell. But a twinkling starfield works: single middle-dot characters with brightness ramps cycling at desynchronized rates across three depth layers create convincing depth from flat rendering.
 
 [click] Anti-aliasing or transparency — impossible. But the constraint is the advantage: chunky movement and solid colors ARE the Space Invaders aesthetic. Aliens move 2 cells every 18 ticks, which looks correct for the genre. Color cycling creates compelling animation without any of these capabilities.
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — section 1: what works (color cycling, box-drawing, multi-line sprites) and what does NOT work (gradients, sub-pixel, smooth animation, complex backgrounds)
+- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — section 1: what works (color cycling, box-drawing, multi-line sprites) and what does NOT work (gradients, sub-pixel, smooth animation, complex backgrounds); section 11: starfield depth layers, Amiga color cycling techniques
 - https://github.com/adewale/vaders/blob/main/CHANGELOG.md — braille pixel art sprites, per-health barrier colors, UFO rainbow color cycling -->
 
 ---
@@ -275,7 +276,7 @@ Sources:
 transition: slide-up
 ---
 
-# 620 tests passed while game_over never reached the UI
+# All tests passed while game_over never reached the UI
 
 Server tests verified events were *sent*. The client silently dropped them.
 
@@ -283,7 +284,7 @@ Server tests verified events were *sent*. The client silently dropped them.
 
 - Server: `expect(ws.send).toHaveBeenCalledWith(...)` -- passes
 - Client: `if (msg.type === 'event')` -- not handled
-- 620+ tests green. `game_over` event never reaches UI.
+- Every test green. `game_over` event never reaches UI.
 - Fix: integration tests across the protocol boundary
 
 </v-clicks>
@@ -296,7 +297,7 @@ The collision story is worse. Server treated `player.x` as left edge. Client tre
 
 [click] Client: if (msg.type === 'event') not handled — the WebSocket handler only processed 'sync', 'error', and 'pong'. The 'event' type was silently dropped.
 
-[click] 620+ tests green, game_over never reaches UI — the game was functionally broken for end-game state. Victory and defeat results never displayed.
+[click] Every test green, game_over never reaches UI — the game was functionally broken for end-game state. Victory and defeat results never displayed.
 
 [click] Fix: integration tests across the protocol boundary — add event handling to useGameConnection.ts, then add tests that verify the full client-server flow. Separately, a coordinate system mismatch placed bullets 2 columns off-center.
 
@@ -309,15 +310,16 @@ layout: fact
 transition: fade
 ---
 
-# <v-mark at="1" color="#39ff14" type="circle">620+</v-mark>
+# <v-mark at="1" color="#39ff14" type="circle">1,600+</v-mark>
 
-tests across all workspaces. 4 players. 33ms server tick. Full-state sync at 30Hz.
+tests across 46 files in 3 workspaces. 4 players. 33ms server tick. Full-state sync at 30Hz.
 
-<!-- 620+ tests span the entire codebase: reducer unit tests (deterministic game logic), GameRoom integration tests (WebSocket protocol), Matchmaker tests (room registry), scaling tests (player count difficulty curves), and property-based collision tests. The 33ms tick interval (30Hz) was chosen over 60Hz to stay within Durable Object CPU limits while providing responsive gameplay. Full-state sync broadcasts ~2KB per tick — simple and correct, no client-side prediction or reconciliation needed. Game difficulty scales with player count: solo gets 3 lives with an 11x5 alien grid at 1.0x speed; 4-player co-op gets 5 shared lives with a 15x6 grid at 1.75x speed.
+<!-- 1,600+ tests span the entire codebase across client (36 test files, ~1,050 tests including property-based), worker (7 test files, ~480 tests), and shared (3 test files, ~150 tests). Property-based tests using fast-check cover color conversion, interpolation, easing, and starfield determinism. The 33ms tick interval (30Hz) was chosen over 60Hz to stay within Durable Object CPU limits while providing responsive gameplay. Full-state sync broadcasts ~2KB per tick — simple and correct, no client-side prediction or reconciliation needed. Game difficulty scales with player count: solo gets 3 lives with an 11x5 alien grid at 1.0x speed; 4-player co-op gets 5 shared lives with a 13x6 grid at 1.75x speed.
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/CHANGELOG.md — "620+ tests — Comprehensive test suite across all workspaces including property-based collision tests"
-- https://github.com/adewale/vaders/blob/main/docs/server-architecture.md — 30Hz tick rate, scaling table (1-4 players), full-state sync rationale -->
+- https://github.com/adewale/vaders — test count verified from actual test files across client/, worker/, shared/ workspaces
+- https://github.com/adewale/vaders/blob/main/docs/server-architecture.md — 30Hz tick rate, scaling table (1-4 players), full-state sync rationale
+- https://github.com/adewale/vaders/blob/main/worker/src/game/scaling.ts — actual scaling table: 4-player grid is 13x6 -->
 
 ---
 layout: end
@@ -326,7 +328,7 @@ transition: fade
 
 # The best game server is a pure function with a mailbox
 
-<!-- The closing resolves the opening and the through-line. "Multiplayer games don't belong in the terminal. Or do they?" — they do, when the server is the truth. The Durable Object is a pure function (the reducer) with a mailbox (WebSocket hibernation + alarm loop). Inputs arrive via WebSocket messages. State is computed deterministically. Everyone gets the same frame. No client-side prediction needed because the terminal's inherent chunkiness makes 30Hz feel correct. The constraints that were supposed to make this impossible — character-cell rendering, no GPU, no game engine — are what made server-authoritative architecture viable. The reducer pattern, the alarm loop, the full-state sync — each traces back to one principle: the server is the truth.
+<!-- The closing resolves the opening and the through-line. "Multiplayer games don't belong in the terminal. Or do they?" — they do, when the server is the truth. The Durable Object is a pure function (the reducer) with a mailbox (WebSocket hibernation + alarm loop). Inputs arrive via WebSocket messages. State is computed deterministically. Everyone gets the same frame. No client-side prediction needed because the terminal's inherent chunkiness makes 30Hz feel correct. The constraints that were supposed to make this impossible — character-cell rendering, no GPU, no game engine — are what made server-authoritative architecture viable. Starfield backgrounds, rainbow wave borders, 4 explosion variants, property-based testing, respawn positioning, wave progression — all built within those constraints. The reducer pattern, the alarm loop, the full-state sync — each traces back to one principle: the server is the truth.
 
 Sources:
 - https://github.com/adewale/vaders/blob/main/Lessons_learned.md — summary: "Server is authoritative. Client renders, server decides."

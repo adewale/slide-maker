@@ -32,7 +32,7 @@
 - colors:
   - bg: "#ffffff"
   - fg: "#18181b"
-  - accent: "#ca8a04"
+  - accent: "#9a6b03"
   - muted: "rgba(24, 24, 27, 0.45)"
 - typography:
   - display: Plus Jakarta Sans

@@ -66,6 +66,8 @@ ul li::marker {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: flex-start;
+  text-align: left;
   padding: 4rem;
 }
 
@@ -152,3 +154,4 @@ ul li::marker {
   font-size: 1.15rem;
   margin-top: 0.75rem;
 }
+
