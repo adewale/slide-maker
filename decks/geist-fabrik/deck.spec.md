@@ -5,17 +5,18 @@
 - purpose: showcase a divergence engine that uses creative reasoning patterns instead of computation
 - audience: developers and knowledge workers interested in AI-augmented thinking
 - tone: philosophical, precise, curious
-- target-length: 12
+- target-length: 13
 - notes: yes
 - style-preset: editorial-dark
 - project-url: https://github.com/adewale/geist_fabrik
 
 ## Source Materials
-- readme: README.md (features, status, architecture overview, 57 default geists, 611 tests, privacy guarantees)
+- readme: README.md (features, status, architecture overview, 45 default geists, 513 tests, privacy guarantees)
 - lessons-learned: LESSONS_LEARNED.md (contradictor war story — algorithmic opposites at 10% vs questions at 100%, API consistency breaking change)
 - specs: specs/geistfabrik_vision.md (philosophy — muses not oracles, diverge/converge loops, Gordon Brander inspiration, success metrics)
 - architecture: docs/ARCHITECTURE.md (two-layer design — Vault + VaultContext, data flow, 384-dim embeddings via all-MiniLM-L6-v2)
-- catalog: docs/GEIST_CATALOG.md (51 geists classified by pattern — 42 code + 9 Tracery, computational complexity, design principles)
+- catalog: docs/GEIST_CATALOG.md (45 geists classified by pattern — 36 code + 9 Tracery, computational complexity, design principles)
+- changelog: CHANGELOG.md (performance optimizations, new geists, congruence_mirror removal, KeyBERT cluster labeling)
 
 ## Through-Line
 - concept: "A well-asked question is better than a poorly-computed answer"
@@ -26,7 +27,7 @@
   - slide 4: default — the algorithmic approach fails at 10% (poorly-computed answer)
   - slide 6: default — simple questions succeed at 100% (well-asked question)
   - slide 8: default/code — API consistency proves questions compose better than functions
-  - slide 11: center — through-line resolution
+  - slide 12: center — through-line resolution
 
 ## Design Tokens
 - colors:
@@ -80,9 +81,9 @@
 - layout: default
 - transition: slide-left
 - title: Geists are reasoning patterns, not algorithms
-- body: 57 geists ship by default — 48 code geists for computation, 9 Tracery grammars for questions. Code when you need math. Grammars when you need provocation.
+- body: 45 geists ship by default — 36 code geists for computation, 9 Tracery grammars for questions. Code when you need math. Grammars when you need provocation.
 - sources:
-  - https://github.com/adewale/geist_fabrik/blob/main/README.md — 57 default geists (48 code + 9 Tracery)
+  - https://github.com/adewale/geist_fabrik/blob/main/README.md — 45 default geists (36 code + 9 Tracery)
   - https://github.com/adewale/geist_fabrik/blob/main/docs/GEIST_CATALOG.md — classification by pattern
 
 ### Slide 4
@@ -138,16 +139,27 @@
   - https://github.com/adewale/geist_fabrik/blob/main/docs/ARCHITECTURE.md — all-MiniLM-L6-v2, cosine similarity
 
 ### Slide 10
+- kind: update
+- layout: default
+- transition: slide-left
+- title: Recent: faster engine, sharper labels, new geists
+- body: 16% faster overall, 56% faster geist phase. KeyBERT cluster labeling for richer semantic names. New creation_burst and burst_evolution geists. Removed congruence_mirror due to O(L) scaling.
+- sources:
+  - https://github.com/adewale/geist_fabrik/blob/main/CHANGELOG.md — performance optimizations, new geists, KeyBERT labeling, congruence_mirror removal
+  - https://github.com/adewale/geist_fabrik/blob/main/STATUS.md — performance measurements
+
+### Slide 11
 - kind: fact
 - layout: fact
 - transition: fade
-- title: "611"
-- subtitle: tests passing. 57 geists. Zero cloud dependencies.
+- title: "513"
+- subtitle: tests passing. 45 geists. Zero cloud dependencies.
 - sources:
-  - https://github.com/adewale/geist_fabrik/blob/main/README.md — 611 tests, 57 geists, 100% local
-  - https://github.com/adewale/geist_fabrik/blob/main/STATUS.md — test counts and status
+  - https://github.com/adewale/geist_fabrik/blob/main/README.md — project overview, geist counts, 100% local
+  - https://github.com/adewale/geist_fabrik/blob/main/STATUS.md — 422 unit + 91 integration tests, version 0.9.0
+  - https://github.com/adewale/geist_fabrik/blob/main/CHANGELOG.md — 513 total tests, performance improvements
 
-### Slide 11
+### Slide 12
 - kind: through-line-resolution
 - layout: center
 - transition: fade
@@ -157,7 +169,7 @@
   - https://github.com/adewale/geist_fabrik/blob/main/LESSONS_LEARNED.md — the principle stated
   - https://github.com/adewale/geist_fabrik/blob/main/specs/geistfabrik_vision.md — muses not oracles philosophy
 
-### Slide 12
+### Slide 13
 - kind: end
 - layout: end
 - transition: fade

@@ -46,7 +46,7 @@ cd examples && bash build.sh    # build all decks
 npx serve examples/_build       # serve at http://localhost:3000
 ```
 
-See individual decks: `demo/`, `vaders/`, `planet-cf/`, `sumi-e/`, `tufte/`, `durable-objects/`, and more.
+See individual decks: `demo/`, `vaders/`, `planet-cf/`, `tufte/`, `durable-objects/`, and more.
 
 ## Tools
 

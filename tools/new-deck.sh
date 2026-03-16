@@ -14,7 +14,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 DECKS_ROOT="$ROOT/../decks"
 
-VALID_PRESETS="editorial-dark swiss-minimal bold-modern sumi-e tufte-data cloudflare material-design"
+VALID_PRESETS="editorial-dark swiss-minimal bold-modern tufte-data cloudflare material-design"
 
 # ─── Usage / validation ────────────────────────────────────────
 
@@ -138,32 +138,6 @@ case "$PRESET" in
     code_bg="rgba(167, 139, 250, 0.08)"
     extra_tokens=""
     ;;
-  sumi-e)
-    theme="seriph"
-    color_schema="light"
-    preset_weights="400,500,600,700"
-    preset_italic="true"
-    font_sans="Crimson Pro"
-    font_serif="Zen Old Mincho"
-    font_mono="JetBrains Mono"
-    transition="fade"
-    bg="#f5f0e8"
-    fg="#1a1a1a"
-    accent="#c23b22"
-    accent_alt=""
-    muted="rgba(26, 26, 26, 0.4)"
-    surface=""
-    border_color=""
-    font_display_css="'Zen Old Mincho', serif"
-    font_body_css="'Crimson Pro', serif"
-    font_mono_css="'JetBrains Mono', monospace"
-    gap="2rem"
-    radius="0"
-    vclick_transition="all 0.6s cubic-bezier(0.4, 0, 0.2, 1)"
-    vclick_transform="translateX(12px)"
-    code_bg="rgba(26, 26, 26, 0.06)"
-    extra_tokens=""
-    ;;
   tufte-data)
     theme="seriph"
     color_schema="light"
@@ -267,7 +241,7 @@ if [[ "$color_schema" == "dark" ]]; then
 fi
 
 is_serif_preset="false"
-if [[ "$PRESET" == "sumi-e" || "$PRESET" == "tufte-data" ]]; then
+if [[ "$PRESET" == "tufte-data" ]]; then
   is_serif_preset="true"
 fi
 

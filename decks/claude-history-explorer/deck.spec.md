@@ -5,7 +5,7 @@
 - purpose: showcase a CLI tool that earns trust through radical transparency and read-only guarantees
 - audience: developers and Claude users interested in conversation data exploration
 - tone: calm, confident, transparent
-- target-length: 10
+- target-length: 11
 - notes: yes
 - style-preset: editorial-dark
 - project-url: https://github.com/adewale/claude-history-explorer
@@ -13,8 +13,9 @@
 ## Source Materials
 - readme: README.md (features, commands, installation, streaming JSONL, read-only design)
 - trust: TRUST.md (5 trust guarantees — read-only, no network, open source, minimal deps, scoped reads)
-- changelog: CHANGELOG.md (v0.1.0 initial release — 10 commands, story generation, concurrent detection)
-- architecture: docs/ARCHITECTURE.md (3-layer architecture — data models, business logic, CLI; streaming JSONL; read-only data access pattern)
+- changelog: CHANGELOG.md (v0.1.0 initial release — 10 commands, story generation, concurrent detection, wrapped annual summaries)
+- architecture: docs/ARCHITECTURE.md (3-layer architecture — 11 modules; streaming JSONL; read-only data access pattern)
+- wrapped-arch: docs/WRAPPED_ARCHITECTURE.md (V3 wrapped format with heatmaps, trait scores, token tracking)
 
 ## Through-Line
 - concept: "Read-only means zero risk"
@@ -24,8 +25,9 @@
   - slide 2: statement — tension about trusting tools with conversation data
   - slide 3: default — 5 trust guarantees, read-only is first
   - slide 5: section — through-line named explicitly
-  - slide 8: default — minimal deps reinforce read-only (no file/network libraries)
-  - slide 10: end — resolution echoes read-only promise
+  - slide 8: default — Wrapped feature maintains trust contract (no network, decodable URLs)
+  - slide 9: default — minimal deps reinforce read-only (no file/network libraries)
+  - slide 11: end — resolution echoes read-only promise
 
 ## Design Tokens
 - colors:
@@ -118,25 +120,36 @@
   - https://github.com/adewale/claude-history-explorer/blob/main/docs/ARCHITECTURE.md — streaming JSONL and lazy loading performance
 
 ### Slide 8
+- kind: feature
+- layout: default
+- transition: slide-up
+- title: Wrapped — your year in Claude Code
+- body: Shareable annual summary URL with heatmaps, trait scores, distributions, token tracking; all data encoded in URL, nothing stored server-side
+- sources:
+  - https://github.com/adewale/claude-history-explorer/blob/main/README.md — wrapped command options
+  - https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — Wrapped privacy model
+  - https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/wrapped.py — V3 implementation
+
+### Slide 9
 - kind: deps
 - layout: default
 - transition: slide-up
-- title: Three dependencies
-- body: click (CLI), rich (formatting), sparklines (charts) — all formatting, no file/network ops
+- title: Five dependencies
+- body: click (CLI), rich (formatting), sparklines (charts), msgpack (binary encoding), pyperclip (clipboard) — no HTTP libraries, no network ops
 - sources:
-  - https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — Guarantee #4 minimal dependencies table
-  - https://github.com/adewale/claude-history-explorer/blob/main/docs/ARCHITECTURE.md — core dependencies section
+  - https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — Guarantee #4 minimal dependencies
+  - https://github.com/adewale/claude-history-explorer/blob/main/pyproject.toml — 5 runtime dependencies
 
-### Slide 9
+### Slide 10
 - kind: fact
 - layout: fact
 - transition: fade
-- title: "~2,600 lines"
-- subtitle: of Python. Small enough to audit in an afternoon.
+- title: "~4,600 lines"
+- subtitle: of Python across eleven modules. Still auditable in a day.
 - sources:
-  - https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md — Guarantee #3: "Total: ~2,600 lines of Python"
+  - https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/ — 11 modules totaling ~4,600 lines
 
-### Slide 10
+### Slide 11
 - kind: end
 - layout: end
 - transition: fade

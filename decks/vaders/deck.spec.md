@@ -12,7 +12,7 @@
 
 ## Source Materials
 - readme: README.md (quick start, controls, architecture overview, game modes, audio credits)
-- changelog: CHANGELOG.md (1.0.0 feature inventory — braille sprites, 620+ tests, dissolve/explosion effects, wave transitions, 4-player scaling)
+- changelog: CHANGELOG.md (1.0.0 feature inventory — braille sprites, 1,600+ tests, dissolve/explosion effects, wave transitions, 4-player scaling, starfield, rainbow borders, spritesheet tool)
 - lessons-learned: Lessons_learned.md (14 sections — pure reducer, held-state networking, audio via subprocess, collision alignment, coordinate contracts, test gaps across protocol)
 - architecture: docs/server-architecture.md (GameRoom DO, Matchmaker DO, 30Hz alarm loop, reducer pipeline, full-state sync, WebSocket protocol, scaling tables)
 - specs: specs/vaders-spec.md (architectural principles, launch screen, state machine, multiplayer flow, enhanced mode)
@@ -84,7 +84,7 @@
 - title: Braille pixel art at 120x36
 - image: /gameplay.png
 - alt: Vaders gameplay showing braille sprites for aliens, player ships, barriers, and bullets in a 120x36 terminal
-- body: 7-wide animated braille sprites. Color cycling for UFO. Per-health barrier colors. Dissolve particle effects.
+- body: 7-wide animated braille sprites. Color cycling for UFO. Starfield with depth layers. 4 explosion variants. Per-wave rainbow borders.
 - sources:
   - https://github.com/adewale/vaders/blob/main/CHANGELOG.md — braille pixel art sprites, dissolve effects, barrier health colors
   - https://github.com/adewale/vaders/blob/main/Lessons_learned.md — section 1: Unicode box-drawing, color cycling, multi-line sprites
@@ -158,10 +158,10 @@
 - kind: fact
 - layout: fact
 - transition: fade
-- title: "620+"
-- subtitle: tests, 4 players, 33ms tick, full-state sync at 30Hz
+- title: "1,600+"
+- subtitle: tests across 46 files in 3 workspaces, 4 players, 33ms tick, full-state sync at 30Hz
 - sources:
-  - https://github.com/adewale/vaders/blob/main/CHANGELOG.md — 620+ tests across all workspaces
+  - https://github.com/adewale/vaders — test count verified from actual test files across client/, worker/, shared/ workspaces
   - https://github.com/adewale/vaders/blob/main/docs/server-architecture.md — 30Hz tick rate, 4-player scaling, full-state sync
 
 ### Slide 12

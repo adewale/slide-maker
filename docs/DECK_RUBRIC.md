@@ -69,7 +69,7 @@ Animate elements to show relationships, growth, or transformation.
 
 **Anti-pattern:** Motion for decoration. Bouncing logos, spinning icons, wobbling text — motion without meaning.
 
-**Good example:** Sumi-e's growth/emergence animation — an element physically grows to embody the concept of emergence.
+**Good example:** A growth/emergence animation — an element physically grows to embody the concept of emergence.
 
 ### Hover States and Interactivity
 

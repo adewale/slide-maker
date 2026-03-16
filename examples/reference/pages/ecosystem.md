@@ -15,14 +15,13 @@ transition: slide-left
 
 # One Preset Controls Typography, Color, and Motion
 
-Each of seven presets generates `tokens.css` + `theme.css`.
+Each of six presets generates `tokens.css` + `theme.css`.
 
 <v-clicks>
 
 - **editorial-dark** — Playfair Display + Source Sans 3. Near-black bg, cool accent. Serious, high-trust. Fades only.
 - **swiss-minimal** — Plus Jakarta Sans + Figtree. White bg, restrained accent. Precise, calm. Two transitions max.
 - **bold-modern** — Bebas Neue + DM Sans. Dark bg, bright accent pair. Assertive, energetic. Uses iris and zoom.
-- **sumi-e** — Zen Old Mincho + Crimson Pro. Washi paper `#f5f0e8`, sumi ink. Contemplative. Fade is the only breath.
 - **tufte-data** — EB Garamond + Source Sans 3. Cream `#fffff8`, data-blue `#2d5f8a`. Scholarly, dense. Sidenote margin layout.
 - **cloudflare** — Inter + JetBrains Mono. Warm cream `#fffbf5`, orange `#ff4801`. Workshop-ready. Full transition vocabulary.
 - **material-design** — Outfit + Plus Jakarta Sans. M3 surface `#FFFBFE`, primary `#6750A4`. Systematic. M3 easing curves.
@@ -36,8 +35,6 @@ Each of seven presets generates `tokens.css` + `theme.css`.
 [click] swiss-minimal — Plus Jakarta Sans + Figtree. White or near-white background, one restrained accent. Mood is precise, calm, disciplined. Only 2 transitions allowed. Best for technical briefings and workshops.
 
 [click] bold-modern — Bebas Neue + DM Sans. Dark or saturated background, bright accent pair. Mood is assertive, energetic, launch-oriented. Uses dramatic transitions including iris and zoom-in. Best for launches and internal keynotes.
-
-[click] sumi-e — Zen Old Mincho + Crimson Pro. Washi paper background, sumi ink foreground, vermillion hanko-red used sparingly. Mood is contemplative, spacious, austere. Fade is the only transition — every page turn is a breath. 60-75% negative space per slide.
 
 [click] tufte-data — EB Garamond for display and body, Source Sans 3 for labels. Warm white background, data-blue for charts and annotations, data-red for anomalies. Scholarly, evidence-driven. 60/30 body-sidenote layout. Best for debugging case studies and data analysis.
 
@@ -175,12 +172,12 @@ layout: fact
 transition: fade
 ---
 
-# 5 + 8 + 13 + 7 + 7
+# 5 + 8 + 13 + 6 + 7
 
-5 visual effects. 8 data viz. 13 transitions. 7 presets. 7 tools.
+5 visual effects. 8 data viz. 13 transitions. 6 presets. 7 tools.
 
-<!-- The component catalog: 5 visual effect components (GlassCard, ImageFX, RevealPath, ShadowStack, CornerCard) for visual polish, plus 8 data visualization components (Sparkline, SmallMultiples, DataTable, MicroBar, SlopeChart, BulletBar, DotStrip, WinLoss) for inline data presentation. 13 cinematic CSS transitions with semantic meanings. 7 style presets generating complete visual systems from tokens through typography to motion. 7 build tools for scaffolding, validation, and comparison.
+<!-- The component catalog: 5 visual effect components (GlassCard, ImageFX, RevealPath, ShadowStack, CornerCard) for visual polish, plus 8 data visualization components (Sparkline, SmallMultiples, DataTable, MicroBar, SlopeChart, BulletBar, DotStrip, WinLoss) for inline data presentation. 13 cinematic CSS transitions with semantic meanings. 6 style presets generating complete visual systems from tokens through typography to motion. 7 build tools for scaffolding, validation, and comparison.
 
 Sources:
 - file:slide-maker/COMPILER_RULES.md — complete component and tool inventory
-- file:slide-maker/STYLE_PRESETS.md — seven preset definitions -->
+- file:slide-maker/STYLE_PRESETS.md — six preset definitions -->

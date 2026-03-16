@@ -200,7 +200,7 @@ Mystery, false trails, evidence, resolution, lessons.
 
 **Why it works:** Mystery creates tension. False trails create identification ("I would have tried that too"). The resolution is satisfying because the audience earned it.
 
-### Philosophical Reflection (Sumi-e pattern)
+### Philosophical Reflection
 
 Paradox, thesis, emergence, insight, silence.
 

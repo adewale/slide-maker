@@ -189,49 +189,6 @@ Best for:
 - sales narratives
 - marketing strategy decks
 
-## sumi-e
-
-Mood: contemplative, spacious, austere, philosophical.
-
-Palette:
-- `#f5f0e8` washi paper background
-- `#1a1a1a` sumi ink foreground
-- `#c23b22` vermillion hanko-red (used sparingly — one accent moment per deck)
-- muted: `rgba(26, 26, 26, 0.4)`
-
-Typography:
-- display: **Zen Old Mincho** (traditional Japanese serif, literary weight)
-- body: **Crimson Pro** (elegant old-style serif, high readability)
-- mono: **JetBrains Mono**
-- avoid: sans-serif fonts — this preset demands serifs throughout
-
-Layout tendencies:
-- radical negative space (60-75% empty per slide)
-- asymmetric content offset (content in lower-left or upper-right third)
-- one idea per slide, often a single sentence
-- ink-wash dividers and brush-texture SVG elements
-- Mermaid diagrams in grayscale with thin strokes
-
-Motion:
-- v-motion for elements that "grow" or "flow" like ink spreading
-- slow, deliberate transitions (fade only)
-- v-mark with type="underline" for the single red accent
-
-Interaction:
-- hover: opacity shift (0.7 to 1.0) + ink-wash border reveal — `border-bottom: 1px solid rgba(26,26,26,0.3)` appears on hover
-- cursor: default everywhere — the contemplative mood rejects "clickable" signals
-- spotlight: gentle opacity dim to 50%, no blur — like ink fading on paper
-- keep hover transitions at 0.4s ease — slow and deliberate, matching the motion character
-
-Transition vocabulary: `fade`
-- Single transition. Contemplative. `fade` is the only transition — every page turn is a breath.
-
-Best for:
-- philosophical narratives
-- constraint-focused projects
-- minimalist tool showcases
-- talks about simplicity and elegance
-
 ## tufte-data
 
 Mood: scholarly, dense, evidence-driven, authoritative.

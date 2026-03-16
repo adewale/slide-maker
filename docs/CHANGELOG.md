@@ -30,7 +30,7 @@ Initial release of the slide-maker skill and monorepo.
 - `COMPILER_RULES.md` — 10-phase compilation pipeline with acceptance checklist
 - `DECK_SPEC.md` — schema for `deck.spec.md` planning documents
 - `SLIDE_KINDS.md` — canonical slide types (cover, section, fact, quote, end, etc.)
-- `STYLE_PRESETS.md` — 7 visual presets (editorial-dark, swiss-minimal, bold-modern, sumi-e, tufte-data, cloudflare, material-design)
+- `STYLE_PRESETS.md` — 6 visual presets (editorial-dark, swiss-minimal, bold-modern, tufte-data, cloudflare, material-design)
 - `SLIDEV_REFERENCE.md` — comprehensive Slidev API reference
 - `styles/transitions.css` — shared transition library
 - `components/` — reusable Vue components (GlassCard, ImageFX, ShadowStack, RevealPath)

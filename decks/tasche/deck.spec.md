@@ -13,7 +13,7 @@
 ## Source Materials
 - readme: README.md (features, deploy model, architecture table, cost, data flow summary)
 - changelog: CHANGELOG.md (bookmarklet pivot from cross-origin fetch to popup, browser extension removal, Readability Service Binding, Preact rewrite, security fixes)
-- lessons-learned: LESSONS_LEARNED.md (36 lessons — FFI boundary layer, bookmarklet SameSite pivot, runtime gap, lxml unavailability, Pyodide cold start, implement-audit loop stats)
+- lessons-learned: LESSONS_LEARNED.md (90 lessons — FFI boundary layer, bookmarklet SameSite pivot, runtime gap, lxml unavailability, Pyodide cold start, implement-audit loop stats, TTS WAV/MP3 discovery, service worker caching patterns)
 - specs: specs/tasche-spec.md (core promise "your articles survive", what gets archived table, content storage philosophy, processing pipeline, TTS idempotency)
 
 ## Through-Line
@@ -77,7 +77,7 @@
 - layout: default
 - transition: slide-left
 - title: The archive promise
-- body: What gets saved per article — original HTML, markdown, images as WebP, metadata, three deduplicated URLs, optional TTS audio
+- body: What gets saved per article — original HTML, markdown, images as WebP, thumbnail from og:image, three deduplicated URLs, optional TTS audio
 - sources:
   - https://github.com/adewale/tasche/blob/main/specs/tasche-spec.md — section 1.2: "What Gets Archived" table
   - https://github.com/adewale/tasche/blob/main/README.md — data flow description
@@ -87,7 +87,7 @@
 - layout: default
 - transition: slide-up
 - title: The FFI boundary
-- body: Magic Move — Python bytes to R2 fails with PyProxy, fix with to_js() conversion
+- body: Magic Move — three FFI failures (bytes→PyProxy for R2, None→undefined for D1, dict→Map for Queues) and centralized Safe* wrapper fix
 - sources:
   - https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md — lesson 29: Python bytes cannot cross FFI boundary to R2
   - https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md — lesson 30: FFI boundary is bidirectional

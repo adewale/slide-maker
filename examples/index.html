@@ -125,6 +125,12 @@
       border-radius: 4px;
     }
 
+    .card .links {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
     .card a {
       font-size: 0.8rem;
       font-weight: 600;
@@ -139,21 +145,40 @@
       text-decoration: underline;
     }
 
+    .card a.md-link {
+      font-size: 0.7rem;
+      opacity: 0.5;
+      color: #a1a1aa;
+    }
+
+    .card a.md-link:hover {
+      opacity: 0.9;
+      color: var(--accent);
+    }
+
     @media (max-width: 900px) {
       .grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 560px) {
-      .grid { grid-template-columns: 1fr; }
-      body { padding: 2rem 1rem; }
-      header h1 { font-size: 1.75rem; }
+      body { padding: 1rem 0.75rem; }
+      header { margin-bottom: 1.5rem; }
+      header h1 { font-size: 1.5rem; }
+      header p { font-size: 0.85rem; }
+      .section-label { margin: 1.5rem 0 0.75rem; font-size: 0.7rem; }
+      .grid { grid-template-columns: 1fr; gap: 0.75rem; }
+      .card { padding: 1rem; gap: 0.5rem; border-radius: 8px; }
+      .card h2 { font-size: 1.1rem; }
+      .card .desc { font-size: 0.8rem; }
+      .card a { font-size: 0.85rem; min-height: 2rem; display: inline-flex; align-items: center; }
+      .card a.md-link { font-size: 0.75rem; }
     }
   </style>
 </head>
 <body>
   <header>
     <h1>Slide Maker</h1>
-    <p>10 Slidev decks. Pick one to present.</p>
+    <p>10 Slidev decks. Pick one to present. <a href="llms.txt" style="color: #52525b; font-size: 0.8rem; text-decoration: none; opacity: 0.7;">llms.txt</a></p>
   </header>
 
   <div class="section-label">Core</div>
@@ -163,7 +188,10 @@
       <div class="desc">Native Slidev decks. Strong visual direction. Minimal abstraction.</div>
       <div class="meta">
         <span class="tag">bold-modern</span>
-        <a href="slide-maker/">View deck</a>
+        <div class="links">
+          <a href="slide-maker/">View deck</a>
+          <a href="view.html?deck=slide-maker" class="md-link">MD</a>
+        </div>
       </div>
     </div>
 
@@ -172,7 +200,10 @@
       <div class="desc">Every feature. One deck. A comprehensive reference for all Slide Maker capabilities.</div>
       <div class="meta">
         <span class="tag">reference</span>
-        <a href="reference/">View deck</a>
+        <div class="links">
+          <a href="reference/">View deck</a>
+          <a href="view.html?deck=reference" class="md-link">MD</a>
+        </div>
       </div>
     </div>
   </div>
@@ -184,7 +215,10 @@
       <div class="desc">Multiplayer TUI Space Invaders. 1-4 players. Cloudflare Durable Objects.</div>
       <div class="meta">
         <span class="tag">bold-modern</span>
-        <a href="vaders/">View deck</a>
+        <div class="links">
+          <a href="vaders/">View deck</a>
+          <a href="view.html?deck=vaders" class="md-link">MD</a>
+        </div>
       </div>
     </div>
 
@@ -193,7 +227,10 @@
       <div class="desc">A feed aggregator built on Cloudflare Python Workers.</div>
       <div class="meta">
         <span class="tag">swiss-minimal</span>
-        <a href="planet-cf/">View deck</a>
+        <div class="links">
+          <a href="planet-cf/">View deck</a>
+          <a href="view.html?deck=planet-cf" class="md-link">MD</a>
+        </div>
       </div>
     </div>
 
@@ -202,7 +239,10 @@
       <div class="desc">Search and visualize your Claude Code conversation history.</div>
       <div class="meta">
         <span class="tag">editorial-dark</span>
-        <a href="claude-history-explorer/">View deck</a>
+        <div class="links">
+          <a href="claude-history-explorer/">View deck</a>
+          <a href="view.html?deck=claude-history-explorer" class="md-link">MD</a>
+        </div>
       </div>
     </div>
 
@@ -211,7 +251,10 @@
       <div class="desc">A divergence engine for Obsidian vaults.</div>
       <div class="meta">
         <span class="tag">editorial-dark</span>
-        <a href="geist-fabrik/">View deck</a>
+        <div class="links">
+          <a href="geist-fabrik/">View deck</a>
+          <a href="view.html?deck=geist-fabrik" class="md-link">MD</a>
+        </div>
       </div>
     </div>
 
@@ -220,7 +263,10 @@
       <div class="desc">Local-first photo indexing and faceted browsing.</div>
       <div class="meta">
         <span class="tag">swiss-minimal</span>
-        <a href="olsen/">View deck</a>
+        <div class="links">
+          <a href="olsen/">View deck</a>
+          <a href="view.html?deck=olsen" class="md-link">MD</a>
+        </div>
       </div>
     </div>
 
@@ -229,7 +275,10 @@
       <div class="desc">Self-hosted read-it-later on Cloudflare.</div>
       <div class="meta">
         <span class="tag">editorial-dark</span>
-        <a href="tasche/">View deck</a>
+        <div class="links">
+          <a href="tasche/">View deck</a>
+          <a href="view.html?deck=tasche" class="md-link">MD</a>
+        </div>
       </div>
     </div>
 
@@ -238,7 +287,10 @@
       <div class="desc">A debugging detective story. Dense prose, sidenotes, and sparklines.</div>
       <div class="meta">
         <span class="tag">tufte-data</span>
-        <a href="tufte/">View deck</a>
+        <div class="links">
+          <a href="tufte/">View deck</a>
+          <a href="view.html?deck=tufte" class="md-link">MD</a>
+        </div>
       </div>
     </div>
 
@@ -247,7 +299,10 @@
       <div class="desc">What are Durable Objects for? Game servers, jam sessions, autonomous agents.</div>
       <div class="meta">
         <span class="tag">cloudflare</span>
-        <a href="durable-objects/">View deck</a>
+        <div class="links">
+          <a href="durable-objects/">View deck</a>
+          <a href="view.html?deck=durable-objects" class="md-link">MD</a>
+        </div>
       </div>
     </div>
   </div>

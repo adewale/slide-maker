@@ -5,7 +5,7 @@
 - purpose: showcase a feed aggregator built on Cloudflare Python Workers, focusing on the JS/Python boundary layer pattern
 - audience: developers building on Cloudflare Workers
 - tone: precise, calm, confident
-- target-length: 12
+- target-length: 13
 - notes: yes
 - style-preset: cloudflare
 - project-url: https://github.com/adewale/planet_cf
@@ -13,7 +13,7 @@
 ## Source Materials
 - readme: README.md (features, smart defaults, multi-instance deployment, configuration table)
 - architecture: docs/ARCHITECTURE.md (system overview — Workers Python via Pyodide/WASM, D1, Vectorize, Queues, Workers AI, edge cache, performance metrics)
-- lessons-learned: docs/LESSONS_LEARNED.md (19 lessons — JsProxy conversion, boundary layers, mock limitations, hybrid search, no filesystem, SSRF, FFI type matrix, E2E testing)
+- lessons-learned: docs/LESSONS_LEARNED.md (21 lessons — JsProxy conversion, boundary layers, mock limitations, hybrid search, no filesystem, SSRF, FFI type matrix, E2E testing, two-tier FFI testing, JsNull/is-None trap)
 
 ## Through-Line
 - concept: "Quarantine the boundary"
@@ -24,7 +24,8 @@
   - slide 5: section — through-line named explicitly
   - slide 6: two-cols-header — boundary consequences (mocks miss JsProxy)
   - slide 9: default — another boundary (no filesystem → build-time embedding)
-  - slide 11: center — resolution: every lesson traces back to the boundary
+  - slide 11: default — multi-instance deployment (one codebase, five planets)
+  - slide 12: center — resolution: every lesson traces back to the boundary
 
 ## Design Tokens
 - colors:
@@ -77,10 +78,10 @@
 - kind: architecture
 - layout: default
 - title: The Cloudflare stack
-- body: Mermaid graph — Cron → Queue → Feed Fetcher → D1+FTS5, Vectorize, Workers AI; Web UI → D1 + Vectorize
+- body: Mermaid graph — Cron → Queue → Feed Fetcher → D1, Vectorize, Workers AI; Web UI → D1 + Vectorize; Static Assets → Web UI
 - motion: v-motion fade-up on diagram
 - sources:
-  - https://github.com/adewale/planet_cf/blob/main/docs/ARCHITECTURE.md — system overview and data flow
+  - https://github.com/adewale/planet_cf/blob/main/docs/ARCHITECTURE.md — system overview, data flow, two-tier serving
   - https://github.com/adewale/planet_cf/blob/main/README.md — Cloudflare resource setup
 
 ### Slide 4
@@ -150,16 +151,26 @@
   - https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — section 8: missing feed dates
 
 ### Slide 11
+- kind: design-insight
+- layout: default
+- transition: slide-left
+- title: One codebase, five planets
+- body: Multi-instance deployment — Planet Python (500+ feeds), Planet Mozilla (190 feeds), full vs lite mode, one-command deploy
+- sources:
+  - https://github.com/adewale/planet_cf/blob/main/docs/MULTI_INSTANCE.md — multi-instance deployment guide
+  - https://github.com/adewale/planet_cf/blob/main/README.md — examples directory and deploy scripts
+
+### Slide 12
 - kind: through-line-resolution
 - layout: center
 - transition: morph-fade
 - title: Every lesson traces back to one principle
 - body: Quarantine the boundary. Convert foreign types at the edge. Let the core be pure.
 - sources:
-  - https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — all 19 lessons trace to boundaries
+  - https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — all 21 lessons trace to boundaries
   - https://github.com/adewale/planet_cf/blob/main/docs/ARCHITECTURE.md — boundary layer architecture
 
-### Slide 12
+### Slide 13
 - kind: end
 - layout: end
 - transition: fade
