@@ -139,7 +139,7 @@ graph LR
   C --> D["Broadcast events"]
   D --> E["Broadcast full state"]
   E --> F["Schedule next alarm +33ms"]
-  F -.->|"hibernation-safe"| A
+  F -.-> A
   classDef green fill:#39ff14,stroke:#39ff14,color:#0a0a0f
   classDef dim fill:#1a3a1a,stroke:#39ff14,color:#39ff14
   class A,C green

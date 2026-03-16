@@ -539,15 +539,15 @@ For the full set of rhetorical principles, see [PRESENTATION_PHILOSOPHY.md](../d
 - No emoji in labels (existing rule, reinforced)
 
 ### Theme control
-- Beautiful Mermaid handles all theming automatically via `setup/mermaid-renderer.ts`. The renderer reads `--deck-bg`, `--deck-fg`, `--deck-accent`, and `--deck-muted` from the computed styles at render time, so diagrams match the deck palette without any per-diagram configuration.
+- Beautiful Mermaid's `color-mix()` auto-theming is **unreliable** — it produces black boxes on both light and dark backgrounds. Do not rely on it. Always add explicit inline `style` directives on every flowchart node.
 - Do not add `{theme: 'base'}`, `{theme: 'dark'}`, or `{theme: 'neutral'}` to mermaid code blocks — these are stock Mermaid options that Beautiful Mermaid ignores.
-- For inline `style` directives on specific nodes, continue using explicit hex colors with proper contrast (see Color methodology).
+- The `setup/mermaid-renderer.ts` scaffold file reads `--deck-bg`, `--deck-fg`, `--deck-accent`, and `--deck-muted` and passes them to Beautiful Mermaid, but this alone does not guarantee readable output. Inline styles are the only reliable mechanism.
 
 ### Node and link completeness (flowcharts)
 Every flowchart diagram must have:
 1. **Every node styled** — each node needs an explicit `style` directive with `fill`, `stroke`, and `color`. Unstyled nodes inherit Mermaid defaults that may not contrast with the deck background. If using `classDef`, every node must be assigned a class.
 2. **linkStyle default** — every flowchart must include `linkStyle default stroke:<color>,stroke-width:2px` where `<color>` contrasts with `--deck-bg`. Without this, arrow lines and edge labels may be invisible on both dark and light backgrounds.
-3. **No edge labels on dark backgrounds** — Mermaid renders edge label text (`-->|label|`) in its default color (black/dark gray), which is invisible on dark slide backgrounds. `linkStyle` only controls the arrow stroke, not the label text. On dark-background decks, remove edge labels and explain the flow in body text instead. Light-background decks can use edge labels safely.
+3. **No edge labels** — edge labels (`-->|label|`) render inside unthemeable boxes that Beautiful Mermaid fills with black. `linkStyle` controls the arrow stroke but not the label container. This fails on both dark and light backgrounds. Always remove edge labels and explain the flow in body text instead.
 
 Example (complete flowchart on a dark background):
 ```
@@ -573,11 +573,13 @@ Beautiful Mermaid's auto-theming does not work equally well for all diagram type
 | `erDiagram` | No | Readable | Untested | Use with caution on dark backgrounds. |
 | `xychart-beta` | No | Readable | Untested | Use with caution on dark backgrounds. |
 
-**Why CSS overrides don't work:** Beautiful Mermaid renders SVGs with inline styles baked into the SVG elements. CSS class selectors — even with `!important` — cannot reliably override these because Beautiful Mermaid may use different class names than stock Mermaid, and the SVG structure varies across Mermaid versions.
+**Why auto-theming fails:** Beautiful Mermaid uses CSS `color-mix()` to derive node fills from `bg`/`fg` tokens. In practice, these computed fills resolve to black in many Slidev/Vite build contexts. Inline `style` directives on individual nodes are the only mechanism that reliably produces correct colors.
 
-**The reliable fix:** Convert non-flowchart diagrams to flowcharts on dark-background decks. Flowcharts support inline `style` directives and `linkStyle`, giving full control over contrast. A sequenceDiagram showing `A ->> B: message` can be represented as `A -->|"message"| B` in a flowchart. A stateDiagram with `[*] --> Draft` can use `S(("Start")) --> Draft`.
+**Why CSS overrides don't work:** Beautiful Mermaid renders SVGs with inline styles baked into the SVG elements. CSS class selectors — even with `!important` — cannot reliably override these because Beautiful Mermaid uses different class names than stock Mermaid, and the SVG structure varies across Mermaid versions.
 
-**Light-background decks** can safely use sequenceDiagram and stateDiagram-v2 — Beautiful Mermaid's defaults are readable on light backgrounds.
+**The reliable fix for flowcharts:** Add explicit `style` with `fill`, `stroke`, and `color` on every node, plus `linkStyle default`. Never use edge labels. Explain flow relationships in body text below the diagram.
+
+**The reliable fix for non-flowchart types (sequence, state):** These don't support inline `style` directives. On dark backgrounds they are unreadable — convert to flowcharts. On light backgrounds (specifically `apple-basic` theme), Beautiful Mermaid's auto-theming happens to work for these types. Test with `screenshot-audit.mjs` to verify.
 
 ### Layout collision prevention
 - For slides with both text and diagrams, use absolute positioning (`class: absolute`) or dedicated diagram-only slides
@@ -612,9 +614,10 @@ The audience must instantly see what matters. Contrast is created by size, weigh
 - Section dividers (`layout: section`) must visually invert the default slide — dark-on-light decks get light-on-dark sections, and vice versa. This structural contrast creates chapter rhythm.
 
 **Mermaid diagram contrast:**
-- Every node in a flowchart must have an explicit `style` directive with `fill`, `stroke`, and `color`. Unstyled nodes inherit Mermaid defaults that may not contrast with the deck background.
-- Every flowchart must include `linkStyle default stroke:<color>,stroke-width:2px` where `<color>` contrasts with `--deck-bg`. Without this, arrow lines may be invisible.
-- For sequenceDiagram and stateDiagram-v2: Beautiful Mermaid's auto-theming handles most styling, but dark-background decks should include CSS overrides for `.actor`, `.messageText`, `.statediagram-state rect`, and `.transition` elements (see reference deck's theme.css for the pattern).
+- Every flowchart node must have an explicit `style` directive with `fill`, `stroke`, and `color`. Beautiful Mermaid's `color-mix()` auto-theming produces black boxes — never rely on it.
+- Every flowchart must include `linkStyle default stroke:<color>,stroke-width:2px` where `<color>` contrasts with `--deck-bg`.
+- Never use edge labels (`-->|text|`) — they render as unthemeable black boxes on all backgrounds.
+- `sequenceDiagram` and `stateDiagram-v2` only work on light backgrounds (specifically `apple-basic` theme). On dark backgrounds, convert to flowcharts.
 
 **Token completeness:**
 - All four required tokens (`--deck-bg`, `--deck-fg`, `--deck-accent`, `--deck-muted`) must be defined in `tokens.css`. Missing `--deck-bg` breaks Beautiful Mermaid auto-theming. Missing `--deck-muted` breaks subtitle and secondary text styling.

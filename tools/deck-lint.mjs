@@ -499,6 +499,12 @@ function checkMermaidSyntax(code, slideIndex) {
       warnings.push(`slide ${slideIndex}: Mermaid flowchart missing linkStyle default — arrow lines may be invisible on the slide background`);
     }
 
+    // ── Edge labels produce black boxes on all backgrounds ──
+    const hasEdgeLabels = lines.some(l => /-->\|/.test(l) || /-->\s*\|/.test(l) || /-\.->\|/.test(l));
+    if (hasEdgeLabels) {
+      warnings.push(`slide ${slideIndex}: Mermaid flowchart uses edge labels (-->|text|) — these render as unthemeable black boxes. Remove labels and explain flow in body text.`);
+    }
+
     // ── CRAP Contrast: classDef assignment completeness ──
     // Every defined classDef must be assigned to at least one node
     const classDefNames = new Set();
@@ -514,6 +520,13 @@ function checkMermaidSyntax(code, slideIndex) {
         warnings.push(`slide ${slideIndex}: Mermaid classDef "${cd}" defined but never assigned to any node`);
       }
     }
+  }
+
+  // ── Non-flowchart types on dark backgrounds ──
+  const DARK_UNSAFE_TYPES = ['sequencediagram', 'statediagram', 'statediagram-v2', 'classdiagram', 'erdiagram'];
+  if (DARK_UNSAFE_TYPES.includes(diagramType)) {
+    // Mark for caller to check against colorSchema
+    warnings.push(`__DARK_CHECK__:slide ${slideIndex}: Mermaid ${diagramType} — unreadable on dark backgrounds (Beautiful Mermaid auto-theming fails). Convert to flowchart or use only on light-bg decks.`);
   }
 
   // ── Missing diagram type ──
@@ -994,8 +1007,17 @@ function lintDeck(deckDir) {
 
       // Content syntax checks
       const mermaidIssues = checkMermaidSyntax(code, slide.index);
+      const colorSchema = fm?.colorSchema || 'dark';
+      const isDark = colorSchema === 'dark';
       for (const issue of mermaidIssues) {
-        warns.push(issue);
+        // __DARK_CHECK__ issues only apply to dark-bg decks
+        if (issue.startsWith('__DARK_CHECK__:')) {
+          if (isDark) {
+            warns.push(issue.replace('__DARK_CHECK__:', ''));
+          }
+        } else {
+          warns.push(issue);
+        }
       }
 
       // Options: theme and scale must be explicit
