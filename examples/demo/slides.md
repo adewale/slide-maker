@@ -3,43 +3,69 @@ theme: default
 title: Slide Maker
 routerMode: hash
 selectable: true
-colorSchema: dark
+colorSchema: light
 fonts:
-  sans: Outfit
-  serif: Plus Jakarta Sans
-  mono: JetBrains Mono
-transition: slide-left
+  sans: Source Sans 3
+  serif: Young Serif
+  mono: Source Code Pro
+  weights: '400,600,700'
+transition: fade
 layout: cover
 ---
 
 # Slide Maker
 
-Native Slidev decks. Strong visual direction. Minimal abstraction.
+Decks that survive the podium. Built from specs, not templates.
 
-github.com/adewale/skill-maker
-
-<!-- This meta-deck explains how Slide Maker works — the skill that builds all other decks. The tension it resolves: generated slides are either too generic (interchangeable, no visual identity) or too brittle (break when you edit them). The dual-layer architecture exists to solve this specific problem.
-
-Sources:
-- file:slide-maker/COMPILER_RULES.md — build phases and acceptance checklist
-- file:slide-maker/STYLE_PRESETS.md — the seven visual direction presets
-- file:slide-maker/DECK_SPEC.md — planning schema specification -->
+<!-- The opening line frames the core problem without naming it yet. "Survive the podium" implies fragility; "specs, not templates" hints at the architecture. This is a warm parchment palette with Young Serif display type and Source Sans 3 body. Deliberately light mode, deliberately serif, deliberately not the AI-aesthetic dark-purple-gradient default. -->
 
 ---
 layout: statement
-transition: fade
+transition: morph-fade
 ---
 
-# Most generated slides are too generic or too brittle
+# Every generated deck looks the same because styling happens last
 
-<!-- The core problem. "Generic" means: same fonts, same layouts, same gradient backgrounds, indistinguishable from any other AI-generated deck. "Brittle" means: custom HTML that breaks when you add a bullet point or change a heading. These are the two failure modes the skill is designed to prevent. -->
+<!-- The tension. Most AI slide tools apply a "theme" after writing content, which means visual identity is decoration, not direction. The result: interchangeable purple-gradient-on-dark decks with Inter type and rounded-corner cards. This slide names the failure mode. -->
+
+---
+transition: slide-left
+---
+
+# The fix: decide direction before writing a single slide
+
+```mermaid {scale: 0.72}
+graph LR
+  A["Brief"]
+  B["Direction"]
+  C["Spec"]
+  D["Compile"]
+  E["Validate"]
+  F["Present"]
+  A --> B
+  B --> C
+  C --> D
+  D --> E
+  E --> F
+  style A fill:#f4f0e8,stroke:#b44215,color:#2b2622
+  style B fill:#b44215,stroke:#b44215,color:#f4f0e8
+  style C fill:#f4f0e8,stroke:#b44215,color:#2b2622
+  style D fill:#f4f0e8,stroke:#b44215,color:#2b2622
+  style E fill:#f4f0e8,stroke:#b44215,color:#2b2622
+  style F fill:#f4f0e8,stroke:#2a6e4e,color:#2b2622
+  linkStyle default stroke:#b44215,stroke-width:2px
+```
+
+**Direction** is step two — before the spec, before any slides exist. By the time compilation starts, the deck already has a voice.
+
+<!-- The flowchart shows the full user journey: brief (what you want to say), direction (how it should look and feel), spec (the structured plan), compile (Markdown generation), validate (WCAG checks, LLM-tell audit, screenshot review), present. The bold highlight on Direction is the key insight. This is the anti-generic mechanism. No edge labels because Mermaid renders them as black boxes; every node has explicit inline style. -->
 
 ---
 layout: SplitInsight
-transition: slide-up
+transition: wipe-right
 ---
 
-# Two layers prevent both failures
+# Two layers, one source of truth
 
 ::left::
 
@@ -47,10 +73,9 @@ transition: slide-up
 
 <v-clicks>
 
-- **deck.spec.md** captures intent
-- Structure, tokens, boundaries
-- Visual direction decided here, not in slides
-- The blueprint you edit first
+- **deck.spec.md** locks intent before compilation
+- Tokens, layout choices, slide outlines
+- Edit the blueprint to change direction
 
 </v-clicks>
 
@@ -58,178 +83,104 @@ transition: slide-up
 
 ### Presentation layer
 
-- **slides.md** is the compiled output
-- Native Slidev Markdown
-- The building you present
+- **slides.md** is native Slidev Markdown
+- `tokens.css` + `theme.css` carry the visual identity
+- Edit slides to change content — nothing breaks
 
-<!-- The dual-layer architecture solves both failure modes.
+<!-- The dual-layer architecture solves both failure modes. The spec layer prevents generic output by forcing direction choices upfront. The presentation layer prevents brittle output by compiling to native Slidev Markdown, not custom wrapper HTML.
 
-[click] deck.spec.md captures intent — the spec layer prevents generic output by forcing visual direction choices before compilation. You decide what the deck looks like before writing a single slide.
+[click] deck.spec.md locks intent — font families, color tokens, layout preferences, and slide-by-slide outlines are decided before any Markdown is written.
 
-[click] Structure, tokens, boundaries — these are planning concerns, not presentation concerns. The spec holds them so the slides don't have to.
+[click] Tokens, layout choices, slide outlines — these are planning concerns, separated from presentation concerns.
 
-[click] Visual direction decided here, not in slides — this is the anti-generic mechanism. By the time compilation starts, the deck already has a voice.
-
-[click] The blueprint you edit first — edit the spec to change direction. Edit slides.md to change content. Neither breaks the other. The presentation layer prevents brittle output by compiling to native Slidev Markdown, not custom HTML.
-
-Sources:
-- file:slide-maker/DECK_SPEC.md — planning schema with required sections (Meta, Design Tokens, Layout System, Slides)
-- file:slide-maker/COMPILER_RULES.md — compilation phases from spec to slides -->
-
----
-layout: section
----
-
-# Use the lowest level that works
-
-Not the most impressive — the most maintainable.
-
-<!-- The section divider reframes the escalation ladder as an anti-brittle principle. "Not the most impressive" is the key qualifier — the temptation is always to reach for custom HTML because it looks better, but it breaks when content changes. -->
-
----
-transition: fade
----
-
-# Start with Markdown and stop as soon as it works
-
-<div v-motion :initial="{ opacity: 0, x: -30 }" :enter="{ opacity: 1, x: 0, transition: { delay: 200, duration: 600 } }">
-
-<v-clicks>
-
-1. **Markdown** — always start here
-2. **Built-in layout** — cover, section, center, fact, end
-3. **Custom layout** — only when a structure repeats
-4. **Custom component** — only when a block has props and reuse
-5. **Inline HTML** — last resort
-
-</v-clicks>
-
-</div>
-
-<!-- Each level is annotated with its relationship to the generic/brittle tension.
-
-[click] Markdown is resilient but can be generic — presets fix that. Always start here because it never breaks when you edit content.
-
-[click] Built-in layouts add structure without fragility — cover, section, center, fact, end. These are free complexity.
-
-[click] Custom layouts are justified only when a structure repeats across multiple slides. This is where you start paying a maintenance cost.
-
-[click] Custom components are justified only when a block has props and reuse. Higher cost, but contained.
-
-[click] Inline HTML is the brittle zone — last resort. This is where generated decks break most often. Every line of inline HTML is a maintenance liability.
-
-Sources:
-- file:slide-maker/COMPILER_RULES.md — "Decide implementation level per slide" section defining the five-level escalation -->
-
----
-layout: SplitInsight
----
-
-# What goes in. What comes out.
-
-::left::
-
-### Inputs
-
-- Title, goal, audience
-- Tone and target length
-- Source material
-- Brand constraints
-
-::right::
-
-### Outputs
-
-- `slides.md`
-- `deck.spec.md`
-- `styles/tokens.css` + `theme.css`
-- Layouts and components only when justified
-
-<!-- No v-clicks here — these lists have equal weight and the audience should see the full picture at once. The "only when justified" on the outputs side echoes the escalation ladder.
-
-Sources:
-- file:slide-maker/COMPILER_RULES.md — Inputs (required/optional) and Outputs (required/optional) sections -->
-
----
-transition: slide-left
----
-
-# From spec to slides
-
-````md
-# deck.spec.md
-## Meta
-- title: My Deck
-- style-preset: editorial-dark
-- target-length: 8
-
-## Slides
-### Slide 1
-- kind: cover
-- title: My Deck
-````
-
-<v-click>
-
-becomes `slides.md` with tokens, theme, layouts, and visual polish — all from one spec file.
-
-</v-click>
-
-<!-- The spec file is the single source of truth. The "style-preset" field is what prevents generic output — it forces a visual direction choice at the spec level, before any slides are written. Visual identity is a planning concern, not a presentation concern.
-
-Sources:
-- file:slide-maker/DECK_SPEC.md — canonical template showing the spec-to-slides compilation path -->
+[click] Edit the blueprint to change direction — the spec is the steering wheel, the slides are the road. -->
 
 ---
 transition: slide-up
 ---
 
-# One skill, six different-looking decks
+# Six presets, zero sameness
 
-```mermaid {theme: 'dark', scale: 0.6}
-graph TD
-  SP((Style Presets)) --> ED["editorial-dark: Serious"]
-  SP --> SM["swiss-minimal: Precise"]
-  SP --> BM["bold-modern: Energetic"]
-  SP --> TD2["tufte-data: Scholarly"]
-  SP --> CF["cloudflare: Workshop"]
-  SP --> MD["material-design: Systematic"]
-  classDef hub fill:#a78bfa,stroke:#a78bfa,color:#0a0a0f
-  classDef leaf fill:#1e1e2e,stroke:#a78bfa,color:#f0f0f5
-  class SP hub
-  class ED,SM,BM,TD2,CF,MD leaf
-  linkStyle default stroke:#a78bfa,stroke-width:2px
-```
+<v-clicks>
 
-Each preset controls typography, color, motion, and layout tendencies — the same content looks and feels different under each preset. This is how one skill produces decks that don't look generated.
+- **editorial-dark** — Playfair Display on near-black. Board decks, investor updates.
+- **swiss-minimal** — DM Sans on white. Technical briefings, research.
+- **bold-modern** — Bebas Neue, saturated backgrounds. Launches, keynotes.
+- **tufte-data** — EB Garamond, 60/30 column split. Evidence-heavy analysis.
+- **cloudflare** — Warm cream, orange accents. Developer workshops.
+- **material-design** — M3 elevation, systematic. Product walkthroughs.
 
-<!-- Presets are not skins applied after the fact. They're directions — they influence which layouts get chosen, how transitions behave, and what the typography communicates. A "serious" deck uses different v-click animations than an "energetic" one. editorial-dark fades in; bold-modern scales and slides.
+</v-clicks>
 
-Sources:
-- file:slide-maker/STYLE_PRESETS.md — six preset definitions with palette, typography, motion, interaction patterns -->
+<!-- Each preset controls typography, color, motion character, and layout tendencies. The same content under editorial-dark feels restrained and high-trust; under bold-modern it feels assertive and launch-ready. Presets are not skins applied after the fact. They are directions that influence which layouts get chosen and how transitions behave.
+
+[click] through [click] Each preset is a different opinion about how information should feel. Real designers make these choices deliberately; Slide Maker forces the choice before writing slides. -->
 
 ---
+layout: section
+transition: iris
+---
 
-# Direction comes before content
+# What the compiler actually does
 
-```mermaid {theme: 'dark', scale: 0.9}
-graph LR
-  A["Intake"] --> B["Direction"] --> C["Spec"] --> D["Compile"] --> E["Validate"]
-  classDef light fill:#a78bfa,stroke:#a78bfa,color:#0a0a0f
-  classDef mid fill:#7c3aed,stroke:#7c3aed,color:#fff
-  classDef dark fill:#5b21b6,stroke:#5b21b6,color:#fff
-  class A light
-  class B,C mid
-  class D,E dark
-  linkStyle default stroke:#a78bfa,stroke-width:2px
-```
+Not a template engine. A seven-phase build.
 
-Notice: "Direction" comes before "Spec" — the visual identity decision is made before any slides are written. This is the anti-generic mechanism. By the time compilation starts, the deck already has a voice.
+<!-- Section break. The word "actually" signals specificity. This is where the deck gets concrete about the build process. -->
 
-<!-- The workflow enforces the principle: direction before content. In the generic failure mode, styling is applied after compilation — backwards. The current workflow makes direction the second step, before a single slide is written.
+---
+transition: slide-left
+---
 
-Sources:
-- file:slide-maker/COMPILER_RULES.md — compilation phases (Normalize, Decide level, Write headmatter, Write slides, Write tokens, Write theme) -->
+# The build: normalize, decide, write, validate
+
+<v-clicks>
+
+1. **Normalize** the brief into structured inputs
+2. **Decide implementation level** per slide — Markdown first, HTML last
+3. **Write headmatter** with tokens, fonts, transitions
+4. **Write slides** using the spec's outline and the preset's tendencies
+5. **Write tokens and theme CSS** from the spec's design tokens
+6. **Validate** — WCAG contrast ratios, LLM-tell audit, CRAP principles
+7. **Screenshot audit** — does the rendered deck match the spec's intent?
+
+</v-clicks>
+
+<!-- The seven phases are sequential. Validation is not optional — the compiler checks its own output against WCAG AA (4.5:1 for body text, 3:1 for large text), runs an LLM-tell check against the catalog in LLM_TELLS.md, and applies CRAP design principles (Contrast, Repetition, Alignment, Proximity).
+
+[click] through [click] Progressive reveal here earns its place because each phase builds on the previous one. The audience should see the dependency chain forming. -->
+
+---
+transition: morph-fade
+---
+
+# The toolkit
+
+<div class="grid grid-cols-2 gap-8 mt-4">
+<div>
+
+### Transitions
+
+12 built-in: fade, slide-left, slide-up, iris, wipe-right, wipe-up, morph-fade, zoom-in, zoom-out, flip-x, flip-y, blur
+
+### Visual effects
+
+v-motion, v-mark (underline, circle, strike, highlight, box), Shiki Magic Move for code transforms
+
+</div>
+<div>
+
+### Data visualization
+
+Mermaid flowcharts, sequence diagrams, mind maps, pie charts, timelines, git graphs, entity-relationship, state diagrams — all with explicit inline styling
+
+### Design guardrails
+
+WCAG contrast checking, LLM-tell detection, CRAP audit, screenshot validation
+
+</div>
+</div>
+
+<!-- This is the breadth slide. No v-clicks — the point is volume, not sequence. Two columns keep it scannable. The numbers are specific: 12 transitions (not "many"), 8 Mermaid diagram types (not "various"), 5 v-mark annotation styles. Specificity is the antidote to AI-generated vagueness. -->
 
 ---
 layout: center
@@ -238,56 +189,53 @@ transition: fade
 
 # The priority stack
 
+<div class="text-4xl font-bold tracking-tight leading-relaxed" style="font-family: var(--deck-font-display);">
+
 <v-clicks>
 
-<div class="text-4xl font-bold tracking-tight leading-relaxed">
-<span class="opacity-100">Editability</span><br>
-<span class="opacity-75">Clarity</span><br>
-<span class="opacity-55">Coherence</span><br>
-<span class="opacity-40">Native Slidev</span><br>
-<span class="opacity-30">Reuse</span><br>
-<span class="opacity-20">Restraint</span>
-</div>
+<span style="opacity: 1;">Editability</span><br>
+<span style="opacity: 0.72;">Clarity</span><br>
+<span style="opacity: 0.52;">Coherence</span><br>
+<span style="opacity: 0.38;">Native Slidev</span><br>
+<span style="opacity: 0.28;">Reuse</span><br>
+<span style="opacity: 0.20;">Restraint</span>
 
 </v-clicks>
 
-Each click reveals the next priority. The fade communicates the hierarchy — the top matters most.
+</div>
 
-<!-- The priority order resolves the generic/brittle tension. The opacity gradient makes the ranking visceral rather than just listed.
+<!-- The opacity gradient makes the hierarchy visceral. Editability at the top means: if you cannot change the deck without breaking it, nothing else matters. Restraint at the bottom is the reminder that complexity is the enemy.
 
-[click] Editability first — the anti-brittle priority. If you can't edit the deck without breaking it, nothing else matters.
+[click] Editability — the anti-brittle priority. Native Markdown over custom HTML.
 
-[click] Clarity second — the anti-generic priority. The deck must communicate clearly, not just exist.
+[click] Clarity — the anti-generic priority. Every slide argues something.
 
-[click] Coherence — every slide serves the argument. No orphan slides, no filler.
+[click] Coherence — no orphan slides, no filler.
 
-[click] Native Slidev — stay on the platform. Don't fight the tool.
+[click] Native Slidev — stay on the platform.
 
-[click] Reuse — shared components, shared presets, shared transitions.
+[click] Reuse — shared presets, shared transitions.
 
-[click] Restraint last — a reminder that the temptation to add complexity is the enemy of both goals. Less is almost always more.
-
-Sources:
-- file:slide-maker/COMPILER_RULES.md — "Goals" section listing the six optimization priorities -->
+[click] Restraint — use just enough of everything. A good deck has few layouts, readable Markdown, and no wrapper soup. -->
 
 ---
 layout: quote
+transition: slide-up
 ---
 
-# "Restraint is the feature"
+# The test: close the tab. What do you remember?
 
-A good deck has few layouts, few components, readable Markdown, and no legacy HTML smell.
+A generic deck leaves nothing. No image, no number, no story. The information was arranged correctly but never argued anything. There was no point of view.
 
-<!-- Restraint is the synthesis. A generic deck has too little visual identity. A brittle deck has too much custom implementation. Restraint is the discipline of using just enough of both — strong direction, minimal abstraction. -->
+<!-- This is from LLM_TELLS.md's "meta-signal" section — the ultimate test for whether a deck reads as AI-generated. It reframes the opening tension: the problem is not just that generated decks look the same; it is that they say nothing memorable. Direction is not decoration. Direction is the argument. -->
 
 ---
 layout: end
-transition: fade
+transition: iris
 ---
 
-# The best slide deck is the one you actually give
+# Direction first. Then slides.
 
-<!-- The closing resolves the opening. "Most generated slides are too generic or too brittle" — generic decks get abandoned because they're embarrassing, brittle decks get abandoned because they break. The goal isn't perfect slides — it's slides that survive contact with a real presenter and a real audience.
+That is the entire idea.
 
-Sources:
-- file:slide-maker/COMPILER_RULES.md — acceptance checklist defining what "done" means -->
+<!-- The closing mirrors the opening. "Decks that survive the podium" resolves to "Direction first. Then slides." The second line defuses any impulse to add more — the idea is small enough to hold in one hand. No install command, no URL, no "questions?" — just the thesis. -->

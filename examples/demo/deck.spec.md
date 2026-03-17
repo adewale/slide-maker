@@ -2,26 +2,28 @@
 
 ## Meta
 - title: Slide Maker
-- purpose: introduce the slide-maker skill
-- audience: developers and Claude Code users
-- tone: assertive, energetic, approachable
-- target-length: 11
+- purpose: introduce the slide-maker skill — its architecture, workflow, and design philosophy
+- audience: developers and Claude Code users building presentation decks
+- tone: direct, specific, opinionated
+- target-length: 12
 - notes: yes
-- style-preset: bold-modern
+- style-preset: editorial-dark
 
 ## Design Tokens
 - colors:
-  - bg: "#0f0a1e"
-  - fg: "#f0eef5"
-  - accent: "#a78bfa"
-  - accent-alt: "#fb923c"
-  - muted: "rgba(240, 238, 245, 0.5)"
+  - bg: "#f4f0e8"
+  - fg: "#2b2622"
+  - accent: "#b44215"
+  - accent-alt: "#2a6e4e"
+  - muted: "#8a7f72"
+  - rule: "#c9c1b3"
+  - code-bg: "#ebe5d9"
 - typography:
-  - display: Outfit
-  - body: Plus Jakarta Sans
-  - mono: JetBrains Mono
+  - display: Young Serif
+  - body: Source Sans 3
+  - mono: Source Code Pro
 - motion:
-  - preset: medium-reveal
+  - preset: editorial-restrained
 
 ## Layout System
 - prefer-builtins: true
@@ -30,7 +32,7 @@
   - statement
   - section
   - default
-  - two-cols-header
+  - center
   - fact
   - quote
   - end
@@ -47,91 +49,90 @@
 - kind: cover
 - layout: cover
 - title: Slide Maker
-- subtitle: Native Slidev decks. Strong visual direction. Minimal abstraction.
+- subtitle: Decks that survive the podium. Built from specs, not templates.
 
 ### Slide 2
 - kind: center-statement
 - layout: statement
-- title: Most generated slides are too generic or too brittle
+- title: Every generated deck looks the same because styling happens last
 
 ### Slide 3
-- kind: split-insight
-- layout: SplitInsight
-- title: Two layers. One source of truth.
-- left:
-  - heading: Planning layer
-  - bullet: deck.spec.md captures intent
-  - bullet: Structure, tokens, boundaries
-  - bullet: The blueprint you edit first
-- right:
-  - heading: Presentation layer
-  - bullet: slides.md is the compiled output
-  - bullet: Native Slidev Markdown
-  - bullet: The building you present
+- kind: default-content
+- layout: default
+- title: The fix: decide direction before writing a single slide
+- body:
+  - diagram: flowchart Brief → Direction → Spec → Compile → Validate → Present (inline styled nodes, no edge labels)
+  - text: Direction is step two — before the spec, before any slides exist.
 
 ### Slide 4
-- kind: section
-- layout: section
-- title: The escalation ladder
-- subtitle: Use the lowest level that solves the slide cleanly.
+- kind: split-insight
+- layout: SplitInsight
+- title: Two layers, one source of truth
+- left:
+  - heading: Planning layer
+  - bullet: deck.spec.md locks intent before compilation
+  - bullet: Tokens, layout choices, slide outlines
+  - bullet: Edit the blueprint to change direction
+- right:
+  - heading: Presentation layer
+  - bullet: slides.md is native Slidev Markdown
+  - bullet: tokens.css + theme.css carry the visual identity
+  - bullet: Edit slides to change content — nothing breaks
 
 ### Slide 5
 - kind: default-content
 - layout: default
-- title: Five levels of implementation
+- title: Six presets, zero sameness
 - body:
-  - numbered: Markdown — always start here
-  - numbered: Built-in layout — cover, section, center, fact, end
-  - numbered: Custom layout — only when a structure repeats
-  - numbered: Custom component — only when a block has props and reuse
-  - numbered: Inline HTML — last resort
+  - bullet: editorial-dark — Playfair Display on near-black
+  - bullet: swiss-minimal — DM Sans on white
+  - bullet: bold-modern — Bebas Neue, saturated backgrounds
+  - bullet: tufte-data — EB Garamond, 60/30 column split
+  - bullet: cloudflare — Warm cream, orange accents
+  - bullet: material-design — M3 elevation, systematic
 
 ### Slide 6
-- kind: split-insight
-- layout: SplitInsight
-- title: What goes in. What comes out.
-- left:
-  - heading: Inputs
-  - bullet: Title, goal, audience
-  - bullet: Tone and target length
-  - bullet: Source material
-  - bullet: Brand constraints
-- right:
-  - heading: Outputs
-  - bullet: slides.md
-  - bullet: deck.spec.md
-  - bullet: styles/tokens.css + theme.css
-  - bullet: Layouts and components only when justified
+- kind: section
+- layout: section
+- title: What the compiler actually does
+- subtitle: Not a template engine. A seven-phase build.
 
 ### Slide 7
 - kind: default-content
 - layout: default
-- title: Three visual directions
+- title: The build: normalize, decide, write, validate
 - body:
-  - diagram: mindmap of editorial-dark, swiss-minimal, bold-modern
+  - numbered: Normalize the brief into structured inputs
+  - numbered: Decide implementation level per slide
+  - numbered: Write headmatter with tokens, fonts, transitions
+  - numbered: Write slides using the spec's outline
+  - numbered: Write tokens and theme CSS
+  - numbered: Validate — WCAG contrast, LLM-tell audit, CRAP principles
+  - numbered: Screenshot audit
 
 ### Slide 8
 - kind: default-content
 - layout: default
-- title: Five-step workflow
+- title: The toolkit
 - body:
-  - diagram: flowchart Intake to Direction to Spec to Compile to Validate
+  - grid: 2-column breadth overview
+  - left: 12 transitions, v-motion, v-mark (5 styles), Shiki Magic Move
+  - right: 8 Mermaid diagram types, WCAG checking, LLM-tell detection, CRAP audit
 
 ### Slide 9
-- kind: fact
-- layout: fact
-- title: 6
-- subtitle: Priorities in order
-- body: Editability, Clarity, Coherence, Native Slidev, Reuse, Restraint
+- kind: center
+- layout: center
+- title: The priority stack
+- body: Editability, Clarity, Coherence, Native Slidev, Reuse, Restraint (opacity gradient, progressive reveal)
 
 ### Slide 10
 - kind: quote-pull
 - layout: quote
-- title: Restraint is the feature
-- body: A good deck has few layouts, few components, readable Markdown, and no legacy HTML smell.
+- title: The test: close the tab. What do you remember?
+- body: A generic deck leaves nothing. No image, no number, no story.
 
 ### Slide 11
 - kind: end
 - layout: end
-- title: Start building
-- body: /slide-maker in Claude Code
+- title: Direction first. Then slides.
+- body: That is the entire idea.

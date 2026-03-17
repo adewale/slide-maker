@@ -28,10 +28,36 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --border: #e4e4e7;
+      --fg: #18181b;
+      --fg-muted: #71717a;
+      --fg-faint: #a1a1aa;
+      --accent-core: #7c3aed;
+      --tag-bg: #f4f4f5;
+      --tag-fg: #52525b;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0a0a0f;
+        --surface: #18181b;
+        --border: #27272a;
+        --fg: #e4e4e7;
+        --fg-muted: #71717a;
+        --fg-faint: #a1a1aa;
+        --accent-core: #a78bfa;
+        --tag-bg: #27272a;
+        --tag-fg: #71717a;
+      }
+    }
+
     body {
       font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      background: #0a0a0f;
-      color: #e4e4e7;
+      background: var(--bg);
+      color: var(--fg);
       min-height: 100vh;
       padding: 3rem 2rem;
     }
@@ -44,14 +70,26 @@
     header h1 {
       font-size: 2.25rem;
       font-weight: 700;
-      color: #a78bfa;
+      color: var(--accent-core);
       letter-spacing: -0.02em;
     }
 
     header p {
       margin-top: 0.5rem;
-      color: #71717a;
+      color: var(--fg-muted);
       font-size: 1rem;
+    }
+
+    header p a {
+      color: var(--fg-faint);
+      font-size: 0.8rem;
+      text-decoration: none;
+      opacity: 0.7;
+    }
+
+    header p a:hover {
+      opacity: 1;
+      text-decoration: underline;
     }
 
     .section-label {
@@ -61,8 +99,8 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: #52525b;
-      border-bottom: 1px solid #27272a;
+      color: var(--fg-faint);
+      border-bottom: 1px solid var(--border);
       padding-bottom: 0.5rem;
     }
 
@@ -79,8 +117,8 @@
     }
 
     .card {
-      background: #18181b;
-      border: 1px solid #27272a;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 1.5rem;
       display: flex;
@@ -102,7 +140,7 @@
 
     .card .desc {
       font-size: 0.875rem;
-      color: #a1a1aa;
+      color: var(--fg-muted);
       line-height: 1.5;
       flex: 1;
     }
@@ -119,8 +157,8 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      color: #52525b;
-      background: #27272a;
+      color: var(--tag-fg);
+      background: var(--tag-bg);
       padding: 0.2rem 0.5rem;
       border-radius: 4px;
     }
@@ -148,7 +186,7 @@
     .card a.md-link {
       font-size: 0.7rem;
       opacity: 0.5;
-      color: #a1a1aa;
+      color: var(--fg-muted);
     }
 
     .card a.md-link:hover {
@@ -178,7 +216,7 @@
 <body>
   <header>
     <h1>Slide Maker</h1>
-    <p>10 Slidev decks. Pick one to present. <a href="llms.txt" style="color: #52525b; font-size: 0.8rem; text-decoration: none; opacity: 0.7;">llms.txt</a></p>
+    <p>10 Slidev decks. Pick one to present. <a href="/llms.txt">llms.txt</a></p>
   </header>
 
   <div class="section-label">Core</div>
@@ -189,8 +227,8 @@
       <div class="meta">
         <span class="tag">bold-modern</span>
         <div class="links">
-          <a href="slide-maker/">View deck</a>
-          <a href="view.html?deck=slide-maker" class="md-link">MD</a>
+          <a href="/slide-maker/">View deck</a>
+          <a href="/view?deck=slide-maker" class="md-link">MD</a>
         </div>
       </div>
     </div>
@@ -201,8 +239,8 @@
       <div class="meta">
         <span class="tag">reference</span>
         <div class="links">
-          <a href="reference/">View deck</a>
-          <a href="view.html?deck=reference" class="md-link">MD</a>
+          <a href="/reference/">View deck</a>
+          <a href="/view?deck=reference" class="md-link">MD</a>
         </div>
       </div>
     </div>
@@ -216,8 +254,8 @@
       <div class="meta">
         <span class="tag">bold-modern</span>
         <div class="links">
-          <a href="vaders/">View deck</a>
-          <a href="view.html?deck=vaders" class="md-link">MD</a>
+          <a href="/vaders/">View deck</a>
+          <a href="/view?deck=vaders" class="md-link">MD</a>
         </div>
       </div>
     </div>
@@ -228,8 +266,8 @@
       <div class="meta">
         <span class="tag">swiss-minimal</span>
         <div class="links">
-          <a href="planet-cf/">View deck</a>
-          <a href="view.html?deck=planet-cf" class="md-link">MD</a>
+          <a href="/planet-cf/">View deck</a>
+          <a href="/view?deck=planet-cf" class="md-link">MD</a>
         </div>
       </div>
     </div>
@@ -240,8 +278,8 @@
       <div class="meta">
         <span class="tag">editorial-dark</span>
         <div class="links">
-          <a href="claude-history-explorer/">View deck</a>
-          <a href="view.html?deck=claude-history-explorer" class="md-link">MD</a>
+          <a href="/claude-history-explorer/">View deck</a>
+          <a href="/view?deck=claude-history-explorer" class="md-link">MD</a>
         </div>
       </div>
     </div>
@@ -252,8 +290,8 @@
       <div class="meta">
         <span class="tag">editorial-dark</span>
         <div class="links">
-          <a href="geist-fabrik/">View deck</a>
-          <a href="view.html?deck=geist-fabrik" class="md-link">MD</a>
+          <a href="/geist-fabrik/">View deck</a>
+          <a href="/view?deck=geist-fabrik" class="md-link">MD</a>
         </div>
       </div>
     </div>
@@ -264,8 +302,8 @@
       <div class="meta">
         <span class="tag">swiss-minimal</span>
         <div class="links">
-          <a href="olsen/">View deck</a>
-          <a href="view.html?deck=olsen" class="md-link">MD</a>
+          <a href="/olsen/">View deck</a>
+          <a href="/view?deck=olsen" class="md-link">MD</a>
         </div>
       </div>
     </div>
@@ -276,8 +314,8 @@
       <div class="meta">
         <span class="tag">editorial-dark</span>
         <div class="links">
-          <a href="tasche/">View deck</a>
-          <a href="view.html?deck=tasche" class="md-link">MD</a>
+          <a href="/tasche/">View deck</a>
+          <a href="/view?deck=tasche" class="md-link">MD</a>
         </div>
       </div>
     </div>
@@ -288,8 +326,8 @@
       <div class="meta">
         <span class="tag">tufte-data</span>
         <div class="links">
-          <a href="tufte/">View deck</a>
-          <a href="view.html?deck=tufte" class="md-link">MD</a>
+          <a href="/tufte/">View deck</a>
+          <a href="/view?deck=tufte" class="md-link">MD</a>
         </div>
       </div>
     </div>
@@ -300,8 +338,8 @@
       <div class="meta">
         <span class="tag">cloudflare</span>
         <div class="links">
-          <a href="durable-objects/">View deck</a>
-          <a href="view.html?deck=durable-objects" class="md-link">MD</a>
+          <a href="/durable-objects/">View deck</a>
+          <a href="/view?deck=durable-objects" class="md-link">MD</a>
         </div>
       </div>
     </div>

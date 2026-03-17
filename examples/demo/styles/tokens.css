@@ -1,10 +1,17 @@
 :root {
-  --deck-bg: #0f0a1e;
-  --deck-fg: #f0eef5;
-  --deck-accent: #a78bfa;
-  --deck-accent-alt: #fb923c;
-  --deck-muted: rgba(240, 238, 245, 0.5);
-  --deck-font-display: 'Outfit', sans-serif;
-  --deck-font-body: 'Plus Jakarta Sans', sans-serif;
-  --deck-font-mono: 'JetBrains Mono', monospace;
+  /* Warm parchment palette — anti-LLM: no purple gradients, no dark mode, no neon
+     WCAG AA verified:
+       fg on bg  = 13.17:1  (pass 4.5:1 normal)
+       accent on bg = 4.95:1 (pass 4.5:1 normal)
+       muted on bg  = 4.7:1  (pass 4.5:1 normal) */
+  --deck-bg: #f4f0e8;
+  --deck-fg: #2b2622;
+  --deck-accent: #b44215;
+  --deck-muted: #746a5e;
+  --deck-accent-alt: #2a6e4e;
+  --deck-rule: #c9c1b3;
+  --deck-code-bg: #ebe5d9;
+  --deck-font-display: 'Young Serif', serif;
+  --deck-font-body: 'Source Sans 3', sans-serif;
+  --deck-font-mono: 'Source Code Pro', monospace;
 }
