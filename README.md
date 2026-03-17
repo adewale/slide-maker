@@ -29,37 +29,48 @@ The `slide-maker/` directory is self-contained:
 | File | Purpose |
 |---|---|
 | `SKILL.md` | Entry point — defines modes, scope, and references |
-| `COMPILER_RULES.md` | Build phases and acceptance checklist |
+| `COMPILER_RULES.md` | Build phases, CRAP principles, Mermaid reliability matrix, acceptance checklist |
 | `DECK_SPEC.md` | Schema for `deck.spec.md` planning documents |
 | `SLIDE_KINDS.md` | Canonical slide types and escalation rules |
-| `STYLE_PRESETS.md` | Visual presets (editorial-dark, swiss-minimal, bold-modern, etc.) |
+| `STYLE_PRESETS.md` | 6 visual presets (editorial-dark, swiss-minimal, bold-modern, tufte-data, cloudflare, material-design) |
 | `SLIDEV_REFERENCE.md` | Slidev API reference for the skill |
 | `styles/` | Shared transition CSS |
-| `components/` | Reusable Vue components (GlassCard, ImageFX, etc.) |
+| `components/` | Reusable Vue components (GlassCard, ImageFX, Sparkline, SlopeChart, etc.) |
 
 ## Example decks
 
-The `examples/` directory contains 10 complete decks built with this skill:
+The `examples/` directory contains 2 core decks built with this skill:
+
+- **demo/** (`slide-maker`) — the skill's own presentation deck
+- **reference/** — every Slidev feature and Slide Maker extension in one deck (64 slides)
 
 ```bash
-cd examples && bash build.sh    # build all decks
+cd examples && bash build.sh    # build decks
 npx serve examples/_build       # serve at http://localhost:3000
 ```
 
-See individual decks: `demo/`, `vaders/`, `planet-cf/`, `tufte/`, `durable-objects/`, and more.
-
 ## Tools
 
-The `tools/` directory contains development utilities:
+| Tool | Purpose |
+|---|---|
+| **deck-lint.mjs** | Structural validator — WCAG contrast, Mermaid completeness, token coverage, content density |
+| **screenshot-audit.mjs** | Visual regression — Playwright-based contrast, overlap, and rendering checks across all slides and viewports |
+| **style-audit.mjs** | Verifies CSS tokens survive the build pipeline |
+| **new-deck.sh** | Scaffold a new deck with a style preset |
+| **deck-preview.mjs** | Text preview of slide content without launching dev server |
+| **deck-diff.mjs** | Visual regression comparison between screenshot sets |
+| **compare-decks.mjs** | Side-by-side comparison against a reference URL |
 
-- **deck-lint.mjs** — structural validator for deck directories
-- **style-audit.mjs** — verifies CSS tokens survive the build pipeline
-- **deck-preview.mjs** — headless screenshot tool for slide captures
-- **deck-diff.mjs** — visual regression comparison between screenshot sets
-- **compare-decks.mjs** — side-by-side comparison against a reference URL
-- **build-and-verify.sh** — post-build smoke test (tokens, selectors, fonts, slide count)
-- **new-deck.sh** — scaffold a new deck with a style preset
+## Project structure
 
-## Lessons learned
+```
+slide-maker/          # The skill (copy this to .claude/skills/)
+examples/             # Core example decks (demo + reference)
+  build.sh            # Builds all decks to _build/
+tools/                # Development and quality tools
+docs/                 # Lessons learned, rubrics, philosophy
+```
 
-See [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md) for hard-won insights from building decks with this skill.
+## License
+
+MIT — see [LICENSE](LICENSE).

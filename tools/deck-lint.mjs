@@ -1282,7 +1282,7 @@ function main() {
       return resolved;
     });
   } else {
-    // Auto-discover decks in both examples/ (core) and decks/ (local)
+    // Auto-discover decks in examples/ (and optionally decks/ if it exists)
     const coreDirs = discoverDecks(examplesDir);
     const localDirs = existsSync(decksDir) ? discoverDecks(decksDir) : [];
     deckDirs = [...coreDirs, ...localDirs];

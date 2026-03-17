@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$ROOT/.." && pwd)"
-DECKS_DIR="$REPO_ROOT/decks"
+DECKS_DIR="${DECKS_DIR:-}"  # optional external decks directory
 OUT="$ROOT/_build"
 
 # Install deps if needed
@@ -22,17 +22,8 @@ declare -a CORE_DECKS=(
   "reference:reference"
 )
 
-# Personal decks (in decks/) — local examples
-declare -a LOCAL_DECKS=(
-  "vaders:vaders"
-  "planet-cf:planet-cf"
-  "claude-history-explorer:claude-history-explorer"
-  "geist-fabrik:geist-fabrik"
-  "olsen:olsen"
-  "tasche:tasche"
-  "tufte:tufte"
-  "durable-objects:durable-objects"
-)
+# External decks (optional — set DECKS_DIR to include personal decks)
+declare -a LOCAL_DECKS=()
 
 # Build core decks from examples/
 for entry in "${CORE_DECKS[@]}"; do
@@ -49,19 +40,21 @@ for entry in "${CORE_DECKS[@]}"; do
   fi
 done
 
-# Build local decks from decks/
-for entry in "${LOCAL_DECKS[@]}"; do
-  dir="${entry%%:*}"
-  name="${entry##*:}"
-  echo ""
-  echo "Building $name..."
-  cd "$DECKS_DIR/$dir"
-  npx slidev build --base "${BASE_PREFIX:-}/$name/" --out "$OUT/$name"
-  cp "$DECKS_DIR/$dir/slides.md" "$OUT/$name/slides.md"
-  if [ -d "$DECKS_DIR/$dir/pages" ]; then
-    cp -r "$DECKS_DIR/$dir/pages" "$OUT/$name/pages"
-  fi
-done
+# Build external decks (if DECKS_DIR is set)
+if [ -n "$DECKS_DIR" ] && [ -d "$DECKS_DIR" ]; then
+  for entry in "${LOCAL_DECKS[@]}"; do
+    dir="${entry%%:*}"
+    name="${entry##*:}"
+    echo ""
+    echo "Building $name..."
+    cd "$DECKS_DIR/$dir"
+    npx slidev build --base "${BASE_PREFIX:-}/$name/" --out "$OUT/$name"
+    cp "$DECKS_DIR/$dir/slides.md" "$OUT/$name/slides.md"
+    if [ -d "$DECKS_DIR/$dir/pages" ]; then
+      cp -r "$DECKS_DIR/$dir/pages" "$OUT/$name/pages"
+    fi
+  done
+fi
 
 # ── Split slides.md into per-slide Markdown files ─────────────
 # Produces slides/1.md, slides/2.md, ... for each deck.
