@@ -2,18 +2,53 @@
 import { computed } from 'vue'
 import { useNav } from '@slidev/client'
 
-const { currentPage, total, currentLayout } = useNav()
+const { currentPage, total, currentLayout, slides } = useNav()
 const hidden = computed(() => ['cover', 'end'].includes(currentLayout.value))
 
-const segments = computed(() => {
-  const count = total.value
-  const current = currentPage.value
-  return Array.from({ length: count }, (_, i) => {
-    const page = i + 1
-    return {
-      page,
-      state: page < current ? 'completed' : page === current ? 'active' : 'unfilled',
+// Build section boundaries from slides with layout: 'section'
+const sections = computed(() => {
+  const all = slides.value || []
+  const sectionStarts = []
+
+  for (let i = 0; i < all.length; i++) {
+    const fm = all[i]?.frontmatter || all[i]?.meta?.frontmatter || {}
+    if (fm.layout === 'section' || fm.layout === 'cover') {
+      sectionStarts.push(i + 1) // 1-indexed page number
     }
+  }
+
+  // If no section slides found, treat the whole deck as one segment
+  if (sectionStarts.length === 0) {
+    return [{ start: 1, end: total.value }]
+  }
+
+  // Build ranges: each section runs from its start to the next section's start - 1
+  const result = []
+  for (let i = 0; i < sectionStarts.length; i++) {
+    const start = sectionStarts[i]
+    const end = i < sectionStarts.length - 1 ? sectionStarts[i + 1] - 1 : total.value
+    result.push({ start, end })
+  }
+  return result
+})
+
+const segmentData = computed(() => {
+  const page = currentPage.value
+  return sections.value.map((sec, i) => {
+    let state = 'unfilled'
+    let fillPercent = 0
+
+    if (page > sec.end) {
+      state = 'completed'
+      fillPercent = 100
+    } else if (page >= sec.start) {
+      state = 'active'
+      const range = sec.end - sec.start + 1
+      const progress = page - sec.start
+      fillPercent = Math.round((progress / range) * 100)
+    }
+
+    return { index: i, state, fillPercent }
   })
 })
 </script>
@@ -21,10 +56,11 @@ const segments = computed(() => {
 <template>
   <div v-if="!hidden" class="progress-segment-bar">
     <span
-      v-for="seg in segments"
-      :key="seg.page"
+      v-for="seg in segmentData"
+      :key="seg.index"
       class="segment"
       :class="seg.state"
+      :style="seg.state === 'active' ? { background: `linear-gradient(to right, var(--deck-accent) ${seg.fillPercent}%, var(--deck-border, var(--deck-muted)) ${seg.fillPercent}%)`, opacity: 1 } : {}"
     />
   </div>
 </template>
@@ -37,7 +73,7 @@ const segments = computed(() => {
   right: 0;
   height: 3px;
   display: flex;
-  gap: 1px;
+  gap: 2px;
   z-index: 100;
   pointer-events: none;
 }
@@ -45,7 +81,7 @@ const segments = computed(() => {
 .segment {
   flex: 1;
   height: 100%;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.3s ease;
 }
 
 .segment.completed {
@@ -53,12 +89,11 @@ const segments = computed(() => {
 }
 
 .segment.active {
-  background-color: var(--deck-accent);
-  opacity: 0.7;
+  background-color: var(--deck-border, var(--deck-muted));
 }
 
 .segment.unfilled {
   background-color: var(--deck-border, var(--deck-muted));
-  opacity: 0.3;
+  opacity: 0.25;
 }
 </style>

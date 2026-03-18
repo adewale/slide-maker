@@ -106,9 +106,8 @@ Optional visual progress indicators show the audience where they are in the deck
 
 | Indicator | Position | Best for | Description |
 |-----------|----------|----------|-------------|
-| `segment-bar` | Top | 10+ slides, technical talks | Thin 3px bar divided into segments that fill with accent color |
+| `segment-bar` | Top | Any deck with sections | Thin 3px bar with one segment per section. Current section fills progressively with accent color. |
 | `dot-rail` | Right edge | 5-15 slides, focused talks | Vertical column of dots, current filled with accent |
-| `fraction-badge` | Bottom-right | Any length, minimal UI | Compact pill showing `3/11` in monospace |
 | `tally-marks` | Bottom | Under 20 slides, editorial/tufte | Analog-style stroke marks, every 5th crosses diagonally |
 | `arc-gauge` | Bottom-right corner | Any length, compact | Quarter-circle SVG that fills clockwise |
 | `none` | — | Default | No progress indicator beyond the standard footer |
@@ -117,7 +116,7 @@ All indicators use `var(--deck-*)` tokens and hide on cover/end layouts. The com
 
 | Preset | Default progress |
 |--------|-----------------|
-| `editorial-dark` | `fraction-badge` |
+| `editorial-dark` | `segment-bar` |
 | `swiss-minimal` | `segment-bar` |
 | `bold-modern` | `segment-bar` |
 | `tufte-data` | `tally-marks` |
