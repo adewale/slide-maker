@@ -12,22 +12,23 @@ onKeyStroke('Escape', () => toggleHelp())
         <h2 class="help-title">Keyboard Shortcuts</h2>
         <div class="help-grid">
           <div class="help-column">
-            <h3>Navigation</h3>
+            <h3>Click-level</h3>
             <div class="help-row">
               <kbd>&#8594;</kbd> / <kbd>Space</kbd>
-              <span>Next slide</span>
+              <span>Next click</span>
             </div>
             <div class="help-row">
               <kbd>&#8592;</kbd>
-              <span>Previous slide</span>
+              <span>Previous click</span>
+            </div>
+            <h3>Slide-level</h3>
+            <div class="help-row">
+              <kbd>&#8595;</kbd>
+              <span>Next slide</span>
             </div>
             <div class="help-row">
               <kbd>&#8593;</kbd>
-              <span>Previous click</span>
-            </div>
-            <div class="help-row">
-              <kbd>&#8595;</kbd>
-              <span>Next click</span>
+              <span>Previous slide</span>
             </div>
             <div class="help-row">
               <kbd>Home</kbd>
