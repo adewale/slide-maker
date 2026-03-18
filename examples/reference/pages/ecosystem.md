@@ -168,15 +168,48 @@ Sources:
 - file:slide-maker/COMPILER_RULES.md — how deck.spec.md compiles into a Slidev project -->
 
 ---
+transition: slide-left
+---
+
+# Four Progress Indicators Show Where You Are
+
+Set `progress:` in deck.spec.md Meta. The compiler mounts the chosen component automatically.
+
+<v-clicks>
+
+- **segment-bar** — Thin 3px bar at the top with one segment per section. Current section fills with accent color.
+- **dot-rail** — Vertical column of dots on the right edge. Current dot filled with accent. Best for 5-15 slides.
+- **tally-marks** — Analog-style stroke marks at the bottom. Every 5th mark crosses diagonally. Best under 20 slides.
+- **arc-gauge** — Quarter-circle SVG in the bottom-right corner that fills clockwise. Works at any length.
+
+</v-clicks>
+
+<!-- Progress indicators are optional visual cues that orient the audience within the deck. Set the progress field in deck.spec.md's Meta section to enable one. The compiler copies the chosen component into the deck and mounts it in global-top.vue or global-bottom.vue. All four use var(--deck-*) tokens and hide on cover/end layouts.
+
+[click] segment-bar — positioned at the top of the slide. A thin 3px bar divided into one segment per section. The current section fills progressively with the accent color. Default for most presets.
+
+[click] dot-rail — positioned on the right edge. A vertical column of small dots where the current slide's dot is filled with accent. Best for focused talks of 5 to 15 slides.
+
+[click] tally-marks — positioned at the bottom. Analog-style stroke marks rendered in groups. Every 5th mark crosses diagonally like a traditional tally. Best for decks under 20 slides with editorial or tufte presets.
+
+[click] arc-gauge — positioned in the bottom-right corner. A quarter-circle SVG arc that fills clockwise as the deck progresses. Compact and works at any deck length.
+
+Preset defaults: editorial-dark, swiss-minimal, bold-modern, cloudflare, and material-design all default to segment-bar. tufte-data defaults to tally-marks. Setting progress: none disables the indicator entirely.
+
+Sources:
+- file:slide-maker/COMPILER_RULES.md — progress indicator specification with preset defaults table
+- file:slide-maker/DECK_SPEC.md — deck.spec.md Meta section where progress is declared -->
+
+---
 layout: fact
 transition: fade
 ---
 
-# 5 + 8 + 13 + 6 + 7
+# 5 + 8 + 13 + 6 + 7 + 4
 
-5 visual effects. 8 data viz. 13 transitions. 6 presets. 7 tools.
+5 visual effects. 8 data viz. 13 transitions. 6 presets. 7 tools. 4 progress indicators.
 
-<!-- The component catalog: 5 visual effect components (GlassCard, ImageFX, RevealPath, ShadowStack, CornerCard) for visual polish, plus 8 data visualization components (Sparkline, SmallMultiples, DataTable, MicroBar, SlopeChart, BulletBar, DotStrip, WinLoss) for inline data presentation. 13 cinematic CSS transitions with semantic meanings. 6 style presets generating complete visual systems from tokens through typography to motion. 7 build tools for scaffolding, validation, and comparison.
+<!-- The component catalog: 5 visual effect components (GlassCard, ImageFX, RevealPath, ShadowStack, CornerCard) for visual polish, plus 8 data visualization components (Sparkline, SmallMultiples, DataTable, MicroBar, SlopeChart, BulletBar, DotStrip, WinLoss) for inline data presentation. 13 cinematic CSS transitions with semantic meanings. 6 style presets generating complete visual systems from tokens through typography to motion. 7 build tools for scaffolding, validation, and comparison. 4 progress indicators (segment-bar, dot-rail, tally-marks, arc-gauge) for audience orientation.
 
 Sources:
 - file:slide-maker/COMPILER_RULES.md — complete component and tool inventory
