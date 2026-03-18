@@ -13,24 +13,36 @@ onKeyStroke('Escape', () => toggleHelp())
         <h2 class="help-title">Keyboard Shortcuts</h2>
 
         <div class="hero">
-          <div class="hero-item">
-            <kbd class="hero-key">&#8594;</kbd>
-            <kbd class="hero-key">Space</kbd>
-            <span class="hero-label">Next</span>
+          <div class="hero-row">
+            <div class="hero-item">
+              <kbd class="hero-key">&#8593;</kbd>
+              <span class="hero-label">Prev slide</span>
+            </div>
           </div>
-          <div class="hero-item">
-            <kbd class="hero-key">&#8592;</kbd>
-            <span class="hero-label">Back</span>
+          <div class="hero-row hero-mid">
+            <div class="hero-item">
+              <kbd class="hero-key">&#8592;</kbd>
+              <span class="hero-label">Prev</span>
+            </div>
+            <div class="hero-item">
+              <kbd class="hero-key">&#8594;</kbd>
+              <kbd class="hero-key">Space</kbd>
+              <span class="hero-label">Next</span>
+            </div>
+          </div>
+          <div class="hero-row">
+            <div class="hero-item">
+              <kbd class="hero-key">&#8595;</kbd>
+              <span class="hero-label">Next slide</span>
+            </div>
           </div>
         </div>
 
         <div class="help-grid">
           <div class="help-column">
             <h3>Move</h3>
-            <div class="help-row"><kbd>&#8595;</kbd><span>Next slide</span></div>
-            <div class="help-row"><kbd>&#8593;</kbd><span>Previous slide</span></div>
-            <div class="help-row"><kbd>]</kbd><span>Skip to next slide</span></div>
-            <div class="help-row"><kbd>[</kbd><span>Skip to prev slide</span></div>
+            <div class="help-row"><kbd>]</kbd><span>Next slide (hold to skip)</span></div>
+            <div class="help-row"><kbd>[</kbd><span>Prev slide (hold to skip)</span></div>
             <div class="help-row"><kbd>Home</kbd><span>First slide</span></div>
             <div class="help-row"><kbd>End</kbd><span>Last slide</span></div>
             <div class="help-row"><kbd>g</kbd><span>Go to slide…</span></div>
@@ -45,6 +57,7 @@ onKeyStroke('Escape', () => toggleHelp())
             <div class="help-row"><kbd>w</kbd><span>White screen</span></div>
             <div class="help-row"><kbd>p</kbd><span>Presenter view</span></div>
             <div class="help-row"><kbd>e</kbd><span>Draw on slide</span></div>
+            <div class="help-row"><kbd>q</kbd><span>Share QR code</span></div>
           </div>
         </div>
 
@@ -112,11 +125,21 @@ onKeyStroke('Escape', () => toggleHelp())
 
 .hero {
   display: flex;
-  justify-content: center;
-  gap: 3rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
   margin-bottom: 1.5rem;
   padding-bottom: 1.25rem;
   border-bottom: 1px solid color-mix(in srgb, var(--deck-fg, #2e3440) 10%, transparent);
+}
+
+.hero-row {
+  display: flex;
+  justify-content: center;
+}
+
+.hero-mid {
+  gap: 3rem;
 }
 
 .hero-item {
