@@ -100,25 +100,26 @@ onKeyStroke('Escape', () => toggleHelp())
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: color-mix(in srgb, var(--deck-bg, #eceff4) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .help-panel {
-  background: rgba(30, 30, 40, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--deck-bg, #eceff4);
+  border: 1px solid color-mix(in srgb, var(--deck-fg, #2e3440) 12%, transparent);
   border-radius: 16px;
   padding: 2rem 2.5rem;
   max-width: 720px;
   width: 90vw;
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--deck-fg, #2e3440) 14%, transparent);
 }
 
 .help-title {
   font-family: var(--deck-font-display, sans-serif);
   font-size: 1.4rem;
   font-weight: 700;
-  color: #e4e8ef;
+  color: var(--deck-fg, #2e3440);
   margin-bottom: 1.5rem;
   text-align: center;
 }
@@ -135,7 +136,7 @@ onKeyStroke('Escape', () => toggleHelp())
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--deck-accent, #22d3ee);
+  color: var(--deck-accent, #3b5f87);
   margin-bottom: 0.75rem;
 }
 
@@ -144,8 +145,9 @@ onKeyStroke('Escape', () => toggleHelp())
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
+  font-family: var(--deck-font-body, sans-serif);
   font-size: 0.8rem;
-  color: rgba(228, 232, 239, 0.7);
+  color: var(--deck-muted, rgba(46, 52, 64, 0.45));
 }
 
 .help-row span {
@@ -161,9 +163,9 @@ kbd {
   padding: 0.15em 0.45em;
   font-family: var(--deck-font-mono, monospace);
   font-size: 0.75rem;
-  color: #e4e8ef;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--deck-accent, #3b5f87);
+  background: color-mix(in srgb, var(--deck-accent, #3b5f87) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--deck-accent, #3b5f87) 22%, transparent);
   border-radius: 4px;
   line-height: 1.4;
 }
