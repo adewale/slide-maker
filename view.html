@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slide Viewer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #18181b;
+      --border: #27272a;
+      --fg: #e4e4e7;
+      --muted: #71717a;
+      --accent: #a78bfa;
+      --note-bg: #1a1a2e;
+      --note-border: #2d2d44;
+    }
+
+    body {
+      font-family: -apple-system, system-ui, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .topbar a.back {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .topbar .title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--fg);
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .topbar .slide-num {
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ── Controls bar ── */
+    .controls {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.375rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .controls button {
+      background: var(--border);
+      border: none;
+      color: var(--fg);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      touch-action: manipulation;
+      min-height: 2.25rem;
+    }
+
+    .controls button:active {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .controls button:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    .controls .spacer { flex: 1; }
+
+    .controls .toggle {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--border);
+    }
+
+    .controls .toggle.active {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: rgba(167, 139, 250, 0.1);
+    }
+
+    /* ── Slide content ── */
+    .slide-area {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 1.25rem 1rem 3rem;
+    }
+
+    .slide-content {
+      max-width: 42rem;
+      margin: 0 auto;
+      line-height: 1.65;
+      font-size: 1rem;
+    }
+
+    /* ── Markdown rendering ── */
+    .slide-content h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0 0 0.75rem;
+      line-height: 1.25;
+    }
+
+    .slide-content h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--fg);
+      margin: 1.25rem 0 0.5rem;
+    }
+
+    .slide-content h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--fg);
+      margin: 1rem 0 0.4rem;
+    }
+
+    .slide-content p {
+      margin: 0.5rem 0;
+    }
+
+    .slide-content ul, .slide-content ol {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+    }
+
+    .slide-content li {
+      margin: 0.25rem 0;
+    }
+
+    .slide-content code {
+      font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85em;
+      background: var(--border);
+      padding: 0.15em 0.35em;
+      border-radius: 4px;
+    }
+
+    .slide-content pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .slide-content pre code {
+      background: none;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    .slide-content blockquote {
+      border-left: 3px solid var(--accent);
+      padding-left: 1rem;
+      color: var(--muted);
+      margin: 0.75rem 0;
+    }
+
+    .slide-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.85rem;
+    }
+
+    .slide-content th, .slide-content td {
+      padding: 0.4rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .slide-content th {
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .slide-content strong {
+      font-weight: 600;
+      color: #f4f4f5;
+    }
+
+    .slide-content a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .slide-content hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.5rem 0;
+    }
+
+    .slide-content img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+
+    /* ── Frontmatter ── */
+    .frontmatter {
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: pre-wrap;
+    }
+
+    /* ── Presenter notes ── */
+    .notes {
+      margin-top: 1.25rem;
+      padding: 0.75rem 1rem;
+      background: var(--note-bg);
+      border: 1px solid var(--note-border);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: #a1a1aa;
+    }
+
+    .notes-label {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #6366f1;
+      margin-bottom: 0.5rem;
+    }
+
+    .notes.hidden { display: none; }
+
+    /* ── Swipe hint ── */
+    .swipe-hint {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.75rem;
+      padding: 1rem;
+      opacity: 0.6;
+    }
+
+    /* ── Loading / error ── */
+    .status {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+    }
+
+    .status h2 {
+      color: var(--fg);
+      margin-bottom: 0.5rem;
+    }
+
+    /* ── Raw markdown view ── */
+    .raw-view {
+      display: none;
+    }
+
+    .raw-view pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .raw-view.active { display: block; }
+    .rendered-view.hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="./" class="back" aria-label="Back to gallery">&larr;</a>
+    <span class="title" id="deck-title">Loading…</span>
+    <span class="slide-num" id="slide-num"></span>
+  </div>
+
+  <div class="controls">
+    <button id="btn-prev" disabled aria-label="Previous slide">&larr; Prev</button>
+    <button id="btn-next" disabled aria-label="Next slide">Next &rarr;</button>
+    <span class="spacer"></span>
+    <button class="toggle" id="btn-notes">Notes</button>
+    <button class="toggle" id="btn-raw">Raw</button>
+  </div>
+
+  <div class="slide-area" id="slide-area">
+    <div class="slide-content" id="slide-content">
+      <div class="status">Loading…</div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const deck = params.get('deck');
+    let slideNum = parseInt(params.get('slide') || '1', 10);
+    let totalSlides = 0;
+    let showNotes = false;
+    let showRaw = false;
+
+    const $ = (id) => document.getElementById(id);
+
+    function updateURL() {
+      const url = new URL(location);
+      url.searchParams.set('slide', slideNum);
+      history.replaceState(null, '', url);
+    }
+
+    function updateControls() {
+      $('btn-prev').disabled = slideNum <= 1;
+      $('btn-next').disabled = slideNum >= totalSlides;
+      $('slide-num').textContent = totalSlides ? `${slideNum} / ${totalSlides}` : '';
+    }
+
+    // ── Minimal Markdown → HTML renderer ──
+    function renderMarkdown(md) {
+      let html = md
+        // Code blocks (``` ... ```)
+        .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+          const escaped = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          return `<pre><code>${escaped}</code></pre>`;
+        })
+        // Tables
+        .replace(/^(\|.+\|)\n(\|[-| :]+\|)\n((?:\|.+\|\n?)*)/gm, (_, header, sep, body) => {
+          const thCells = header.split('|').filter(c => c.trim()).map(c => `<th>${c.trim()}</th>`).join('');
+          const rows = body.trim().split('\n').map(row => {
+            const cells = row.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
+            return `<tr>${cells}</tr>`;
+          }).join('');
+          return `<table><thead><tr>${thCells}</tr></thead><tbody>${rows}</tbody></table>`;
+        })
+        // Headings
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+        // Blockquotes
+        .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+        // Horizontal rules
+        .replace(/^---+$/gm, '<hr>')
+        // Bold + italic
+        .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        // Inline code
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        // Links
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+        // Images
+        .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">')
+        // Unordered lists
+        .replace(/^- (.+)$/gm, '<li>$1</li>')
+        // Paragraphs (non-empty lines that aren't already wrapped)
+        .replace(/^(?!<[a-z])((?!<\/)[^\n]+)$/gm, '<p>$1</p>');
+
+      // Wrap consecutive <li> in <ul>
+      html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>');
+
+      return html;
+    }
+
+    // ── Parse slide content ──
+    function parseSlide(raw) {
+      let frontmatter = '';
+      let content = raw;
+      let notes = '';
+
+      // Extract frontmatter
+      const fmMatch = content.match(/^---\n([\s\S]*?)\n---\n?/);
+      if (fmMatch) {
+        frontmatter = fmMatch[1].trim();
+        content = content.slice(fmMatch[0].length);
+      }
+
+      // Extract HTML comments as presenter notes
+      const commentParts = [];
+      content = content.replace(/<!--([\s\S]*?)-->/g, (_, body) => {
+        commentParts.push(body.trim());
+        return '';
+      });
+      notes = commentParts.join('\n\n');
+
+      // Strip Slidev directives that don't render as content
+      content = content
+        .replace(/^<v-clicks?[^>]*>\s*$/gm, '')
+        .replace(/^<\/v-clicks?>\s*$/gm, '')
+        .replace(/^\{v-click[^}]*\}\s*$/gm, '')
+        .replace(/\[click\]/g, '')
+        .replace(/<div[^>]*v-motion[^>]*>[\s\S]*?<\/div>/g, '')
+        .trim();
+
+      return { frontmatter, content, notes };
+    }
+
+    // ── Render slide ──
+    function displaySlide(raw) {
+      const { frontmatter, content, notes } = parseSlide(raw);
+
+      let html = '';
+
+      // Frontmatter (compact)
+      if (frontmatter) {
+        html += `<div class="frontmatter">${frontmatter.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
+      }
+
+      // Rendered content
+      html += `<div class="rendered-view${showRaw ? ' hidden' : ''}">${renderMarkdown(content)}</div>`;
+
+      // Raw content
+      const escaped = raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      html += `<div class="raw-view${showRaw ? ' active' : ''}"><pre>${escaped}</pre></div>`;
+
+      // Presenter notes
+      if (notes) {
+        html += `<div class="notes${showNotes ? '' : ' hidden'}"><span class="notes-label">Presenter Notes</span>${renderMarkdown(notes)}</div>`;
+      }
+
+      $('slide-content').innerHTML = html;
+      $('slide-area').scrollTop = 0;
+    }
+
+    // ── Fetch slide ──
+    async function loadSlide(n) {
+      slideNum = n;
+      updateURL();
+      updateControls();
+
+      try {
+        const res = await fetch(`${deck}/slides/${n}.md`);
+        if (!res.ok) throw new Error(`Slide ${n} not found`);
+        const raw = await res.text();
+        displaySlide(raw);
+      } catch (e) {
+        $('slide-content').innerHTML = `<div class="status"><h2>Slide not found</h2><p>${e.message}</p></div>`;
+      }
+    }
+
+    // ── Init ──
+    async function init() {
+      if (!deck) {
+        $('slide-content').innerHTML = '<div class="status"><h2>No deck specified</h2><p>Use ?deck=name to load a deck.</p></div>';
+        return;
+      }
+
+      // Read title from slides.md frontmatter
+      try {
+        const mainRes = await fetch(`${deck}/slides.md`);
+        if (mainRes.ok) {
+          const mainMd = await mainRes.text();
+          const titleMatch = mainMd.match(/^title:\s*(.+)$/m);
+          $('deck-title').textContent = titleMatch ? titleMatch[1] : deck;
+        } else {
+          $('deck-title').textContent = deck;
+        }
+      } catch {
+        $('deck-title').textContent = deck;
+      }
+
+      // Get slide count
+      try {
+        const countRes = await fetch(`${deck}/slides/count`);
+        if (countRes.ok) {
+          totalSlides = parseInt(await countRes.text(), 10);
+        }
+      } catch {}
+
+      updateControls();
+      loadSlide(slideNum);
+
+      // Keyboard navigation
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          if (slideNum < totalSlides) loadSlide(slideNum + 1);
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          if (slideNum > 1) loadSlide(slideNum - 1);
+        }
+      });
+
+      // Swipe navigation
+      let touchStartX = 0;
+      const area = $('slide-area');
+      area.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+      }, { passive: true });
+      area.addEventListener('touchend', (e) => {
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(dx) > 60) {
+          if (dx < 0 && slideNum < totalSlides) loadSlide(slideNum + 1);
+          if (dx > 0 && slideNum > 1) loadSlide(slideNum - 1);
+        }
+      }, { passive: true });
+
+      // Buttons
+      $('btn-prev').addEventListener('click', () => {
+        if (slideNum > 1) loadSlide(slideNum - 1);
+      });
+      $('btn-next').addEventListener('click', () => {
+        if (slideNum < totalSlides) loadSlide(slideNum + 1);
+      });
+
+      // Notes toggle
+      $('btn-notes').addEventListener('click', () => {
+        showNotes = !showNotes;
+        $('btn-notes').classList.toggle('active', showNotes);
+        document.querySelectorAll('.notes').forEach(el => {
+          el.classList.toggle('hidden', !showNotes);
+        });
+      });
+
+      // Raw toggle
+      $('btn-raw').addEventListener('click', () => {
+        showRaw = !showRaw;
+        $('btn-raw').classList.toggle('active', showRaw);
+        document.querySelectorAll('.raw-view').forEach(el => {
+          el.classList.toggle('active', showRaw);
+        });
+        document.querySelectorAll('.rendered-view').forEach(el => {
+          el.classList.toggle('hidden', showRaw);
+        });
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!--
+  Slidev Deck Menu
+
+  Static build:
+    bash build.sh          # builds all decks to _build/
+    npx serve _build       # serve at http://localhost:3000
+
+  Dev servers (core — from examples/):
+    cd demo && npx slidev --port 3030               # Slide Maker
+    cd reference && npx slidev --port 3031           # Reference
+
+  Dev servers (local — from decks/):
+    cd vaders && npx slidev --port 3032              # Vaders
+    cd planet-cf && npx slidev --port 3033           # Planet CF
+    cd claude-history-explorer && npx slidev --port 3034  # Claude History Explorer
+    cd geist-fabrik && npx slidev --port 3035        # GeistFabrik
+    cd olsen && npx slidev --port 3036               # Olsen
+    cd tasche && npx slidev --port 3037              # Tasche
+    cd tufte && npx slidev --port 3038               # Debug at the Source
+    cd durable-objects && npx slidev --port 3039     # Durable Objects
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slide Maker - All Decks</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --border: #e4e4e7;
+      --fg: #18181b;
+      --fg-muted: #71717a;
+      --fg-faint: #a1a1aa;
+      --accent-core: #7c3aed;
+      --title: #52525b;
+      --tag-bg: #f4f4f5;
+      --tag-fg: #52525b;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0a0a0f;
+        --surface: #18181b;
+        --border: #27272a;
+        --fg: #e4e4e7;
+        --fg-muted: #71717a;
+        --fg-faint: #a1a1aa;
+        --accent-core: #a78bfa;
+        --title: #a1a1aa;
+        --tag-bg: #27272a;
+        --tag-fg: #71717a;
+      }
+    }
+
+    body {
+      font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      padding: 3rem 2rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    header h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--title);
+      letter-spacing: -0.02em;
+    }
+
+    header .tagline {
+      margin-top: 0.75rem;
+      color: var(--fg-muted);
+      font-size: 1rem;
+      line-height: 1.6;
+      max-width: 38rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    header .header-links {
+      margin-top: 0.75rem;
+    }
+
+    header .header-links a {
+      color: var(--fg-faint);
+      font-size: 0.8rem;
+      text-decoration: none;
+      opacity: 0.7;
+    }
+
+    header .header-links a:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+
+    header .header-links .sep {
+      color: var(--fg-faint);
+      opacity: 0.4;
+      margin: 0 0.25rem;
+    }
+
+    .section-label {
+      max-width: 72rem;
+      margin: 2.5rem auto 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg-faint);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+
+    .section-label:first-of-type {
+      margin-top: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      max-width: 72rem;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover {
+      border-color: var(--accent);
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.01em;
+    }
+
+    .card .desc {
+      font-size: 0.875rem;
+      color: var(--fg-muted);
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .card .meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--tag-fg);
+      background: var(--tag-bg);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .card .links {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .card a {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .card a:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+
+    .card a.md-link {
+      font-size: 0.7rem;
+      opacity: 0.5;
+      color: var(--fg-muted);
+    }
+
+    .card a.md-link:hover {
+      opacity: 0.9;
+      color: var(--accent);
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 560px) {
+      body { padding: 1rem 0.75rem; }
+      header { margin-bottom: 1.5rem; }
+      header h1 { font-size: 1.5rem; }
+      header p { font-size: 0.85rem; }
+      .section-label { margin: 1.5rem 0 0.75rem; font-size: 0.7rem; }
+      .grid { grid-template-columns: 1fr; gap: 0.75rem; }
+      .card { padding: 1rem; gap: 0.5rem; border-radius: 8px; }
+      .card h2 { font-size: 1.1rem; }
+      .card .desc { font-size: 0.8rem; }
+      .card a { font-size: 0.85rem; min-height: 2rem; display: inline-flex; align-items: center; }
+      .card a.md-link { font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Slide Maker</h1>
+    <p class="tagline">A Claude Code skill that creates native Slidev presentation decks with strong visual direction and minimal abstraction. Decks are built from specs, not templates.</p>
+    <p class="header-links"><a href="https://github.com/adewale/slide-maker">GitHub</a> <span class="sep">&middot;</span> <a href="./llms.txt">llms.txt</a></p>
+  </header>
+
+  <div class="section-label">Core</div>
+  <div class="grid">
+    <div class="card" style="--accent: #b44215">
+      <h2><a href="./slide-maker/">Slide Maker</a></h2>
+      <div class="desc">Native Slidev decks. Strong visual direction. Minimal abstraction.</div>
+      <div class="meta">
+        <span class="tag">bold-modern</span>
+        <div class="links">
+          <a href="./slide-maker/slides.md" class="md-link">MD</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="--accent: #3b5f87">
+      <h2><a href="./reference/">Reference</a></h2>
+      <div class="desc">Every feature. One deck. A comprehensive reference for all Slide Maker capabilities.</div>
+      <div class="meta">
+        <span class="tag">reference</span>
+        <div class="links">
+          <a href="./reference/slides.md" class="md-link">MD</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+</body>
+</html>

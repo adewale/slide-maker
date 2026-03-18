@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/slide-maker/**", "destination": "/slide-maker/index.html" },
+    { "source": "/reference/**", "destination": "/reference/index.html" }
+  ]
+}
