@@ -36,6 +36,7 @@
       --fg-muted: #71717a;
       --fg-faint: #a1a1aa;
       --accent-core: #7c3aed;
+      --title: #52525b;
       --tag-bg: #f4f4f5;
       --tag-fg: #52525b;
     }
@@ -49,6 +50,7 @@
         --fg-muted: #71717a;
         --fg-faint: #a1a1aa;
         --accent-core: #a78bfa;
+        --title: #a1a1aa;
         --tag-bg: #27272a;
         --tag-fg: #71717a;
       }
@@ -70,26 +72,40 @@
     header h1 {
       font-size: 2.25rem;
       font-weight: 700;
-      color: var(--accent-core);
+      color: var(--title);
       letter-spacing: -0.02em;
     }
 
-    header p {
-      margin-top: 0.5rem;
+    header .tagline {
+      margin-top: 0.75rem;
       color: var(--fg-muted);
       font-size: 1rem;
+      line-height: 1.6;
+      max-width: 38rem;
+      margin-left: auto;
+      margin-right: auto;
     }
 
-    header p a {
+    header .header-links {
+      margin-top: 0.75rem;
+    }
+
+    header .header-links a {
       color: var(--fg-faint);
       font-size: 0.8rem;
       text-decoration: none;
       opacity: 0.7;
     }
 
-    header p a:hover {
+    header .header-links a:hover {
       opacity: 1;
       text-decoration: underline;
+    }
+
+    header .header-links .sep {
+      color: var(--fg-faint);
+      opacity: 0.4;
+      margin: 0 0.25rem;
     }
 
     .section-label {
@@ -216,7 +232,8 @@
 <body>
   <header>
     <h1>Slide Maker</h1>
-    <p>Slidev decks built with the Slide Maker skill. <a href="./llms.txt">llms.txt</a></p>
+    <p class="tagline">A Claude Code skill that creates native Slidev presentation decks with strong visual direction and minimal abstraction. Decks are built from specs, not templates.</p>
+    <p class="header-links"><a href="https://github.com/adewale/slide-maker">GitHub</a> <span class="sep">&middot;</span> <a href="./llms.txt">llms.txt</a></p>
   </header>
 
   <div class="section-label">Core</div>
@@ -227,7 +244,6 @@
       <div class="meta">
         <span class="tag">bold-modern</span>
         <div class="links">
-          <a href="./slide-maker/">View deck</a>
           <a href="./slide-maker/slides.md" class="md-link">MD</a>
         </div>
       </div>
@@ -239,7 +255,6 @@
       <div class="meta">
         <span class="tag">reference</span>
         <div class="links">
-          <a href="./reference/">View deck</a>
           <a href="./reference/slides.md" class="md-link">MD</a>
         </div>
       </div>

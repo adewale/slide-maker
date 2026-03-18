@@ -4,6 +4,7 @@ import { useNav } from '@slidev/client'
 import { showHelp } from './composables/useHelp'
 import KeyboardHelp from './components/KeyboardHelp.vue'
 import ProgressSegmentBar from './components/ProgressSegmentBar.vue'
+import AudienceQRCode from './components/AudienceQRCode.vue'
 
 const nav = useNav()
 const pointerX = ref(0)
@@ -49,6 +50,9 @@ onUnmounted(() => {
 
   <!-- Keyboard help overlay -->
   <KeyboardHelp v-if="showHelp" />
+
+  <!-- QR code sharing overlay -->
+  <AudienceQRCode />
 </template>
 
 <style scoped>
