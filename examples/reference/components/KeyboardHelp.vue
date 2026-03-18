@@ -48,9 +48,6 @@ onKeyStroke('Escape', () => toggleHelp())
           </div>
         </div>
 
-        <div class="help-footnote">
-          Esc close · ? this panel · u pen color · Delete clear drawings
-        </div>
       </div>
     </div>
   </Teleport>
@@ -146,42 +143,34 @@ onKeyStroke('Escape', () => toggleHelp())
 .help-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-}
-
-.help-footnote {
-  margin-top: 1.25rem;
-  padding-top: 1rem;
-  border-top: 1px solid color-mix(in srgb, var(--deck-fg, #2e3440) 8%, transparent);
-  text-align: center;
-  font-size: 0.7rem;
-  color: var(--deck-muted, rgba(46, 52, 64, 0.45));
-  font-family: var(--deck-font-body, sans-serif);
-  letter-spacing: 0.02em;
+  gap: 1rem 2.5rem;
+  align-items: start;
 }
 
 .help-column h3 {
-  font-family: var(--deck-font-display, sans-serif);
-  font-size: 0.85rem;
+  font-family: var(--deck-font-body, sans-serif);
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--deck-accent, #3b5f87);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--deck-accent, #3b5f87) 15%, transparent);
 }
 
 .help-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 3.2rem 1fr;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: 0.6rem;
+  margin-bottom: 0.35rem;
   font-family: var(--deck-font-body, sans-serif);
   font-size: 0.8rem;
-  color: var(--deck-muted, rgba(46, 52, 64, 0.45));
+  color: var(--deck-fg, #2e3440);
 }
 
 .help-row span {
-  margin-left: auto;
   white-space: nowrap;
 }
 
@@ -193,9 +182,9 @@ kbd {
   padding: 0.15em 0.45em;
   font-family: var(--deck-font-mono, monospace);
   font-size: 0.75rem;
-  color: var(--deck-accent, #3b5f87);
-  background: color-mix(in srgb, var(--deck-accent, #3b5f87) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--deck-accent, #3b5f87) 22%, transparent);
+  color: var(--deck-muted, rgba(46, 52, 64, 0.45));
+  background: color-mix(in srgb, var(--deck-fg, #2e3440) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--deck-fg, #2e3440) 12%, transparent);
   border-radius: 4px;
   line-height: 1.4;
 }
