@@ -561,6 +561,9 @@ fi
   echo "  margin-top: 1.5rem;"
   echo "  font-size: 1rem;"
   echo "}"
+  echo ""
+  echo "/* Presenter cursor — crosshair when drawing mode is active */"
+  echo ".slidev-drawing-enabled { cursor: crosshair !important; }"
 } > "$DECK_DIR/styles/theme.css"
 
 # ─── Generate styles/index.css ─────────────────────────────────
@@ -715,7 +718,7 @@ cat > "$DECK_DIR/setup/shortcuts.ts" << 'SHORTCUTS'
 import { defineShortcutsSetup } from '@slidev/types'
 import { toggleHelp } from '../composables/useHelp'
 
-export default defineShortcutsSetup((_, base) => {
+export default defineShortcutsSetup((nav, base) => {
   return [
     ...base,
     {
@@ -730,6 +733,16 @@ export default defineShortcutsSetup((_, base) => {
         window.open(`${base}presenter/`, '_blank')
       },
       autoRepeat: false,
+    },
+    {
+      key: ']',
+      fn: () => nav.nextSlide(),
+      autoRepeat: true,
+    },
+    {
+      key: '[',
+      fn: () => nav.prevSlide(),
+      autoRepeat: true,
     },
   ]
 })
@@ -767,6 +780,14 @@ onKeyStroke('Escape', () => toggleHelp())
             <div class="help-row">
               <kbd>&#8593;</kbd>
               <span>Previous slide</span>
+            </div>
+            <div class="help-row">
+              <kbd>]</kbd>
+              <span>Next slide (skip clicks)</span>
+            </div>
+            <div class="help-row">
+              <kbd>[</kbd>
+              <span>Prev slide (skip clicks)</span>
             </div>
             <div class="help-row">
               <kbd>Home</kbd>

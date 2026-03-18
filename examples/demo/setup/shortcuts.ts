@@ -1,7 +1,7 @@
 import { defineShortcutsSetup } from '@slidev/types'
 import { toggleHelp } from '../composables/useHelp'
 
-export default defineShortcutsSetup((_, base) => {
+export default defineShortcutsSetup((nav, base) => {
   return [
     ...base,
     {
@@ -17,6 +17,16 @@ export default defineShortcutsSetup((_, base) => {
         window.open(isHash ? `${b}#/presenter` : `${b}presenter/`, '_blank')
       },
       autoRepeat: false,
+    },
+    {
+      key: ']',
+      fn: () => nav.nextSlide(),
+      autoRepeat: true,
+    },
+    {
+      key: '[',
+      fn: () => nav.prevSlide(),
+      autoRepeat: true,
     },
   ]
 })

@@ -192,3 +192,6 @@ hr {
   font-size: 1.1rem;
   margin-top: 1rem;
 }
+
+/* Presenter cursor — crosshair when drawing mode is active */
+.slidev-drawing-enabled { cursor: crosshair !important; }
