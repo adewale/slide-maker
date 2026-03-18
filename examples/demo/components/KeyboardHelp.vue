@@ -11,91 +11,45 @@ onKeyStroke('Escape', () => toggleHelp())
       <div class="help-panel">
         <button class="close-btn" title="Close (Esc)" @click="toggleHelp()">&times;</button>
         <h2 class="help-title">Keyboard Shortcuts</h2>
+
+        <div class="hero">
+          <div class="hero-item">
+            <kbd class="hero-key">&#8594;</kbd>
+            <kbd class="hero-key">Space</kbd>
+            <span class="hero-label">Next</span>
+          </div>
+          <div class="hero-item">
+            <kbd class="hero-key">&#8592;</kbd>
+            <span class="hero-label">Back</span>
+          </div>
+        </div>
+
         <div class="help-grid">
           <div class="help-column">
-            <h3>Click-level</h3>
-            <div class="help-row">
-              <kbd>&#8594;</kbd> / <kbd>Space</kbd>
-              <span>Next click</span>
-            </div>
-            <div class="help-row">
-              <kbd>&#8592;</kbd>
-              <span>Previous click</span>
-            </div>
-            <h3>Slide-level</h3>
-            <div class="help-row">
-              <kbd>&#8595;</kbd>
-              <span>Next slide</span>
-            </div>
-            <div class="help-row">
-              <kbd>&#8593;</kbd>
-              <span>Previous slide</span>
-            </div>
-            <div class="help-row">
-              <kbd>]</kbd>
-              <span>Next slide (skip clicks)</span>
-            </div>
-            <div class="help-row">
-              <kbd>[</kbd>
-              <span>Prev slide (skip clicks)</span>
-            </div>
-            <div class="help-row">
-              <kbd>Home</kbd>
-              <span>First slide</span>
-            </div>
-            <div class="help-row">
-              <kbd>End</kbd>
-              <span>Last slide</span>
-            </div>
+            <h3>Move</h3>
+            <div class="help-row"><kbd>&#8595;</kbd><span>Next slide</span></div>
+            <div class="help-row"><kbd>&#8593;</kbd><span>Previous slide</span></div>
+            <div class="help-row"><kbd>]</kbd><span>Skip to next slide</span></div>
+            <div class="help-row"><kbd>[</kbd><span>Skip to prev slide</span></div>
+            <div class="help-row"><kbd>Home</kbd><span>First slide</span></div>
+            <div class="help-row"><kbd>End</kbd><span>Last slide</span></div>
+            <div class="help-row"><kbd>g</kbd><span>Go to slide…</span></div>
+            <div class="help-row"><kbd>o</kbd><span>All slides</span></div>
           </div>
 
           <div class="help-column">
-            <h3>View</h3>
-            <div class="help-row">
-              <kbd>o</kbd>
-              <span>Slide overview</span>
-            </div>
-            <div class="help-row">
-              <kbd>d</kbd>
-              <span>Toggle dark mode</span>
-            </div>
-            <div class="help-row">
-              <kbd>f</kbd>
-              <span>Fullscreen</span>
-            </div>
-            <div class="help-row">
-              <kbd>g</kbd>
-              <span>Go to slide</span>
-            </div>
-            <div class="help-row">
-              <kbd>Esc</kbd>
-              <span>Close overlays</span>
-            </div>
+            <h3>Screen</h3>
+            <div class="help-row"><kbd>f</kbd><span>Fullscreen</span></div>
+            <div class="help-row"><kbd>d</kbd><span>Light / dark</span></div>
+            <div class="help-row"><kbd>b</kbd><span>Black screen</span></div>
+            <div class="help-row"><kbd>w</kbd><span>White screen</span></div>
+            <div class="help-row"><kbd>p</kbd><span>Presenter view</span></div>
+            <div class="help-row"><kbd>e</kbd><span>Draw on slide</span></div>
           </div>
+        </div>
 
-          <div class="help-column">
-            <h3>Tools</h3>
-            <div class="help-row">
-              <kbd>p</kbd>
-              <span>Presenter mode</span>
-            </div>
-            <div class="help-row">
-              <kbd>?</kbd>
-              <span>Toggle this panel</span>
-            </div>
-            <div class="help-row">
-              <kbd>e</kbd>
-              <span>Pen / drawing</span>
-            </div>
-            <div class="help-row">
-              <kbd>u</kbd>
-              <span>Pen color</span>
-            </div>
-            <div class="help-row">
-              <kbd>Delete</kbd>
-              <span>Clear drawings</span>
-            </div>
-          </div>
+        <div class="help-footnote">
+          Esc close · ? this panel · u pen color · Delete clear drawings
         </div>
       </div>
     </div>
@@ -159,10 +113,51 @@ onKeyStroke('Escape', () => toggleHelp())
   text-align: center;
 }
 
+.hero {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--deck-fg, #2b2622) 10%, transparent);
+}
+
+.hero-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hero-key {
+  font-size: 0.95rem;
+  padding: 0.25em 0.6em;
+  background: color-mix(in srgb, var(--deck-accent, #b44215) 14%, transparent);
+  border-color: color-mix(in srgb, var(--deck-accent, #b44215) 30%, transparent);
+}
+
+.hero-label {
+  font-family: var(--deck-font-body, sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--deck-fg, #2b2622);
+  margin-left: 0.3rem;
+}
+
 .help-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
+}
+
+.help-footnote {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--deck-fg, #2b2622) 8%, transparent);
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--deck-muted, #746a5e);
+  font-family: var(--deck-font-body, sans-serif);
+  letter-spacing: 0.02em;
 }
 
 .help-column h3 {

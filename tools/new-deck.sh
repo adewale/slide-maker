@@ -760,6 +760,7 @@ onKeyStroke('Escape', () => toggleHelp())
   <Teleport to="body">
     <div class="help-backdrop" @click.self="toggleHelp()">
       <div class="help-panel">
+        <button class="close-btn" title="Close (Esc)" @click="toggleHelp()">&times;</button>
         <h2 class="help-title">Keyboard Shortcuts</h2>
         <div class="help-grid">
           <div class="help-column">
@@ -856,22 +857,47 @@ onKeyStroke('Escape', () => toggleHelp())
 .help-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 9000;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.85);
+  background: color-mix(in srgb, var(--deck-bg) 88%, transparent);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 
 .help-panel {
+  position: relative;
   background: rgba(30, 30, 40, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 2rem 2.5rem;
   max-width: 720px;
   width: 90vw;
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--deck-border, #444);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--deck-muted, #888);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: var(--deck-fg, #ccc);
+  border-color: var(--deck-muted, #888);
 }
 
 .help-title {
