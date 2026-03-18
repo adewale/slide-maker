@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useNav } from '@slidev/client'
 import { showHelp } from './composables/useHelp'
 import KeyboardHelp from './components/KeyboardHelp.vue'
+import ProgressSegmentBar from './components/ProgressSegmentBar.vue'
 
 const nav = useNav()
 const pointerX = ref(0)
@@ -42,6 +43,9 @@ onUnmounted(() => {
       top: `${pointerY}px`,
     }"
   />
+
+  <!-- Progress indicator -->
+  <ProgressSegmentBar />
 
   <!-- Keyboard help overlay -->
   <KeyboardHelp v-if="showHelp" />

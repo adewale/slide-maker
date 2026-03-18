@@ -42,6 +42,7 @@ Optional:
 - target-length: 10
 - notes: yes
 - style-preset: swiss-minimal
+- progress: segment-bar
 
 ## Design Tokens
 - colors:

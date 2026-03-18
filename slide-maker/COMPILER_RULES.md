@@ -100,6 +100,30 @@ Slidev's built-in navigation bar (bottom of the screen) provides these actions o
 
 No configuration is needed — the nav bar works automatically. To add custom buttons, create `custom-nav-controls.vue` in the deck root. This is an optional extension point — most decks do not need it.
 
+### Progress indicators
+
+Optional visual progress indicators show the audience where they are in the deck. Set `progress:` in `deck.spec.md` Meta section. The compiler copies the chosen component into the deck and mounts it in `global-top.vue` or `global-bottom.vue`.
+
+| Indicator | Position | Best for | Description |
+|-----------|----------|----------|-------------|
+| `segment-bar` | Top | 10+ slides, technical talks | Thin 3px bar divided into segments that fill with accent color |
+| `dot-rail` | Right edge | 5-15 slides, focused talks | Vertical column of dots, current filled with accent |
+| `fraction-badge` | Bottom-right | Any length, minimal UI | Compact pill showing `3/11` in monospace |
+| `tally-marks` | Bottom | Under 20 slides, editorial/tufte | Analog-style stroke marks, every 5th crosses diagonally |
+| `arc-gauge` | Bottom-right corner | Any length, compact | Quarter-circle SVG that fills clockwise |
+| `none` | — | Default | No progress indicator beyond the standard footer |
+
+All indicators use `var(--deck-*)` tokens and hide on cover/end layouts. The compiler recommends a default based on the style preset:
+
+| Preset | Default progress |
+|--------|-----------------|
+| `editorial-dark` | `fraction-badge` |
+| `swiss-minimal` | `segment-bar` |
+| `bold-modern` | `segment-bar` |
+| `tufte-data` | `tally-marks` |
+| `cloudflare` | `segment-bar` |
+| `material-design` | `segment-bar` |
+
 ## Phases
 
 ### 1. Gather and digest source material (project decks only)

@@ -8,6 +8,7 @@
 - target-length: 12
 - notes: yes
 - style-preset: editorial-dark
+- progress: segment-bar
 
 ## Design Tokens
 - colors:

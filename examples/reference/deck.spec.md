@@ -8,6 +8,7 @@
 - target-length: 64
 - notes: yes
 - style-preset: nord-light (custom — based on Beautiful Mermaid defaults)
+- progress: fraction-badge
 
 ## Source Materials
 - compiler-rules: slide-maker/COMPILER_RULES.md (compilation phases, acceptance checklist, CRAP principles, diagram guidelines)
