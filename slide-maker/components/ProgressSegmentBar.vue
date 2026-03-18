@@ -1,36 +1,11 @@
 <script setup>
 import { computed } from 'vue'
 import { useNav } from '@slidev/client'
+import { useSections } from '../composables/useSections'
 
-const { currentPage, total, currentLayout, slides } = useNav()
+const { currentPage, currentLayout } = useNav()
+const { sections } = useSections()
 const hidden = computed(() => ['cover', 'end'].includes(currentLayout.value))
-
-// Build section boundaries from slides with layout: 'section'
-const sections = computed(() => {
-  const all = slides.value || []
-  const sectionStarts = []
-
-  for (let i = 0; i < all.length; i++) {
-    const fm = all[i]?.frontmatter || all[i]?.meta?.frontmatter || {}
-    if (fm.layout === 'section' || fm.layout === 'cover') {
-      sectionStarts.push(i + 1) // 1-indexed page number
-    }
-  }
-
-  // If no section slides found, treat the whole deck as one segment
-  if (sectionStarts.length === 0) {
-    return [{ start: 1, end: total.value }]
-  }
-
-  // Build ranges: each section runs from its start to the next section's start - 1
-  const result = []
-  for (let i = 0; i < sectionStarts.length; i++) {
-    const start = sectionStarts[i]
-    const end = i < sectionStarts.length - 1 ? sectionStarts[i + 1] - 1 : total.value
-    result.push({ start, end })
-  }
-  return result
-})
 
 const segmentData = computed(() => {
   const page = currentPage.value
@@ -81,7 +56,7 @@ const segmentData = computed(() => {
 .segment {
   flex: 1;
   height: 100%;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease;
 }
 
 .segment.completed {

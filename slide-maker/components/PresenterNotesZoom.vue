@@ -97,7 +97,7 @@ function decrease() {
 }
 
 .zoom-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.25;
   cursor: not-allowed;
 }
 

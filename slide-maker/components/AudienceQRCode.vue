@@ -40,6 +40,7 @@ onUnmounted(() => {
   <Teleport to="body">
     <div v-if="visible" class="url-overlay" @click.self="toggle()">
       <div class="url-card">
+        <button class="close-btn" title="Close (Esc)" @click="toggle">&times;</button>
         <p class="url-heading">Share this slide</p>
         <p class="url-text">{{ currentUrl }}</p>
         <p class="url-hint">Press <kbd>q</kbd> or click outside to dismiss</p>
@@ -52,19 +53,44 @@ onUnmounted(() => {
 .url-overlay {
   position: fixed;
   inset: 0;
-  z-index: 10000;
+  z-index: 9500;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.85);
+  background: color-mix(in srgb, var(--deck-bg) 88%, transparent);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 
 .url-card {
+  position: relative;
   text-align: center;
   padding: 3rem 4rem;
   max-width: 90vw;
+}
+
+.close-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--deck-border, #444);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--deck-muted, #888);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: var(--deck-fg, #ccc);
+  border-color: var(--deck-muted, #888);
 }
 
 .url-heading {

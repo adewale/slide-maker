@@ -9,6 +9,7 @@ onKeyStroke('Escape', () => toggleHelp())
   <Teleport to="body">
     <div class="help-backdrop" @click.self="toggleHelp()">
       <div class="help-panel">
+        <button class="close-btn" title="Close (Esc)" @click="toggleHelp()">&times;</button>
         <h2 class="help-title">Keyboard Shortcuts</h2>
         <div class="help-grid">
           <div class="help-column">
@@ -105,27 +106,52 @@ onKeyStroke('Escape', () => toggleHelp())
 .help-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 9000;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--deck-bg, #f4f0e8) 88%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--deck-bg) 88%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .help-panel {
+  position: relative;
   background: var(--deck-bg, #f4f0e8);
   border: 1px solid color-mix(in srgb, var(--deck-fg, #2b2622) 12%, transparent);
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 2rem 2.5rem;
   max-width: 720px;
   width: 90vw;
   box-shadow: 0 8px 32px color-mix(in srgb, var(--deck-fg, #2b2622) 14%, transparent);
 }
 
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--deck-border, #444);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--deck-muted, #888);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: var(--deck-fg, #ccc);
+  border-color: var(--deck-muted, #888);
+}
+
 .help-title {
-  font-family: var(--deck-font-display, serif);
+  font-family: var(--deck-font-display, sans-serif);
   font-size: 1.4rem;
   font-weight: 700;
   color: var(--deck-fg, #2b2622);
@@ -140,7 +166,7 @@ onKeyStroke('Escape', () => toggleHelp())
 }
 
 .help-column h3 {
-  font-family: var(--deck-font-display, serif);
+  font-family: var(--deck-font-display, sans-serif);
   font-size: 0.85rem;
   font-weight: 600;
   text-transform: uppercase;

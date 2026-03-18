@@ -1,49 +1,13 @@
 <script setup>
 import { computed } from 'vue'
-import { useNav } from '@slidev/client'
+import { useSections } from '../composables/useSections'
 
-const { currentPage, total, slides } = useNav()
-
-// Build section list from slides with layout: 'section' or 'cover'
-const sections = computed(() => {
-  const all = slides.value || []
-  const sectionStarts = []
-
-  for (let i = 0; i < all.length; i++) {
-    const fm = all[i]?.frontmatter || all[i]?.meta?.frontmatter || {}
-    if (fm.layout === 'section' || fm.layout === 'cover') {
-      // Extract title from the slide content or frontmatter
-      const title = fm.title || extractTitle(all[i]) || `Section ${sectionStarts.length + 1}`
-      sectionStarts.push({ page: i + 1, title })
-    }
-  }
-
-  if (sectionStarts.length === 0) {
-    return [{ page: 1, title: 'Presentation', start: 1, end: total.value }]
-  }
-
-  return sectionStarts.map((sec, i) => ({
-    ...sec,
-    start: sec.page,
-    end: i < sectionStarts.length - 1 ? sectionStarts[i + 1].page - 1 : total.value,
-  }))
-})
-
-function extractTitle(slide) {
-  // Try to get the first heading from slide content
-  const content = slide?.content || slide?.source?.content || ''
-  const match = content.match(/^#\s+(.+)$/m)
-  return match ? match[1].trim() : null
-}
+const { sections, currentSectionIndex } = useSections()
 
 const currentSection = computed(() => {
-  const page = currentPage.value
-  for (let i = sections.value.length - 1; i >= 0; i--) {
-    if (page >= sections.value[i].start) {
-      return { ...sections.value[i], index: i }
-    }
-  }
-  return null
+  const idx = currentSectionIndex.value
+  const sec = sections.value[idx]
+  return sec ? { ...sec, index: idx } : null
 })
 
 const label = computed(() => {

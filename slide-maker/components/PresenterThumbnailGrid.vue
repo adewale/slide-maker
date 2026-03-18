@@ -2,34 +2,12 @@
 import { computed, watch, ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useNav } from '@slidev/client'
 import { showThumbnails, selectedSection, toggleThumbnails } from '../composables/useThumbnails'
+import { useSections } from '../composables/useSections'
 
 const { currentPage, total, slides, go } = useNav()
+const { sections } = useSections()
 
 const gridRef = ref(null)
-
-// Build section list (same logic as PresenterSectionNav for consistency)
-const sections = computed(() => {
-  const all = slides.value || []
-  const sectionStarts = []
-
-  for (let i = 0; i < all.length; i++) {
-    const fm = all[i]?.frontmatter || all[i]?.meta?.frontmatter || {}
-    if (fm.layout === 'section' || fm.layout === 'cover') {
-      const title = fm.title || extractTitle(all[i]) || `Section ${sectionStarts.length + 1}`
-      sectionStarts.push({ page: i + 1, title })
-    }
-  }
-
-  if (sectionStarts.length === 0) {
-    return [{ page: 1, title: 'Presentation', start: 1, end: total.value }]
-  }
-
-  return sectionStarts.map((sec, i) => ({
-    ...sec,
-    start: sec.page,
-    end: i < sectionStarts.length - 1 ? sectionStarts[i + 1].page - 1 : total.value,
-  }))
-})
 
 function extractTitle(slide) {
   const content = slide?.content || slide?.source?.content || ''
@@ -164,8 +142,8 @@ watch(selectedSection, async (secIdx) => {
   position: fixed;
   inset: 0;
   z-index: 500;
-  background: color-mix(in srgb, var(--deck-bg, #111) 90%, transparent);
-  backdrop-filter: blur(4px);
+  background: color-mix(in srgb, var(--deck-bg) 88%, transparent);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -178,7 +156,7 @@ watch(selectedSection, async (secIdx) => {
   overflow-y: auto;
   background: var(--deck-bg, #111);
   border: 1px solid var(--deck-border, #444);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 16px;
   scrollbar-width: thin;
   scrollbar-color: var(--deck-border, #444) transparent;
@@ -290,7 +268,7 @@ watch(selectedSection, async (secIdx) => {
   cursor: pointer;
   text-align: left;
   font-family: var(--deck-font-body, sans-serif);
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   min-height: 72px;
 }
 
@@ -320,7 +298,7 @@ watch(selectedSection, async (secIdx) => {
   display: inline-block;
   align-self: flex-start;
   padding: 1px 5px;
-  border-radius: 3px;
+  border-radius: 4px;
   font-size: 0.6rem;
   font-weight: 500;
   letter-spacing: 0.03em;
