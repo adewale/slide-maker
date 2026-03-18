@@ -249,7 +249,7 @@ for entry in "${ALL_DECKS[@]}"; do
   deck_index="$OUT/$name/index.html"
   if [ -f "$deck_index" ]; then
     # Insert the link tag before </head>
-    sed -i '' 's|</head>|<link rel="alternate" type="text/markdown" href="slides.md" title="Slide Markdown"></head>|' "$deck_index"
+    sed -i.bak 's|</head>|<link rel="alternate" type="text/markdown" href="slides.md" title="Slide Markdown"></head>|' "$deck_index" && rm -f "$deck_index.bak"
   fi
 done
 
