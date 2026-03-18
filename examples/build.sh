@@ -42,7 +42,7 @@ done
 
 # Build external decks (if DECKS_DIR is set)
 if [ -n "$DECKS_DIR" ] && [ -d "$DECKS_DIR" ]; then
-  for entry in "${LOCAL_DECKS[@]}"; do
+  for entry in ${LOCAL_DECKS[@]+"${LOCAL_DECKS[@]}"}; do
     dir="${entry%%:*}"
     name="${entry##*:}"
     echo ""
@@ -201,14 +201,14 @@ for entry in "${CORE_DECKS[@]}"; do
   split_slides "$OUT/$name" "$ROOT/$dir"
 done
 
-for entry in "${LOCAL_DECKS[@]}"; do
+for entry in ${LOCAL_DECKS[@]+"${LOCAL_DECKS[@]}"}; do
   dir="${entry%%:*}"
   name="${entry##*:}"
   split_slides "$OUT/$name" "$DECKS_DIR/$dir"
 done
 
 # Combined list for routing config
-ALL_DECKS=("${CORE_DECKS[@]}" "${LOCAL_DECKS[@]}")
+ALL_DECKS=("${CORE_DECKS[@]}" ${LOCAL_DECKS[@]+${LOCAL_DECKS[@]+"${LOCAL_DECKS[@]}"}})
 
 # Copy menu page, viewer, and prevent Jekyll processing
 cp "$ROOT/index.html" "$OUT/index.html"
@@ -272,7 +272,7 @@ SITE_URL="${SITE_URL:-}"
     count=$(cat "$OUT/$name/slides/count" 2>/dev/null || echo "?")
     echo "- [${title}](${SITE_URL}/${name}/slides.md): ${count} slides (core project deck)"
   done
-  for entry in "${LOCAL_DECKS[@]}"; do
+  for entry in ${LOCAL_DECKS[@]+"${LOCAL_DECKS[@]}"}; do
     name="${entry##*:}"
     dir="${entry%%:*}"
     title=$(grep -m1 '^title:' "$DECKS_DIR/$dir/slides.md" 2>/dev/null | sed 's/^title:[[:space:]]*//' || echo "$name")
@@ -293,9 +293,31 @@ SITE_URL="${SITE_URL:-}"
   done
 } > "$OUT/llms.txt"
 
+# ── Root 404.html for GitHub Pages SPA routing ───────────────
+# GitHub Pages serves this for any route that doesn't match a file.
+# It redirects to the index which handles deck routing.
+cat > "$OUT/404.html" << 'HTML404'
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Redirecting...</title></head>
+<body>
+<script>
+// GitHub Pages SPA redirect: preserve the path for client-side routing
+var path = window.location.pathname;
+if (path !== '/' && path !== '/index.html') {
+  // Keep the path — let the deck's own index.html handle hash routing
+  window.location.replace(path);
+} else {
+  window.location.replace('/');
+}
+</script>
+</body>
+</html>
+HTML404
+
 echo ""
 echo "Done. All decks built to examples/_build/"
 echo ""
-echo "  open examples/_build/index.html   # file:// (links won't work)"
-echo "  npx serve examples/_build         # http://localhost:3000"
-echo "  wrangler pages deploy examples/_build  # Cloudflare Pages"
+echo "  npx serve examples/_build                    # local preview"
+echo "  npx gh-pages -d examples/_build              # deploy to GitHub Pages"
+echo "  wrangler pages deploy examples/_build        # deploy to Cloudflare Pages"
