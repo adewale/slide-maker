@@ -1,0 +1,13 @@
+:root {
+  --deck-bg: #fffff8;
+  --deck-fg: #111111;
+  --deck-accent: #2d5f8a;
+  --deck-accent-alt: #c0392b;
+  --deck-muted: rgba(17, 17, 17, 0.5);
+  --deck-font-display: 'EB Garamond', serif;
+  --deck-font-body: 'EB Garamond', serif;
+  --deck-font-mono: 'Source Code Pro', monospace;
+  --deck-font-labels: 'Source Sans 3', sans-serif;
+  --deck-gap: 1.5rem;
+  --deck-radius: 0;
+}

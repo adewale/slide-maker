@@ -1,0 +1,212 @@
+/* Theme — editorial-dark preset */
+
+/* Base slide */
+.slidev-layout {
+  background: var(--deck-bg);
+  color: var(--deck-fg);
+  font-family: var(--deck-font-body);
+}
+
+/* Headings */
+.slidev-layout h1 {
+  font-family: var(--deck-font-display);
+  color: var(--deck-fg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.slidev-layout h2 {
+  font-family: var(--deck-font-display);
+  color: var(--deck-fg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Cover layout */
+.slidev-layout.cover {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: left;
+  padding: var(--deck-space-xl) 4rem;
+  background: var(--deck-bg);
+}
+
+.slidev-layout.cover h1 {
+  font-size: 3.5rem;
+  line-height: 1.05;
+  color: var(--deck-fg);
+  font-weight: 900;
+  max-width: 80%;
+}
+
+.slidev-layout.cover p {
+  color: var(--deck-muted);
+  font-size: 1.3rem;
+  margin-top: var(--deck-space-md);
+  font-weight: 300;
+  font-style: italic;
+}
+
+/* Section layout — inverted for contrast */
+.slidev-layout.section {
+  background: var(--deck-section-bg);
+  color: var(--deck-section-fg);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--deck-space-xl) 4rem;
+}
+
+.slidev-layout.section h1 {
+  font-size: 2.5rem;
+  color: var(--deck-section-fg);
+  font-weight: 700;
+}
+
+/* Center layout */
+.slidev-layout.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--deck-space-xl);
+}
+
+.slidev-layout.center h1 {
+  font-size: 2.5rem;
+  max-width: 70%;
+  font-weight: 700;
+}
+
+.slidev-layout.center p {
+  color: var(--deck-muted);
+  font-size: 1.1rem;
+  max-width: 60%;
+  margin-top: var(--deck-space-md);
+  line-height: 1.6;
+}
+
+/* Fact layout */
+.slidev-layout.fact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--deck-space-xl);
+}
+
+.slidev-layout.fact h1 {
+  font-size: 2rem;
+  max-width: 80%;
+  color: var(--deck-accent);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.slidev-layout.fact p {
+  color: var(--deck-muted);
+  font-size: 1rem;
+  max-width: 65%;
+  margin-top: var(--deck-space-lg);
+  line-height: 1.6;
+}
+
+/* End layout */
+.slidev-layout.end {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--deck-space-xl);
+}
+
+.slidev-layout.end h1 {
+  font-size: 2.2rem;
+  color: var(--deck-fg);
+  font-weight: 700;
+  max-width: 70%;
+  line-height: 1.2;
+}
+
+.slidev-layout.end p {
+  color: var(--deck-muted);
+  font-size: 1rem;
+  margin-top: var(--deck-space-md);
+}
+
+/* Default content */
+.slidev-layout.default h1 {
+  font-size: 1.75rem;
+  margin-bottom: var(--deck-space-lg);
+  padding-bottom: var(--deck-space-sm);
+  border-bottom: 1px solid var(--deck-border);
+}
+
+/* Two-cols layout */
+.slidev-layout.two-cols h1 {
+  font-size: 1.75rem;
+  margin-bottom: var(--deck-space-lg);
+  padding-bottom: var(--deck-space-sm);
+  border-bottom: 1px solid var(--deck-border);
+}
+
+/* List styling */
+.slidev-layout ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.slidev-layout ul li {
+  position: relative;
+  padding-left: 1.5em;
+  margin-bottom: 0.65em;
+  line-height: 1.5;
+  font-size: 1rem;
+}
+
+.slidev-layout ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--deck-accent);
+}
+
+/* Code */
+.slidev-layout code {
+  font-family: var(--deck-font-mono);
+}
+
+.slidev-layout :not(pre) > code {
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--deck-accent);
+  padding: 0.15em 0.4em;
+  border-radius: var(--deck-radius);
+  font-size: 0.9em;
+}
+
+/* Strong emphasis */
+.slidev-layout strong {
+  color: var(--deck-accent);
+  font-weight: 600;
+}
+
+/* v-click animation — restrained fade for editorial-dark */
+.slidev-vclick-target {
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.slidev-vclick-hidden {
+  opacity: 0;
+  transform: translateY(4px);
+}

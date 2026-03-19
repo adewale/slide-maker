@@ -1,0 +1,11 @@
+:root {
+  --deck-bg: #fffbf5;
+  --deck-fg: #521000;
+  --deck-accent: #ff4801;
+  --deck-accent-alt: #e54100;
+  --deck-muted: #7a4a3a;
+  --deck-border: #ebd5c1;
+  --deck-font-display: 'Inter', sans-serif;
+  --deck-font-body: 'Inter', sans-serif;
+  --deck-font-mono: 'JetBrains Mono', monospace;
+}

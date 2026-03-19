@@ -53,6 +53,17 @@ declare -a CORE_DECKS=(
   "reference:reference"
 )
 
+# Generated decks (from generated-decks/) — showcases of the skill
+GENERATED_DIR="$REPO_ROOT/generated-decks"
+declare -a GENERATED_DECKS=()
+if [ -d "$GENERATED_DIR" ]; then
+  for deck_dir in "$GENERATED_DIR"/*/; do
+    [ -f "$deck_dir/slides.md" ] || continue
+    name=$(basename "$deck_dir")
+    GENERATED_DECKS+=("$name")
+  done
+fi
+
 # External decks (optional — set DECKS_DIR to include personal decks)
 declare -a LOCAL_DECKS=()
 
@@ -87,6 +98,18 @@ if [ -n "$DECKS_DIR" ] && [ -d "$DECKS_DIR" ]; then
     fi
   done
 fi
+
+# Build generated decks (showcases of the skill applied to real projects)
+for name in ${GENERATED_DECKS[@]+"${GENERATED_DECKS[@]}"}; do
+  echo ""
+  echo "Building $name (generated)..."
+  cd "$GENERATED_DIR/$name"
+  npx slidev build --base "${BASE_PREFIX:-}/$name/" --out "$OUT/$name"
+  cp "$GENERATED_DIR/$name/slides.md" "$OUT/$name/slides.md"
+  if [ -d "$GENERATED_DIR/$name/pages" ]; then
+    cp -r "$GENERATED_DIR/$name/pages" "$OUT/$name/pages"
+  fi
+done
 
 # ── Split slides.md into per-slide Markdown files ─────────────
 # Produces slides/1.md, slides/2.md, ... for each deck.
@@ -239,7 +262,17 @@ for entry in ${LOCAL_DECKS[@]+"${LOCAL_DECKS[@]}"}; do
   split_slides "$OUT/$name" "$DECKS_DIR/$dir"
 done
 
-# Combined list for routing config
+for name in ${GENERATED_DECKS[@]+"${GENERATED_DECKS[@]}"}; do
+  split_slides "$OUT/$name" "$GENERATED_DIR/$name"
+done
+
+# Combined list for routing config — need all deck names for serve.json and _redirects
+ALL_DECK_NAMES=()
+for entry in "${CORE_DECKS[@]}"; do ALL_DECK_NAMES+=("${entry##*:}"); done
+for entry in ${LOCAL_DECKS[@]+"${LOCAL_DECKS[@]}"}; do ALL_DECK_NAMES+=("${entry##*:}"); done
+for name in ${GENERATED_DECKS[@]+"${GENERATED_DECKS[@]}"}; do ALL_DECK_NAMES+=("$name"); done
+
+# Keep ALL_DECKS for llms.txt which needs dir:name pairs
 ALL_DECKS=("${CORE_DECKS[@]}" ${LOCAL_DECKS[@]+${LOCAL_DECKS[@]+"${LOCAL_DECKS[@]}"}})
 
 # Copy menu page, viewer, and prevent Jekyll processing
@@ -252,8 +285,7 @@ touch "$OUT/.nojekyll"
   echo '{'
   echo '  "rewrites": ['
   first=true
-  for entry in "${ALL_DECKS[@]}"; do
-    name="${entry##*:}"
+  for name in "${ALL_DECK_NAMES[@]}"; do
     if [ "$first" = true ]; then
       first=false
     else
@@ -269,15 +301,13 @@ touch "$OUT/.nojekyll"
 # Generate _redirects for Cloudflare Pages / Workers Static Assets
 # Slidev uses HTML5 history routing — each deck needs SPA fallback
 {
-  for entry in "${ALL_DECKS[@]}"; do
-    name="${entry##*:}"
+  for name in "${ALL_DECK_NAMES[@]}"; do
     printf '/%s/*    /%s/index.html   200\n' "$name" "$name"
   done
 } > "$OUT/_redirects"
 
 # ── Inject <link rel="alternate"> into each deck's index.html ──
-for entry in "${ALL_DECKS[@]}"; do
-  name="${entry##*:}"
+for name in "${ALL_DECK_NAMES[@]}"; do
   deck_index="$OUT/$name/index.html"
   if [ -f "$deck_index" ]; then
     # Insert the link tag before </head>
@@ -311,13 +341,17 @@ SITE_URL="${SITE_URL:-}"
     count=$(cat "$OUT/$name/slides/count" 2>/dev/null || echo "?")
     echo "- [${title}](${SITE_URL}/${name}/slides.md): ${count} slides"
   done
+  for name in ${GENERATED_DECKS[@]+"${GENERATED_DECKS[@]}"}; do
+    title=$(grep -m1 '^title:' "$GENERATED_DIR/$name/slides.md" 2>/dev/null | sed 's/^title:[[:space:]]*//' || echo "$name")
+    count=$(cat "$OUT/$name/slides/count" 2>/dev/null || echo "?")
+    echo "- [${title}](${SITE_URL}/${name}/slides.md): ${count} slides (generated from GitHub project)"
+  done
   echo ""
   echo "## Optional"
   echo ""
   echo "Per-slide Markdown is available for each deck. Replace slides.md with slides/N.md to fetch slide N, or slides/count for the total number of slides."
   echo ""
-  for entry in "${ALL_DECKS[@]}"; do
-    name="${entry##*:}"
+  for name in "${ALL_DECK_NAMES[@]}"; do
     count=$(cat "$OUT/$name/slides/count" 2>/dev/null || echo "?")
     for n in $(seq 1 "$count" 2>/dev/null); do
       echo "- [${name} slide ${n}](${SITE_URL}/${name}/slides/${n}.md)"

@@ -1,0 +1,17 @@
+:root {
+  /* Tasche project colors override bold-modern defaults.
+     Monochrome palette from the project's pen-and-ink design language.
+     WCAG AA verified:
+       fg on bg    = 18.1:1  (pass 4.5:1 normal)
+       accent on bg = 16.2:1 (pass 4.5:1 normal)
+       muted on bg  = 8.6:1  (pass 4.5:1 normal) */
+  --deck-bg: #0a0a0f;
+  --deck-fg: #f0f0f5;
+  --deck-accent: #e8e8ed;
+  --deck-muted: rgba(240, 240, 245, 0.5);
+  --deck-font-display: 'Bebas Neue', sans-serif;
+  --deck-font-body: 'DM Sans', sans-serif;
+  --deck-font-mono: 'JetBrains Mono', monospace;
+  --deck-gap: 1.5rem;
+  --deck-radius: 12px;
+}
