@@ -47,7 +47,7 @@ sync_skill_files() {
 rm -rf "$OUT"
 mkdir -p "$OUT"
 
-# Core decks (in examples/) — part of the project
+# Core decks (in examples/) — dir:name
 declare -a CORE_DECKS=(
   "demo:slide-maker"
   "reference:reference"
@@ -67,7 +67,6 @@ for entry in "${CORE_DECKS[@]}"; do
   cd "$ROOT/$dir"
   npx slidev build --base "${BASE_PREFIX:-}/$name/" --out "$OUT/$name"
   cp "$ROOT/$dir/slides.md" "$OUT/$name/slides.md"
-  # Copy src:-imported page files if they exist
   if [ -d "$ROOT/$dir/pages" ]; then
     cp -r "$ROOT/$dir/pages" "$OUT/$name/pages"
   fi

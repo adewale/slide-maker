@@ -4,7 +4,7 @@ A Claude Code skill that generates [Slidev](https://sli.dev) presentation decks.
 
 Output is native Slidev Markdown — editable by hand, buildable to static HTML, deployable anywhere.
 
-[Live demo](https://slides-oshineye-dev.adewale-883.workers.dev/slide-maker/)
+[Live demo](https://adewale.github.io/slide-maker/slide-maker/)
 
 ## Install
 

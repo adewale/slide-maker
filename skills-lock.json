@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "good-readme": {
+      "source": "adewale/good-readme",
+      "sourceType": "github",
+      "computedHash": "56c11ea39561e6b605d4f51c86c983af6fa30a92ab7f32fd543d039fbce21875"
+    }
+  }
+}
