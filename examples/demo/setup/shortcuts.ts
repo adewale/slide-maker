@@ -20,12 +20,12 @@ export default defineShortcutsSetup((nav, base) => {
     },
     {
       key: ']',
-      fn: () => nav.nextSlide(),
+      fn: () => nav.nextSlide(true),
       autoRepeat: true,
     },
     {
       key: '[',
-      fn: () => nav.prevSlide(),
+      fn: () => nav.prevSlide(true),
       autoRepeat: true,
     },
   ]
