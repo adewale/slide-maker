@@ -1,0 +1,42 @@
+{
+  "eval_id": 1,
+  "eval_name": "pitch-deck-brief",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "has-deck-spec",
+      "passed": true,
+      "evidence": "deck.spec.md exists at outputs/deck.spec.md with title 'The Breaking Point', 7 slides outlined, editorial-dark preset"
+    },
+    {
+      "text": "has-slides-md",
+      "passed": true,
+      "evidence": "slides.md exists at outputs/slides.md"
+    },
+    {
+      "text": "slide-count-is-7",
+      "passed": true,
+      "evidence": "slides.md contains exactly 7 slides: 1) The Breaking Point (cover), 2) 73% (fact), 3) THE SEAM BETWEEN SERVICES (section), 4) What we monitor, 5) Every breaking change was detectable... (center), 6) How it works, 7) Stop finding breaks in production (end)"
+    },
+    {
+      "text": "uses-editorial-dark",
+      "passed": true,
+      "evidence": "tokens.css has dark bg #0a0a0f and Playfair Display font: --deck-bg: #0a0a0f; --deck-font-display: 'Playfair Display', serif"
+    },
+    {
+      "text": "no-generic-phrases",
+      "passed": true,
+      "evidence": "None of 'Let's dive in', 'In conclusion', or 'Without further ado' found in slides.md"
+    },
+    {
+      "text": "has-v-clicks",
+      "passed": true,
+      "evidence": "slides.md contains 4 occurrences of v-click tags: <v-clicks> blocks on slides 4 (What we monitor) and 6 (How it works)"
+    },
+    {
+      "text": "no-emoji",
+      "passed": true,
+      "evidence": "No emoji characters found in slides.md"
+    }
+  ]
+}

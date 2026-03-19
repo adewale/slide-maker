@@ -1,0 +1,49 @@
+{
+  "skill_name": "slide-maker",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Create a short 5-slide deck about the architecture of this project. Focus on how the build system works and how decks get deployed. Use the cloudflare preset.",
+      "expected_output": "A complete Slidev deck with deck.spec.md, slides.md, styles/tokens.css, styles/theme.css, and styles/index.css. The deck should reference real files from this repo (build.sh, deploy workflow) and use cloudflare preset tokens.",
+      "files": [],
+      "assertions": [
+        {"name": "has-deck-spec", "check": "deck.spec.md exists in outputs"},
+        {"name": "has-slides-md", "check": "slides.md exists in outputs"},
+        {"name": "has-tokens-css", "check": "styles/tokens.css exists in outputs"},
+        {"name": "has-styles-index", "check": "styles/index.css exists in outputs"},
+        {"name": "slide-count-is-5", "check": "slides.md contains exactly 5 slides (count slide separators)"},
+        {"name": "references-build-sh", "check": "slides.md mentions build.sh, build pipeline, or the build system with specific details from the repo"},
+        {"name": "uses-cloudflare-tokens", "check": "tokens.css contains warm cream/orange color values consistent with the cloudflare preset"},
+        {"name": "no-hardcoded-colors", "check": "No hex color literals inside <style scoped> blocks in slides.md — must use var(--deck-*) tokens"}
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "I need a 7-slide pitch deck for a developer tool startup. The product is an API monitoring service that catches breaking changes before they hit production. Target audience is VPs of engineering. Use editorial-dark.",
+      "expected_output": "A complete Slidev deck with deck.spec.md, slides.md, and styles. Should use editorial-dark preset (Playfair Display, near-black bg). Clear narrative arc. No generic AI phrases. Progressive reveal on dense slides.",
+      "files": [],
+      "assertions": [
+        {"name": "has-deck-spec", "check": "deck.spec.md exists in outputs"},
+        {"name": "has-slides-md", "check": "slides.md exists in outputs"},
+        {"name": "slide-count-is-7", "check": "slides.md contains exactly 7 slides"},
+        {"name": "uses-editorial-dark", "check": "tokens.css has dark background color and references Playfair Display font"},
+        {"name": "no-generic-phrases", "check": "slides.md does not contain 'Let\\'s dive in', 'In conclusion', 'Without further ado', or similar generic stock phrases"},
+        {"name": "has-v-clicks", "check": "slides.md contains at least one <v-clicks> or <v-click> for progressive reveal"},
+        {"name": "no-emoji", "check": "slides.md contains no emoji characters"}
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Update the demo deck at examples/demo/slides.md — slide 8 ('The toolkit') is too dense. Split it into two slides: one for transitions and visual effects, one for data visualization and design guardrails.",
+      "expected_output": "Updated slides.md where the original slide 8 is now two separate slides. Content preserved, just reorganized. deck.spec.md updated to reflect new slide count.",
+      "files": ["examples/demo/slides.md", "examples/demo/deck.spec.md"],
+      "assertions": [
+        {"name": "slide-count-increased", "check": "Output slides.md has 12 slides (original had 11, one was split into two)"},
+        {"name": "transitions-content-preserved", "check": "Output contains 'transitions' and 'visual effects' content from the original slide"},
+        {"name": "dataviz-content-preserved", "check": "Output contains 'data visualization' and 'design guardrails' content from the original slide"},
+        {"name": "other-slides-unchanged", "check": "Slides before and after the split point are substantially identical to the original"},
+        {"name": "spec-updated", "check": "deck.spec.md exists and reflects the new slide count or structure"}
+      ]
+    }
+  ]
+}

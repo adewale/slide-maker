@@ -1,0 +1,54 @@
+{
+  "metadata": {
+    "skill_name": "slide-maker",
+    "timestamp": "2026-03-19T00:00:00Z",
+    "evals_run": ["project-grounded-deck", "pitch-deck-brief", "update-split-slide"],
+    "runs_per_configuration": 3
+  },
+  "configurations": [
+    {
+      "name": "with_skill",
+      "pass_rate": { "mean": 1.0, "stddev": 0.0 },
+      "time_seconds": { "mean": 256.23, "stddev": 109.59 },
+      "tokens": { "mean": 66584, "stddev": 20050 }
+    },
+    {
+      "name": "without_skill",
+      "pass_rate": { "mean": 0.677, "stddev": 0.215 },
+      "time_seconds": { "mean": 86.53, "stddev": 33.06 },
+      "tokens": { "mean": 26160, "stddev": 8305 }
+    }
+  ],
+  "per_eval": [
+    {
+      "eval_name": "project-grounded-deck",
+      "with_skill": { "pass_rate": 1.0, "time_seconds": 256.7, "tokens": 77615 },
+      "without_skill": { "pass_rate": 0.375, "time_seconds": 94.4, "tokens": 29803 }
+    },
+    {
+      "eval_name": "pitch-deck-brief",
+      "with_skill": { "pass_rate": 1.0, "time_seconds": 390.2, "tokens": 83696 },
+      "without_skill": { "pass_rate": 0.857, "time_seconds": 122.5, "tokens": 34008 }
+    },
+    {
+      "eval_name": "update-split-slide",
+      "with_skill": { "pass_rate": 1.0, "time_seconds": 121.8, "tokens": 38442 },
+      "without_skill": { "pass_rate": 0.8, "time_seconds": 42.7, "tokens": 14670 }
+    }
+  ],
+  "run_summary": {
+    "delta": {
+      "pass_rate": "+0.32",
+      "time_seconds": "+169.7",
+      "tokens": "+40424"
+    }
+  },
+  "notes": [
+    "with_skill achieves 100% pass rate across all 3 evals; without_skill averages 67.7%",
+    "The quality gain comes at a cost: with_skill uses ~2.5x more tokens and ~3x more wall-clock time",
+    "project-grounded-deck shows the largest quality gap (100% vs 37.5%) — without_skill fails to produce the required file structure (deck.spec.md, styles/tokens.css, styles/index.css) and hardcodes colors in slides",
+    "pitch-deck-brief is the closest eval (100% vs 85.7%) — without_skill only missed creating deck.spec.md",
+    "update-split-slide is also close (100% vs 80%) — without_skill correctly split the slide but failed to create/update deck.spec.md",
+    "The consistent failure pattern for without_skill is missing deck.spec.md and the structured styles/ directory, which are skill-specific conventions"
+  ]
+}

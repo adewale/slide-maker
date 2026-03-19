@@ -1,0 +1,47 @@
+{
+  "eval_id": 0,
+  "eval_name": "project-grounded-deck",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "has-deck-spec",
+      "passed": true,
+      "evidence": "deck.spec.md exists at outputs/deck.spec.md"
+    },
+    {
+      "text": "has-slides-md",
+      "passed": true,
+      "evidence": "slides.md exists at outputs/slides.md"
+    },
+    {
+      "text": "has-tokens-css",
+      "passed": true,
+      "evidence": "styles/tokens.css exists at outputs/styles/tokens.css with cloudflare preset tokens"
+    },
+    {
+      "text": "has-styles-index",
+      "passed": true,
+      "evidence": "styles/index.css exists at outputs/styles/index.css containing @import './tokens.css' and @import './theme.css'"
+    },
+    {
+      "text": "slide-count-is-5",
+      "passed": true,
+      "evidence": "slides.md contains exactly 5 slides: 1) How Slide Maker Ships (cover), 2) build.sh is the entire build system, 3) What the build produces, 4) Two deploy targets same artifact, 5) One script Static files Deploy anywhere (end)"
+    },
+    {
+      "text": "references-build-sh",
+      "passed": true,
+      "evidence": "slides.md mentions build.sh multiple times with specific repo details: 'build.sh is the entire build system' (slide title), 'Runs npx slidev build per deck with --base', 'CI runs build.sh, deploys _build', and source comments referencing 'examples/build.sh sync_skill_files function'"
+    },
+    {
+      "text": "uses-cloudflare-tokens",
+      "passed": true,
+      "evidence": "tokens.css has warm cream bg #fffbf5 and orange accent #ff4801, accent-alt #e54100, muted #7a4a3a, rule #ebd5c1 — consistent with cloudflare preset warm cream/orange palette"
+    },
+    {
+      "text": "no-hardcoded-colors",
+      "passed": true,
+      "evidence": "slides.md contains zero <style> or <style scoped> blocks — no hex colors in any style blocks"
+    }
+  ]
+}

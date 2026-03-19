@@ -1,0 +1,29 @@
+/* Design tokens — cloudflare preset */
+:root {
+  /* Core palette */
+  --deck-bg: #fffbf5;
+  --deck-fg: #521000;
+  --deck-accent: #ff4801;
+  --deck-accent-alt: #e54100;
+  --deck-muted: #7a4a3a;
+  --deck-rule: #ebd5c1;
+  --deck-code-bg: #231710;
+  --deck-code-chrome: #1c120b;
+
+  /* Typography */
+  --deck-font-sans: 'Inter', sans-serif;
+  --deck-font-mono: 'JetBrains Mono', monospace;
+
+  /* Spacing */
+  --deck-space-sm: 0.5rem;
+  --deck-space-md: 1rem;
+  --deck-space-lg: 2rem;
+  --deck-space-xl: 3rem;
+
+  /* Radius */
+  --deck-radius: 8px;
+
+  /* Shadow — warm brown, not neutral black */
+  --deck-shadow: 0 4px 16px rgba(82, 16, 0, 0.12);
+  --deck-shadow-lg: 0 20px 40px -12px rgba(82, 16, 0, 0.25);
+}
