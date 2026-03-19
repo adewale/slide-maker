@@ -19,7 +19,7 @@ defineProps({
 
 .small-multiples :deep(> *) {
   text-align: center;
-  font-family: var(--deck-font-body, sans-serif);
+  font-family: var(--deck-font-body, 'Source Sans 3', sans-serif);
   font-size: 0.8rem;
 }
 </style>

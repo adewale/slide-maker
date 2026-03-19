@@ -1,11 +1,9 @@
 <script setup>
-import { computed } from 'vue'
-
 const props = defineProps({
   data: { type: Array, required: true },
   width: { type: Number, default: 80 },
   height: { type: Number, default: 16 },
-  color: { type: String, default: 'currentColor' },
+  color: { type: String, default: '#22d3ee' },
 })
 
 const points = computed(() => {
@@ -22,6 +20,8 @@ const points = computed(() => {
     })
     .join(' ')
 })
+
+import { computed } from 'vue'
 </script>
 
 <template>

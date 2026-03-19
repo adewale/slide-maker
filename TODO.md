@@ -11,7 +11,7 @@ Quick win — hide chrome, eliminate black bars on portrait phones.
 - [ ] Test on iPhone SE (375px) and Pixel 7 (412px)
 
 ### Phase 2: Scroll view
-Vertically scrollable card view for portrait phones. Spec: `specs/mobile-scroll-view.md`.
+Vertically scrollable card view for portrait phones. Spec: `docs/mobile-scroll-view.md`.
 
 - [ ] Build `MobileScrollView.vue` — renders all slides in a scroll container
 - [ ] Force all `v-click` content visible (`$clicks: Infinity`)

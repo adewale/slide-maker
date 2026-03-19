@@ -138,11 +138,13 @@ current slide.
 
 ```
 slide-maker/          # The skill (copy to .claude/skills/)
+  components/         # Canonical Vue components (symlinked by decks)
+  composables/        # Shared composables (useSections, useThumbnails)
+  styles/             # Shared transitions and interactions CSS
 examples/             # Core decks (demo + reference)
   build.sh            # Multi-deck build with per-slide splitting
 tools/                # deck-lint, screenshot-audit, style-audit, deck-diff
-docs/                 # Philosophy, rubrics, lessons learned
-specs/                # Feature specs (mobile scroll view)
+docs/                 # Philosophy, rubrics, specs, lessons learned
 ```
 
 ## Priority stack

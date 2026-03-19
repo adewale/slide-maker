@@ -2,8 +2,6 @@
 
 All notable changes to the slide-maker project and its Slidev extensions.
 
-For changes to the skill itself, see [docs/CHANGELOG.md](docs/CHANGELOG.md).
-
 ## [Unreleased]
 
 ### Added

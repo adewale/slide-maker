@@ -17,9 +17,10 @@ const maxVal = computed(() => Math.max(...allValues.value))
 const range = computed(() => maxVal.value - minVal.value || 1)
 
 function yPos(val) {
-  const padding = 20
-  const usable = props.height - padding * 2
-  return padding + usable - ((val - minVal.value) / range.value) * usable
+  const topPadding = 36 // leave room for header labels above data points
+  const bottomPadding = 20
+  const usable = props.height - topPadding - bottomPadding
+  return topPadding + usable - ((val - minVal.value) / range.value) * usable
 }
 </script>
 
