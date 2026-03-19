@@ -2,7 +2,7 @@
 
 Decks that survive the podium. Built from specs, not templates.
 
-[Live demo](https://slides-oshineye-dev.adewale-883.workers.dev/slide-maker/) — try it on your phone too.
+[Live demo](https://slides-oshineye-dev.adewale-883.workers.dev/skills/slide-maker/) — try it on your phone too.
 
 ## What this is
 
@@ -59,10 +59,10 @@ The compiler checks its own output:
 
 ## Install
 
-Copy `slide-maker/` into your project's `.claude/skills/` folder:
+Copy `skills/slide-maker/` into your project's `.claude/skills/` folder:
 
 ```bash
-cp -r slide-maker/ your-project/.claude/skills/slide-maker/
+cp -r skills/slide-maker/ your-project/.claude/skills/skills/slide-maker/
 ```
 
 Claude Code discovers the skill automatically.
@@ -137,7 +137,7 @@ current slide.
 ## Project structure
 
 ```
-slide-maker/          # The skill (copy to .claude/skills/)
+skills/slide-maker/          # The skill (copy to .claude/skills/)
   components/         # Canonical Vue components (symlinked by decks)
   composables/        # Shared composables (useSections, useThumbnails)
   styles/             # Shared transitions and interactions CSS

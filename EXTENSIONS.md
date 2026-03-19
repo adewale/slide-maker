@@ -74,7 +74,7 @@ not part of the slide-maker skill.
 
 ## Transitions
 
-13 cinematic transitions defined in `slide-maker/styles/transitions.css`:
+13 cinematic transitions defined in `skills/slide-maker/styles/transitions.css`:
 
 | Transition | Effect | Duration |
 |---|---|---|
@@ -98,7 +98,7 @@ All use `cubic-bezier(0.4, 0, 0.2, 1)` easing. Slidev's built-in `fade` and
 
 ## Hover Interactions
 
-6 interaction patterns defined in `slide-maker/styles/interactions.css`:
+6 interaction patterns defined in `skills/slide-maker/styles/interactions.css`:
 
 | Class | Effect |
 |---|---|

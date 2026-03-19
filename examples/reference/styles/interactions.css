@@ -1,4 +1,6 @@
 /* ─── Reusable Hover & Interaction Patterns ─── */
+/* Import into any deck's styles/index.css alongside tokens and theme. */
+/* All patterns use deck tokens for consistent theming. */
 
 /* ── Hover lift for cards ── */
 .hover-lift {
@@ -11,13 +13,13 @@
 }
 
 /* ── Spotlight group — dim siblings on hover ── */
-.spotlight-group > * {
-  transition: opacity 0.3s ease, filter 0.3s ease;
-  cursor: pointer;
-}
-.spotlight-group:hover > *:not(:hover) {
+.spotlight-group:hover .spotlight-item:not(:hover) {
   opacity: 0.3;
   filter: blur(1px);
+}
+.spotlight-item {
+  transition: opacity 0.3s ease, filter 0.3s ease;
+  cursor: pointer;
 }
 
 /* ── Scale reveal for data elements ── */
@@ -45,7 +47,7 @@
   cursor: pointer;
 }
 .hover-glow:hover {
-  box-shadow: 0 0 16px rgba(34, 211, 238, 0.25);
+  box-shadow: 0 0 16px rgba(var(--deck-accent-rgb, 100, 100, 255), 0.25);
 }
 
 /* ── Hover dim — reduce opacity to signal non-focus ── */

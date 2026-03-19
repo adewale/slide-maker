@@ -1,0 +1,11 @@
+{
+  "name": "slide-maker",
+  "description": "Generate presentation decks grounded in real GitHub projects using a structured brief-to-slides process with WCAG-validated visual direction.",
+  "plugins": [
+    {
+      "name": "slide-maker",
+      "source": "./",
+      "skills": ["./skills/slide-maker"]
+    }
+  ]
+}

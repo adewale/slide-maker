@@ -1,1 +1,7 @@
-../../../slide-maker/composables/useHelp.ts
+import { ref } from 'vue'
+
+export const showHelp = ref(false)
+
+export function toggleHelp() {
+  showHelp.value = !showHelp.value
+}

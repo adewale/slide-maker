@@ -2,6 +2,28 @@
 
 This document defines how to compile `deck.spec.md` into a Slidev deck project.
 
+## Table of contents
+
+- [Goals](#goals)
+- [Anti-patterns](#anti-patterns-never-do-these)
+- [Inputs](#inputs)
+- [Outputs](#outputs)
+- [Universal features](#universal-features-every-deck)
+- [Phases](#phases)
+- [Available Slidev features](#available-slidev-features)
+- [Synchronization rules](#synchronization-rules)
+- [Color methodology](#color-methodology)
+- [Storytelling](#storytelling)
+- [Diagram guidelines](#diagram-guidelines)
+- [Visual design principles (CRAP)](#visual-design-principles-crap)
+- [Content density limits](#content-density-limits)
+- [Animation guidelines](#animation-guidelines)
+- [Hover and cursor patterns](#hover-and-cursor-patterns)
+- [Spotlight and focus patterns](#spotlight-and-focus-patterns)
+- [Data visualization components](#available-data-visualization-components)
+- [Acceptance checklist](#acceptance-checklist)
+- [Enforcement and verification](#enforcement-and-verification)
+
 ## Goals
 
 Optimize for:
@@ -16,17 +38,81 @@ These compiler goals serve the broader project priorities defined in SKILL.md §
 
 ## Anti-patterns (never do these)
 
+Each anti-pattern shows the wrong way and the right way.
+
+### Hardcoded colors
+
+```vue
+<!-- NEVER — bypasses token system, causes palette drift -->
+<style scoped>
+h1 { color: #b44215; }
+.card { background: #f4f0e8; }
+</style>
+
+<!-- ALWAYS — uses deck tokens, adapts to any preset -->
+<style scoped>
+h1 { color: var(--deck-accent); }
+.card { background: var(--deck-bg); }
+</style>
+```
+
+### Bullet dumps vs progressive reveal
+
+```md
+<!-- NEVER — wall of text, audience reads ahead -->
+- First point
+- Second point
+- Third point
+- Fourth point
+
+<!-- ALWAYS — progressive reveal, audience follows the speaker -->
+<v-clicks>
+
+- First point
+- Second point
+- Third point
+- Fourth point
+
+</v-clicks>
+```
+
+### Arrow syntax in comments
+
+```md
+<!-- NEVER — breaks Slidev's parser (treats --> as comment close) -->
+<!-- The data flows from A --> B --> C -->
+
+<!-- ALWAYS — use prose or Unicode arrows -->
+<!-- The data flows from A to B to C -->
+```
+
+### Generic closings
+
+```md
+<!-- NEVER — forgettable install slide -->
+---
+layout: end
+---
+# Get started
+npm install slide-maker
+
+<!-- ALWAYS — echo the opening thesis -->
+---
+layout: end
+---
+# Direction first. Then slides.
+That is the entire idea.
+```
+
+### Other rules
+
 - No emoji in slides or Mermaid diagrams
-- No generic stock phrases ("Let's dive in", "In conclusion")
-- No overused font families across decks (Inter, Inter Tight, Roboto, Arial) — each deck must use fonts from STYLE_PRESETS.md for its preset. Exception: presets that specify these fonts as part of a brand identity (e.g., cloudflare preset uses Inter as Cloudflare's corporate typeface).
+- No generic stock phrases ("Let's dive in", "In conclusion", "Without further ado")
+- No overused font families across decks (Inter, Inter Tight, Roboto, Arial) — each deck must use fonts from STYLE_PRESETS.md for its preset. Exception: presets that specify these fonts as part of a brand identity.
 - No purple-gradient-on-white cliches
 - No ad-hoc transitions — every transition type must have a consistent semantic meaning (see Transition grammar)
-- No dumping every bullet on screen at once — use `<v-clicks>` for progressive reveal
 - No same layout for every content slide — alternate between built-in layouts
-- No blanket `.slidev-layout { background }` overrides when using a non-default theme — let the theme control its own backgrounds
-- No hardcoded colors in scoped styles — always reference `var(--deck-*)` tokens. Literal hex/rgb values in `<style scoped>` blocks bypass the token system and cause palette drift.
-- No "install command" closings — the final slide must resonate with the opening question/metaphor, not end with `npm install` or `git clone`. Installation belongs in presenter notes or a penultimate "Get started" slide, never the last word.
-- No `-->` arrow syntax inside HTML comments or presenter notes — Slidev's Markdown parser treats `-->` as a comment-close token, breaking the slide. Use prose ("A flows to B") or Unicode arrows instead.
+- No blanket `.slidev-layout { background }` overrides when using a non-default theme
 
 For the full catalog of AI-generated aesthetic tells to avoid, see [LLM_TELLS.md](../docs/LLM_TELLS.md).
 

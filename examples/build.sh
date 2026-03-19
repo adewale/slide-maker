@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$ROOT/.." && pwd)"
+SKILL_DIR="$REPO_ROOT/skills/slide-maker"
 DECKS_DIR="${DECKS_DIR:-}"  # optional external decks directory
 OUT="$ROOT/_build"
 
@@ -11,6 +12,36 @@ if [ ! -d "$REPO_ROOT/node_modules" ]; then
   echo "Installing dependencies..."
   npm install --prefix "$REPO_ROOT"
 fi
+
+# ── Sync shared files from the skill into each deck ──────────────────────
+# The skill is the canonical source. Decks get copies so they work standalone.
+sync_skill_files() {
+  local deck_dir="$1"
+
+  # Components: copy any that exist in the skill and are used by the deck
+  if [ -d "$deck_dir/components" ]; then
+    for comp in "$deck_dir/components/"*.vue; do
+      [ -f "$comp" ] || continue
+      base=$(basename "$comp")
+      if [ -f "$SKILL_DIR/components/$base" ]; then
+        cp "$SKILL_DIR/components/$base" "$comp"
+      fi
+    done
+  fi
+
+  # Composables, setup, styles: copy if deck has the directory
+  for subdir in composables setup styles; do
+    if [ -d "$deck_dir/$subdir" ]; then
+      for file in "$deck_dir/$subdir/"*; do
+        [ -f "$file" ] || continue
+        base=$(basename "$file")
+        if [ -f "$SKILL_DIR/$subdir/$base" ]; then
+          cp "$SKILL_DIR/$subdir/$base" "$file"
+        fi
+      done
+    fi
+  done
+}
 
 # Clean previous build
 rm -rf "$OUT"
@@ -30,6 +61,8 @@ for entry in "${CORE_DECKS[@]}"; do
   dir="${entry%%:*}"
   name="${entry##*:}"
   echo ""
+  echo "Syncing skill files into $dir..."
+  sync_skill_files "$ROOT/$dir"
   echo "Building $name (core)..."
   cd "$ROOT/$dir"
   npx slidev build --base "${BASE_PREFIX:-}/$name/" --out "$OUT/$name"

@@ -1,6 +1,6 @@
 ---
 name: slide-maker
-description: Create or update native Slidev deck projects. Use when the user asks to create a presentation, slide deck, talk, or Slidev project.
+description: Generate presentation decks grounded in real GitHub projects, or walk through a structured brief-to-slides process. Use when the user asks to create a presentation, slide deck, talk, pitch, keynote, or Slidev project — especially when they want slides based on an existing codebase, architecture, or project documentation.
 argument-hint: [goal or update instructions]
 ---
 
