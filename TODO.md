@@ -1,5 +1,32 @@
 # TODO
 
+## Mobile support (high priority)
+
+### Phase 1: CSS cosmetics
+Quick win — hide chrome, eliminate black bars on portrait phones.
+
+- [ ] Hide Slidev nav toolbar on mobile: `@media (max-width: 639px) and (orientation: portrait)`
+- [ ] Replace black container background with `--deck-bg`
+- [ ] Pad ProgressSegmentBar tap targets to 44px (Apple HIG / WCAG 2.5.8)
+- [ ] Test on iPhone SE (375px) and Pixel 7 (412px)
+
+### Phase 2: Scroll view
+Vertically scrollable card view for portrait phones. Spec: `specs/mobile-scroll-view.md`.
+
+- [ ] Build `MobileScrollView.vue` — renders all slides in a scroll container
+- [ ] Force all `v-click` content visible (`$clicks: Infinity`)
+- [ ] Disable transitions between cards — static layout only
+- [ ] Scroll-snap: `y mandatory` with `scroll-snap-align: start` per card
+- [ ] Intrinsic card height (no fixed 16:9 aspect ratio)
+- [ ] ProgressSegmentBar reads scroll position via `IntersectionObserver`
+- [ ] Activate automatically below 640px in portrait
+- [ ] Verify two-column layouts (SplitInsight) readable at 375px
+- [ ] Verify Mermaid diagrams fit viewport width
+- [ ] Verify code blocks horizontally scrollable
+
+Note: Slidev upstream has scroll view on their roadmap (#1515) but zero implementation
+or design work has started. We are building this independently.
+
 ## Skill architecture
 
 ### Progressive disclosure (high priority)
@@ -19,45 +46,13 @@ Restructure:
 - [ ] PRESENTATION_PHILOSOPHY.md should only be loaded during Phase 3 (Intake) and Phase 5 (Write spec)
 - [ ] DECK_SPEC.md should only be loaded during Phase 5
 
-### Visual style preview (high priority)
-Users currently choose styles from prose descriptions. frontend-slides generates 3 visual HTML previews so users *see* before committing.
-
-- [ ] Design a style preview mechanism — generate 3 mini-decks (3 slides each: cover, content, code) in candidate presets
-- [ ] Each preview should be a self-contained HTML file the user can open in a browser
-- [ ] The preview should use the user's actual title and a representative content slide, not generic lorem ipsum
-- [ ] Integrate into Phase 4 (Style direction): instead of describing styles in words, show them
-
 ### Viewport discipline (medium priority)
-frontend-slides treats viewport fitting as non-negotiable — `100vh`, `overflow:hidden`, `clamp()` everywhere. We rely on Slidev's defaults which are good but not as strict.
-
 - [ ] Audit all decks for overflow: any slide that scrolls is a bug
 - [ ] Add viewport overflow to the acceptance checklist as a hard fail
 - [ ] Consider adding `overflow: hidden` to `.slidev-layout` in the universal scaffold
 - [ ] Add `clamp()` for typography in theme.css to handle edge cases
 
 ## Feature gaps
-
-### PPT/PPTX conversion (medium priority)
-Many corporate environments require PowerPoint. frontend-slides has a Python HTML→PPTX converter.
-
-- [ ] Investigate `slidev export --format pptx` (if supported in v52+)
-- [ ] If not native, investigate post-build conversion (e.g., `pdf2pptx`, `libreoffice --convert-to pptx`)
-- [ ] Alternative: document a manual path using PDF export + Google Slides import
-- [ ] Add to Phase 8 (Deliver) as an option
-
-### Single-file HTML export (low priority)
-frontend-slides outputs a single self-contained HTML file — zero dependencies, opens in any browser. We require npm + Slidev.
-
-- [ ] Investigate post-build inlining of all assets into a single HTML file
-- [ ] Could be a "lite mode" for simple decks that don't need Slidev's full power
-- [ ] Or a post-processing step: `slidev build` → inline → single `.html`
-
-### More style presets (low priority)
-We have 7 presets, frontend-slides has 12 (4 dark, 4 light, 4 specialty).
-
-- [ ] Add 3-5 more presets to reach parity
-- [ ] Specifically: add at least 2 light-mode presets (we currently skew dark)
-- [ ] Consider specialty presets: terminal/hacker, academic/paper, startup-pitch
 
 ## Build and tooling
 
@@ -67,16 +62,21 @@ We have 7 presets, frontend-slides has 12 (4 dark, 4 light, 4 specialty).
 - [ ] Still generate deck.spec.md, but do it silently/automatically
 
 ### Gallery improvements
-- [ ] Auto-generate `index.html` from deck metadata during `build.sh` (currently hand-maintained)
+- [ ] Auto-generate `index.html` from deck metadata during `build.sh`
 - [ ] Add deck thumbnails to the gallery (screenshot of cover slide)
 - [ ] Add search/filter to the gallery page
 
-### CI/CD templates
-- [ ] GitHub Actions workflow for auto-building and deploying to GitHub Pages
-- [ ] Cloudflare Pages integration template
-- [ ] Netlify build plugin or `netlify.toml` template
+### CI/CD
+- [x] GitHub Actions workflow for GitHub Pages (`.github/workflows/deploy.yml`)
+- [ ] Fix GitHub Pages environment protection rules — `main` branch blocked from deploying
+- [x] Cloudflare Workers deployment (`slides.oshineye.dev/`)
 
 ## Quality and testing
+
+### Mobile screenshot testing
+- [x] Playwright capture script for mobile viewports (iPhone SE, iPhone 14, Pixel 7)
+- [ ] Add landscape mobile viewport captures
+- [ ] Capture click states (slides with v-click animations at each step)
 
 ### Eval framework
 - [ ] Use the reference deck (`examples/reference/`) as the primary eval fixture
@@ -90,12 +90,27 @@ We have 7 presets, frontend-slides has 12 (4 dark, 4 light, 4 specialty).
 
 ## Documentation
 
-### Example gallery with live previews
-- [ ] Deploy all example decks to a public URL
-- [ ] Add screenshots or live preview links to the README
-- [ ] Show before/after of style presets applied to the same content
+### README rewrite (high priority)
+Current README assumes the user is a developer who knows Slidev. Should lead with the primary userflow.
+
+- [ ] Identify a complete user journey from creating decks to sharing
+
 
 ### Skill marketplace metadata
 - [ ] Add marketplace-compatible metadata (icon, category, tags, version)
 - [ ] Write a compelling skill description for marketplace listings
 - [ ] Add usage examples that show the skill in action
+
+## Done
+
+- [x] AudienceQRCode component — press Q to share slide URL as QR code
+- [x] Keyboard help d-pad redesign — spatial layout distinguishing step vs slide navigation
+- [x] QR shortcut added to keyboard help Screen column
+- [x] Cross-platform build.sh — `sed -i.bak` replaces macOS-only `sed -i ''`
+- [x] Cloudflare Workers deployment with SPA fallback
+- [x] GitHub Actions workflow (build succeeds, deploy blocked by environment rules)
+- [x] Mobile screenshot testing at 3 viewport sizes (33 screenshots across 11 slides)
+- [x] Mobile scroll view spec written (`specs/mobile-scroll-view.md`)
+- [x] EXTENSIONS.md — complete reference for all custom Slidev extensions
+- [x] CHANGELOG.md — chronological project history
+- [x] Slidev vs Reveal.js feature comparison

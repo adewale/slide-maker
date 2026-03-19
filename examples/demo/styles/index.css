@@ -1,3 +1,23 @@
 @import './tokens.css';
 @import './theme.css';
 @import './transitions.css';
+
+/* ── Mobile: hide Slidev chrome, fix black bars ── */
+@media (max-width: 639px) and (orientation: portrait) {
+  /* Replace black bars with deck background */
+  .slidev-slide-container {
+    --slidev-slide-container-background: var(--deck-bg, #f4f0e8) !important;
+    background: var(--deck-bg, #f4f0e8) !important;
+  }
+
+  /* Hide Slidev nav toolbar */
+  .slidev-nav-controls,
+  nav[class*="bottom-0"] {
+    display: none !important;
+  }
+
+  /* Hide default progress bar (scroll view has its own) */
+  .progress-segment-bar {
+    display: none !important;
+  }
+}

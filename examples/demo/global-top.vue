@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useNav } from '@slidev/client'
+import { useMediaQuery } from '@vueuse/core'
 import { showHelp } from './composables/useHelp'
 import KeyboardHelp from './components/KeyboardHelp.vue'
 import ProgressSegmentBar from './components/ProgressSegmentBar.vue'
 import AudienceQRCode from './components/AudienceQRCode.vue'
+import MobileScrollView from './components/MobileScrollView.vue'
 
 const nav = useNav()
+const isNarrow = useMediaQuery('(max-width: 639px) and (orientation: portrait)')
+const isMobileScroll = computed(() => isNarrow.value && !nav.isPresenter?.value)
 const pointerX = ref(0)
 const pointerY = ref(0)
 const pointerVisible = ref(false)
@@ -45,14 +49,15 @@ onUnmounted(() => {
     }"
   />
 
-  <!-- Progress indicator -->
-  <ProgressSegmentBar />
+  <!-- Mobile scroll view replaces everything on portrait phones -->
+  <MobileScrollView v-if="isMobileScroll" />
 
-  <!-- Keyboard help overlay -->
-  <KeyboardHelp v-if="showHelp" />
-
-  <!-- QR code sharing overlay -->
-  <AudienceQRCode />
+  <!-- Desktop / landscape: normal slide chrome -->
+  <template v-if="!isMobileScroll">
+    <ProgressSegmentBar />
+    <KeyboardHelp v-if="showHelp" />
+    <AudienceQRCode />
+  </template>
 </template>
 
 <style scoped>
