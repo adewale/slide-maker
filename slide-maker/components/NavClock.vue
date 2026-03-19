@@ -30,9 +30,9 @@ onUnmounted(() => {
 
 <style scoped>
 .nav-clock {
-  font-family: var(--deck-font-mono, 'JetBrains Mono', monospace);
+  font-family: var(--deck-font-mono, monospace);
   font-size: 0.75rem;
-  color: rgba(240, 238, 245, 0.5);
+  color: var(--deck-muted, #666);
   letter-spacing: 0.04em;
   padding: 0 0.5rem;
   user-select: none;
