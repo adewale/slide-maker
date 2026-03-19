@@ -1,6 +1,0 @@
-{
-  "eval_id": 1,
-  "eval_name": "pitch-deck-brief",
-  "prompt": "I need a 7-slide pitch deck for a developer tool startup. The product is an API monitoring service that catches breaking changes before they hit production. Target audience is VPs of engineering. Use editorial-dark.",
-  "assertions": []
-}

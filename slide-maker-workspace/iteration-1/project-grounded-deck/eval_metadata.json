@@ -1,6 +1,0 @@
-{
-  "eval_id": 0,
-  "eval_name": "project-grounded-deck",
-  "prompt": "Create a short 5-slide deck about the architecture of this project. Focus on how the build system works and how decks get deployed. Use the cloudflare preset.",
-  "assertions": []
-}

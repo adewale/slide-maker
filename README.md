@@ -2,20 +2,17 @@
 
 Decks that survive the podium. Built from specs, not templates.
 
-[Live demo](https://slides-oshineye-dev.adewale-883.workers.dev/skills/slide-maker/) — try it on your phone too.
+[Live demo](https://slides-oshineye-dev.adewale-883.workers.dev/slide-maker/) — try it on your phone too.
 
 ## What this is
 
 A Claude Code skill that generates presentation decks grounded in real GitHub
-projects. Point it at a repo and it builds a deck from what's actually there —
-source code, architecture, decisions — not from generic bullet points.
+projects. Point it at a repo and it builds a deck from what's actually there: source code, architecture, decisions.
 
-The same skill walks you through creating any compelling deck using a structured
-process: brief, direction, spec, compile, validate, present. Every deck gets a
-visual identity before a single slide is written.
+The same skill walks you through creating any deck using a structured
+process: brief, direction, spec, compile, validate, present.
 
-Built decks are native [Slidev](https://sli.dev) Markdown — editable, deployable
-as static sites, and agent-ready.
+Built decks are native [Slidev](https://sli.dev) Markdown — editable, and deployable as static sites.
 
 ## How it works
 
@@ -23,10 +20,8 @@ as static sites, and agent-ready.
 Brief → Direction → Spec → Compile → Validate → Present
 ```
 
-**Direction first. Then slides.** Most AI slide tools apply a theme after writing
-content. Slide Maker forces the visual direction — typography, palette, layout
-tendencies, motion character — before compilation starts. This is why no two
-decks look the same.
+**Direction first. Then slides.** Slide Maker forces the visual direction — typography, palette, layout
+tendencies, motion character — before compilation starts.
 
 ### Two layers, one source of truth
 
@@ -127,7 +122,7 @@ No black bars, no nav chrome, no transitions. Just the content.
 
 ## Extensions
 
-25 custom Vue components, 13 cinematic transitions, 8 data visualization
+29 custom Vue components, 13 cinematic transitions, 8 data visualization
 components, and presenter mode enhancements built on top of Slidev.
 See [EXTENSIONS.md](EXTENSIONS.md) for the full reference.
 

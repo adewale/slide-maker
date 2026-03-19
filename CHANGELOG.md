@@ -176,8 +176,7 @@ All notable changes to the slide-maker project and its Slidev extensions.
 
 ## [0.1.0] — 2025-02-27
 
-Initial public release. See [docs/CHANGELOG.md](docs/CHANGELOG.md) for the full
-skill changelog covering the compiler rules, style presets, and slide types.
+Initial public release.
 
 ### Infrastructure
 - 13 cinematic transitions (iris, wipe, morph-fade, zoom, flip, cube, swing, blur, glide)

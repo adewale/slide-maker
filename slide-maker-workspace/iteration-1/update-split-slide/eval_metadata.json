@@ -1,6 +1,0 @@
-{
-  "eval_id": 2,
-  "eval_name": "update-split-slide",
-  "prompt": "Update the demo deck at examples/demo/slides.md — slide 8 ('The toolkit') is too dense. Split it into two slides: one for transitions and visual effects, one for data visualization and design guardrails.",
-  "assertions": []
-}
