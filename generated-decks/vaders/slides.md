@@ -1,7 +1,9 @@
 ---
 theme: default
 title: Vaders
-colorSchema: light
+selectable: true
+routerMode: hash
+colorSchema: dark
 transition: slide-left
 layout: cover
 fonts:
@@ -13,131 +15,185 @@ fonts:
 
 # Vaders
 
-An OpenTUI Space Invaders clone supporting solo play or 2-4 player co-op, synchronised via Cloudflare Durable Objects.
+An OpenTUI Space Invaders clone supporting solo play or 2-4 player co-op, synchronised via Cloudflare Durable Objects
+
+<span style="font-family: var(--deck-font-mono); font-size: 0.85rem; color: var(--deck-muted); margin-top: 1.5rem; display: block;">github.com/adewale/vaders</span>
 
 <!--
-This is a multiplayer terminal game. Not a web app, not a native GUI — a terminal game with real-time multiplayer over Cloudflare Durable Objects. That choice drives everything in the architecture.
+Vaders is a multiplayer terminal game built with Bun, TypeScript, and OpenTUI React. The server runs on Cloudflare Workers with Durable Objects providing the real-time game state. The game targets a 120x36 terminal and supports macOS/Linux audio via system players. This deck synthesizes architecture docs, lessons learned, and the source code itself -- not just the README.
 
 Sources:
-- https://github.com/adewale/vaders — project repository and README description
+- https://github.com/adewale/vaders — project repository
+- file:README.md — project description used as subtitle
 -->
 
 ---
+layout: default
 transition: slide-left
 ---
 
-# Space Invaders in Your Terminal
+# Painting with Character Cells
 
-A 120x36 character grid. Braille pixel art sprites. A 30Hz game loop running inside a Durable Object. 1-4 players connected over WebSocket.
+How 1980s Amiga color cycling and Unicode braille produce arcade visuals in a terminal
 
 <v-clicks>
 
-- **Bun + OpenTUI** for terminal rendering with React
-- **Cloudflare Durable Objects** for authoritative game state
-- **Hibernatable WebSockets** — the server sleeps between games
-- **Seeded RNG** — deterministic gameplay from identical inputs
+- Sprites: 14x8 pixel grids encoded as braille characters
+- Color cycling: 6-color palette rotates every 5 ticks (UFO)
+- Wave borders shift from ocean blues to danger reds
+- ASCII fallback sprites for limited terminals
 
 </v-clicks>
 
 <!--
-The terminal is not a constraint being worked around — it is the chosen medium. OpenTUI gives React semantics (useKeyboard, box layout, position=absolute) inside a terminal. The server is not a traditional game server; it is a Durable Object that wakes on WebSocket message and sleeps via hibernation between sessions. Every game action flows through a pure reducer function that returns new state, events to broadcast, and whether to persist. The through-line starts here: the terminal constraint is the feature.
+The braille pixel art system is the most surprising visual decision. Each alien, player ship, and UFO is defined as a 14x8 boolean grid (pixels on/off), then converted at module load into braille Unicode characters using the 2x4 dot pattern of the braille block (U+2800). This gives sub-character resolution -- 14 pixels across 7 character cells. The color cycling for the UFO uses the classic Amiga technique: rotate through a palette array indexed by tick count, producing a rainbow shimmer effect from a single line of code. The wave border gradients use interpolateGradient() with presets that escalate from cool ocean tones (waves 1-2) through the signature cyan-magenta vaders palette (waves 3-4) to danger reds (wave 9+).
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/README.md — architecture overview, tech stack
-- https://github.com/adewale/vaders/blob/main/CLAUDE.md — tick rate (33ms/30Hz), screen size (120x36), state machine
+- file:Lessons_learned.md — Amiga color cycling techniques, "constraints breed creativity"
+- file:client/src/sprites.ts — pixelsToBraille() conversion, PIXEL_ART definitions
+- file:client/src/effects.ts — getUFOColor() cycling through 6 colors every 5 ticks
+- file:client/src/gradient.ts — getWaveGradient() escalation from ocean to danger
 -->
 
 ---
-transition: slide-up
-layout: image-right
-image: /images/gameplay.png
+layout: section
+transition: iris
 ---
 
-# Braille Sprites and Alien Marches
-
-Unicode box-drawing characters create recognizable game entities at character scale.
-
-<v-clicks>
-
-- **2-line tall sprites** — squids, crabs, octopuses
-- **4 destructible barriers** with per-health color
-- **Rainbow UFO** via color cycling
-- **Dissolve effects** — braille particle system for deaths
-
-</v-clicks>
+# The Server Is the Game
 
 <!--
-Moving from 80x24 to 120x36 allowed 2-line sprites that are much more readable than single-line alternatives. Characters like the box-drawing set create ships and aliens. The UFO uses a color cycling rainbow effect — six colors rotating every 5 ticks. Barriers degrade from both sides, matching the original Space Invaders design where they buy time but are never permanent cover. The dissolve effect uses a braille particle system for entity deaths.
-
-Sources:
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — Unicode sprites, multi-line sprites, dissolve effects
-- https://github.com/adewale/vaders/blob/main/CHANGELOG.md — braille pixel art sprites, barrier segments, dissolve effects
+Section break. The key architectural insight: in Vaders, the server is not a relay -- it IS the game. All game logic runs server-side in a pure reducer function. The client is a dumb terminal that renders whatever state the server sends. This is a deliberate rejection of client-side prediction, which would have been the "proper" networking approach for a real-time game.
 -->
 
 ---
+layout: center
 transition: fade
-layout: center
 ---
 
-# Full state sync at 30Hz. No deltas.
+# Full state sync at 30 Hz. No delta compression. No client prediction.
 
-2KB per tick. 4 players. 120 messages per second. The optimisation was not building delta updates.
+2 KB per tick with 4 players is 120 messages/second -- well within WebSocket limits. The simplicity of full sync outweighs bandwidth savings at this scale.
 
 <!--
-The server broadcasts full game state to every connected client on every tick. At 30Hz with 4 players, that is 120 WebSocket messages per second. Each message is roughly 2KB of JSON. The team considered delta updates but decided against them — full sync is simpler to reason about and debug. The only optimisation applied: omit playerId and config from subsequent syncs (they are sent once on join), roughly halving payload size. Binary protocols were considered and rejected at this scale. This is the through-line in action: the "naive" approach was good enough, and its simplicity became an advantage.
+This is the most counterintuitive networking decision in the project. Conventional wisdom says real-time multiplayer games need delta compression and client-side prediction. Vaders rejects both. Every 33ms, the server sends the entire GameState object -- all players, all entities, all aliens, all bullets -- to every connected client. The optimization applied was surgical: omit playerId and config from subsequent syncs (sent once on join), roughly halving payload size from ~4KB to ~2KB. Delta updates were considered but not implemented. The reasoning: at 30Hz with 4 players and ~2KB payloads, the total bandwidth is roughly 60KB/s per player. Modern WebSockets handle this trivially. The complexity cost of delta compression (diffing, patching, reconciliation, edge cases) far exceeds the bandwidth cost of full sync at this scale.
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — full sync vs delta updates, broadcast frequency optimisations
-- https://github.com/adewale/vaders/blob/main/CLAUDE.md — state sync architecture, WebSocket protocol
+- file:docs/server-architecture.md — "Why Full Sync?" table: simplicity, correctness, debuggability
+- file:Lessons_learned.md — "Start with full state sync. Only optimize if bandwidth becomes a problem"
+- file:shared/protocol.ts — sync optimization: playerId and config sent once, omitted thereafter
 -->
 
 ---
+layout: two-cols
+transition: slide-left
+---
+
+# Durable Objects as Game Servers
+
+<v-clicks>
+
+- Each room is a Durable Object -- single-threaded actor
+- Hibernatable WebSockets: connections survive DO sleep
+- Alarms replace `setInterval` -- hibernation-safe 30 Hz
+- SQLite persists state across hibernation cycles
+
+</v-clicks>
+
+::right::
+
+<v-clicks>
+
+- Matchmaker DO: singleton room registry
+- Pure reducer: `(state, action) -> state`
+- Seeded RNG (mulberry32) for determinism
+
+</v-clicks>
+
+<!--
+The Durable Object pattern here is worth examining closely. Each GameRoom is a single-threaded actor that owns its WebSocket connections and game state. The hibernation model means Cloudflare can sleep the DO while maintaining those WebSocket connections -- the DO only wakes when a message arrives or an alarm fires. This dramatically reduces billing for idle rooms. The game tick uses ctx.storage.setAlarm(Date.now() + 33) instead of setInterval -- alarms survive hibernation, intervals do not. State is persisted to SQLite (CREATE TABLE game_state with JSON blob + next_entity_id), so the game can resume after hibernation. The Matchmaker is a separate singleton DO maintaining an in-memory room registry with stale-room cleanup after 5 minutes. The pure reducer pattern means gameReducer(state, action) returns { state, events[], persist } -- every state transition is a pure function, making the game logic trivially testable without network mocks.
+
+Sources:
+- file:worker/src/GameRoom.ts — hibernation pattern, alarm-based tick, SQLite schema
+- file:docs/server-architecture.md — GameRoom lifecycle, Matchmaker architecture
+- file:Lessons_learned.md — "Use hibernation-friendly patterns. Alarms, not intervals."
+- file:worker/src/game/reducer.ts — pure reducer, canTransition state machine guard
+-->
+
+---
+layout: center
 transition: morph-fade
-layout: center
 ---
 
-# 1980s Amiga Color Cycling in a 2026 Terminal
+# Chunky movement is not a bug. It is the genre.
 
-Brightness ramps, not color jumps. Coprime tick rates across depth layers. Hash-based phase offsets so neighboring stars never pulse in sync.
+Aliens move 2 cells every 18 ticks. Players move 1 cell per tick while holding a key. Entities snap to whole character cells. Fighting the grid makes it worse -- embracing it makes it Space Invaders.
 
 <!--
-This is the surprising slide. The Amiga had a 32-color palette and artists developed techniques to create compelling animation from minimal state changes. Those same techniques map directly to terminal cells which also have a single foreground color per cell. The starfield uses multiple depth layers cycling at coprime periods (15, 20, 28 ticks) to prevent lockstep. Rare bright spikes in otherwise dim ramps create scintillation. Spatial phase offsets via hash function distribution ensure neighboring stars desynchronize. The lesson from Lessons_learned.md: "Constraints breed creativity."
+This slide captures the project's central design insight. Terminals render character cells -- there is no sub-pixel positioning. Early experiments tried smooth interpolation between server ticks, but the result felt wrong for Space Invaders. The classic game has discrete, grid-snapped movement. Aliens march in formation, stepping sideways in lockstep. The "chunky" feel is not a limitation of terminal rendering -- it IS the game feel that made the original a classic. The specific numbers matter: ALIEN_MOVE_STEP = 2 (cells per move), baseAlienMoveIntervalTicks = 18 (ticks between moves), playerMoveSpeed = 1 (cells per tick while key held). These were tuned through play, not calculated. The lesson learned entry puts it directly: "Accept this limitation rather than fighting it. Aliens moving 2 cells every 18 ticks looks correct for the genre."
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — Amiga color cycling techniques, visual effects in terminals, color visibility on black backgrounds
+- file:Lessons_learned.md — "Smooth sub-cell animations do not work in terminals"
+- file:shared/types.ts — ALIEN_MOVE_STEP = 2, baseAlienMoveIntervalTicks = 18, playerMoveSpeed = 1
+- file:Lessons_learned.md — "Accept terminal constraints. Chunky movement and solid colors are features, not bugs."
 -->
 
 ---
+layout: default
 transition: slide-up
+---
+
+# What Broke and What We Cut
+
+<v-clicks>
+
+- Barrier hitbox used 1x offset; rendering used 2x -- miss
+- Tests that assert buggy behavior passed green -- false OK
+- Y-axis tolerance compensates for move-before-check
+- Cut: client prediction, seq numbers, ECS, spectator
+
+</v-clicks>
+
+<!--
+The barrier collision bug is instructive. Rendering code placed barrier segments at barrier.x + seg.offsetX * BARRIER_SEGMENT_WIDTH (2x multiplier via the width constant), but collision code used barrier.x + seg.offsetX (1x multiplier, no width). Result: bullets passed through the visual barrier because the hitbox was in the wrong place. The fix was to copy the exact formula from rendering code into collision code -- visual rendering is always the source of truth for hitboxes. Separately, some tests had been written to document known bugs: "it('MISMATCH: bullet at visual right edge misses alien')". These tests passed, creating false confidence that collision was "working." The lesson: tests asserting buggy behavior are worse than failing tests asserting correct behavior. The Y-axis tolerance discovery was subtler: bullets move BEFORE collision detection each tick, so a bullet at y=10 moves to y=9, then collision checks against an alien at y=10. Strict bounds (y >= 10) miss this -- the 2-cell tolerance (Math.abs(bY - aY) < 2) is intentional compensation for the move-before-check pattern.
+
+Sources:
+- file:Lessons_learned.md — "Visual Rendering Code is the Source of Truth" section
+- file:Lessons_learned.md — "Tests That Document Bugs Can Mask Problems" section
+- file:Lessons_learned.md — "Y-Axis Tolerance is Intentional" section
+- file:Lessons_learned.md — "Over-Engineering Avoided" section (cut features list)
+-->
+
+---
 layout: fact
+transition: fade
 ---
 
 # 620+
 
-Tests across all workspaces
-
-Property-based testing with fast-check found a color conversion bug that no hand-written test caught. Gray values 239-248 produced index 256 — out of the valid [16, 255] range.
+tests across all workspaces, including property-based collision tests that caught a color conversion bug no hand-written test found
 
 <!--
-The hexTo256Color function had been passing all example-based tests. Property-based testing with fast-check immediately found a counterexample: gray = 243 produced Math.round((243-8)/10) + 232 = 256, which is out of range. The white detection threshold was too high (>248 instead of >238). This is a textbook case for property testing: functions that map continuous inputs to bounded outputs. The invariant "output is always in [16, 255]" is trivial to assert but hard to exhaustively verify with examples. IEEE 754 edge cases also surfaced — lerp(-0, 0, 0) returns 0 not -0, Math.floor(-5e-324) returns -1. The solution: constrain generators to realistic ranges rather than patching code.
+The test suite is comprehensive: unit tests for the game reducer, integration tests for the GameRoom Durable Object, property-based tests using fast-check for collision functions and color conversion. The property-based testing story is particularly sharp: hexTo256Color had been working fine in production and passing all example-based tests. fast-check immediately found gray values 239-248 that produced index 256 -- out of the valid [16, 255] range. The root cause: the white detection threshold was > 248 instead of > 238, and Math.round((243 - 8) / 10) + 232 = 256. No hand-written test had exercised these specific gray values. The fix was a single threshold change. The lesson: functions that map continuous inputs to bounded outputs are ideal property-based testing candidates. The invariant "output is always in [16, 255]" is trivial to assert but impossible to exhaustively verify with examples.
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — property-based testing, hexTo256Color bug, IEEE 754 edge cases
-- https://github.com/adewale/vaders/blob/main/CHANGELOG.md — 620+ tests, property-based collision tests
+- file:CHANGELOG.md — "620+ tests" in v1.0.0 feature list
+- file:Lessons_learned.md — "Property Tests Find Bugs Example Tests Miss" with hexTo256Color counterexample
+- file:Lessons_learned.md — "Best Candidates for Property-Based Testing" table
 -->
 
 ---
-transition: fade
 layout: end
+transition: fade
 ---
 
-# Accept the constraint. It becomes the feature.
+# Accept the constraint. Ship the game.
 
-Chunky movement is retro charm. Single-color cells are Amiga cycling. Full sync is simplicity. The terminal was never the limitation.
+github.com/adewale/vaders
 
 <!--
-This resolves the through-line. Every architectural decision that looks like a compromise turned out to be an advantage. Chunky cell-by-cell movement matches the Space Invaders aesthetic. The single foreground color per cell enabled techniques borrowed from 1980s Amiga artists. Full state sync avoided complexity and the simplicity made debugging trivial. The 120x36 grid forced braille sprite art that gives the game its distinctive visual identity. The project proves that working within constraints — rather than fighting them — produces coherent, opinionated software.
+The through-line resolved. Every constraint the terminal imposed -- character-cell rendering, no sub-pixel positioning, no GPU acceleration -- forced architectural decisions that turned out to be better than the "proper" alternatives. Full state sync instead of delta compression: simpler, correct, debuggable. Braille pixel art instead of a graphics library: portable, creative, genre-appropriate. Alarms instead of intervals: hibernation-compatible, cost-efficient. A pure reducer instead of an ECS: trivially testable, no framework overhead. The terminal was not the limitation. It was the design.
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — key principles summary, accept terminal constraints
+- file:Lessons_learned.md — Summary principles: "Accept terminal constraints", "Prefer full sync until it hurts", "Cut features, do not defer them"
 -->

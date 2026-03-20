@@ -1,7 +1,7 @@
-/* ─── Cinematic Slide Transitions ─── */
+/* --- Cinematic Slide Transitions --- */
 /* Each defines -enter-active, -leave-active, -enter-from, -leave-to */
 
-/* ── iris: circular clip-path reveal from center ── */
+/* -- iris: circular clip-path reveal from center -- */
 .iris-enter-active,
 .iris-leave-active {
   transition: clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1);
@@ -16,7 +16,7 @@
   clip-path: circle(0% at 50% 50%);
 }
 
-/* ── wipe-right: linear clip-path wipe left-to-right ── */
+/* -- wipe-right: linear clip-path wipe left-to-right -- */
 .wipe-right-enter-active,
 .wipe-right-leave-active {
   transition: clip-path 0.6s cubic-bezier(0.4, 0, 0.2, 1);
@@ -31,7 +31,7 @@
   clip-path: inset(0 0 0 100%);
 }
 
-/* ── wipe-up: linear clip-path wipe bottom-to-top ── */
+/* -- wipe-up: linear clip-path wipe bottom-to-top -- */
 .wipe-up-enter-active,
 .wipe-up-leave-active {
   transition: clip-path 0.6s cubic-bezier(0.4, 0, 0.2, 1);
@@ -46,7 +46,7 @@
   clip-path: inset(0 0 100% 0);
 }
 
-/* ── morph-fade: scale + opacity + blur ── */
+/* -- morph-fade: scale + opacity + blur -- */
 .morph-fade-enter-active {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -64,7 +64,7 @@
   transform: scale(0.95);
 }
 
-/* ── zoom-in: scale from 0.6 to 1 + fade ── */
+/* -- zoom-in: scale from 0.6 to 1 + fade -- */
 .zoom-in-enter-active {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -80,7 +80,7 @@
   transform: scale(0.6);
 }
 
-/* ── zoom-out: scale from 1.2 to 1 + fade ── */
+/* -- zoom-out: scale from 1.2 to 1 + fade -- */
 .zoom-out-enter-active {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -96,7 +96,7 @@
   transform: scale(1.2);
 }
 
-/* ── flip-x: 3D rotateY card flip ── */
+/* -- flip-x: 3D rotateY card flip -- */
 .flip-x-enter-active,
 .flip-x-leave-active {
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
@@ -111,7 +111,7 @@
   transform: perspective(1200px) rotateY(-90deg);
 }
 
-/* ── flip-y: 3D rotateX card flip ── */
+/* -- flip-y: 3D rotateX card flip -- */
 .flip-y-enter-active,
 .flip-y-leave-active {
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
@@ -126,7 +126,7 @@
   transform: perspective(1200px) rotateX(-90deg);
 }
 
-/* ── cube: 3D cube rotation with perspective ── */
+/* -- cube: 3D cube rotation with perspective -- */
 .cube-enter-active,
 .cube-leave-active {
   transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
@@ -141,7 +141,7 @@
   transform: perspective(1200px) rotateY(-90deg) translateZ(100px);
 }
 
-/* ── swing: rotateY swing-in ── */
+/* -- swing: rotateY swing-in -- */
 .swing-enter-active {
   transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -159,7 +159,7 @@
   transform-origin: right center;
 }
 
-/* ── blur: blur(12px) to blur(0) + opacity ── */
+/* -- blur: blur(12px) to blur(0) + opacity -- */
 .blur-enter-active {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -175,7 +175,7 @@
   filter: blur(12px);
 }
 
-/* ── glide: translateX + slight scale + fade ── */
+/* -- glide: translateX + slight scale + fade -- */
 .glide-enter-active {
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }

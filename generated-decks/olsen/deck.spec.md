@@ -2,30 +2,34 @@
 
 ## Meta
 - title: Olsen
-- purpose: present a high-performance photo indexer that treats read-only access as an architectural virtue
-- audience: developers building media pipelines, photo management tools, or local-first applications
+- subtitle: A local-first CLI tool for faceted browsing of photographs
+- purpose: present a Go-based photo indexing system that treats faceted navigation as a state machine
+- audience: developers interested in local-first tools, data modeling, and search UX
 - tone: scholarly, evidence-driven, precise
-- target-length: 7
-- notes: yes
+- target-length: 9
+- notes: no
 - style-preset: tufte-data
-- project-url: https://github.com/adewale/olsen
 - progress: segment-bar
+- project-url: https://github.com/adewale/olsen
 
 ## Source Materials
-- readme: README.md (project overview -- DNG/JPEG/BMP indexing, thumbnail generation, color analysis, perceptual hashing, SQLite storage)
-- specs: specs/olsen_specs.md (system specification -- 50+ metadata fields, four thumbnail sizes, 8-stage pipeline, faceted query engine)
-- specs: specs/facet_state_machine.spec (state machine navigation -- zero-result prevention, data-driven enablement, filter preservation)
-- specs: specs/performance.spec (performance instrumentation -- 8-stage pipeline timing, bottleneck analysis, worker scaling)
-- research: specs/faceted_ux_research_synthesis.md (UX research -- Nielsen Norman Group, Morville, Tunkelang findings on faceted navigation)
+- readme: README.md (project overview -- what it does, formats supported, performance benchmarks, read-only guarantee)
+- architecture: docs/architecture.md (4-layer system -- CLI, Indexer Engine, Query Engine, SQLite; worker pool concurrency model)
+- lessons-learned: docs/LESSONS_LEARNED.md (state machines over hierarchies, debug at the source not the display, saturation-first color logic)
+- specs: specs/facet_state_machine.spec (core insight -- faceted navigation as valid state transitions, not taxonomy)
+- specs: specs/dominant_colours.spec (11 Berlin-Kay colors, k-means on thumbnails, saturation-first achromatic detection)
+- changelog: CHANGELOG.md (v0.1.0 initial release -- complete feature inventory)
+- research: docs/HIERARCHICAL_FACETS.md (migration from hierarchical to state machine model, the bug that revealed the truth)
 
 ## Through-Line
-- concept: "Read-only to sources -- the constraint that became the architecture"
+- concept: "Constraint as architecture -- every design decision in Olsen is a deliberate restriction that eliminates a class of problems."
 - type: design-rule
 - appears-in:
-  - slide 2: default -- introduces O_RDONLY as the first design decision, not a limitation
-  - slide 4: section -- "the constraint that became the architecture" reframed
-  - slide 5: default -- read-only forces all output into a single portable SQLite file
-  - slide 7: end -- resolution: the read-only constraint made every other decision simpler
+  - slide 1: cover -- the project is introduced as a read-only indexer
+  - slide 3: center-statement -- read-only is not a limitation, it is the architecture
+  - slide 5: default-content -- the state machine constraint prevents zero-result dead ends
+  - slide 7: default-content -- saturation-first is a constraint on color classification order
+  - slide 9: end -- the resolution: constraints compound into trust
 
 ## Design Tokens
 - colors:
@@ -33,7 +37,8 @@
   - fg: "#111111"
   - accent: "#2d5f8a"
   - accent-alt: "#c0392b"
-  - muted: "rgba(17, 17, 17, 0.5)"
+  - muted: "rgba(17, 17, 17, 0.45)"
+  - border: "rgba(17, 17, 17, 0.12)"
 - typography:
   - display: EB Garamond
   - body: Source Sans 3
@@ -49,13 +54,16 @@
   - default
   - center
   - fact
+  - two-cols
   - end
 - custom-layouts: []
 - components:
   - ProgressSegmentBar
+  - KeyboardHelp
 - css-files:
   - styles/tokens.css
   - styles/theme.css
+  - styles/transitions.css
 
 ## Slides
 
@@ -63,49 +71,72 @@
 - kind: cover
 - layout: cover
 - title: Olsen
-- subtitle: A high-performance photo indexing system for DNG, JPEG, and BMP files
+- subtitle: A local-first CLI tool for faceted browsing of photographs
+- sources:
+  - file:README.md -- project description and purpose
 
 ### Slide 2
 - kind: default-content
 - layout: default
-- title: What Is Olsen?
-- body: A local-first photo cataloger that extracts EXIF metadata, generates aspect-ratio-preserving thumbnails at four sizes, analyzes dominant color palettes via k-means clustering, and computes perceptual hashes for similarity detection. Every file is opened O_RDONLY. The indexer never modifies a source photograph.
+- title: What Olsen does in 62 milliseconds
+- body: Per-photo pipeline -- EXIF extraction, 4 thumbnail sizes, k-means color palette, perceptual hash, metadata inference. All read-only. All into a single SQLite file.
 - sources:
-  - https://github.com/adewale/olsen/blob/main/README.md -- project overview and feature list
-  - https://github.com/adewale/olsen/blob/main/specs/olsen_specs.md -- system specification
+  - file:README.md -- performance benchmarks on M3 Max
+  - file:docs/architecture.md -- processing pipeline stages
 
 ### Slide 3
-- kind: fact
-- layout: fact
-- title: 62ms
-- body: Combined processing time per photo on Apple M3 Max -- 34ms thumbnail generation, 28ms color extraction, 0.6ms hashing. At 8 workers, the indexer sustains 15-25 photos per second.
+- kind: center-statement
+- layout: center
+- title: Read-only is not a limitation. It is the architecture.
+- body: O_RDONLY on every file open. No writes to photo directories. Processing happens entirely in memory. The database is the only mutable artifact.
 - sources:
-  - https://github.com/adewale/olsen/blob/main/specs/performance.spec -- pipeline timing breakdown
+  - file:README.md -- read-only guarantee section
+  - file:docs/architecture.md -- enforcement mechanisms
 
 ### Slide 4
 - kind: section
 - layout: section
-- title: The Constraint That Became the Architecture
+- title: The state machine insight
 
 ### Slide 5
 - kind: default-content
-- layout: default
-- title: One SQLite File Is the Catalog
-- body: Because the indexer cannot write back to source files, every derived artifact -- thumbnails, color palettes, perceptual hashes, burst groups, duplicate clusters -- lives in a single SQLite database. The database IS the catalog. Move the file, move the collection. No sidecar files, no hidden directories, no server process.
+- layout: two-cols
+- title: Hierarchical vs. state machine navigation
+- left: Hierarchical (wrong) -- changing Year clears Month. System assumes relationships. Filters disappear unexpectedly. Users lose context.
+- right: State machine (correct) -- all filters preserved. SQL computes valid transitions. Zero-count facets shown but disabled. Behavior emerges from data.
 - sources:
-  - https://github.com/adewale/olsen/blob/main/specs/olsen_specs.md -- "the SQLite database IS the catalog"
+  - file:specs/facet_state_machine.spec -- core insight and implementation strategy
+  - file:docs/HIERARCHICAL_FACETS.md -- migration from hierarchical to state machine model
+  - file:docs/LESSONS_LEARNED.md -- state machines over hierarchies
 
 ### Slide 6
-- kind: center-statement
-- layout: center
-- title: Users can never reach zero results
-- body: Olsen's faceted navigation is a state machine, not a hierarchy. Every filter transition is validated against actual data -- values that would produce empty results are disabled before the user can select them. No dead ends.
+- kind: default-content
+- layout: default
+- title: One rule for every facet
+- body: The fundamental guarantee -- users cannot transition from a state with results to a state with zero results. No special cases per facet type. No hardcoded clearing logic. SQL WHERE clauses with GROUP BY naturally compute which transitions are valid.
 - sources:
-  - https://github.com/adewale/olsen/blob/main/specs/facet_state_machine.spec -- state machine navigation design
-  - https://github.com/adewale/olsen/blob/main/specs/faceted_ux_research_synthesis.md -- UX research synthesis
+  - file:specs/facet_state_machine.spec -- fundamental rule and implementation
+  - file:docs/LESSONS_LEARNED.md -- architectural lesson on state machines
 
 ### Slide 7
+- kind: default-content
+- layout: default
+- title: 11 colors, saturation first
+- body: Berlin-Kay universal color categories classified from k-means clusters. The critical insight -- check saturation before hue. A grayscale pixel at hue 0 is not red; it is achromatic. Without this ordering constraint, every B&W photograph gets misclassified.
+- sources:
+  - file:specs/dominant_colours.spec -- saturation-first detection, Berlin-Kay categories
+  - file:docs/LESSONS_LEARNED.md -- color classification evolution from v1 to v2
+
+### Slide 8
+- kind: default-content
+- layout: default
+- title: Debug at the source, not the display
+- body: The Monochrom DNG bug -- embedded JPEG extraction returned the first preview (160x120) instead of the largest (9504x6320). The fix was not in the UI, not in the database, not in the query layer. It was in the byte scanner that finds SOI/EOI markers in the DNG file.
+- sources:
+  - file:docs/LESSONS_LEARNED.md -- Monochrom DNG thumbnail bug timeline and debugging order
+
+### Slide 9
 - kind: end
 - layout: end
-- title: Read-Only Made Everything Simpler
-- subtitle: One constraint. One file. One way to browse 100,000 photographs.
+- title: Constraints compound into trust
+- subtitle: github.com/adewale/olsen

@@ -1,11 +1,12 @@
-# Vaders — Slide Deck
+# Vaders
 
-A 7-slide presentation about [Vaders](https://github.com/adewale/vaders), a multiplayer TUI Space Invaders clone built with OpenTUI and Cloudflare Durable Objects.
+A 9-slide Slidev deck presenting the architecture, surprising design choices, and lessons learned from building [Vaders](https://github.com/adewale/vaders) -- a multiplayer TUI Space Invaders clone built with OpenTUI and Cloudflare Durable Objects.
 
 ## Quick start
 
 ```bash
-npx slidev slides.md
+npm install
+npx slidev
 ```
 
 ## Build
@@ -14,7 +15,7 @@ npx slidev slides.md
 npx slidev build
 ```
 
-## Export to PDF
+## Export PDF
 
 ```bash
 npx slidev export
@@ -22,18 +23,37 @@ npx slidev export
 
 ## Structure
 
-| File | Purpose |
-|------|---------|
-| `slides.md` | Presentation source |
-| `deck.spec.md` | Planning spec |
-| `styles/tokens.css` | Design tokens |
-| `styles/theme.css` | Typography and layout styles |
-| `styles/transitions.css` | Cinematic slide transitions |
-| `components/ProgressSegmentBar.vue` | Section progress indicator |
-| `components/KeyboardHelp.vue` | Keyboard shortcut overlay |
-| `global-top.vue` | Progress bar + help overlay mount |
-| `global-bottom.vue` | Footer chrome (title + page number) |
+```
+slides.md              Main presentation
+deck.spec.md           Planning spec
+styles/
+  tokens.css           Design tokens
+  theme.css            Typography, layout, color application
+  transitions.css      Cinematic slide transitions
+  index.css            Style entry point
+components/
+  ProgressSegmentBar   Bottom progress indicator
+  KeyboardHelp         Shortcut overlay (press ?)
+composables/
+  useHelp              Help overlay state
+  useSections          Section detection for progress bar
+setup/
+  shortcuts            Keyboard shortcut registration
+  mermaid-renderer     Beautiful Mermaid with deck tokens
+global-top.vue         Progress bar + help overlay
+global-bottom.vue      Footer chrome (title + page number)
+```
 
-## Style preset
+## Preset
 
-Material Design (M3 baseline) with project accent color `#00BCD4` (cyan — matching the P1 player ship color from the game).
+Material Design (dark variant) with project color overrides: cyan accent (#00FFFF) from the game's player 1 color, red accent-alt (#FF5555) from alien threat colors.
+
+## Keyboard shortcuts
+
+| Key | Action |
+|-----|--------|
+| ? | Toggle shortcut help |
+| p | Open presenter view |
+| ] / [ | Skip to next/prev slide |
+| f | Fullscreen |
+| o | Slide overview |

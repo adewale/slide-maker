@@ -1,13 +1,8 @@
-<script setup>
-import ProgressSegmentBar from './components/ProgressSegmentBar.vue'
-</script>
-
 <template>
   <div v-if="!['cover', 'end'].includes($nav.currentLayout)" class="deck-footer">
     <span class="deck-footer-title">{{ $slidev.configs.title }}</span>
     <span class="deck-footer-page">{{ $nav.currentPage }} / {{ $nav.total }}</span>
   </div>
-  <ProgressSegmentBar />
 </template>
 <style scoped>
 .deck-footer {

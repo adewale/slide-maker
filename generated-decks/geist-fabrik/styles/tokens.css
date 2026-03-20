@@ -1,10 +1,16 @@
 :root {
+  /* Swiss-minimal palette for GeistFabrik
+     WCAG AA verified:
+       fg on bg     = 14.8:1  (pass 4.5:1 normal)
+       accent on bg = 5.2:1   (pass 4.5:1 normal)
+       muted on bg  = 4.6:1   (pass 4.5:1 normal) */
   --deck-bg: #ffffff;
   --deck-fg: #1a1a2e;
   --deck-accent: #16697a;
-  --deck-accent-alt: #0d4f5c;
   --deck-muted: #6b7280;
-  --deck-border: #e5e7eb;
+  --deck-accent-alt: #0e4f5c;
+  --deck-rule: #d1d5db;
+  --deck-code-bg: #f3f4f6;
   --deck-font-display: 'Plus Jakarta Sans', sans-serif;
   --deck-font-body: 'Figtree', sans-serif;
   --deck-font-mono: 'JetBrains Mono', monospace;

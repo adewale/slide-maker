@@ -1,38 +1,49 @@
 # GeistFabrik
 
-A 7-slide deck introducing [GeistFabrik](https://github.com/adewale/geist_fabrik), a Python-based divergence engine for Obsidian vaults that generates creative suggestions through code and Tracery grammars.
+A 9-slide deck presenting GeistFabrik, a Python-based divergence engine for Obsidian vaults.
 
-## Running
+## Quick start
 
 ```bash
 npm install
 npx slidev
 ```
 
-## Building
+## Build
 
 ```bash
 npx slidev build
 ```
 
-## Style
+## Export PDF
 
-- **Preset:** swiss-minimal
-- **Fonts:** Plus Jakarta Sans (display), Figtree (body), JetBrains Mono (mono)
-- **Accent:** #16697a (teal)
-
-## Through-line
-
-"Muses, not oracles" — the design rule that shaped every decision in GeistFabrik, from its question-first geist philosophy to its deliberate avoidance of LLM integration.
+```bash
+npx slidev export
+```
 
 ## Structure
 
-| Slide | Layout | Content |
-|-------|--------|---------|
-| 1 | cover | Title + project description |
-| 2 | default | What GeistFabrik is and the governing principle |
-| 3 | two-cols | Code geists vs Tracery geists |
-| 4 | center | The surprise: 13 lines of YAML beat 100 lines of Python |
-| 5 | section | Through-line echo: questions scale, answers don't |
-| 6 | default | Deterministic randomness and the filtering pipeline |
-| 7 | end | Resolution: the best tool for thought asks |
+| File | Purpose |
+|------|---------|
+| `slides.md` | Presentation source |
+| `deck.spec.md` | Planning schema |
+| `styles/tokens.css` | Design tokens |
+| `styles/theme.css` | Layout and typography |
+| `styles/transitions.css` | Slide transitions |
+| `styles/index.css` | CSS entry point |
+| `components/ProgressSegmentBar.vue` | Section progress indicator |
+| `components/KeyboardHelp.vue` | Keyboard shortcut overlay |
+| `composables/useSections.ts` | Section detection for progress bar |
+| `composables/useHelp.ts` | Help overlay state |
+| `setup/shortcuts.ts` | Keyboard shortcut registration |
+| `setup/mermaid-renderer.ts` | Themed Mermaid diagrams |
+| `global-top.vue` | Progress bar + help overlay |
+| `global-bottom.vue` | Footer with slide number |
+
+## Preset
+
+swiss-minimal -- precise, calm, disciplined.
+
+## Project
+
+[github.com/adewale/geist_fabrik](https://github.com/adewale/geist_fabrik)

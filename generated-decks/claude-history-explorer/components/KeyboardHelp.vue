@@ -45,7 +45,7 @@ onKeyStroke('Escape', () => toggleHelp())
             <div class="help-row"><kbd>[</kbd><span>Skip to prev slide</span></div>
             <div class="help-row"><kbd>Home</kbd><span>First slide</span></div>
             <div class="help-row"><kbd>End</kbd><span>Last slide</span></div>
-            <div class="help-row"><kbd>g</kbd><span>Go to slide...</span></div>
+            <div class="help-row"><kbd>g</kbd><span>Go to slide…</span></div>
             <div class="help-row"><kbd>o</kbd><span>All slides</span></div>
           </div>
 
@@ -57,7 +57,6 @@ onKeyStroke('Escape', () => toggleHelp())
             <div class="help-row"><kbd>w</kbd><span>White screen</span></div>
             <div class="help-row"><kbd>p</kbd><span>Presenter view</span></div>
             <div class="help-row"><kbd>e</kbd><span>Draw on slide</span></div>
-            <div class="help-row"><kbd>q</kbd><span>Share QR code</span></div>
           </div>
         </div>
 
@@ -74,20 +73,20 @@ onKeyStroke('Escape', () => toggleHelp())
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--deck-bg, #fff) 88%, transparent);
+  background: color-mix(in srgb, var(--deck-bg, #0a0a0f) 88%, transparent);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 
 .help-panel {
   position: relative;
-  background: var(--deck-bg, #fff);
-  border: 1px solid color-mix(in srgb, var(--deck-fg, #222) 12%, transparent);
+  background: var(--deck-bg, #0a0a0f);
+  border: 1px solid color-mix(in srgb, var(--deck-fg, #e8e6e1) 12%, transparent);
   border-radius: 12px;
   padding: 2rem 2.5rem;
   max-width: 720px;
   width: 90vw;
-  box-shadow: 0 8px 32px color-mix(in srgb, var(--deck-fg, #222) 14%, transparent);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--deck-fg, #e8e6e1) 14%, transparent);
 }
 
 .close-btn {
@@ -99,7 +98,7 @@ onKeyStroke('Escape', () => toggleHelp())
   justify-content: center;
   width: 28px;
   height: 28px;
-  border: 1px solid color-mix(in srgb, var(--deck-fg, #222) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--deck-fg, #e8e6e1) 20%, transparent);
   border-radius: 4px;
   background: transparent;
   color: var(--deck-muted, #666);
@@ -110,7 +109,7 @@ onKeyStroke('Escape', () => toggleHelp())
 }
 
 .close-btn:hover {
-  color: var(--deck-fg, #222);
+  color: var(--deck-fg, #e8e6e1);
   border-color: var(--deck-muted, #666);
 }
 
@@ -118,7 +117,7 @@ onKeyStroke('Escape', () => toggleHelp())
   font-family: var(--deck-font-display, sans-serif);
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--deck-fg, #222);
+  color: var(--deck-fg, #e8e6e1);
   margin-bottom: 1.5rem;
   text-align: center;
 }
@@ -130,7 +129,7 @@ onKeyStroke('Escape', () => toggleHelp())
   gap: 0.35rem;
   margin-bottom: 1.5rem;
   padding-bottom: 1.25rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--deck-fg, #222) 10%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--deck-fg, #e8e6e1) 10%, transparent);
 }
 
 .hero-row {
@@ -151,15 +150,15 @@ onKeyStroke('Escape', () => toggleHelp())
 .hero-key {
   font-size: 0.95rem;
   padding: 0.25em 0.6em;
-  background: color-mix(in srgb, var(--deck-accent, #2563eb) 14%, transparent);
-  border-color: color-mix(in srgb, var(--deck-accent, #2563eb) 30%, transparent);
+  background: color-mix(in srgb, var(--deck-accent, #38bdf8) 14%, transparent);
+  border-color: color-mix(in srgb, var(--deck-accent, #38bdf8) 30%, transparent);
 }
 
 .hero-label {
   font-family: var(--deck-font-body, sans-serif);
   font-size: 1rem;
   font-weight: 600;
-  color: var(--deck-fg, #222);
+  color: var(--deck-fg, #e8e6e1);
   margin-left: 0.3rem;
 }
 
@@ -176,10 +175,10 @@ onKeyStroke('Escape', () => toggleHelp())
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--deck-accent, #2563eb);
+  color: var(--deck-accent, #38bdf8);
   margin-bottom: 0.6rem;
   padding-bottom: 0.4rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--deck-accent, #2563eb) 15%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--deck-accent, #38bdf8) 15%, transparent);
 }
 
 .help-row {
@@ -190,7 +189,7 @@ onKeyStroke('Escape', () => toggleHelp())
   margin-bottom: 0.35rem;
   font-family: var(--deck-font-body, sans-serif);
   font-size: 0.8rem;
-  color: var(--deck-fg, #222);
+  color: var(--deck-fg, #e8e6e1);
 }
 
 .help-row span {
@@ -206,8 +205,8 @@ kbd {
   font-family: var(--deck-font-mono, monospace);
   font-size: 0.75rem;
   color: var(--deck-muted, #666);
-  background: color-mix(in srgb, var(--deck-fg, #222) 5%, transparent);
-  border: 1px solid color-mix(in srgb, var(--deck-fg, #222) 12%, transparent);
+  background: color-mix(in srgb, var(--deck-fg, #e8e6e1) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--deck-fg, #e8e6e1) 12%, transparent);
   border-radius: 4px;
   line-height: 1.4;
 }

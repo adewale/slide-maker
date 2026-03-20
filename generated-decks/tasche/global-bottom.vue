@@ -3,13 +3,7 @@
     <span class="deck-footer-title">{{ $slidev.configs.title }}</span>
     <span class="deck-footer-page">{{ $nav.currentPage }} / {{ $nav.total }}</span>
   </div>
-  <ProgressSegmentBar />
 </template>
-
-<script setup>
-import ProgressSegmentBar from './components/ProgressSegmentBar.vue'
-</script>
-
 <style scoped>
 .deck-footer {
   position: absolute; bottom: 0; left: 0; right: 0;

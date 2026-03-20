@@ -151,7 +151,7 @@ function scrollToSection(secIdx) {
   flex-direction: column;
 }
 
-/* ── Progress bar with 44px tap targets ── */
+/* -- Progress bar with 44px tap targets -- */
 .mobile-progress-bar {
   position: sticky;
   top: 0;
@@ -188,7 +188,7 @@ function scrollToSection(secIdx) {
   opacity: 0.25;
 }
 
-/* ── Scroll container ── */
+/* -- Scroll container -- */
 .mobile-scroll-container {
   flex: 1;
   overflow-y: auto;
@@ -197,7 +197,7 @@ function scrollToSection(secIdx) {
   -webkit-overflow-scrolling: touch;
 }
 
-/* ── Individual slide cards ── */
+/* -- Individual slide cards -- */
 .scroll-card {
   scroll-snap-align: start;
   height: 100svh;
@@ -227,13 +227,13 @@ function scrollToSection(secIdx) {
   display: block !important;
 }
 
-/* Mermaid diagrams — fit width */
+/* Mermaid diagrams -- fit width */
 .scroll-card :deep(svg.mermaid) {
   max-width: 100%;
   height: auto;
 }
 
-/* Code blocks — horizontal scroll */
+/* Code blocks -- horizontal scroll */
 .scroll-card :deep(pre) {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;

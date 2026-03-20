@@ -1,11 +1,16 @@
-# Tasche deck
+# Tasche -- Slide Deck
 
-A 7-slide presentation about [Tasche](https://github.com/adewale/tasche), a self-hosted read-it-later service built on Cloudflare Python Workers.
+A 9-slide deck presenting [Tasche](https://github.com/adewale/tasche), a self-hosted read-it-later service built on Cloudflare Python Workers.
 
-## Quick start
+## Theme
+
+- **Preset:** bold-modern
+- **Through-line:** "What happens when you run Python where JavaScript is supposed to go?"
+- **Narrative arc:** The ecosystem mismatch (Python on a JS platform), the FFI boundary layer, the cross-runtime Service Binding, the testing gap, and the resolution.
+
+## Preview
 
 ```bash
-npm install
 npx slidev
 ```
 
@@ -15,30 +20,25 @@ npx slidev
 npx slidev build
 ```
 
-Output goes to `dist/`. Deploy to any static host -- Slidev generates `index.html`, `404.html`, and `_redirects`.
-
-## Export PDF
-
-```bash
-npx slidev export
-```
-
 ## Structure
 
-| File | Purpose |
-|------|---------|
-| `slides.md` | Presentation content |
-| `deck.spec.md` | Planning spec |
-| `styles/tokens.css` | Design tokens |
-| `styles/theme.css` | Typography, layout, animation |
-| `styles/transitions.css` | Cinematic slide transitions |
-| `styles/index.css` | Style entry point |
-| `global-top.vue` | Keyboard help overlay |
-| `global-bottom.vue` | Footer chrome + progress bar |
-| `components/` | ProgressSegmentBar, KeyboardHelp |
-| `composables/` | useHelp, useSections |
-| `setup/` | Keyboard shortcuts, Mermaid renderer |
-
-## Style preset
-
-bold-modern with Tasche's monochrome identity. Dark background (`#0a0a0f`), light accent (`#e8e8ed`), Bebas Neue display / DM Sans body.
+```
+slides.md              # All 9 slides
+deck.spec.md           # Planning spec
+styles/
+  index.css            # Entry point (imports tokens, theme, transitions)
+  tokens.css           # Design tokens
+  theme.css            # Layout and typography styles
+  transitions.css      # Cinematic slide transitions
+components/
+  KeyboardHelp.vue     # Keyboard shortcut overlay
+  ProgressSegmentBar.vue  # Section progress indicator (bottom bar)
+composables/
+  useHelp.ts           # Help overlay state
+  useSections.ts       # Section detection for progress bar
+setup/
+  shortcuts.ts         # Keyboard shortcut bindings
+  mermaid-renderer.ts  # Beautiful Mermaid with deck tokens
+global-top.vue         # Progress bar + keyboard help
+global-bottom.vue      # Footer chrome (title + page number)
+```

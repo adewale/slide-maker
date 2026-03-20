@@ -1,6 +1,8 @@
 ---
 theme: default
 title: GeistFabrik
+selectable: true
+routerMode: hash
 colorSchema: light
 transition: fade
 layout: cover
@@ -15,159 +17,196 @@ fonts:
 
 A Python-based divergence engine for Obsidian vaults
 
-<!--
-GeistFabrik means "spirit factory" in German. The name captures both the creative and the industrial — it manufactures creative provocations, not creative answers. Inspired by Gordon Brander's work on tools for thought.
+github.com/adewale/geist_fabrik
 
-The subtitle is the project's own README description, verbatim. This sets the stage: divergence engine is the key term. Not a search tool, not an AI assistant, not a recommendation system. A divergence engine.
+<!-- GeistFabrik means "spirit factory" in German. The name is intentional -- geists are small programs that generate creative provocations from your notes. Created by Adewale, inspired by Gordon Brander's work on tools for thought and his concept of "tarot for thought" from the Subconscious project.
 
 Sources:
-- https://github.com/adewale/geist_fabrik/blob/main/README.md — project description and philosophy
--->
+- file:README.md -- project name, description, Gordon Brander attribution
+- file:specs/geistfabrik_vision.md -- Brander's "Building a Second Subconscious" essay, Hegel's owl of Minerva connection -->
 
 ---
 transition: slide-left
 ---
 
-# A spirit factory for your notes
-
-<div v-motion :initial="{ x: -40, opacity: 0 }" :enter="{ x: 0, opacity: 1, transition: { delay: 200, duration: 600 } }">
-
-GeistFabrik parses your Obsidian vault into a SQLite database, computes 384-dimensional embeddings via `sentence-transformers`, then runs 57 "geists" — small programs that generate creative suggestions.
-
-</div>
+# What GeistFabrik does
 
 <v-clicks>
 
-- The output is always a question, never an answer
-- All processing is local — your vault never leaves your machine
-- The governing principle: **muses, not oracles**
+- Parses Obsidian vaults into SQLite with 384-dim embeddings
+- 57 geists (48 Python, 9 YAML) ask "What if...?" questions
+- 4-stage filtering samples ~5 suggestions per session
+- 100% local, read-only, deterministic -- same date = same output
 
 </v-clicks>
 
-<!--
-"Muses, not oracles" is introduced here as the governing design principle. This is the through-line that runs through every design decision GeistFabrik makes.
-
-The 384-dim embeddings use the all-MiniLM-L6-v2 model via sentence-transformers. The project has zero cloud dependency — after installation, it never contacts a server. This is a deliberate architectural choice, not a limitation. The README explicitly states: "100% local processing."
-
-611 tests pass at 100%. The project is at version 0.9.0, feature-complete and approaching 1.0.
+<!-- The 384-dim embeddings come from all-MiniLM-L6-v2 via sentence-transformers, bundled locally with zero API calls. "Deterministic randomness" means the RNG is seeded by session date -- identical vault state on the same date always produces identical suggestions. This makes debugging reproducible: replay any session by passing its date.
 
 Sources:
-- https://github.com/adewale/geist_fabrik/blob/main/README.md — feature list, privacy guarantees, and design principles
-- https://github.com/adewale/geist_fabrik/blob/main/STATUS.md — 611 tests, 99% complete
--->
+- file:README.md -- feature inventory, 57 default geists count, deterministic randomness principle
+- file:docs/ARCHITECTURE.md -- session orchestrator flow, embedding computation details -->
 
 ---
-transition: slide-left
+layout: center
+transition: fade
+---
+
+# Muses, not oracles
+
+Geists provoke thinking. They do not pretend to think for you.
+
+<!-- Gordon Brander described building "a creative oracle that helps provoke ideas... More tarot than flash cards. Tarot for thought." GeistFabrik takes that vision and grounds it in a concrete system. The name "Geists" also invokes Hegel's owl of Minerva -- wisdom comes from reflecting on accumulated knowledge, not from predicting the future.
+
+Sources:
+- file:LESSONS_LEARNED.md -- "Muses, not oracles" as the governing design principle
+- file:specs/geistfabrik_vision.md -- Gordon Brander's original "tarot for thought" framing -->
+
+---
 layout: two-cols
+transition: slide-left
 ---
 
-# Two kinds of geists
+# Two-layer architecture
+
+**Layer 1: Vault** -- raw data
 
 <v-clicks>
 
-- **Code geists** (48 default)
-- Full Python with VaultContext API
-- Graph traversal, temporal analysis
-- When computation is truly needed
+- Parses Markdown, extracts wikilinks and tags
+- Incremental sync to SQLite
+- Computes temporal + semantic embeddings
 
 </v-clicks>
 
 ::right::
 
+<div style="padding-top: 3.5rem;">
+
+**Layer 2: VaultContext** -- intelligence
+
 <v-clicks>
 
-- **Tracery geists** (9 default)
-- Declarative YAML grammars
-- Template variations, creative collision
-- When a question beats a computation
+- Semantic search and graph operations
+- Deterministic sampling (date-seeded RNG)
+- Metadata inference + function registry
 
 </v-clicks>
 
-<!--
-The two-type system reflects a fundamental split in what creative suggestion needs. Code geists handle objective computation — orphan detection, embedding similarity, temporal drift analysis. Tracery geists handle subjective provocation — what-ifs, contradictions, creative collisions.
+</div>
 
-The ratio tells a story: 48 code geists to 9 Tracery grammars. But the Tracery geists punch above their weight, as the next slide will demonstrate. The extensibility model is three-dimensional: metadata inference modules, vault functions, and geists themselves. Non-programmers can write Tracery geists in YAML without touching Python.
+<!-- Notes are frozen dataclasses -- lightweight and immutable. All intelligence lives in VaultContext, not in the Note objects themselves. This separation means Layer 1 can be replaced or upgraded (different vault format, different database) without touching the 57 geists that depend on Layer 2's API. The function registry is the critical bridge: it lets Tracery grammars call Python vault functions via the $vault.function() syntax.
 
 Sources:
-- https://github.com/adewale/geist_fabrik/blob/main/README.md — geist inventory, extensibility model, code vs Tracery distinction
--->
+- file:docs/ARCHITECTURE.md -- two-layer design, VaultContext wraps Vault
+- file:src/geistfabrik/vault_context.py -- VaultContext API surface, frozen Note dataclass -->
 
 ---
-transition: fade
+layout: two-cols
+transition: slide-left
+---
+
+# Code geists vs Tracery geists
+
+**Code geists** (Python)
+
+<v-clicks>
+
+- Full VaultContext API access
+- Graph algorithms, similarity scores
+- Best for computation-heavy analysis
+
+</v-clicks>
+
+::right::
+
+<div style="padding-top: 3.5rem;">
+
+**Tracery geists** (YAML)
+
+<v-clicks>
+
+- Declarative grammar with `$vault.*` calls
+- Template variations, question patterns
+- Non-programmers can create and modify
+
+</v-clicks>
+
+</div>
+
+<!-- The custom Tracery engine is only 283 lines of Python. It intentionally omits standard Tracery features -- modifiers like .capitalize and push-pop stack memory -- in favor of the $vault.function() call system that queries live vault data at expansion time. Standard Tracery requires all content to be pre-computed; GeistFabrik's engine resolves vault queries dynamically during grammar expansion.
+
+Sources:
+- file:LESSONS_LEARNED.md -- decision criteria: when to use code vs Tracery
+- file:docs/TRACERY_COMPARISON.md -- 283-line engine, omitted features, vault function bridge -->
+
+---
 layout: center
+transition: morph-fade
 ---
 
-# 13 lines of YAML outperformed 100 lines of Python
+# 13 lines of YAML beat 100+ lines of Python
 
-The Contradictor geist tried to algorithmically generate opposites of note titles. It succeeded 10% of the time. A simple Tracery question — "What contradicts this note?" — works for every note, every time.
+The Contradictor geist tried to algorithmically generate opposites. 10% success rate. Replaced with questions -- 100% success.
 
-<!--
-This is the genuinely surprising finding from the project's own LESSONS_LEARNED.md. The Python implementation used 100+ lines of pattern matching to generate opposite titles. Results: "Benefits of Morning Routines" produced "Costs of Morning Routines" (works). But "Evergreen notes" produced "The opposite of Evergreen notes" (useless). And "2023-09-12" produced "The opposite of 2023-09-12" (absurd).
-
-The Tracery replacement is 13 lines of YAML. It asks "What contradicts this note?" and lets the human generate the opposite. Success rate: 100%, because the question works for any note regardless of title structure.
-
-The insight, stated in LESSONS_LEARNED.md: "A well-asked question is better than a poorly-computed answer." This proved the through-line — muses, not oracles — was not just philosophy but engineering.
+<!-- The original Python approach pattern-matched note titles: "Benefits of Morning Routines" became "Costs of Morning Routines" (works), but "Evergreen notes" became "The opposite of Evergreen notes" (useless), and "Meeting with Sarah" became "The opposite of Meeting with Sarah" (nonsensical). The YAML replacement just asks "What contradicts this note?" -- it works for ANY note because it delegates the hard cognitive work to the human. This is the purest expression of "muses, not oracles": a well-asked question is better than a poorly-computed answer.
 
 Sources:
-- https://github.com/adewale/geist_fabrik/blob/main/LESSONS_LEARNED.md — Muses Not Oracles case study, 10% vs 100% success rates, code vs YAML comparison
--->
-
----
-transition: iris
-layout: section
----
-
-# Questions scale. Answers don't.
-
-<!--
-Through-line echo: "Muses, not oracles" reframed as a scalability argument. A question that works for any note is more valuable than an answer that works for 10% of notes.
-
-This is also why GeistFabrik deliberately avoids LLM integration. An LLM would turn the tool into an oracle — generating answers, not questions. The project's philosophy page quotes Gordon Brander: the geist's job is not to know the answer, but to ask questions you would not ask yourself. The project calls this "intermittent invocation" — the user initiates a session, receives provocations, then thinks. It is the opposite of a continuous recommendation feed.
-
-Sources:
-- https://github.com/adewale/geist_fabrik/blob/main/LESSONS_LEARNED.md — "Muses, not oracles" principle and its engineering implications
-- https://github.com/adewale/geist_fabrik/blob/main/README.md — design principles section
--->
+- file:LESSONS_LEARNED.md -- full Contradictor case study, 10% vs 100% comparison table
+- file:src/geistfabrik/default_geists/tracery/contradictor.yaml -- the 13-line replacement -->
 
 ---
 transition: slide-left
 ---
 
-# Deterministic randomness
-
-Same date plus same vault equals same suggestions. GeistFabrik seeds its RNG with the session date, making every session reproducible.
+# Three-dimensional extensibility
 
 <v-clicks>
 
-- Execution order in `config.yaml` determines which geist gets which random numbers
-- 150+ raw suggestions flow through a 4-stage filter: boundary, novelty, diversity, quality
-- About 5 survive to the session note
+- **Metadata inference** -- custom note properties via Python
+- **Vault functions** -- reusable queries, callable from Tracery
+- **Geists** -- new generators in Python or YAML
+- Each layer feeds the next: metadata to functions to geists
 
 </v-clicks>
 
-<!--
-Deterministic randomness is a counterintuitive design choice. Most creative tools lean into unpredictability. GeistFabrik makes randomness reproducible because the user should be able to replay a productive session — same date, same vault, same output. The config.yaml execution order matters because all geists share a single RNG.
-
-The filtering pipeline is aggressive: from 150+ raw geist outputs, the 4-stage filter (boundary check, novelty scoring, diversity sampling, quality threshold) reduces suggestions to roughly 5. Three invocation modes let the user control filtering: default (filtered + sampled), full (filtered, no sampling), and no-filter (raw output). The session note is written to the vault's "geist journal" directory as a linkable Obsidian note with block IDs.
+<!-- This three-layer model is what makes GeistFabrik a platform rather than a tool. A non-programmer can write a Tracery geist that calls vault functions written by a programmer, which use metadata computed by a data scientist. All extensibility is filesystem-based: drop a .py file in the right directory and it becomes available. No configuration beyond the file itself.
 
 Sources:
-- https://github.com/adewale/geist_fabrik/blob/main/README.md — configuration, filtering modes, session notes
--->
+- file:README.md -- three extensibility dimensions with examples
+- file:docs/ARCHITECTURE.md -- metadata system, function registry, geist executor interaction -->
 
 ---
-transition: fade
+transition: slide-left
+---
+
+# Design principles as constraints
+
+<v-clicks>
+
+- **Questions, not answers** -- "What if...?" not "Here is how"
+- **Sample, do not rank** -- avoid preferential attachment
+- **Never destructive** -- read-only vault access
+- **Deterministic randomness** -- reproducible sessions for debugging
+- **Local-first** -- no network required after installation
+
+</v-clicks>
+
+<!-- "Sample, do not rank" is a deliberate choice against recommendation algorithms. Ranking creates preferential attachment where popular notes attract more attention. Sampling ensures orphans and forgotten notes surface with equal probability. The deterministic randomness principle means that if a geist produces a bad suggestion, you can replay the exact session that generated it by passing --date to the CLI.
+
+Sources:
+- file:README.md -- eight design principles
+- file:specs/geistfabrik_vision.md -- diverge/converge feedback loops, Brander's influence -->
+
+---
 layout: end
+transition: fade
 ---
 
-# The best tool for thought asks. It never answers.
+# The geist's job is to ask questions you would not ask yourself
 
 github.com/adewale/geist_fabrik
 
-<!--
-Resolution of the through-line. "Muses, not oracles" resolves here as a design philosophy that extends beyond this single project. GeistFabrik demonstrates that creative tools can be more powerful when they constrain themselves to questions rather than attempting answers.
-
-The closing echoes the opening: a divergence engine manufactures creative questions, not creative answers. The name itself — GeistFabrik, spirit factory — captures this perfectly. It is industrial (factory) in its mechanism but spiritual (geist) in its purpose.
+<!-- This line comes directly from the Lessons Learned document and is the resolution of the "muses, not oracles" through-line. GeistFabrik is at v0.9.0, approaching 1.0 -- 611 passing tests, 57 default geists, feature-complete. The Contradictor case study proved the principle: a simple question achieves what complex code cannot.
 
 Sources:
-- https://github.com/adewale/geist_fabrik — project repository
--->
+- file:LESSONS_LEARNED.md -- concluding principle from the Contradictor case study -->

@@ -5,8 +5,8 @@
 /* ── Mobile: hide Slidev chrome, fix black bars ── */
 @media (max-width: 639px) and (orientation: portrait) {
   .slidev-slide-container {
-    --slidev-slide-container-background: var(--deck-bg, #fff) !important;
-    background: var(--deck-bg, #fff) !important;
+    --slidev-slide-container-background: var(--deck-bg, #0a0a0f) !important;
+    background: var(--deck-bg, #0a0a0f) !important;
   }
 
   .slidev-nav-controls,

@@ -1,11 +1,15 @@
 :root {
-  --deck-bg: #FFFBFE;
-  --deck-fg: #1C1B1F;
-  --deck-accent: #00BCD4;
-  --deck-accent-alt: #6750A4;
-  --deck-muted: rgba(28, 27, 31, 0.5);
-  --deck-primary-container: #B2EBF2;
-  --deck-secondary-container: #E8DEF8;
+  /* ── Palette ── */
+  --deck-bg: #1C1B1F;
+  --deck-fg: #E6E1E5;
+  --deck-accent: #00FFFF;
+  --deck-accent-alt: #FF5555;
+  --deck-muted: #938F99;
+  --deck-primary-container: #003333;
+  --deck-secondary: #625B71;
+  --deck-border: #3a3840;
+
+  /* ── Typography ── */
   --deck-font-display: 'Outfit', sans-serif;
   --deck-font-body: 'Plus Jakarta Sans', sans-serif;
   --deck-font-mono: 'Roboto Mono', monospace;

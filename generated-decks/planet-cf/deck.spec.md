@@ -2,44 +2,45 @@
 
 ## Meta
 - title: Planet CF
-- purpose: present a feed aggregator that runs Python inside JavaScript on Cloudflare's edge
-- audience: developers interested in Cloudflare Workers, Python, and feed aggregation
-- tone: warm, practical, curious
-- target-length: 7
+- purpose: present a Python-on-Cloudflare feed aggregator that bridges two runtime worlds
+- audience: developers interested in Cloudflare Workers, Python, or edge computing
+- tone: practical, curious, technically grounded
+- target-length: 9
 - notes: yes
 - style-preset: cloudflare
-- project-url: https://github.com/adewale/planet_cf
 - progress: segment-bar
+- project-url: https://github.com/adewale/planet_cf
 
 ## Source Materials
-- readme: README.md (project overview -- features, quick start, multi-instance deployment, architecture summary)
-- architecture: docs/ARCHITECTURE.md (system topology -- D1, Queues, Vectorize, edge cache, request flows)
-- lessons-learned: docs/LESSONS_LEARNED.md (21 hard-won insights -- JsProxy traps, FFI boundary layers, template embedding, hybrid search)
-- config: wrangler.jsonc (infrastructure bindings -- D1, Vectorize, Queues, Workers AI, cron triggers)
-- code: src/config.py (smart defaults -- 20+ configuration values with sensible fallbacks)
+- readme: README.md (project overview -- feed aggregator on Cloudflare Python Workers, features, multi-instance support)
+- architecture: docs/ARCHITECTURE.md (system topology -- Python Worker orchestrating D1, Queues, Vectorize, Workers AI, Static Assets)
+- lessons-learned: docs/LESSONS_LEARNED.md (21 hard-won lessons -- JsProxy conversion, JsNull trap, boundary layer pattern, template embedding, hybrid search)
+- wrangler: wrangler.jsonc (Cloudflare bindings -- D1, Vectorize, Queues, AI, Static Assets)
+- code: src/wrappers.py (boundary layer implementation -- SafeD1, SafeVectorize, SafeAI, SafeQueue, type conversion functions)
 
 ## Through-Line
-- concept: "Python inside JavaScript -- and the boundaries that make it work"
-- type: concept
+- concept: "What happens when Python wakes up inside JavaScript's house?"
+- type: question
 - appears-in:
-  - slide 2: default -- introduces the concept: Python running in V8 via Pyodide/WASM
-  - slide 4: section -- "boundaries that make it work" -- the FFI boundary layer pattern
-  - slide 5: default -- the surprise: `None` is not enough at the FFI boundary
-  - slide 7: end -- resolution: boundaries create reliability
+  - slide 1: cover -- the question is implicit in the subtitle
+  - slide 3: center-statement -- Python running inside V8, not alongside it
+  - slide 4: section -- the boundary problem is named
+  - slide 6: center-statement -- the JsNull trap as the sharpest example
+  - slide 8: section -- 21 lessons as the answer to the question
+  - slide 9: end -- resolution: the boundary layer is the architecture
 
 ## Design Tokens
 - colors:
-  - bg: "#f5f1eb"
+  - bg: "#fffbf5"
   - fg: "#521000"
-  - accent: "#ff6633"
-  - accent-alt: "#b45309"
-  - muted: "rgba(82, 16, 0, 0.6)"
-  - surface: "#fffbf5"
+  - accent: "#ff4801"
+  - accent-alt: "#e54100"
+  - muted: "rgba(82, 16, 0, 0.45)"
   - border: "#ebd5c1"
 - typography:
-  - display: Work Sans
-  - body: DM Sans
-  - mono: IBM Plex Mono
+  - display: Inter
+  - body: Inter
+  - mono: JetBrains Mono
 - motion:
   - preset: medium-reveal
 
@@ -51,13 +52,19 @@
   - default
   - center
   - fact
+  - two-cols
   - end
 - custom-layouts: []
 - components:
   - ProgressSegmentBar
+  - KeyboardHelp
+  - AudienceQRCode
+  - MobileScrollView
 - css-files:
   - styles/tokens.css
   - styles/theme.css
+  - styles/transitions.css
+  - styles/index.css
 
 ## Slides
 
@@ -66,49 +73,67 @@
 - layout: cover
 - title: Planet CF
 - subtitle: A feed aggregator built on Cloudflare's Python Workers platform
+- notes:
+  - Planet CF is a modern take on the classic "Planet" feed aggregator concept (Planet Python, Planet Mozilla), rebuilt to run entirely on Cloudflare's edge. The surprise: it's Python, not JavaScript, running inside V8 via Pyodide/WASM.
 
 ### Slide 2
 - kind: default-content
 - layout: default
 - title: What Is Planet CF?
-- body: RSS/Atom aggregator that runs Python inside V8 isolates via Pyodide/WASM on Cloudflare's edge network. Single worker handles cron scheduling, queue consumption, HTTP serving, and admin UI.
+- body: RSS/Atom aggregator where Python runs inside V8 isolates via Pyodide/WASM. One worker handles scheduling, queue consumption, HTTP serving, and admin. Supports multi-instance deployment (Planet Python with 500+ feeds, Planet Mozilla with 190).
 - sources:
-  - https://github.com/adewale/planet_cf/blob/main/README.md -- project overview
+  - file:README.md -- feature list and multi-instance examples
   - file:docs/ARCHITECTURE.md -- system topology
 
 ### Slide 3
-- kind: default-content
-- layout: default
-- title: The Full Cloudflare Stack
-- body: Architecture diagram showing D1, Queues, Vectorize, Workers AI, and static assets all orchestrated from a single Python worker.
+- kind: center-statement
+- layout: center
+- title: Python inside JavaScript. Not alongside it.
+- body: Pyodide compiles CPython to WebAssembly. No filesystem. No threading. Every external operation crosses the FFI boundary into JavaScript APIs.
 - sources:
-  - file:docs/ARCHITECTURE.md -- binding topology and data flow
+  - file:docs/LESSONS_LEARNED.md -- lesson 1 (JsProxy conversion) and lesson 4 (no filesystem)
 
 ### Slide 4
 - kind: section
 - layout: section
-- title: Boundaries That Make It Work
+- title: The Boundary Problem
+- subtitle: Five Cloudflare primitives, each returning JavaScript types to Python code
 
 ### Slide 5
 - kind: default-content
 - layout: default
-- title: None Is Not None
-- body: JavaScript null arrives as JsNull, not Python None. Three null-like values cross the FFI boundary -- and `is None` catches only one. The fix is a boundary function that checks type(x).__name__.
+- title: The Boundary Layer Pattern
+- body: Architecture diagram showing JS APIs at top, thin boundary wrappers in middle, pure Python core at bottom. SafeD1, SafeVectorize, SafeAI, SafeQueue -- each wraps a Cloudflare binding and converts types at the edge.
 - sources:
-  - file:docs/LESSONS_LEARNED.md -- lesson 21, JsNull trap
-  - file:docs/LESSONS_LEARNED.md -- lesson 17, FFI type-compatibility matrix
+  - file:docs/LESSONS_LEARNED.md -- lesson 2 (boundary layer pattern)
+  - file:src/wrappers.py -- SafeD1, SafeVectorize, SafeAI, SafeQueue implementations
 
 ### Slide 6
-- kind: fact
-- layout: fact
-- title: 21
-- body: Hard-won lessons documented. Each traced to a specific production incident.
+- kind: center-statement
+- layout: center
+- title: None is not None
+- body: JavaScript null becomes JsNull in Python. It is falsy, but `is None` returns False. Every `if x is None` at the FFI boundary is a latent bug.
 - sources:
-  - file:docs/LESSONS_LEARNED.md -- full lessons catalog
-  - file:src/config.py -- smart defaults
+  - file:docs/LESSONS_LEARNED.md -- lesson 17 (FFI type matrix) and lesson 21 (is None trap)
 
 ### Slide 7
+- kind: default-content
+- layout: two-cols
+- title: Three Null-Like Values
+- left: Python type behavior table showing None, JsNull, JsUndefined
+- right: The fix -- boundary layer _is_js_undefined() checks type(x).__name__
+- sources:
+  - file:docs/LESSONS_LEARNED.md -- lesson 21 (is None is never enough)
+  - file:src/wrappers.py -- _is_js_undefined function
+
+### Slide 8
+- kind: section
+- layout: section
+- title: 21 Lessons, One Document
+- subtitle: From JsProxy to SSRF protection, every surprise documented
+
+### Slide 9
 - kind: end
 - layout: end
-- title: Boundaries Create Reliability
-- subtitle: Planet CF -- Python inside JavaScript, made safe by a thin conversion layer
+- title: The boundary layer is the architecture
+- subtitle: github.com/adewale/planet_cf

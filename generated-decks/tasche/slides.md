@@ -1,14 +1,13 @@
 ---
 theme: default
 title: Tasche
-routerMode: hash
-selectable: true
 colorSchema: dark
 fonts:
-  sans: DM Sans
-  serif: Bebas Neue
+  sans: Bebas Neue
+  serif: DM Sans
   mono: JetBrains Mono
   weights: '400,500,700'
+  italic: false
 transition: slide-left
 layout: cover
 ---
@@ -17,55 +16,46 @@ layout: cover
 
 A self-hosted read-it-later service built on Cloudflare Python Workers
 
+<p style="color: var(--deck-muted); font-family: var(--deck-font-mono); font-size: 0.85rem; margin-top: 2rem;">github.com/adewale/tasche</p>
+
 <!--
-"Tasche" is German for "pocket." Let the subtitle land before saying anything else. The audience should understand what this is before you explain why it exists. The name signals a personal, portable knowledge store -- not a SaaS product, not a startup.
+Tasche is German for "pocket." The name signals exactly what this is -- a Pocket alternative you own and deploy to your own Cloudflare account. One click, your own D1 database, your own R2 bucket, your own Queues.
+
+The surprising part is not that it exists. It is that it runs Python on a platform where nearly every tutorial, example, and template is JavaScript.
 
 Sources:
-- https://github.com/adewale/tasche/blob/main/README.md -- project description, first paragraph
+- https://github.com/adewale/tasche/blob/main/README.md -- project overview and description
+- https://github.com/adewale/tasche/blob/main/specs/tasche-spec.md -- deployment model and naming
 -->
 
 ---
-transition: fade
+transition: slide-up
 ---
 
-# Your reading list should not be someone else's business model
+# Your Articles Survive
 
-Save articles, read them offline, listen to them as audio -- all running in your own Cloudflare account.
+Save a URL and Tasche creates a **complete, self-contained archive**.
+
+The original can get paywalled, deleted, or the domain can expire. Tasche already has your copy.
 
 <v-clicks>
 
-- **Save articles by URL** with automatic content extraction
-- **Full-text search** across your entire library via FTS5
-- **Listen Later** -- generate audio via Workers AI TTS
-- **Offline reading** -- PWA with service worker caching
-- **Self-hosted** -- your data stays in your account
+- **14-step async pipeline** from URL to archived article
+- **D1** for articles and FTS5 search, **R2** for content
+- **Queues** for background processing, **KV** for sessions
+- **Workers AI** for text-to-speech via MeloTTS
+- **Service Binding** to a JS Worker for Readability
 
 </v-clicks>
 
 <!--
-This slide explains what Tasche IS and WHY it exists. The title is the through-line provocation -- the reason this project exists at all. Pause after revealing "self-hosted" at the end. Every other read-it-later service holds your data hostage. Tasche does not. Pocket was acquired by Mozilla, then Mozilla laid off the team. Instapaper was acquired by Pinterest, then sold again. Your reading history should not depend on a company's survival.
+The core promise is article permanence. When you save a URL, Tasche fetches the page, resolves redirects, extracts the article via Readability, downloads and converts all images to WebP, stores clean HTML and Markdown in R2, and indexes the content in D1 FTS5.
+
+The pipeline runs asynchronously via Cloudflare Queues. The user sees "saving" immediately. Processing happens in the background. If you click the original URL and it 404s -- good thing you saved it.
 
 Sources:
-- https://github.com/adewale/tasche/blob/main/README.md -- feature list and project description
--->
-
----
-layout: fact
-transition: slide-up
----
-
-# 6 Cloudflare services. 1 worker. $5/month.
-
-Python Workers + D1 + R2 + KV + Queues + Workers AI
-
-No external dependencies. No egress fees.
-
-<!--
-The $5/month figure is the Cloudflare Workers Paid plan as of early 2026. The free tier covers light personal use at 100K requests/day. The point is not the price -- it is the absence of hidden costs. No S3 bills, no database hosting, no third-party TTS API keys. Everything runs on one platform, one bill, one account.
-
-Sources:
-- https://github.com/adewale/tasche/blob/main/README.md -- cost section: "Requires the Cloudflare Workers Paid plan ($5/month as of early 2026)"
-- https://github.com/adewale/tasche/blob/main/README.md -- architecture table listing all six bindings
+- https://github.com/adewale/tasche/blob/main/specs/tasche-spec.md -- core promise, archival pipeline, 14-step processing
+- https://github.com/adewale/tasche/blob/main/CLAUDE.md -- binding map and data flow
 -->
 
 ---
@@ -73,73 +63,166 @@ layout: section
 transition: iris
 ---
 
-# Every byte lives in your account
+# Python Inside V8
+
+Running Pyodide in Cloudflare's JavaScript runtime
 
 <!--
-The through-line surfaces as an architectural claim. Pause here. The audience should feel the weight of "self-hosted" -- it is not a marketing label, it is a topology decision. D1 stores your articles and FTS5 index. R2 stores your archived HTML, images in WebP, and TTS audio. KV stores your sessions with a 7-day TTL. Queues handle async article processing. Nothing leaves your Cloudflare account. If Tasche the project disappears tomorrow, your data is still in your D1 database and R2 bucket, accessible through the Cloudflare dashboard.
+This is the ecosystem mismatch that makes Tasche architecturally interesting. Cloudflare Workers documentation defaults to JavaScript and TypeScript. The getting started guides, the templates, the examples -- all JS. Python Workers compile to WebAssembly via Pyodide and run inside V8 isolates.
+
+The through-line surfaces here: what happens when you put Python where JavaScript is supposed to go? You get a set of hard constraints that shape every architectural decision.
 
 Sources:
-- https://github.com/adewale/tasche/blob/main/README.md -- architecture table: D1, R2, KV, Queues, Workers AI bindings
+- https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- lesson 27 (runtime gap between CPython and Pyodide)
+- https://github.com/adewale/tasche/blob/main/CLAUDE.md -- "Runtime: Python on Pyodide (WebAssembly) inside V8 isolates"
 -->
 
 ---
-transition: morph-fade
-layout: center
+layout: two-cols
+transition: slide-left
 ---
 
-# Python running inside JavaScript, not alongside it
+# The Platform Stack
 
-Pyodide compiles CPython to WebAssembly inside V8 isolates
+### Cloudflare Bindings
 
 <v-clicks>
 
-- No threads -- all handlers must be `async def`
-- No C extensions -- pure Python or Pyodide-compatible only
-- No `eval()` -- broke `python-readability`, forced a fallback
-- The FFI boundary: convert at the edge, native Python everywhere else
+- **D1** -- articles, tags, FTS5 search
+- **R2** -- HTML, markdown, images, audio
+- **KV** -- auth sessions (7-day TTL)
+- **Queues** -- async processing and TTS
+- **Workers AI** -- TTS via MeloTTS
+- **Service Binding** -- Readability (JS Worker)
+
+</v-clicks>
+
+::right::
+
+### Python Constraints
+
+<v-clicks>
+
+- All handlers must be `async def`
+- No C extensions (no lxml)
+- No `eval()` or `Function()` in V8
+- No threading or multiprocessing
+- `None` becomes `undefined`, not `null`
+- `bytes` becomes `PyProxy`, not `Uint8Array`
 
 </v-clicks>
 
 <!--
-This is the genuinely surprising constraint. Most developers assume "Python Workers" means a Python container or sidecar. It is actually Python compiled to WebAssembly running inside a JavaScript V8 isolate. This single architectural fact explains almost every design decision in the codebase. python-readability broke because it calls js.eval() internally, which throws EvalError in Workers. The team had to switch to BeautifulSoup plus a separate Readability Service Binding. The FFI boundary layer in src/wrappers.py -- _to_py_safe, _to_js_value, d1_first -- prevents JsProxy objects from leaking into Python code. It was built in Phase 1 and used consistently across all nine implementation phases.
+Six different Cloudflare bindings, each with its own FFI conversion requirements. The left column is what the platform gives you. The right column is what it takes away.
+
+Every handler must be async def -- sync handlers cause "RuntimeError: can't start new thread." This is not a best practice, it is a hard constraint of running Python inside V8. The None-to-undefined and bytes-to-PyProxy conversions are the root cause of three separate production bugs.
 
 Sources:
-- https://github.com/adewale/tasche/blob/main/docs/architecture.md -- "Pyodide (CPython compiled to WebAssembly) inside Cloudflare's V8 isolates"
-- https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- "The FFI Boundary Layer Pays Off" and Phase 1 wrappers.py
+- https://github.com/adewale/tasche/blob/main/CLAUDE.md -- binding map, constraints list
+- https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- lessons 27, 29, 32 (runtime constraints)
 -->
 
 ---
 transition: zoom-in
 ---
 
-# From URL to archived article in 14 steps
+# The FFI Boundary Layer
 
-```mermaid {scale: 0.75}
-graph LR
-  A["Save URL"] --> B["Queue"]
-  B --> C["Fetch page"]
-  C --> D["Readability"]
-  D --> E["Images to WebP"]
-  E --> F["R2 archive"]
-  F --> G["FTS5 index"]
-  style A fill:#e8e8ed,stroke:#e8e8ed,color:#0a0a0f
-  style B fill:#0a0a0f,stroke:#e8e8ed,color:#e8e8ed
-  style C fill:#e8e8ed,stroke:#e8e8ed,color:#0a0a0f
-  style D fill:#0a0a0f,stroke:#e8e8ed,color:#e8e8ed
-  style E fill:#e8e8ed,stroke:#e8e8ed,color:#0a0a0f
-  style F fill:#0a0a0f,stroke:#e8e8ed,color:#e8e8ed
-  style G fill:#e8e8ed,stroke:#e8e8ed,color:#0a0a0f
-  linkStyle default stroke:#e8e8ed,stroke-width:2px
-```
+Every Python type crossing into JavaScript needs explicit conversion. `wrappers.py` is the single checkpoint.
 
-Queue-driven. Each step can fail independently. If images fail, the article still saves.
+<v-clicks>
+
+- `None` to `undefined` breaks D1 -- use `d1_null()`
+- `bytes` to `PyProxy` breaks R2 -- use `to_js_bytes()`
+- `dict` to `Map` breaks Queues -- use `_to_js_value()`
+- `JsNull` is not `None` -- reads need conversion too
+
+</v-clicks>
+
+<p v-click style="color: var(--deck-accent); margin-top: 1.5rem; font-weight: 500;">The boundary is bidirectional: convert on writes (Python to JS) AND on reads (JS to Python).</p>
 
 <!--
-The full pipeline is 14 steps: URL validation, SSRF check, fetch with redirect resolution, canonical URL extraction, readability content extraction, image discovery, image download, WebP conversion, HTML storage to R2, Markdown storage to R2, FTS5 indexing in D1, status update, and optional TTS generation via a second queue message. The diagram shows the critical path. The key insight is graceful degradation -- if any step after the initial fetch fails, the article is still saved with whatever was successfully processed. This was discovered during Phase 4 auditing when the error handling was too aggressive, failing the entire pipeline on a single image download timeout.
+The Pyodide FFI type matrix is the central architectural insight. It took 7 commits across 3 days to centralize this boundary layer -- each commit discovered a new category of FFI leaks the previous one missed.
+
+Safe* wrappers (SafeD1, SafeR2, SafeKV, SafeQueue, SafeAI, SafeReadability) encapsulate both read and write conversions. Application code never touches JsProxy directly.
+
+Through-line deepens: "running Python where JavaScript goes" means building a bidirectional translation layer at every boundary.
 
 Sources:
-- https://github.com/adewale/tasche/blob/main/specs/tasche-spec.md -- "14-step processing pipeline" and archival specification
-- https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- Phase 4 "Error handling in the 14-step pipeline"
+- https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- lesson 29 (FFI type matrix), lesson 30 (bidirectional boundary), pattern 1 (7 commits to centralize)
+-->
+
+---
+layout: section
+transition: iris
+---
+
+# When Python Cannot Do It, Call JavaScript
+
+Service Binding RPC across runtimes
+
+<!--
+Through-line refracted through a new lens. python-readability uses eval(), which V8 isolates block with EvalError. Every serious Python content extraction library (Trafilatura, Newspaper4k, Goose3, ReadabiliPy) requires lxml -- a C extension incompatible with Pyodide/WebAssembly.
+
+The solution: a separate JavaScript Worker running Mozilla Readability via linkedom, called from the Python Worker via Service Binding RPC. The call is in-process (1-5ms), not a network round-trip. Two runtimes cooperating on the same platform.
+
+Content extraction was rearchitected 3 times: python-readability (crashed), BeautifulSoup heuristics (lower quality), then the JS Service Binding with BS4 as fallback.
+
+Sources:
+- https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- lessons 32-33 (eval blocked, lxml unavailable)
+- https://github.com/adewale/tasche/blob/main/readability-worker/src/index.js -- the JS Worker source
+-->
+
+---
+transition: morph-fade
+---
+
+# 480 Tests Pass, Core Workflow Broken
+
+Three fatal bugs hid behind CPython unit tests with mock Cloudflare bindings. The primary user journey did not work until **commit 20 of 25**.
+
+<v-clicks>
+
+- **Queue signature** -- wrong arg count, silent crash
+- **eval() blocked** -- Readability calls `js.eval()`, V8 rejects
+- **None to undefined** -- D1 rejects `undefined` in `.bind()`
+
+</v-clicks>
+
+<p v-click style="color: var(--deck-muted); font-size: 0.95rem; margin-top: 1rem;">All three share one root cause: unit tests ran in CPython, production ran in Pyodide inside V8. The tests verified a simulation, not the real platform.</p>
+
+<!--
+The most damning statistic from the commit history: 53 total commits, 17 corrective, fix-to-feature ratio 1:2.1. The core user journey -- "save a URL, read it later" -- was broken for 7 of 8 development days while test counts climbed.
+
+A single live smoke test on day 1 would have caught all three bugs. The lesson: for novel runtimes, deploy to the real platform first. Tests measure correctness of logic in the wrong runtime; smoke tests measure reachability of function in the right one.
+
+Sources:
+- https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- lesson 27 (runtime gap), lesson 34 (commit history analysis), lesson 38 (E2E tests)
+-->
+
+---
+layout: center
+transition: fade
+---
+
+<div v-motion :initial="{ y: 40, opacity: 0 }" :enter="{ y: 0, opacity: 1, transition: { duration: 800 } }">
+
+# Two Runtimes, One Platform
+
+</div>
+
+<p style="font-size: 1.25rem; max-width: 36rem; text-align: center; color: var(--deck-muted); line-height: 1.6;">Python for the application logic. JavaScript for what Python cannot reach. The boundary layer makes them one system.</p>
+
+<!--
+Through-line resolution. The answer to "what happens when you run Python where JavaScript goes" is: you build a boundary layer, you accept the constraints, and when you hit a wall you bridge to JS via Service Bindings.
+
+This is not a workaround. Cloudflare natively supports both runtimes. The Python Worker handles FastAPI routing, D1 queries, R2 storage, queue processing. The JS Worker handles Readability extraction. Service Binding RPC connects them in-process.
+
+The architecture that emerged is genuinely novel: a Python application calling a JavaScript service via in-process RPC, both running on the same edge platform, sharing no state except the function call boundary.
+
+Sources:
+- https://github.com/adewale/tasche/blob/main/CLAUDE.md -- architecture overview, binding map
+- https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- lesson 32 (Service Binding solution)
 -->
 
 ---
@@ -147,13 +230,15 @@ layout: end
 transition: fade
 ---
 
-# The articles survive because you own the infrastructure
+# You Build a Boundary Layer
 
-Your pocket. Your rules.
+github.com/adewale/tasche
 
 <!--
-Echo the through-line and resolve it. The original article might get paywalled, deleted, or the domain might expire. Does not matter -- you have your copy with all images converted to WebP, a full Markdown version for search, and optionally an audio version for listening. That is the entire point of Tasche. The closing deliberately mirrors the opening: the cover said what it IS, this slide says what it MEANS. Self-hosting is not just a deployment model -- it is a guarantee that your reading history outlives every company in the chain.
+Echoes the opening provocation. What happens when you run Python where JavaScript is supposed to go? You build wrappers.py. You build Safe* classes. You build a Readability Service Binding. You accept what each runtime does well and connect them at the border.
+
+The GitHub URL gives the audience a concrete next step -- the entire project is open source, MIT licensed, deployable with one click.
 
 Sources:
-- https://github.com/adewale/tasche/blob/main/specs/tasche-spec.md -- "Core Promise: Your Articles Survive"
+- https://github.com/adewale/tasche -- project repository
 -->
