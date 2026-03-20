@@ -12,20 +12,19 @@ export default defineShortcutsSetup((nav, base) => {
     {
       key: 'p',
       fn: () => {
-        const b = import.meta.env.BASE_URL || '/'
-        const isHash = location.hash.startsWith('#')
-        window.open(isHash ? `${b}#/presenter` : `${b}presenter/`, '_blank')
+        const base = import.meta.env.BASE_URL || '/'
+        window.open(`${base}presenter/`, '_blank')
       },
       autoRepeat: false,
     },
     {
       key: ']',
-      fn: () => nav.nextSlide(true),
+      fn: () => nav.nextSlide(),
       autoRepeat: true,
     },
     {
       key: '[',
-      fn: () => nav.prevSlide(true),
+      fn: () => nav.prevSlide(),
       autoRepeat: true,
     },
   ]

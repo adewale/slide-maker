@@ -2,9 +2,9 @@
 
 ## Meta
 - title: GeistFabrik
-- subtitle: A Divergence Engine for Obsidian Vaults
-- purpose: introduce GeistFabrik's philosophy and architecture to developers and PKM enthusiasts
-- audience: Obsidian users, tools-for-thought practitioners, developers curious about creative augmentation
+- subtitle: A Python-based divergence engine for Obsidian vaults
+- purpose: introduce GeistFabrik's philosophy and architecture to developers who use Obsidian
+- audience: Obsidian power users, PKM enthusiasts, developers interested in tools for thought
 - tone: precise, curious, grounded
 - target-length: 7
 - notes: yes
@@ -13,24 +13,24 @@
 - progress: segment-bar
 
 ## Source Materials
-- readme: README.md (project overview -- what it does, 57 default geists, three-layer extensibility, privacy model)
-- lessons-learned: LESSONS_LEARNED.md (design insight -- questions beat computed answers, Contradictor case study)
-- status: STATUS.md (project health -- 611 tests, 99% complete, 16 modules, schema v6)
+- readme: README.md (factual backbone -- what it does, how to run, feature inventory, design philosophy)
+- lessons-learned: LESSONS_LEARNED.md (the "muses not oracles" insight -- questions beat computed answers)
 
 ## Through-Line
-- concept: "Muses, not oracles -- a well-asked question beats a poorly-computed answer."
+- concept: "A well-asked question is better than a poorly-computed answer."
 - type: design-rule
 - appears-in:
-  - slide 1: cover -- the design rule is introduced as subtitle framing
-  - slide 3: center-statement -- the Contradictor case study proves questions beat algorithms
-  - slide 5: default-content -- extensibility layers show how questions compose with computation
-  - slide 7: end -- the design rule resolves as an invitation
+  - slide 1: cover -- the project's identity and what it is
+  - slide 3: center-statement -- the design rule stated directly
+  - slide 5: default-content -- muses not oracles in practice via Tracery vs code
+  - slide 7: end -- the rule as resolution
 
 ## Design Tokens
 - colors:
   - bg: "#ffffff"
   - fg: "#1a1a2e"
-  - accent: "#2563eb"
+  - accent: "#4a6741"
+  - accent-alt: "#7a5c3a"
   - muted: "rgba(26, 26, 46, 0.45)"
 - typography:
   - display: Plus Jakarta Sans
@@ -43,9 +43,9 @@
 - prefer-builtins: true
 - builtins:
   - cover
-  - center
-  - default
   - section
+  - default
+  - center
   - fact
   - two-cols
   - end
@@ -61,84 +61,75 @@
 - kind: cover
 - layout: cover
 - title: GeistFabrik
-- subtitle: What happens when your notes ask the questions?
+- subtitle: A Python-based divergence engine for Obsidian vaults
 - notes:
-  - GeistFabrik means "spirit factory" in German. The name signals its role -- manufacturing provocations, not answers.
-  - Set the frame: this is about augmenting human thinking, not replacing it.
+  - GeistFabrik means "spirit factory" in German. Open by establishing what this project actually is before anything else.
 
 ### Slide 2
-- kind: fact
-- layout: fact
-- title: 611
-- body: tests passing across 16 modules. 57 geists. Zero network calls.
+- kind: default-content
+- layout: default
+- title: What GeistFabrik is and why it exists
+- body: |
+  GeistFabrik (German for "spirit factory") generates creative suggestions through both code and Tracery grammars. It is a tool for thought that acts as a muse, not an oracle -- offering provocative "What if...?" questions rather than prescriptive answers.
+
+  Inspired by Gordon Brander's work on tools for thought.
 - sources:
-  - file:STATUS.md -- test count, module count, feature completeness
-  - file:README.md -- privacy model, local-first architecture
+  - file:README.md -- first paragraph description and attribution
 - notes:
-  - The "zero network calls" claim is the real headline. Everything runs locally with sentence-transformers.
-  - 611 tests at 100% pass rate across unit and integration suites.
+  - This slide grounds the audience. The first paragraph from the README appears verbatim. Emphasize the "muse, not an oracle" framing -- this is the core philosophy.
 
 ### Slide 3
 - kind: center-statement
 - layout: center
-- title: The Contradictor taught us something
-- body: 100 lines of Python to compute opposites. 10% success rate. 13 lines of Tracery to ask "What contradicts this?" 100% success rate.
+- title: A WELL-ASKED QUESTION IS BETTER THAN A POORLY-COMPUTED ANSWER
+- subtitle: The design rule that shaped every geist
 - sources:
-  - file:LESSONS_LEARNED.md -- Contradictor case study, code vs question comparison
+  - file:LESSONS_LEARNED.md -- the "muses not oracles" principle
 - notes:
-  - This is the war story. The Contradictor geist tried to algorithmically generate opposite note titles. It worked for "Benefits of Morning Routines" but failed for "Evergreen notes" and dates.
-  - The fix: stop computing answers, start asking questions. A YAML template that says "What contradicts [[note]]?" works on any note title.
+  - This is the through-line. Pause here. The caps are deliberate -- one-per-section emphasis per PRESENTATION_PHILOSOPHY principle 5.
 
 ### Slide 4
-- kind: default-content
-- layout: two-cols
-- title: Two Engines, One Pipeline
-- left:
-  - Code geists: Python with full VaultContext API
-  - Graph ops, semantic search, temporal drift
-  - Best when computation reveals structure
-- right:
-  - Tracery geists: YAML grammars with vault functions
-  - Template variations, provocative questions
-  - Best when human creativity exceeds algorithmic reach
+- kind: fact
+- layout: fact
+- title: "57"
+- subtitle: Default geists
+- body: 48 code + 9 Tracery. 611 tests passing. Zero external API calls.
 - sources:
-  - file:README.md -- code vs Tracery geist architecture
-  - file:LESSONS_LEARNED.md -- when to use code vs Tracery decision framework
+  - file:README.md -- status section (version 0.9.0, geist count, test count)
 - notes:
-  - The two engines are not competitors -- they compose. Vault functions written in Python can be called from Tracery grammars.
-  - The pipeline runs both types through the same 4-stage filter: boundary, novelty, diversity, quality.
+  - The 57 geists ship out of the box. The "zero external API calls" reinforces local-first. 611 tests is the real number from the README status section.
 
 ### Slide 5
-- kind: default-content
-- layout: default
-- title: Three Dimensions of Extension
-- bullets:
-  - Metadata inference adds properties to notes
-  - Vault functions create reusable queries
-  - Geists compose both into provocations
-- body: Each layer builds on the one below.
+- kind: comparison
+- layout: two-cols
+- title: Code geist vs Tracery geist
+- left:
+  - "Code: 100+ lines of pattern matching"
+  - "Contradictor tried to compute opposites"
+  - "Success rate: ~10%"
+- right:
+  - "Tracery: 13 lines of YAML"
+  - "Just asks: 'What contradicts this note?'"
+  - "Success rate: 100%"
 - sources:
-  - file:README.md -- three-dimensional extensibility section
+  - file:LESSONS_LEARNED.md -- Contradictor geist comparison (code vs question approach)
 - notes:
-  - Metadata inference adds computed properties (reading time, lexical diversity, sentence count). Vault functions wrap reusable queries behind a decorator. Geists compose both.
-  - Non-programmers write Tracery geists that call functions written by developers.
+  - The Contradictor war story from LESSONS_LEARNED.md. The code approach failed because it tried to compute answers. The Tracery approach succeeded because it asked questions. This is the through-line in action.
 
 ### Slide 6
 - kind: default-content
 - layout: default
-- title: The Data Flow
-- body: A Mermaid diagram showing vault files through sync, embeddings, VaultContext, geist execution, filtering, to session notes.
+- title: The data flow
+- body: Mermaid diagram showing vault files through sync, embeddings, geist execution, filtering, and session notes
 - sources:
   - file:README.md -- architecture section, data flow diagram
 - notes:
-  - The pipeline is deterministic -- same date plus same vault equals same output. This is by design for reproducible sessions.
-  - Incremental sync means only changed files are reprocessed. Batch embeddings are 15-20x faster than naive implementation.
+  - Walk through the pipeline. Vault files are read-only. Everything stays local. The output is a linkable Obsidian note.
 
 ### Slide 7
 - kind: end
 - layout: end
-- title: A well-asked question beats a poorly-computed answer
-- body: github.com/adewale/geist_fabrik
+- title: Muses, not oracles
+- subtitle: GeistFabrik asks questions so you can find answers
 - notes:
-  - Circle back to the through-line. The closing resolves the opening by restating the design principle that shapes every decision in the project.
-  - The URL is secondary to the thesis. Let the principle linger.
+  - Circle back to the through-line. The closing echoes the opening philosophy. Do not end with an install command.

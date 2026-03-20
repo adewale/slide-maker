@@ -1,12 +1,12 @@
 # Vaders — Slide Deck
 
-A 7-slide presentation about [Vaders](https://github.com/adewale/vaders), a multiplayer TUI Space Invaders clone built with OpenTUI and Cloudflare Durable Objects.
+A 7-slide presentation about the [Vaders](https://github.com/adewale/vaders) project: a multiplayer TUI Space Invaders clone built with OpenTUI and Cloudflare Durable Objects.
 
 ## Quick start
 
 ```bash
 npm install
-npx slidev
+npx slidev slides.md
 ```
 
 ## Build
@@ -15,7 +15,7 @@ npx slidev
 npx slidev build
 ```
 
-Produces `dist/` for static hosting.
+Output goes to `dist/`.
 
 ## Export PDF
 
@@ -25,18 +25,36 @@ npx slidev export
 
 ## Structure
 
-| File | Purpose |
-|------|---------|
-| `slides.md` | Presentation source |
-| `deck.spec.md` | Planning spec |
-| `styles/tokens.css` | Design tokens |
-| `styles/theme.css` | Theme styles |
-| `styles/transitions.css` | Cinematic transitions |
-| `global-top.vue` | Help overlay, progress bar, QR code, mobile view |
-| `global-bottom.vue` | Footer chrome |
-| `setup/shortcuts.ts` | Keyboard shortcuts |
-| `setup/mermaid-renderer.ts` | Beautiful Mermaid integration |
+```
+slides.md                  # Presentation source
+deck.spec.md               # Planning spec
+styles/
+  index.css                # Entry point (imports tokens + theme + transitions)
+  tokens.css               # Design tokens
+  theme.css                # Typography, layout, animation styles
+  transitions.css          # Cinematic slide transitions
+setup/
+  shortcuts.ts             # Keyboard shortcuts (?, p, ], [)
+  mermaid-renderer.ts      # Beautiful Mermaid with deck tokens
+composables/
+  useHelp.ts               # Help overlay state
+  useSections.ts           # Section boundary detection
+components/
+  KeyboardHelp.vue         # Keyboard shortcut overlay
+  ProgressSegmentBar.vue   # Top progress bar
+  AudienceQRCode.vue       # QR code sharing (press q)
+  MobileScrollView.vue     # Portrait phone scroll view
+global-top.vue             # Help, progress, QR, mobile scroll
+global-bottom.vue          # Footer chrome (title + page number)
+```
 
-## Style
+## Keyboard shortcuts
 
-Material Design preset with project-specific cyan accent (`#00BCD4`) reflecting the game's player 1 color. Outfit for display, Plus Jakarta Sans for body, Roboto Mono for code.
+| Key | Action |
+|-----|--------|
+| `?` | Toggle keyboard help |
+| `p` | Open presenter view |
+| `q` | Share QR code |
+| `]` / `[` | Skip to next/prev slide |
+| `f` | Fullscreen |
+| `o` | Slide overview |

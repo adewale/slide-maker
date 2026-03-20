@@ -2,56 +2,56 @@
 
 ## Meta
 - title: Vaders
-- subtitle: Multiplayer Space Invaders in your terminal
-- purpose: present how a multiplayer TUI game was built with OpenTUI and Cloudflare Durable Objects
-- audience: developers interested in real-time multiplayer, terminal UIs, and serverless architecture
-- tone: practical, energetic, technical but accessible
+- purpose: present the architecture and design decisions behind a multiplayer TUI game
+- audience: developers interested in real-time multiplayer, terminal rendering, or Cloudflare Workers
+- tone: technical, specific, retro-warm
 - target-length: 7
 - notes: yes
 - style-preset: material-design
-- progress: segment-bar
 - project-url: https://github.com/adewale/vaders
+- progress: segment-bar
 
 ## Source Materials
-- readme: README.md (project overview — 1-4 player TUI Space Invaders, controls, architecture, tech stack)
-- architecture: docs/server-architecture.md (Cloudflare Worker + Durable Object game server, WebSocket protocol, matchmaking)
-- lessons-learned: Lessons_learned.md (TUI rendering constraints, pure reducer pattern, WebSocket hibernation, seeded RNG)
-- package: package.json (Bun runtime, three workspaces — client/worker/shared, 620+ tests)
-- changelog: CHANGELOG.md (v1.0.0 feature inventory — braille sprites, wave transitions, dissolve effects, confetti)
+- readme: README.md (project overview — what it does, game modes, controls, architecture)
+- changelog: CHANGELOG.md (v1.0.0 feature inventory — sprites, effects, multiplayer, audio)
+- lessons-learned: Lessons_learned.md (TUI constraints, multiplayer sync, collision bugs, property testing)
+- claude-md: CLAUDE.md (architecture details — tick rate, scaling table, WebSocket protocol, state machine)
+- screenshots: docs/ (launch-screen.png, gameplay.png, spritesheet.png)
 
 ## Through-Line
-- concept: "What happens when you give a terminal a game loop?"
-- type: question
+- concept: "Accept the constraint"
+- type: design-rule
 - appears-in:
-  - slide 1: cover — the question is posed
-  - slide 2: center-statement — the terminal becomes a canvas (braille pixels, color cycling)
-  - slide 4: section — the terminal becomes a game server (Durable Objects, 30Hz tick)
-  - slide 5: default-content — the terminal becomes multiplayer (WebSocket sync, held-state input)
-  - slide 7: end — the question is answered — "It plays back"
+  - slide 2: default — introduced as the core design philosophy
+  - slide 4: section — terminal constraints become retro aesthetic
+  - slide 5: default — full sync chosen over delta updates because simplicity wins at this scale
+  - slide 7: end — resolution: constraints breed the right design
 
 ## Design Tokens
 - colors:
   - bg: "#FFFBFE"
   - fg: "#1C1B1F"
   - accent: "#00BCD4"
-  - accent-alt: "#6750A4"
-  - muted: "rgba(28, 27, 31, 0.5)"
+  - accent-alt: "#FF8800"
+  - muted: "#625B71"
+  - primary-container: "#B2EBF2"
+  - secondary-container: "#FFE0B2"
 - typography:
   - display: Outfit
   - body: Plus Jakarta Sans
   - mono: Roboto Mono
 - motion:
-  - preset: m3-systematic
+  - preset: material-m3
 
 ## Layout System
 - prefer-builtins: true
 - builtins:
   - cover
-  - center
-  - section
   - default
+  - section
+  - center
   - fact
-  - two-cols-header
+  - two-cols
   - end
 - custom-layouts: []
 - components: []
@@ -66,72 +66,66 @@
 - kind: cover
 - layout: cover
 - title: Vaders
-- subtitle: What happens when you give a terminal a game loop?
+- subtitle: Multiplayer TUI Space Invaders clone (1-4 players) built with OpenTUI and Cloudflare Durable Objects.
 - notes:
-  - This is a multiplayer TUI Space Invaders clone for 1-4 players, built with Bun, OpenTUI, and Cloudflare Durable Objects. The question sets up the through-line — each section answers it differently.
+  - This is a terminal-native game running in a 120x36 character grid. The subtitle is the project's own description from the README.
 
 ### Slide 2
-- kind: center-statement
-- layout: center
-- title: 120 x 36 characters. Braille pixels. Color cycling.
-- body: The terminal becomes a canvas — Unicode box-drawing for sprites, Amiga-style palette rotation for animation, two-line entities on a fixed grid.
+- kind: default-content
+- layout: default
+- title: What Vaders is and why it exists
+- body: Multiplayer TUI Space Invaders clone (1-4 players) built with OpenTUI and Cloudflare Durable Objects. Solo play with 3 lives, or 2-4 player co-op with 5 shared lives, scaled alien grids, and faster enemies. Real-time sync at 30Hz via WebSocket. The core philosophy: accept the constraint.
 - sources:
-  - https://github.com/adewale/vaders/blob/main/Lessons_learned.md — TUI rendering techniques, braille pixel art, color cycling from Amiga era
-  - https://github.com/adewale/vaders/blob/main/CHANGELOG.md — braille pixel art sprites, 7-wide animated sprites
+  - https://github.com/adewale/vaders/blob/main/README.md — project overview and game modes
+  - https://github.com/adewale/vaders/blob/main/CLAUDE.md — architecture overview
 - notes:
-  - The 120x36 grid is a hard constraint. Sprites are 2-line tall, 5-char wide. Color cycling rotates through a palette array every N ticks — no per-pixel rendering needed. The UFO cycles through 6 rainbow colors.
+  - Introduce the through-line here: the project succeeds by embracing terminal limitations rather than fighting them.
 
 ### Slide 3
-- kind: fact
-- layout: fact
-- title: "620+"
-- body: Tests across all three workspaces — including property-based collision checks with fast-check.
+- kind: default-content
+- layout: two-cols
+- title: Architecture
+- left: Client (Bun + OpenTUI React), Worker (Cloudflare DO + game loop), Shared (TypeScript types + protocol)
+- right: Mermaid flowchart showing Client to Worker to Shared data flow
 - sources:
-  - https://github.com/adewale/vaders/blob/main/CHANGELOG.md — 620+ tests, comprehensive test suite
-  - https://github.com/adewale/vaders/blob/main/package.json — test scripts, fast-check dependency
+  - https://github.com/adewale/vaders/blob/main/CLAUDE.md — three-workspace architecture
+  - https://github.com/adewale/vaders/blob/main/README.md — architecture section
 - notes:
-  - The test suite spans client, worker, and shared workspaces. Property-based tests with fast-check verify collision logic under random inputs, not just hand-picked cases. This is unusually thorough for a game project.
+  - The architecture is a classic client-server split. The Durable Object is the authoritative game server running a 30Hz tick loop.
 
 ### Slide 4
 - kind: section
 - layout: section
-- title: A function with a name, a memory, and an alarm
+- title: Terminal constraints become retro aesthetic
 - notes:
-  - Transition to the server architecture section. Each Durable Object is a GameRoom — it has identity (room code), persistent state (SQLite), and a game loop driven by alarms, not setInterval.
+  - Through-line echo: the limitations of terminal rendering (chunky movement, solid colors, character cells) produced a game that feels authentically retro.
 
 ### Slide 5
 - kind: default-content
-- layout: two-cols-header
-- title: Client and server, 30 times per second
-- left:
-  - bullet: Pure reducer — all state changes through one function
-  - bullet: Seeded RNG for deterministic replay
-  - bullet: Full state sync at 30Hz (~2KB per tick)
-- right:
-  - bullet: WebSocket hibernation — the DO sleeps between messages
-  - bullet: Alarms replace setInterval for the game tick
-  - bullet: Held-state for movement, discrete events for shooting
+- layout: default
+- title: Full sync at 30Hz — simplicity wins
+- body: The server broadcasts complete game state every tick. At ~2KB per message with 4 players, that is 120 messages/second — well within WebSocket limits. Delta updates were considered and rejected.
 - sources:
-  - https://github.com/adewale/vaders/blob/main/Lessons_learned.md — pure reducer pattern, seeded RNG, full sync vs delta, WebSocket hibernation
-  - https://github.com/adewale/vaders/blob/main/docs/server-architecture.md — game loop, alarm scheduling, WebSocket protocol
+  - https://github.com/adewale/vaders/blob/main/Lessons_learned.md — full sync vs delta updates section
+  - https://github.com/adewale/vaders/blob/main/CLAUDE.md — WebSocket protocol details
 - notes:
-  - The pure reducer returns state + events + persist flag + optional alarm. This makes the game testable and deterministic. Full sync was chosen over delta because 2KB at 30Hz for 4 players is well within WebSocket limits. Hibernation lets the DO sleep while maintaining connections.
+  - Accept the constraint: full sync is "wasteful" but correct and simple. The optimization was omitting config and playerId after initial join, halving payload size.
 
 ### Slide 6
-- kind: default-content
-- layout: default
-- title: The alien march is a state machine
-- body: "Seven game statuses. Explicit transition guards. No race conditions during countdown."
+- kind: fact
+- layout: fact
+- title: 620+ tests
+- body: Including property-based tests that caught a color conversion bug no hand-written test found
 - sources:
-  - https://github.com/adewale/vaders/blob/main/Lessons_learned.md — state machine for game status, guard transitions
-  - https://github.com/adewale/vaders/blob/main/CLAUDE.md — game statuses: waiting, countdown, wipe_hold, wipe_reveal, playing, game_over
+  - https://github.com/adewale/vaders/blob/main/CHANGELOG.md — test count from v1.0.0
+  - https://github.com/adewale/vaders/blob/main/Lessons_learned.md — property-based testing section
 - notes:
-  - The state machine prevents bugs like players joining mid-countdown or inputs arriving during wipe transitions. The wipe phases (wipe_exit, wipe_hold, wipe_reveal) create cinematic wave transitions between levels. This is the war story slide — stale closures in keyboard handlers caused keys to "stick" during screen transitions, solved by using refs.
+  - The hexTo256Color function had been passing all example-based tests. fast-check found that gray values 239-248 produced index 256, which is out of range. The fix was a one-line threshold change.
 
 ### Slide 7
 - kind: end
 - layout: end
-- title: It plays back.
-- subtitle: bun run vaders
+- title: Accept the constraint
+- subtitle: Chunky movement, solid colors, full state sync. The terminal shaped a better game.
 - notes:
-  - Circle back to the opening question. "What happens when you give a terminal a game loop?" — It plays back. The command is the invitation.
+  - Resolution of the through-line. Every "limitation" produced a design strength: chunky movement matches the retro genre, solid colors work within terminal rendering, full sync keeps the codebase simple.

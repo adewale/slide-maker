@@ -1,17 +1,31 @@
+/* Design tokens -- bold-modern preset with Tasche monochrome brand override */
 :root {
-  /* Tasche project colors override bold-modern defaults.
-     Monochrome palette from the project's pen-and-ink design language.
-     WCAG AA verified:
-       fg on bg    = 18.1:1  (pass 4.5:1 normal)
-       accent on bg = 16.2:1 (pass 4.5:1 normal)
-       muted on bg  = 8.6:1  (pass 4.5:1 normal) */
+  /* Core palette -- Tasche's monochrome identity on dark background */
   --deck-bg: #0a0a0f;
   --deck-fg: #f0f0f5;
-  --deck-accent: #e8e8ed;
-  --deck-muted: rgba(240, 240, 245, 0.5);
+  --deck-accent: #f0f0f5;
+  --deck-accent-alt: #d2d2d7;
+  --deck-muted: #6e6e73;
+
+  /* Structural */
+  --deck-rule: #2a2a30;
+  --deck-code-bg: #16161c;
+
+  /* Typography */
   --deck-font-display: 'Bebas Neue', sans-serif;
   --deck-font-body: 'DM Sans', sans-serif;
   --deck-font-mono: 'JetBrains Mono', monospace;
-  --deck-gap: 1.5rem;
-  --deck-radius: 12px;
+
+  /* Spacing */
+  --deck-space-sm: 0.5rem;
+  --deck-space-md: 1rem;
+  --deck-space-lg: 2rem;
+  --deck-space-xl: 3rem;
+
+  /* Radius */
+  --deck-radius: 6px;
+
+  /* Shadow */
+  --deck-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --deck-shadow-lg: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
 }

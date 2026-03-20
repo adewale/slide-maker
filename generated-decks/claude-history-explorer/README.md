@@ -1,47 +1,52 @@
-# Claude History Explorer
+# Claude History Explorer — Slide Deck
 
-A 7-slide deck presenting the Claude History Explorer project -- a Python CLI
-that turns raw Claude Code conversation history into searchable conversations,
-statistics, and narrative insights. Uses the editorial-dark preset.
+A 7-slide presentation about [Claude History Explorer](https://github.com/adewale/claude-history-explorer), a Python CLI tool to explore, search and visualise your Claude Code conversation history.
 
-## Quick start
+## Style
+
+- **Preset:** editorial-dark
+- **Theme:** seriph (dark color schema)
+- **Typography:** Playfair Display (display), Source Sans 3 (body), JetBrains Mono (code)
+- **Accent:** `#38bdf8` (sky blue)
+
+## Through-line
+
+"Read-only to your history. Never silent about what it reads." — a design-rule through-line that surfaces in slides 2, 4, 5, and 7.
+
+## Running
 
 ```bash
+cd generated-decks/claude-history-explorer
 npx slidev slides.md
 ```
 
-## Build
+## Building
 
 ```bash
-npx slidev build --out dist
+npx slidev build
 ```
 
-## Files
+## Structure
 
-| File | Purpose |
-|------|---------|
-| `slides.md` | Presentation source (Slidev Markdown) |
-| `deck.spec.md` | Planning spec -- tokens, layout choices, slide outlines |
-| `styles/tokens.css` | Design tokens (editorial-dark palette) |
-| `styles/theme.css` | Theme rules using token variables |
-| `styles/transitions.css` | Cinematic slide transitions |
-| `styles/index.css` | Slidev style entry point (imports all style files) |
-| `components/KeyboardHelp.vue` | Keyboard shortcut overlay (press ?) |
-| `components/ProgressSegmentBar.vue` | Segmented progress bar at top of slides |
-| `composables/useHelp.ts` | Reactive help overlay state |
-| `composables/useSections.ts` | Section detection for progress bar |
-| `setup/shortcuts.ts` | Custom keyboard shortcuts |
-| `setup/mermaid-renderer.ts` | Beautiful Mermaid rendering with deck tokens |
-| `global-top.vue` | Global top layer (progress bar + help overlay) |
-| `global-bottom.vue` | Global bottom layer (footer with title + page number) |
-
-## Style preset
-
-**editorial-dark** -- near-black background, soft off-white foreground, cool
-blue accent (#38bdf8), Playfair Display headings, Source Sans 3 body text,
-restrained fade motion. See `styles/tokens.css` for the full token set.
-
-## Project
-
-- Source: https://github.com/adewale/claude-history-explorer
-- Through-line: "Read-only to your history. Read everything about your habits."
+```
+├── slides.md              # Presentation source
+├── deck.spec.md           # Planning spec
+├── global-top.vue         # Help overlay + progress bar
+├── global-bottom.vue      # Footer chrome
+├── styles/
+│   ├── index.css          # Entry point (auto-discovered)
+│   ├── tokens.css         # Design tokens
+│   ├── theme.css          # Theme styles
+│   └── transitions.css    # Cinematic transitions
+├── setup/
+│   ├── shortcuts.ts       # Keyboard shortcuts
+│   └── mermaid-renderer.ts # Beautiful Mermaid integration
+├── composables/
+│   ├── useHelp.ts         # Help overlay state
+│   └── useSections.ts     # Section navigation
+└── components/
+    ├── KeyboardHelp.vue   # Keyboard shortcut overlay
+    ├── ProgressSegmentBar.vue # Section progress bar
+    ├── AudienceQRCode.vue # QR code sharing
+    └── MobileScrollView.vue # Mobile scroll mode
+```

@@ -3,153 +3,176 @@ theme: default
 title: Vaders
 colorSchema: light
 transition: slide-left
+layout: cover
 fonts:
   sans: Outfit
   serif: Plus Jakarta Sans
   mono: Roboto Mono
   weights: '300,400,500,600,700'
-layout: cover
+routerMode: hash
+selectable: true
 ---
 
 # Vaders
 
-What happens when you give a terminal a game loop?
+Multiplayer TUI Space Invaders clone (1-4 players) built with OpenTUI and Cloudflare Durable Objects.
 
 <!--
-This is a multiplayer TUI Space Invaders clone for 1-4 players, built with Bun, OpenTUI, and Cloudflare Durable Objects. The question sets up the through-line — each section answers it differently.
+The cover uses the project's actual description from the README as the subtitle, not the through-line. Vaders is a terminal-native game running in a 120x36 character grid with braille pixel art sprites, real-time WebSocket multiplayer, and audio via system players.
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/README.md — project overview and feature list
--->
-
----
-transition: morph-fade
-layout: center
----
-
-# 120 x 36 characters. Braille pixels. Color cycling.
-
-The terminal becomes a canvas — Unicode box-drawing for sprites, Amiga-style palette rotation for animation, two-line entities on a fixed grid.
-
-<!--
-The 120x36 grid is a hard constraint. Sprites are 2-line tall, 5-char wide. Color cycling rotates through a palette array every N ticks — no per-pixel rendering needed. The UFO cycles through 6 rainbow colors. This technique dates back to Amiga demos — you shift palette indices instead of redrawing pixels.
-
-Sources:
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — TUI rendering techniques, braille pixel art, color cycling from Amiga era
-- https://github.com/adewale/vaders/blob/main/CHANGELOG.md — braille pixel art sprites, 7-wide animated sprites with gradient coloring
+- https://github.com/adewale/vaders/blob/main/README.md — project description, first paragraph
 -->
 
 ---
 transition: slide-up
-layout: fact
 ---
 
-# 620+
+# What Vaders is and why it exists
 
-tests across three workspaces
+Multiplayer TUI Space Invaders clone (1-4 players) built with OpenTUI and Cloudflare Durable Objects.
 
-Property-based collision checks with fast-check — not hand-picked cases, random inputs.
+<v-clicks>
+
+- **Solo mode** — 3 lives, 11x5 alien grid, classic march pattern
+- **Co-op** (2-4 players) — 5 shared lives, scaled grids up to 15x6, aliens 1.75x faster
+- **30Hz real-time sync** via Cloudflare Durable Objects and WebSocket
+- **Braille pixel art** — 2-line sprites, box-drawing characters, color cycling
+
+</v-clicks>
+
+<div v-click class="mt-4 text-lg" style="color: var(--deck-accent); font-weight: 600;">
+The core philosophy: accept the constraint.
+</div>
 
 <!--
-The test suite spans client, worker, and shared workspaces. Property-based tests with fast-check verify collision logic under random inputs, not just carefully chosen scenarios. This is unusually thorough for a game project — most TUI games ship with zero tests.
+This slide explains what Vaders IS before diving into architecture. The README description appears verbatim. The through-line is introduced here: the project succeeds by embracing terminal limitations rather than fighting them. Chunky movement is not a bug — it is the correct feel for the genre. Solid foreground colors are not a limitation — they enable Amiga-style color cycling animation.
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/CHANGELOG.md — 620+ tests, comprehensive test suite across all workspaces including property-based collision tests
-- https://github.com/adewale/vaders/blob/main/package.json — test scripts, fast-check devDependency
+- https://github.com/adewale/vaders/blob/main/README.md — game modes, requirements, feature list
+- https://github.com/adewale/vaders/blob/main/CLAUDE.md — scaling table: 1 player = 3 lives, 2-4 = 5 shared lives
+- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — braille pixel art sprites, color cycling technique
 -->
 
 ---
-transition: iris
-layout: section
----
-
-# A function with a name, a memory, and an alarm
-
-Each GameRoom Durable Object has identity, persistent SQLite state, and a 30Hz alarm loop.
-
-<!--
-Transition to the server architecture section. Each Durable Object is a GameRoom — it has identity (room code), persistent state (SQLite), and a game loop driven by alarms, not setInterval. Alarms are hibernation-compatible; setInterval is not.
-
-Sources:
-- https://github.com/adewale/vaders/blob/main/docs/server-architecture.md — GameRoom Durable Object, alarm-driven game loop, SQLite persistence
--->
-
----
-transition: slide-left
+transition: morph-fade
 layout: two-cols-header
 ---
 
-# Client and server, 30 times per second
+# Architecture
+
+Three workspaces, one authoritative server
 
 ::left::
 
 <v-clicks>
 
-- **Pure reducer** — all state through one function
-- **Seeded RNG** for deterministic replay
-- **Full sync** at 30Hz — ~2KB per tick
+- **Client** — Bun + OpenTUI React terminal app
+- **Worker** — Cloudflare Durable Object game server
+- **Shared** — TypeScript types and protocol definitions
 
 </v-clicks>
 
 ::right::
 
+```mermaid {scale: 0.8}
+graph LR
+  C["Client"] --> W["Worker DO"]
+  W --> S["Shared Types"]
+  C --> S
+  style C fill:#B2EBF2,stroke:#00BCD4,color:#1C1B1F
+  style W fill:#FFE0B2,stroke:#FF8800,color:#1C1B1F
+  style S fill:#E8DEF8,stroke:#625B71,color:#1C1B1F
+  linkStyle default stroke:#00BCD4,stroke-width:2px
+```
+
+The Durable Object runs the 30Hz game loop and broadcasts full state via WebSocket. The client renders and sends input. Shared types enforce the contract.
+
+<!--
+The architecture is a classic authoritative-server split. The Durable Object uses hibernatable WebSockets — it can sleep while maintaining connections, waking on messages or alarms. Alarms replace setInterval for hibernation compatibility. The game loop ticks at 33ms intervals. All game logic flows through a single pure reducer function, making state changes deterministic and testable.
+
+Sources:
+- https://github.com/adewale/vaders/blob/main/README.md — architecture section showing three workspaces
+- https://github.com/adewale/vaders/blob/main/CLAUDE.md — tick rate 33ms, full state sync, hibernatable WebSockets
+- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — pure reducer pattern, alarm-based tick loop
+-->
+
+---
+layout: section
+transition: iris
+---
+
+# Terminal constraints become retro aesthetic
+
+Chunky movement. Solid colors. Character cells. Not bugs — design decisions.
+
+<!--
+Through-line echo: the Lessons Learned document repeatedly returns to this theme. Aliens moving 2 cells every 18 ticks "looks correct for the genre." Color cycling through a palette (the Amiga technique) creates compelling animation from minimal state changes. The 120x36 grid forced 2-line sprites that are more readable than single-line alternatives. Every constraint shaped a better design.
+
+Sources:
+- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — TUI constraints section, color cycling, sprite design
+-->
+
+---
+transition: slide-up
+---
+
+# Full sync at 30Hz — simplicity wins
+
+The server broadcasts complete game state every tick.
+
 <v-clicks>
 
-- **WebSocket hibernation** — DO sleeps between messages
-- **Alarms** replace setInterval for the tick
-- **Held-state** for movement, discrete for shooting
+- Game state is ~2KB per tick
+- With 4 players: 120 messages/second — within WebSocket limits
+- Delta updates were considered and rejected
+- Only optimization: omit `config` and `playerId` after initial join
 
 </v-clicks>
 
+```ts
+// Full sync — simple and correct
+this.broadcast({ type: 'sync', state: this.game })
+```
+
 <!--
-The pure reducer returns state + events + persist flag + optional alarm schedule. This makes the game deterministic and testable. Full sync was chosen over delta because 2KB at 30Hz for 4 players is well within WebSocket limits — the optimization applied was omitting playerId and config from subsequent syncs, roughly halving payload size.
+Accept the constraint: full sync sounds wasteful, but at this scale the simplicity is worth it. The Lessons Learned document is explicit: "Start with full state sync. Only optimize if bandwidth becomes a problem." Binary protocols and compression were also rejected — JSON at 2KB is below the compression benefit threshold. The one optimization applied (omitting config after join) roughly halved payload size without adding complexity.
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — pure reducer pattern, seeded RNG, full sync vs delta updates, WebSocket hibernation with Durable Objects
-- https://github.com/adewale/vaders/blob/main/docs/server-architecture.md — game loop architecture, alarm scheduling, WebSocket protocol
+- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — full sync vs delta updates, broadcast optimization
+- https://github.com/adewale/vaders/blob/main/CLAUDE.md — WebSocket protocol: sync messages at 30Hz
 -->
 
 ---
+layout: fact
 transition: fade
-layout: default
 ---
 
-# The alien march is a state machine
+# 620+
+tests across all workspaces
 
-Seven game statuses. Explicit transition guards. No race conditions during countdown.
-
-```
-waiting -> countdown -> wipe_hold -> wipe_reveal -> playing -> game_over
-                                          ^                       |
-                           wipe_exit <----+---- (wave cleared) ---+
-```
-
-<v-click>
-
-**The war story:** stale closures in keyboard handlers caused keys to "stick" during screen transitions. Fix: `useLayoutEffect` for ref updates that callbacks depend on.
-
-</v-click>
+Including property-based tests with `fast-check` that caught a color conversion bug no hand-written test found — gray values 239-248 produced index 256, one past the valid range.
 
 <!--
-The state machine prevents bugs like players joining mid-countdown or inputs arriving during wipe transitions. The wipe phases (wipe_exit, wipe_hold, wipe_reveal) create cinematic wave transitions between levels. The stale closure bug was discovered when keys would stay "held" after transitioning from lobby to gameplay — useRef plus useLayoutEffect solved it.
+The hexTo256Color function maps 24-bit hex colors to the 256-color terminal palette. It had been working in production and passing all example-based tests. Property-based testing with fast-check immediately found a counterexample: Math.round((243 - 8) / 10) + 232 = 256, which is out of the valid [16, 255] range. The fix was lowering the white detection threshold from > 248 to > 238. This is a concrete example of the through-line: property-based testing accepted that human test authors cannot enumerate every edge case, and let the machine find the gap.
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — state machine for game status, explicit transition guards, stale closure bug in keyboard handlers
-- https://github.com/adewale/vaders/blob/main/CLAUDE.md — game statuses: waiting, countdown, wipe_exit, wipe_hold, wipe_reveal, playing, game_over
+- https://github.com/adewale/vaders/blob/main/CHANGELOG.md — "620+ tests" in v1.0.0 feature list
+- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — property-based testing section, hexTo256Color counterexample
 -->
 
 ---
-transition: fade
 layout: end
+transition: fade
 ---
 
-# It plays back.
+# Accept the constraint
 
-`bun run vaders`
+Chunky movement, solid colors, full state sync. The terminal shaped a better game.
 
 <!--
-Circle back to the opening question. "What happens when you give a terminal a game loop?" — It plays back. The command is the invitation. The project is open source at github.com/adewale/vaders.
+Resolution of the through-line. Every limitation produced a design strength: chunky movement at 2 cells per 18 ticks matches the Space Invaders genre feel. Solid foreground colors enable Amiga-style color cycling. Full state sync keeps the codebase simple at the cost of bandwidth that does not matter at this scale. Property-based testing accepts that humans cannot enumerate every edge case. The constraints were not obstacles to work around — they were the design.
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/README.md — quick start command
+- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — summary principles: "Accept terminal constraints. Chunky movement and solid colors are features, not bugs."
 -->

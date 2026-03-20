@@ -2,79 +2,118 @@
 theme: seriph
 title: Olsen
 colorSchema: light
+transition: fade
+layout: cover
 fonts:
-  sans: Source Sans 3
   serif: EB Garamond
+  sans: Source Sans 3
   mono: Source Code Pro
   weights: '400,500'
   italic: true
-transition: fade
-layout: cover
 ---
 
 # Olsen
 
-A read-only photo indexer that treats your library as sacred ground
+A local-first CLI tool for faceted browsing of photographs in DNG (and other file formats)
 
 <!--
-Olsen is a Go CLI tool for indexing DNG, JPEG, and BMP photos into a portable SQLite database. The read-only constraint is not a feature flag -- it is enforced at the syscall level with O_RDONLY. Every file access uses os.Open(), which cannot write. This deck traces why that one decision shaped everything else in the architecture.
+Olsen is a Go project built for photographers who want to understand their own collections without surrendering them to cloud services. The name evokes methodical, scholarly exploration of visual archives.
 
 Sources:
-- https://github.com/adewale/olsen/blob/main/README.md -- project overview and read-only guarantee
+- https://github.com/adewale/olsen — repo description
 -->
 
 ---
-layout: section
-transition: fade
+transition: slide-left
 ---
 
-# The read-only guarantee
+# What Olsen is and why it exists
 
-`O_RDONLY` is not a policy. It is a syscall.
+A high-performance photo indexing system for DNG (Digital Negative), JPEG, and BMP files that extracts comprehensive metadata, generates aspect-ratio-preserving thumbnails, analyzes color palettes, and computes perceptual hashes for similarity detection.
+
+<v-clicks>
+
+- The critical guarantee: Olsen **never modifies your photo files**
+- All file access uses `O_RDONLY` — read-only mode at the OS level
+- Image processing happens entirely in memory
+- Only the SQLite database is written to
+
+</v-clicks>
 
 <!--
-The indexer uses os.Open() exclusively, which opens files with the O_RDONLY flag. There are no calls to os.Create, os.OpenFile, os.WriteFile, os.Remove, or os.Rename anywhere in the indexer codebase. All image processing -- EXIF parsing, thumbnail generation, color extraction, perceptual hashing -- happens entirely in memory. The only thing Olsen writes to is the SQLite database.
+Start with the project's own description verbatim, then immediately establish the design constraint that shapes every architectural decision. The read-only guarantee is not a feature — it is the foundational rule. Everything else follows from it. This is the first appearance of the through-line: read-only to sources, read-write to understanding.
 
 Sources:
-- https://github.com/adewale/olsen/blob/main/docs/architecture.md -- read-only enforcement mechanisms
-- https://github.com/adewale/olsen/blob/main/README.md -- critical guarantee section
+- https://github.com/adewale/olsen/blob/main/README.md — first-paragraph description and read-only guarantee section
 -->
+
+---
+layout: fact
+transition: slide-up
+---
+
+# ~62 ms per photo
+On Apple M3 Max with 8 workers
+
+<div class="fact-breakdown">
+
+File hash 0.4 ms. Thumbnails 34 ms. Color palette 28 ms. Perceptual hash 0.2 ms.
+
+**15-25 photos/second.** 100K photos indexed in under 2 hours.
+
+</div>
+
+<!--
+These benchmarks come from the project README. The total is dominated by thumbnail generation and color extraction — both pixel-level operations. The file hash and perceptual hash are near-instant because they operate on fixed-size inputs (SHA-256 on bytes, pHash on a 32x32 grid). Memory usage stays constant at ~500 MB regardless of library size.
+
+Sources:
+- https://github.com/adewale/olsen/blob/main/README.md — performance benchmarks table and scale estimates
+-->
+
+<style scoped>
+.fact-breakdown {
+  margin-top: 1.5rem;
+  font-family: var(--deck-font-body, sans-serif);
+  font-size: 0.95rem;
+  color: var(--deck-muted);
+  max-width: 32rem;
+}
+</style>
 
 ---
 layout: two-cols-header
 transition: slide-left
 ---
 
-# 62ms per photo
+# The processing pipeline
 
 ::left::
 
 <v-clicks>
 
-- File hash calculation: **0.4ms**
-- Thumbnail generation (4 sizes): **34ms**
-- Color palette via k-means: **28ms**
-- Perceptual hash (pHash): **0.2ms**
+- **Extract** EXIF metadata — 50+ fields per photo
+- **Decode** image into memory
+- **Generate** 4 thumbnail sizes (64 to 1024 px)
+- **Analyze** dominant colors via k-means clustering
+- **Hash** with pHash for near-duplicate detection
 
 </v-clicks>
 
 ::right::
 
-<v-clicks>
+Everything extracted lives in a single SQLite file.
 
-- 15--25 photos/second with 8 workers
-- 100K photos indexed in 1.5--2 hours
-- Database size: 20--25 GB with thumbnails
-- Memory usage: 500 MB constant
-
-</v-clicks>
+- ~190 KB stored per photo
+- 100K photos fit in ~20 GB
+- Portable: one file to back up, migrate, query
+- Original files are never touched
 
 <!--
-Benchmarked on Apple M3 Max. Thumbnail generation dominates at 34ms because it produces four sizes (64, 256, 512, 1024px longest edge) with Lanczos3 resampling. Color extraction uses k-means clustering on the 256px thumbnail for efficiency -- not the full-resolution image. The perceptual hash at 0.2ms enables near-duplicate detection across the entire library. All four sizes preserve aspect ratio by constraining the longest edge, never forcing square crops.
+The pipeline is the through-line in action: five extraction stages, zero writes back to the source. Each stage reads from memory buffers, never from the file again after initial load. The SQLite database becomes a parallel catalog — a complete representation of the collection that can be queried, filtered, and browsed without opening a single photo file. Worker pool pattern with configurable concurrency (default 4 workers, buffered channel of 100) keeps throughput high while staying memory-bounded.
 
 Sources:
-- https://github.com/adewale/olsen/blob/main/README.md -- performance benchmarks table
-- https://github.com/adewale/olsen/blob/main/CHANGELOG.md -- v0.1.0 performance details
+- https://github.com/adewale/olsen/blob/main/docs/architecture.md — processing pipeline diagram, storage estimates, worker pool architecture
+- https://github.com/adewale/olsen/blob/main/README.md — database schema and key design decisions
 -->
 
 ---
@@ -82,69 +121,57 @@ layout: center
 transition: fade
 ---
 
-# Five processing stages. Zero writes to source files.
+# Faceted navigation is a state machine
 
-EXIF extraction, thumbnail generation, color palette analysis, perceptual hashing, metadata inference -- all in memory, all flowing into a single portable SQLite file.
+Users can never transition from a state with results to a state with zero results.
+
+<div class="sidenote">
+
+SQL queries compute which facet values have results given current filters. Facet values with count=0 are shown but disabled. No hardcoded hierarchies — data determines valid paths.
+
+</div>
 
 <!--
-The five stages run concurrently across a worker pool. Each worker receives a file path from a buffered channel, processes it through all five stages in memory, then writes the results to SQLite in a single transaction. The worker pool pattern means adding more workers scales linearly until disk I/O becomes the bottleneck. The SQLite database uses WAL mode for concurrent read access, so the web explorer can query while indexing continues.
+This was the key architectural insight from the project's own lessons learned. The initial implementation assumed hierarchical relationships: Year contains Month, Camera contains Lens. That assumption broke when filters were combined — "Year 2024, Camera Leica" has different valid months than "Year 2024" alone. The state machine model treats every filter dimension as independent. ALL filters are preserved during transitions. The SQL WHERE clause builds dynamically. The result: users explore freely, and every click leads somewhere real.
 
 Sources:
-- https://github.com/adewale/olsen/blob/main/docs/architecture.md -- indexer engine components
-- https://github.com/adewale/olsen/blob/main/docs/flow.md -- complete processing pipeline
+- https://github.com/adewale/olsen/blob/main/README.md — state machine model section
+- https://github.com/adewale/olsen/blob/main/docs/LESSONS_LEARNED.md — "Assumed Hierarchical Relationships" mistake and state machine discovery
 -->
+
+<style scoped>
+.sidenote {
+  margin-top: 1.5rem;
+  max-width: 36rem;
+  font-family: var(--deck-font-body, sans-serif);
+  font-size: 0.85rem;
+  color: var(--deck-muted);
+  line-height: 1.6;
+}
+</style>
 
 ---
 transition: slide-up
 ---
 
-# The state machine insight
+# The Monochrom thumbnail bug
 
-Faceted navigation is not a hierarchy. Year does not "contain" Month. Every filter combination is a state, and the only valid transitions are ones that produce results.
+`ExtractEmbeddedJPEG()` returned the **first** JPEG in the DNG file — 160x120 pixels — not the **largest** at 9504x6320.
 
 <v-clicks>
 
-- First assumption: Year contains Month contains Day
-- Changing year cleared the month filter silently
-- The fix: every filter combo is an independent state
-- Zero-result values are shown disabled, never hidden
+- First fix: patched the web UI with a thumbnail fallback (symptom, not cause)
+- Regression: removing `isBlackImage()` produced completely black thumbnails
+- Root cause: found only when someone ran `exiftool` on the actual DNG file
+- The lesson: **always debug at the source layer, not the display layer**
 
 </v-clicks>
 
 <!--
-This was a significant architectural discovery. The initial implementation built faceted navigation on assumed hierarchical relationships between facets -- "Year contains Month, so changing Year should clear Month." This broke the user's mental model. If a user was viewing November 2024 photos and clicked Year 2023, the system cleared the month filter instead of showing November 2023 photos. The state machine model preserves all filters during transitions and lets SQL determine which combinations are valid. The fundamental rule: users should never transition from a state with results to a state with zero results.
+This war story comes directly from the project's LESSONS_LEARNED.md. The team spent time fixing symptoms in the UI layer before inspecting what the RAW decode layer was actually producing. The PreviewImageLength field in exiftool output showed 2.1 MB — the answer was there the whole time. The fix was to modify embedded JPEG extraction to find the largest preview, not the first one. Time to initial working system was about 2 weeks. Three major bugs found, two regressions introduced. Test coverage at end: ~70% with ~2500 lines of test code.
 
 Sources:
-- https://github.com/adewale/olsen/blob/main/specs/facet_state_machine.spec -- core insight and state transition rules
-- https://github.com/adewale/olsen/blob/main/docs/LESSONS_LEARNED.md -- hierarchical assumption mistake
--->
-
----
-transition: slide-left
----
-
-# 160 x 120 px
-
-A thumbnail that should have been 9504 x 6320.
-
-<v-click>
-
-`ExtractEmbeddedJPEG()` returned the **first** JPEG preview it found inside Leica Monochrom DNG files -- a 160x120 navigation thumbnail -- not the largest at 9504x6320. The web UI showed black rectangles. The team fixed display fallbacks, database queries, and upscale warnings before anyone thought to inspect the RAW decode layer.
-
-</v-click>
-
-<v-click>
-
-The rule that emerged: **when data is wrong, debug at the source, not the display.**
-
-</v-click>
-
-<!--
-This war story comes directly from the Lessons Learned document. The timeline: (1) missing images in web app, upscale warnings in logs. (2) First fix: thumbnail fallback in web UI -- wrong layer. (3) Regression: removed isBlackImage() check, got completely black thumbnails. (4) Root cause: embedded JPEG extraction found the first JPEG marker, not the largest preview. The DNG file contained 44 preview images ranging from 160x120 to 9504x6320. Running exiftool -a -G1 -s on the file would have shown the answer immediately. The debugging order should have been: file format inspection, RAW decode layer, processing pipeline, database, then UI.
-
-Sources:
-- https://github.com/adewale/olsen/blob/main/docs/LESSONS_LEARNED.md -- Monochrom DNG thumbnail bug timeline
-- https://github.com/adewale/olsen/blob/main/docs/LESSONS_LEARNED.md -- "Always Debug at the Source" rule
+- https://github.com/adewale/olsen/blob/main/docs/LESSONS_LEARNED.md — Monochrom DNG thumbnail bug timeline, debugging methodology, key metrics
 -->
 
 ---
@@ -152,13 +179,13 @@ layout: end
 transition: fade
 ---
 
-# Read-only to sources. Read-write to understanding.
+# Your photos stay untouched. Your catalog grows richer.
 
-github.com/adewale/olsen
+Read-only to your photos. Read-write to your understanding of them.
 
 <!--
-The read-only constraint was not a limitation. It was the decision that made everything else possible: portable single-file databases, safe re-indexing with hash-based resume, concurrent workers without file locks, and the confidence to point the tool at irreplaceable photo libraries. The constraint freed the architecture. Olsen never modifies your photos. It builds a rich, queryable understanding of them -- metadata, thumbnails, dominant colors, perceptual hashes, burst groups -- all in a single SQLite file you can copy, back up, or query directly.
+The through-line resolves here. The read-only guarantee is not a limitation — it is what makes Olsen trustworthy on large, irreplaceable photo libraries. The project is early (v0.1.0, October 2025) and warns against use on valuable data, but the architectural foundation is sound: worker pool concurrency, portable SQLite catalog, state machine navigation, and a strict separation between source files and derived data.
 
 Sources:
-- https://github.com/adewale/olsen/blob/main/README.md -- read-only guarantee and feature overview
+- https://github.com/adewale/olsen/blob/main/README.md — project status warning, read-only guarantee, installation instructions
 -->

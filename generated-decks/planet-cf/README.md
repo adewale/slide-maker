@@ -1,30 +1,44 @@
-# Planet CF — Slide Deck
+# Planet CF deck
 
 A 7-slide presentation about [Planet CF](https://github.com/adewale/planet_cf), a feed aggregator built on Cloudflare's Python Workers platform.
 
+## Style preset
+
+`cloudflare` -- warm cream background, Cloudflare orange accent, Work Sans display font.
+
 ## Through-line
 
-"What happens when Python runs inside JavaScript?" — explores how Planet CF handles the type boundary between Pyodide and Cloudflare's JavaScript APIs.
+"Every boundary is a type conversion" -- the concept that Python running inside V8 isolates creates type boundaries at every API call, and those boundaries shaped the architecture.
 
-## Running
+## Preview
 
 ```bash
-npm install
-npx slidev slides.md
+npx slidev
 ```
 
-## Building
+## Build
 
 ```bash
 npx slidev build
 ```
 
-The `dist/` directory can be deployed to any static host.
+## Project structure
 
-## Style
-
-Uses the **cloudflare** preset with Cloudflare orange (`#ff4801`) accent on warm cream (`#fffbf5`) background.
-
-## Source
-
-Grounded in the project's README.md, ARCHITECTURE.md, LESSONS_LEARNED.md, SPEC.md, and source code (config.py, wrappers.py).
+```
+slides.md              # Presentation source
+deck.spec.md           # Planning spec
+styles/
+  index.css            # Style entry point
+  tokens.css           # Design tokens
+  theme.css            # Theme styles
+  transitions.css      # Cinematic transitions
+components/
+  KeyboardHelp.vue     # Keyboard shortcut overlay
+composables/
+  useHelp.ts           # Help state
+setup/
+  shortcuts.ts         # Keyboard shortcuts
+  mermaid-renderer.ts  # Beautiful Mermaid setup
+global-top.vue         # Help overlay mount
+global-bottom.vue      # Footer chrome
+```

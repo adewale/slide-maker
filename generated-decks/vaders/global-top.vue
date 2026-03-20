@@ -14,10 +14,7 @@ const isMobileScroll = computed(() => isNarrow.value && !nav.isPresenter?.value)
 </script>
 
 <template>
-  <!-- Mobile scroll view replaces everything on portrait phones -->
   <MobileScrollView v-if="isMobileScroll" />
-
-  <!-- Desktop / landscape: normal slide chrome -->
   <template v-if="!isMobileScroll">
     <ProgressSegmentBar />
     <KeyboardHelp v-if="showHelp" />

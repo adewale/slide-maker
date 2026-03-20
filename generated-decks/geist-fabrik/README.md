@@ -1,60 +1,43 @@
-# GeistFabrik — A Divergence Engine for Obsidian Vaults
+# GeistFabrik
 
-A 7-slide Slidev deck introducing GeistFabrik's philosophy and architecture.
+A 7-slide deck introducing [GeistFabrik](https://github.com/adewale/geist_fabrik) -- a Python-based divergence engine for Obsidian vaults that generates creative suggestions through code and Tracery grammars.
 
-## Preset
+## Running
 
-**swiss-minimal** — precise, calm, disciplined. White background, dark gray text, blue accent.
+```bash
+cd generated-decks/geist-fabrik
+npx slidev slides.md
+```
+
+## Building
+
+```bash
+npx slidev build slides.md
+```
+
+The built deck will be in `dist/`.
+
+## Style
+
+Uses the **swiss-minimal** preset with a muted green accent (`#4a6741`) drawn from the project's organic/growth metaphor. Typography: Plus Jakarta Sans (display), Figtree (body), JetBrains Mono (code).
+
+## Structure
+
+| Slide | Kind | Layout | Content |
+|-------|------|--------|---------|
+| 1 | cover | cover | Project identity and one-line description |
+| 2 | default-content | default | What it is and why it exists (README verbatim) |
+| 3 | center-statement | center | Through-line: the design rule |
+| 4 | fact | fact | 57 geists, 611 tests, zero API calls |
+| 5 | comparison | two-cols | Code vs Tracery war story |
+| 6 | default-content | default | Data flow Mermaid diagram |
+| 7 | end | end | Closing: muses, not oracles |
 
 ## Through-line
 
-"Muses, not oracles — a well-asked question beats a poorly-computed answer."
-
-This design rule surfaces on the cover (as a question), in the Contradictor war story (as evidence), in the extensibility slides (as architectural consequence), and in the closing (as resolution).
+"A well-asked question is better than a poorly-computed answer." -- surfaces in slides 1, 3, 5, and 7.
 
 ## Source materials
 
-- [README.md](https://github.com/adewale/geist_fabrik/blob/main/README.md) — project overview, architecture, privacy model
-- [LESSONS_LEARNED.md](https://github.com/adewale/geist_fabrik/blob/main/LESSONS_LEARNED.md) — Contradictor case study, code vs question insight
-- [STATUS.md](https://github.com/adewale/geist_fabrik/blob/main/STATUS.md) — 611 tests, 16 modules, schema v6
-
-## Preview
-
-```bash
-npx slidev
-```
-
-## Build
-
-```bash
-npx slidev build
-```
-
-## Export PDF
-
-```bash
-npx slidev export
-```
-
-## Project structure
-
-```
-geist-fabrik/
-  slides.md              # Presentation source
-  deck.spec.md           # Planning spec
-  README.md              # This file
-  global-top.vue         # Help overlay mount
-  global-bottom.vue      # Footer chrome
-  composables/
-    useHelp.ts           # Reactive help state
-  components/
-    KeyboardHelp.vue     # Keyboard shortcut overlay
-  setup/
-    shortcuts.ts         # Custom keyboard shortcuts
-    mermaid-renderer.ts  # Beautiful Mermaid setup
-  styles/
-    index.css            # Style entry point
-    tokens.css           # Design tokens
-    theme.css            # Typography and layout styles
-    transitions.css      # Cinematic slide transitions
-```
+- `README.md` -- project description, features, architecture, design principles
+- `LESSONS_LEARNED.md` -- the Contradictor experiment and "muses not oracles" principle

@@ -5,8 +5,8 @@ routerMode: hash
 selectable: true
 colorSchema: dark
 fonts:
-  sans: Bebas Neue
-  serif: DM Sans
+  sans: DM Sans
+  serif: Bebas Neue
   mono: JetBrains Mono
   weights: '400,500,700'
 transition: slide-left
@@ -15,83 +15,86 @@ layout: cover
 
 # Tasche
 
-A self-hosted read-it-later service. Your articles survive.
+A self-hosted read-it-later service built on Cloudflare Python Workers
 
-<!-- Tasche is German for "pocket." The name signals intent: this is a personal preservation tool, not a social reading platform. The through-line -- "your articles survive" -- establishes the core promise immediately. The audience should feel the stakes: every article they have bookmarked on a SaaS service is one shutdown away from vanishing.
-
-Sources:
-- https://github.com/adewale/tasche — README: "Save articles, read them offline, and listen to them as audio -- all running in your own Cloudflare account." -->
-
----
-layout: statement
-transition: morph-fade
----
-
-# The original gets paywalled. The domain expires. The CDN drops the images. Your copy is still there.
-
-<!-- This slide names the failure mode that every reader has experienced. The rhythm of three losses (paywall, domain death, CDN expiry) followed by the survival statement is deliberate -- it builds the case through accumulation. The product spec for Tasche puts it more directly: "If you click the original URL and it 404s: Good thing you saved it." This is not hypothetical; link rot studies consistently show 25% of URLs break within 5 years.
+<!--
+"Tasche" is German for "pocket." The name signals the tool's intent -- a personal, portable knowledge store. Let the subtitle land before saying anything else. The audience should understand what this is before you explain why it exists.
 
 Sources:
-- https://github.com/adewale/tasche/blob/main/specs/tasche-spec.md — section 1.1: "Your Articles Survive" -->
+- https://github.com/adewale/tasche/blob/main/README.md -- project description, first paragraph
+-->
 
 ---
-transition: slide-up
+transition: fade
 ---
 
-# What gets archived when you save a URL
+# Your reading list should not be someone else's business model
+
+A self-hosted read-it-later service built on Cloudflare Python Workers. Save articles, read them offline, and listen to them as audio -- all running in your own Cloudflare account.
 
 <v-clicks>
 
-- **Clean HTML** via Readability extraction -- not a raw page dump
-- **Every image** downloaded and converted to WebP (2MB limit per image)
-- **Full markdown** for offline reading in the PWA
-- **TTS audio** on demand via Workers AI (MeloTTS, up to 100K characters)
-- **Three-URL dedup** across original, final, and canonical URLs
+- **Save articles by URL** with automatic content extraction and archival
+- **Full-text search** across your entire library via FTS5
+- **Listen Later** -- generate audio via Workers AI TTS
+- **Offline reading** -- PWA with service worker caching
+- **Self-hosted** -- your data stays in your Cloudflare account
 
 </v-clicks>
 
-<!-- This is the specificity slide. Each bullet names a concrete mechanism, not a vague promise. The numbers matter: 2MB per image, 100K character TTS limit, three distinct URL fields for deduplication. The audience should understand that "archival" means a 14-step processing pipeline that fetches the page, resolves redirects, extracts content with Readability, downloads and converts every image to WebP, stores clean HTML and Markdown to R2, and indexes full text in D1 with FTS5. This is not a bookmark -- it is a self-contained archive.
-
-[click] Readability extraction strips ads, navigation, and chrome. The result is clean article content.
-
-[click] Images are the most fragile part of the web. Hotlink protection, CDN expiry, and domain death all kill images faster than text.
-
-[click] Markdown enables the offline PWA reader. Service worker caches it locally.
-
-[click] Text-to-speech converts markdown to audio via Workers AI. The audio is stored in R2 alongside the article.
-
-[click] Three-URL deduplication catches the same article shared via Twitter t.co links, newsletter tracking URLs, and the canonical URL the page declares.
+<!--
+This slide explains what Tasche IS and WHY it exists. The title makes the argument; the bullets prove it. Pause after "self-hosted" -- that is the differentiator. Every other read-it-later service holds your data hostage. Tasche does not.
 
 Sources:
-- https://github.com/adewale/tasche/blob/main/specs/tasche-spec.md — section 1.2: asset table
-- https://github.com/adewale/tasche/blob/main/CHANGELOG.md — v0.1.0: "14-step processing pipeline" -->
+- https://github.com/adewale/tasche/blob/main/README.md -- feature list and project description
+-->
+
+---
+layout: fact
+transition: slide-up
+---
+
+# 6 Cloudflare services. 1 worker. $5/month.
+
+Python Workers + D1 + R2 + KV + Queues + Workers AI
+
+No external dependencies. No egress fees.
+
+<!--
+The $5/month figure is the Cloudflare Workers Paid plan as of early 2026. The free tier covers light personal use at 100K requests/day. The point is not the price -- it is the absence of hidden costs. No S3 bills, no database hosting, no third-party TTS API keys.
+
+Sources:
+- https://github.com/adewale/tasche/blob/main/README.md -- cost section and architecture table
+- https://github.com/adewale/tasche/blob/main/wrangler.jsonc -- D1, R2, KV, Queues, AI, Service Binding in one config
+-->
 
 ---
 layout: section
 transition: iris
 ---
 
-# Six Cloudflare services, one worker
+# Every byte lives in your account
 
-No containers. No VMs. No ops.
-
-<!-- Section break. The shift from "what it does" to "how it works" is marked by an iris transition -- new chapter. The subtitle makes the architectural claim explicit: this is not a traditional deployment. There are no servers to patch, no containers to orchestrate, no VMs to resize. Everything runs on Cloudflare's edge.
+<!--
+This is the through-line surfacing as an architectural claim. Pause here. The audience should feel the weight of "self-hosted" -- it is not a marketing label, it is a topology decision. D1 stores your articles. R2 stores your archived HTML, images, and audio. KV stores your sessions. Nothing leaves your Cloudflare account.
 
 Sources:
-- https://github.com/adewale/tasche/blob/main/docs/architecture.md — section 1: "Tasche runs Python on Pyodide inside Cloudflare V8 isolates. This is not a container or a VM." -->
+- https://github.com/adewale/tasche/blob/main/README.md -- architecture table showing all 6 bindings
+-->
 
 ---
 layout: two-cols
 transition: slide-left
 ---
 
-# The platform does the work
+# The 14-step pipeline
 
 <v-clicks>
 
-- **Python Workers** -- FastAPI API + queue consumer
-- **D1** -- articles, users, tags, FTS5 search
-- **R2** -- archived HTML, markdown, images, audio
+- Save URL -- API creates article
+- Queue consumer fetches the page
+- Readability extracts content
+- Images converted to WebP
 
 </v-clicks>
 
@@ -99,39 +102,42 @@ transition: slide-left
 
 <v-clicks>
 
-- **KV** -- auth sessions with 7-day TTL
-- **Queues** -- async article processing and TTS
-- **Workers AI** -- text-to-speech via MeloTTS
+- HTML + Markdown stored in R2
+- FTS5 indexed in D1
+- TTS audio generated on demand
 
 </v-clicks>
 
-<!-- Six bindings, each doing one job. This is the architecture slide but presented as an inventory, not a diagram, because the relationships are straightforward: the Worker orchestrates everything else. D1 holds structured data and FTS5 search indexes. R2 holds archived content (HTML, Markdown, images, audio). KV holds ephemeral sessions. Queues decouple the save-article request from the 14-step processing pipeline. Workers AI provides TTS without an external API dependency.
-
-[click] through [click] The left column is the heavy infrastructure: compute, database, object storage.
-
-[click] through [click] The right column is the supporting services: sessions, async processing, AI.
-
-The Python Workers runtime deserves a note: this is Pyodide (CPython compiled to WebAssembly) running inside V8 isolates. No C extensions, no threading, no multiprocessing. Every handler must be async def. The FFI boundary between Python and JavaScript required a custom wrappers.py layer to safely convert JsProxy objects at every D1/R2/KV/Queue boundary.
+<!--
+Walk through left column first, then right. The key insight: this is not a synchronous request. The API returns immediately with a "pending" article. The queue consumer does the heavy lifting asynchronously -- fetch, extract, convert, store, index. The user sees the article appear in their library as processing completes. Article-status polling updates cards automatically.
 
 Sources:
-- https://github.com/adewale/tasche/blob/main/README.md — architecture table
-- https://github.com/adewale/tasche/blob/main/docs/architecture.md — binding topology and Pyodide constraints -->
+- https://github.com/adewale/tasche/blob/main/README.md -- data flow description
+- https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- Phase 4 content processing pipeline, 14-step processing
+-->
 
 ---
-layout: fact
-transition: slide-up
+transition: fade
 ---
 
-# $5/month
+# FTS5 accepts operators inside your query parameter
 
-CLOUDFLARE WORKERS PAID PLAN
+Parameterized queries prevent SQL injection. But FTS5's `MATCH` clause accepts its own operators -- `OR`, `NOT`, `NEAR`, wildcards. Unsanitized user input is query injection *inside* the parameter value.
 
-Your data, your account, your infrastructure. The free tier covers light personal use.
+<v-clicks>
 
-<!-- The cost slide is the through-line moment: permanence has a price, and that price is $5/month paid directly to Cloudflare. No middleman, no SaaS markup, no "free tier that becomes $29/month when you exceed limits." The emphasis on "your account" reinforces self-hosting -- the data lives in the user's own Cloudflare D1 database and R2 bucket. If Tasche the project disappears tomorrow, the data remains accessible through the Cloudflare dashboard. One-click deploy via the Deploy to Cloudflare button provisions all six resources automatically.
+- Every search word quoted as a literal
+- FTS5 operators stripped before execution
+- Discovered during edge-case hardening -- 17 issues fixed in one pass
+
+</v-clicks>
+
+<!--
+This is the war story. Phase 9 of the implement-audit loop found 3 CRITICAL, 6 HIGH, and 8 MEDIUM issues in a single hardening pass. The FTS5 injection was one of the critical findings. The fix is simple -- strip operators, quote words -- but the discovery required an explicit security audit. Parameterized queries gave false confidence. The lesson: FTS5 is its own query language, and it needs its own sanitization layer.
 
 Sources:
-- https://github.com/adewale/tasche/blob/main/README.md — "Requires the Cloudflare Workers Paid plan ($5/month as of early 2026)" -->
+- https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- Pattern 11: "FTS5 Is Its Own Query Language", Phase 9: 17 edge cases fixed
+-->
 
 ---
 layout: end
@@ -140,6 +146,8 @@ transition: fade
 
 # Your pocket. Your rules.
 
-Your articles survive.
+What happens when you trust no one with your reading list? You build Tasche.
 
-<!-- The closing resolves the opening. "Tasche" means "pocket" in German -- the name is the thesis. The through-line phrase returns one final time, now carrying the weight of everything the deck has shown: the archival pipeline, the six-service architecture, the $5/month permanence guarantee. No install command, no QR code. The idea is small enough to hold in one hand. -->
+<!--
+Echo the through-line question and answer it. "Your pocket" connects back to the German name. "Your rules" connects to the architecture -- every byte in your account, every pipeline on your infrastructure. Let this slide sit. Do not rush to close the window.
+-->

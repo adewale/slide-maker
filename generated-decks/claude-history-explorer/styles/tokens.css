@@ -1,32 +1,11 @@
-/* Design tokens — editorial-dark preset */
 :root {
-  /* Core palette */
   --deck-bg: #0a0a0f;
   --deck-fg: #e8e4df;
   --deck-accent: #38bdf8;
-  --deck-muted: #6b6b76;
-
-  /* Section divider (inverted) */
-  --deck-section-bg: #e8e4df;
-  --deck-section-fg: #0a0a0f;
-
-  /* Typography */
+  --deck-muted: rgba(232, 228, 223, 0.45);
+  --deck-accent-alt: #7dd3fc;
   --deck-font-display: 'Playfair Display', serif;
   --deck-font-body: 'Source Sans 3', sans-serif;
   --deck-font-mono: 'JetBrains Mono', monospace;
-
-  /* Spacing */
-  --deck-space-sm: 0.5rem;
-  --deck-space-md: 1rem;
-  --deck-space-lg: 2rem;
-  --deck-space-xl: 3rem;
-
-  /* Radius */
-  --deck-radius: 4px;
-
-  /* Borders */
   --deck-border: rgba(232, 228, 223, 0.12);
-
-  /* Shadow */
-  --deck-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }

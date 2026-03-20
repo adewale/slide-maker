@@ -1,94 +1,85 @@
-/* Theme — editorial-dark preset */
+/* ─── Editorial-dark theme for Claude History Explorer ─── */
 
-/* Base slide */
+/* Base typography */
 .slidev-layout {
-  background: var(--deck-bg);
   color: var(--deck-fg);
   font-family: var(--deck-font-body);
 }
 
-/* Headings */
 .slidev-layout h1 {
   font-family: var(--deck-font-display);
-  color: var(--deck-fg);
   font-weight: 700;
   letter-spacing: -0.02em;
-  line-height: 1.15;
-}
-
-.slidev-layout h2 {
-  font-family: var(--deck-font-display);
   color: var(--deck-fg);
-  font-weight: 600;
-  letter-spacing: -0.01em;
 }
 
-/* Cover layout */
+.slidev-layout h2,
+.slidev-layout h3 {
+  font-family: var(--deck-font-display);
+  font-weight: 600;
+  color: var(--deck-fg);
+}
+
+.slidev-layout p,
+.slidev-layout li {
+  font-family: var(--deck-font-body);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--deck-fg);
+}
+
+.slidev-layout code {
+  font-family: var(--deck-font-mono);
+  font-size: 0.85em;
+  background: rgba(56, 189, 248, 0.1);
+  padding: 0.15em 0.35em;
+  border-radius: 3px;
+  color: var(--deck-accent);
+}
+
+.slidev-layout strong {
+  color: var(--deck-accent);
+  font-weight: 600;
+}
+
+/* Cover alignment */
 .slidev-layout.cover {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   text-align: left;
-  padding: var(--deck-space-xl) 4rem;
+  padding: 3rem 4rem;
   background: var(--deck-bg);
 }
 
 .slidev-layout.cover h1 {
-  font-size: 3.5rem;
-  line-height: 1.05;
-  color: var(--deck-fg);
+  font-size: 2.8rem;
   font-weight: 900;
-  max-width: 80%;
+  line-height: 1.1;
+  margin-bottom: 1rem;
 }
 
 .slidev-layout.cover p {
+  font-size: 1.15rem;
   color: var(--deck-muted);
-  font-size: 1.3rem;
-  margin-top: var(--deck-space-md);
-  font-weight: 300;
-  font-style: italic;
+  max-width: 70%;
 }
 
-/* Section layout — inverted for contrast */
+/* Section dividers: invert palette */
 .slidev-layout.section {
-  background: var(--deck-section-bg);
-  color: var(--deck-section-fg);
+  background: var(--deck-accent);
+  color: var(--deck-bg);
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  padding: var(--deck-space-xl) 4rem;
-}
-
-.slidev-layout.section h1 {
-  font-size: 2.5rem;
-  color: var(--deck-section-fg);
-  font-weight: 700;
-}
-
-/* Center layout */
-.slidev-layout.center {
-  display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: var(--deck-space-xl);
 }
 
-.slidev-layout.center h1 {
-  font-size: 2.5rem;
-  max-width: 70%;
-  font-weight: 700;
-}
-
-.slidev-layout.center p {
-  color: var(--deck-muted);
-  font-size: 1.1rem;
-  max-width: 60%;
-  margin-top: var(--deck-space-md);
-  line-height: 1.6;
+.slidev-layout.section h1 {
+  color: var(--deck-bg);
+  font-size: 2.4rem;
+  font-weight: 900;
 }
 
 /* Fact layout */
@@ -98,115 +89,55 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: var(--deck-space-xl);
+  background: var(--deck-bg);
 }
 
 .slidev-layout.fact h1 {
-  font-size: 2rem;
-  max-width: 80%;
+  font-size: 2.2rem;
+  font-weight: 900;
   color: var(--deck-accent);
-  font-weight: 700;
-  line-height: 1.2;
+  margin-bottom: 0.75rem;
 }
 
 .slidev-layout.fact p {
+  font-size: 1.1rem;
   color: var(--deck-muted);
-  font-size: 1rem;
-  max-width: 65%;
-  margin-top: var(--deck-space-lg);
-  line-height: 1.6;
 }
 
 /* End layout */
 .slidev-layout.end {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  text-align: center;
-  padding: var(--deck-space-xl);
+  text-align: left;
+  padding: 3rem 4rem;
+  background: var(--deck-bg);
 }
 
 .slidev-layout.end h1 {
   font-size: 2.2rem;
+  font-weight: 900;
   color: var(--deck-fg);
-  font-weight: 700;
-  max-width: 70%;
-  line-height: 1.2;
+  margin-bottom: 0.5rem;
 }
 
 .slidev-layout.end p {
+  font-size: 1.1rem;
   color: var(--deck-muted);
-  font-size: 1rem;
-  margin-top: var(--deck-space-md);
 }
 
-/* Default content */
-.slidev-layout.default h1 {
-  font-size: 1.75rem;
-  margin-bottom: var(--deck-space-lg);
-  padding-bottom: var(--deck-space-sm);
-  border-bottom: 1px solid var(--deck-border);
-}
-
-/* Two-cols layout */
-.slidev-layout.two-cols h1 {
-  font-size: 1.75rem;
-  margin-bottom: var(--deck-space-lg);
-  padding-bottom: var(--deck-space-sm);
-  border-bottom: 1px solid var(--deck-border);
-}
-
-/* List styling */
-.slidev-layout ul {
-  list-style: none;
-  padding-left: 0;
-}
-
-.slidev-layout ul li {
-  position: relative;
-  padding-left: 1.5em;
-  margin-bottom: 0.65em;
-  line-height: 1.5;
-  font-size: 1rem;
-}
-
-.slidev-layout ul li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.6em;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--deck-accent);
-}
-
-/* Code */
-.slidev-layout code {
-  font-family: var(--deck-font-mono);
-}
-
-.slidev-layout :not(pre) > code {
-  background: rgba(56, 189, 248, 0.12);
+/* List markers */
+.slidev-layout li::marker {
   color: var(--deck-accent);
-  padding: 0.15em 0.4em;
-  border-radius: var(--deck-radius);
-  font-size: 0.9em;
 }
 
-/* Strong emphasis */
-.slidev-layout strong {
-  color: var(--deck-accent);
-  font-weight: 600;
-}
-
-/* v-click animation — restrained fade for editorial-dark */
+/* v-click animation — editorial restrained */
 .slidev-vclick-target {
-  transition: opacity 0.35s ease, transform 0.35s ease;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .slidev-vclick-hidden {
   opacity: 0;
-  transform: translateY(4px);
+  transform: translateY(6px);
 }

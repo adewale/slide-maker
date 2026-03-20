@@ -2,10 +2,9 @@
 
 ## Meta
 - title: Olsen
-- subtitle: A read-only photo indexer that treats your library as sacred ground
-- purpose: introduce Olsen's architecture, design philosophy, and key technical insights to developers who work with photo libraries
-- audience: developers and engineers interested in photo management, metadata systems, and local-first tools
-- tone: scholarly, specific, evidence-driven
+- purpose: introduce Olsen's architecture and design philosophy to developers interested in local-first photo tooling
+- audience: developers who work with photograph collections and care about data sovereignty
+- tone: scholarly, evidence-driven, precise
 - target-length: 7
 - notes: yes
 - style-preset: tufte-data
@@ -13,22 +12,19 @@
 - progress: tally-marks
 
 ## Source Materials
-- readme: README.md (project overview -- what it does, supported formats, performance benchmarks, architecture diagram)
-- changelog: CHANGELOG.md (v0.1.0 release -- full feature inventory, dependency list, performance data)
-- architecture: docs/architecture.md (four-layer system, worker pool pattern, read-only guarantee enforcement)
-- lessons-learned: docs/LESSONS_LEARNED.md (Monochrom DNG thumbnail bug, faceted navigation state machine discovery, debugging-at-source rule)
-- specs: specs/facet_state_machine.spec (state machine model for faceted search, zero-result prevention)
-- flow: docs/flow.md (complete indexing pipeline from CLI invocation to summary report)
+- readme: README.md (factual backbone — what Olsen does, supported formats, performance benchmarks, safety guarantees)
+- architecture: docs/architecture.md (system layers, worker pool pattern, processing pipeline, storage design)
+- changelog: CHANGELOG.md (v0.1.0 feature inventory — indexer, database, web explorer, CLI)
+- lessons-learned: docs/LESSONS_LEARNED.md (Monochrom DNG thumbnail bug, state machine discovery, debugging methodology)
 
 ## Through-Line
-- concept: "Read-only to sources, read-write to understanding"
+- concept: "Read-only to your photos. Read-write to your understanding of them."
 - type: design-rule
 - appears-in:
-  - slide 1: cover -- the constraint is introduced as the project's founding rule
-  - slide 2: section -- the read-only guarantee as architectural enforcement, not policy
-  - slide 4: center-statement -- the constraint flips: what you extract is richer than what you touch
-  - slide 5: default-content -- the state machine prevents invalid transitions, another form of read-only discipline
-  - slide 7: end -- the constraint resolves as a broader design philosophy
+  - slide 2: default-content — the read-only guarantee introduced as the foundational design constraint
+  - slide 4: default-content — the processing pipeline extracts without modifying, building a parallel catalog
+  - slide 5: center-statement — the state machine insight: data determines valid paths, not hardcoded hierarchies
+  - slide 7: end — the resolution: your photos stay untouched, your catalog grows richer
 
 ## Design Tokens
 - colors:
@@ -36,31 +32,29 @@
   - fg: "#111111"
   - accent: "#2d5f8a"
   - accent-alt: "#c0392b"
-  - muted: "rgba(17, 17, 17, 0.5)"
+  - muted: "#666666"
 - typography:
   - display: EB Garamond
-  - body: EB Garamond
-  - labels: Source Sans 3
+  - body: Source Sans 3
   - mono: Source Code Pro
 - motion:
-  - preset: restrained-fade
+  - preset: tufte-evidence-reveal
 
 ## Layout System
 - prefer-builtins: true
 - builtins:
   - cover
-  - section
   - default
   - center
   - fact
-  - two-cols
+  - two-cols-header
   - end
 - custom-layouts: []
-- components: []
+- components:
+  - KeyboardHelp
+  - ProgressTallyMarks
 - css-files:
-  - styles/tokens.css
-  - styles/theme.css
-  - styles/transitions.css
+  - styles/index.css
 
 ## Slides
 
@@ -68,73 +62,56 @@
 - kind: cover
 - layout: cover
 - title: Olsen
-- subtitle: A read-only photo indexer that treats your library as sacred ground
+- subtitle: A local-first CLI tool for faceted browsing of photographs in DNG (and other file formats)
 - notes:
-  - Olsen is a Go CLI tool for indexing DNG, JPEG, and BMP photos. The read-only constraint is not a feature flag -- it is enforced at the syscall level with O_RDONLY. This deck traces why that one decision shaped everything else.
+  - Olsen is named after the idea of exploring your own photo library with the rigor of a research tool. The subtitle is the project's actual description from the repo.
 
 ### Slide 2
-- kind: section
-- layout: section
-- transition: fade
-- title: The read-only guarantee
-- subtitle: O_RDONLY is not a policy. It is a syscall.
-- notes:
-  - The indexer uses os.Open() which opens with O_RDONLY. No os.Create, os.OpenFile, os.WriteFile, os.Remove, or os.Rename anywhere in the codebase. Image processing happens entirely in memory. Only the SQLite database is modified.
-
-### Slide 3
-- kind: default-content
-- layout: two-cols
-- transition: slide-left
-- title: 62ms per photo
-- left:
-  - File hash: 0.4ms
-  - Thumbnail generation (4 sizes): 34ms
-  - Color palette (k-means): 28ms
-  - Perceptual hash: 0.2ms
-- right:
-  - 15-25 photos/second with 8 workers
-  - 100K library: 1.5-2 hours initial index
-  - Database: ~20-25 GB (with thumbnails)
-  - Memory: ~500 MB constant
-- sources:
-  - README.md -- performance benchmarks on Apple M3 Max
-  - CHANGELOG.md -- v0.1.0 performance details
-
-### Slide 4
-- kind: center-statement
-- layout: center
-- transition: fade
-- title: Five processing stages. Zero writes to source files.
-- body: EXIF extraction, thumbnail generation, color palette analysis, perceptual hashing, metadata inference -- all in memory, all flowing into a single SQLite file.
-- sources:
-  - docs/architecture.md -- indexer engine components and read-only enforcement
-  - docs/flow.md -- complete indexing pipeline
-
-### Slide 5
 - kind: default-content
 - layout: default
-- transition: slide-up
-- title: The state machine insight
-- body: Faceted navigation is not a hierarchy. Year does not "contain" Month. Every filter combination is a state, and the only valid transitions are ones that produce results.
+- title: What Olsen is and why it exists
+- body: A high-performance photo indexing system for DNG (Digital Negative), JPEG, and BMP files that extracts comprehensive metadata, generates aspect-ratio-preserving thumbnails, analyzes color palettes, and computes perceptual hashes for similarity detection. The critical guarantee — Olsen NEVER modifies your photo files. All file access uses read-only mode. Only the SQLite database is modified.
 - sources:
-  - specs/facet_state_machine.spec -- core insight, state transition rules
-  - docs/LESSONS_LEARNED.md -- "Assumed Hierarchical Relationships" mistake
+  - https://github.com/adewale/olsen/blob/main/README.md — project description and read-only guarantee
+
+### Slide 3
+- kind: fact
+- layout: fact
+- title: ~62 ms per photo
+- body: File hash 0.4 ms. Thumbnails 34 ms. Color palette 28 ms. Perceptual hash 0.2 ms. 15-25 photos/second on Apple M3 Max.
+- sources:
+  - https://github.com/adewale/olsen/blob/main/README.md — performance benchmarks
+
+### Slide 4
+- kind: default-content
+- layout: two-cols-header
+- title: The processing pipeline
+- left: Extract (EXIF metadata, 50+ fields), Decode (image into memory), Generate (4 thumbnail sizes), Analyze (k-means color palette), Hash (pHash for similarity)
+- right: Everything extracted lives in a single SQLite file. ~190 KB per photo. 100K photos fit in ~20 GB. The original files are never touched.
+- sources:
+  - https://github.com/adewale/olsen/blob/main/docs/architecture.md — processing pipeline and storage architecture
+
+### Slide 5
+- kind: center-statement
+- layout: center
+- title: Faceted navigation is a state machine
+- body: Users can never transition from a state with results to a state with zero results. SQL queries compute which facet values have results given current filters. No hardcoded hierarchies — data determines valid paths.
+- sources:
+  - https://github.com/adewale/olsen/blob/main/README.md — state machine model description
+  - https://github.com/adewale/olsen/blob/main/docs/LESSONS_LEARNED.md — state machine discovery
 
 ### Slide 6
 - kind: default-content
 - layout: default
-- transition: slide-left
-- title: 160x120px
-- body: The Monochrom DNG bug. ExtractEmbeddedJPEG() returned the first JPEG preview -- 160x120 pixels -- not the largest at 9504x6320. The UI showed black thumbnails. The team fixed display fallbacks, database queries, and upscale logic before discovering the decode layer was returning the wrong image.
+- title: The Monochrom thumbnail bug
+- body: ExtractEmbeddedJPEG() returned the FIRST JPEG in the DNG file (160x120 pixels), not the LARGEST (9504x6320). Initial fix patched the UI. The regression — removing isBlackImage() — produced completely black thumbnails. Root cause found only when someone ran exiftool on the actual file.
 - sources:
-  - docs/LESSONS_LEARNED.md -- Monochrom DNG thumbnail bug timeline
-  - docs/LESSONS_LEARNED.md -- "Always Debug at the Source" rule
+  - https://github.com/adewale/olsen/blob/main/docs/LESSONS_LEARNED.md — Monochrom DNG thumbnail bug timeline
 
 ### Slide 7
 - kind: end
 - layout: end
-- transition: fade
-- title: Read-only to sources. Read-write to understanding.
-- subtitle: github.com/adewale/olsen
+- title: Your photos stay untouched. Your catalog grows richer.
+- subtitle: Read-only to your photos. Read-write to your understanding of them.
 - notes:
-  - The read-only constraint was not a limitation. It was the decision that made everything else possible -- portable databases, safe re-indexing, concurrent workers without file locks. The constraint freed the architecture.
+  - Circle back to the through-line. The design constraint that shaped every decision — never modify source files — is also the value proposition.

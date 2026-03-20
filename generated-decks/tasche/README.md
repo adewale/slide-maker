@@ -1,15 +1,10 @@
-# Tasche Deck
+# Tasche
 
-A 7-slide presentation introducing [Tasche](https://github.com/adewale/tasche), a self-hosted read-it-later service built on Cloudflare Python Workers.
+A 7-slide deck introducing Tasche -- a self-hosted read-it-later service built
+on Cloudflare Python Workers. Covers what it is, why it exists, its architecture,
+the processing pipeline, and a war story about FTS5 query injection.
 
-## Style
-
-- **Preset:** bold-modern
-- **Palette:** Monochrome (project colors override the default bold-modern purple)
-- **Typography:** Bebas Neue (display), DM Sans (body), JetBrains Mono (code)
-- **Color scheme:** Dark
-
-## Preview
+## Quick start
 
 ```bash
 npx slidev slides.md
@@ -18,26 +13,25 @@ npx slidev slides.md
 ## Build
 
 ```bash
-npx slidev build
+npx slidev build --out dist
 ```
 
-## Structure
+## Files
 
-```
-slides.md              # Presentation source (7 slides)
-deck.spec.md           # Planning spec
-styles/
-  tokens.css           # Design tokens
-  theme.css            # Layout and typography styles
-  transitions.css      # Cinematic slide transitions
-  index.css            # Import aggregator
-components/
-  KeyboardHelp.vue     # Keyboard shortcut overlay
-composables/
-  useHelp.ts           # Help panel state
-setup/
-  shortcuts.ts         # Keyboard shortcut registration
-  mermaid-renderer.ts  # Beautiful Mermaid renderer
-global-top.vue         # Help overlay mount
-global-bottom.vue      # Footer chrome (slide number + title)
-```
+| File | Purpose |
+|------|---------|
+| `slides.md` | Presentation source (Slidev Markdown) |
+| `deck.spec.md` | Planning spec -- tokens, layout choices, slide outlines |
+| `styles/tokens.css` | Design tokens (bold-modern preset, Tasche monochrome override) |
+| `styles/theme.css` | Theme rules using token variables |
+| `styles/index.css` | Slidev style entry point (imports tokens + theme) |
+
+## Style preset
+
+**bold-modern** -- dark background, high-contrast type, Bebas Neue display font,
+DM Sans body. Tasche's monochrome pen-and-ink brand identity overrides the accent
+palette: white-on-black instead of a saturated color pair.
+
+## Project
+
+Source: https://github.com/adewale/tasche

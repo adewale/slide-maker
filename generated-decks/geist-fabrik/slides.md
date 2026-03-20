@@ -1,175 +1,164 @@
 ---
 theme: default
 title: GeistFabrik
+selectable: true
+routerMode: hash
 colorSchema: light
+transition: fade
+layout: cover
 fonts:
   sans: Plus Jakarta Sans
   serif: Figtree
   mono: JetBrains Mono
   weights: '400,500,600,700'
-  italic: false
-transition: slide-left
-layout: cover
 ---
 
 # GeistFabrik
 
-What happens when your notes ask the questions?
+A Python-based divergence engine for Obsidian vaults
 
-<!--
-GeistFabrik means "spirit factory" in German. The name signals its role: manufacturing provocations from your Obsidian vault, not answers. This deck introduces the project's philosophy and architecture to developers and PKM practitioners.
-
-The opening question is the through-line. By the end, we will have an answer: a well-asked question beats a poorly-computed answer.
+<!-- GeistFabrik means "spirit factory" in German. Open by establishing what this project actually is. The subtitle is the project's own description from the README, not the through-line.
 
 Sources:
-- https://github.com/adewale/geist_fabrik/blob/main/README.md — project name, tagline, and philosophy
--->
+- file:README.md -- repo description and first-paragraph identity -->
 
 ---
-layout: fact
-transition: fade
+transition: slide-left
 ---
 
-# 611
+# What GeistFabrik is and why it exists
 
-TESTS PASSING
+GeistFabrik (German for "spirit factory") generates creative suggestions through both code and Tracery grammars. It's a tool for thought that acts as a muse, not an oracle -- offering provocative "What if...?" questions rather than prescriptive answers.
 
-57 geists. 16 modules. Zero network calls.
+Inspired by Gordon Brander's work on tools for thought.
 
-<!--
-The numbers ground the project in concrete evidence. 611 tests at 100% pass rate across unit and integration suites. 57 bundled default geists (48 code, 9 Tracery). 16 source modules totalling ~6,000 lines.
+<v-clicks>
 
-"Zero network calls" is the real headline. GeistFabrik uses sentence-transformers for local 384-dimensional embeddings. No data leaves your machine. No API keys. No internet required after installation.
+- **100% local** -- no data leaves your machine
+- **Read-only** -- never modifies your notes
+- **Deterministic** -- same date + vault = same suggestions
+
+</v-clicks>
+
+<!-- This slide grounds the audience. The first paragraph from the README appears verbatim. The three properties reinforce why a user should trust this tool with their vault.
 
 Sources:
-- https://github.com/adewale/geist_fabrik/blob/main/STATUS.md — 611/611 tests, 16 modules, schema v6
-- https://github.com/adewale/geist_fabrik/blob/main/README.md — privacy model, local-first architecture, geist count
--->
+- file:README.md -- first paragraph description, privacy section, design principles -->
 
 ---
 layout: center
 transition: fade
 ---
 
-# The Contradictor taught us something
+# A WELL-ASKED QUESTION IS BETTER THAN A POORLY-COMPUTED ANSWER
 
-100 lines of Python to compute opposites. **10% success rate.**
+The design rule that shaped every geist
 
-13 lines of Tracery to ask "What contradicts this?" **100% success rate.**
-
-<!--
-This is the war story. The Contradictor geist originally tried to algorithmically generate opposite note titles using 100+ lines of pattern matching. It worked for "Benefits of Morning Routines" (producing "Costs of Morning Routines") but failed for "Evergreen notes" (producing "The opposite of Evergreen notes") and dates (producing "The opposite of 2023-09-12").
-
-The fix was to stop computing answers and start asking questions. A 13-line YAML template that says "What contradicts [[note]]?" works on any note title, because the human generates the opposite — not the algorithm.
-
-This incident became a design principle: "A well-asked question is better than a poorly-computed answer."
+<!-- This is the through-line. Pause here. The caps are deliberate -- one strategic emphasis per PRESENTATION_PHILOSOPHY principle 5. This principle comes directly from LESSONS_LEARNED.md and it governs every design decision in the project.
 
 Sources:
-- https://github.com/adewale/geist_fabrik/blob/main/LESSONS_LEARNED.md — Contradictor case study, 10% vs 100% success rate, code-to-question comparison
--->
+- file:LESSONS_LEARNED.md -- "Muses, Not Oracles: The Case for Asking Over Answering" -->
+
+---
+layout: fact
+transition: slide-left
+---
+
+# 57
+
+Default geists
+
+48 code + 9 Tracery. 611 tests passing. Zero external API calls.
+
+<!-- The 57 geists ship out of the box with zero configuration. "Zero external API calls" reinforces the local-first architecture. 611 is the actual test count from the README status section at version 0.9.0.
+
+Sources:
+- file:README.md -- status section (version 0.9.0 beta, 57 default geists, 611 tests at 100%) -->
 
 ---
 layout: two-cols
 transition: slide-left
 ---
 
-# Two Engines, One Pipeline
+# Code vs Tracery
+
+The Contradictor experiment
+
+::left::
+
+### Code approach
 
 <v-clicks>
 
-- **Code geists**: Python with VaultContext API
-- Graph operations, semantic search, temporal drift
-- Best when computation reveals structure
+- 100+ lines of pattern matching
+- Tried to compute opposites algorithmically
+- "Evergreen notes" became "The opposite of Evergreen notes"
+- **Success rate: ~10%**
 
 </v-clicks>
 
 ::right::
 
-<v-clicks>
-
-- **Tracery geists**: YAML grammars with vault functions
-- Template variations, provocative questions
-- Best when human creativity exceeds algorithms
-
-</v-clicks>
-
-<!--
-The two engines are not competitors. They compose. Vault functions written in Python can be called from Tracery grammars using the $vault.function_name() syntax. A code geist might compute the 20 oldest highly-connected notes; a Tracery geist turns that into "Consider revisiting [[note]] — what has changed since you wrote it?"
-
-Both engine types run through the same 4-stage filtering pipeline: boundary checks, novelty scoring, diversity enforcement, and quality gates. The pipeline samples ~5 suggestions by default, with --full and --no-filter modes for deeper exploration.
-
-Sources:
-- https://github.com/adewale/geist_fabrik/blob/main/README.md — code vs Tracery architecture, VaultContext API, filtering pipeline
-- https://github.com/adewale/geist_fabrik/blob/main/LESSONS_LEARNED.md — when to use code vs Tracery decision framework
--->
-
----
-transition: slide-left
----
-
-# Three Dimensions of Extension
+### Tracery approach
 
 <v-clicks>
 
-- **Metadata inference** adds properties to notes
-- **Vault functions** create reusable queries
-- **Geists** compose both into provocations
+- 13 lines of YAML
+- Asks: "What contradicts this note?"
+- Works for any note, any title, any topic
+- **Success rate: 100%**
 
 </v-clicks>
 
-Each layer builds on the one below. Non-programmers write Tracery geists that call functions written by developers.
-
-<!--
-The three-layer extensibility model is what makes GeistFabrik more than a suggestion engine. Metadata inference modules add computed properties to notes (reading time, lexical diversity, sentence count). Vault functions wrap reusable queries behind a @vault_function decorator. Geists compose both into creative provocations.
-
-The practical result: a developer writes a vault function that finds notes above a complexity threshold, and a non-programmer writes a Tracery geist that asks "Could you simplify [[complex_note]] by splitting it into three smaller notes?"
+<!-- The Contradictor war story from LESSONS_LEARNED.md. The code approach failed on anything that wasn't a pattern like "Benefits of X." The Tracery approach works universally because it asks the human to generate the answer. This is the through-line in action: questions beat computed answers.
 
 Sources:
-- https://github.com/adewale/geist_fabrik/blob/main/README.md — metadata inference, vault functions, geist examples, three-dimensional extensibility
--->
+- file:LESSONS_LEARNED.md -- Contradictor geist comparison, code vs question approach, success rate data -->
 
 ---
 transition: fade
 ---
 
-# The Pipeline
+# How suggestions reach your vault
 
-```mermaid {scale: 0.8}
-graph LR
-  A["Vault Files"] --> B["Sync"]
-  B --> C["Embeddings"]
-  C --> D["VaultContext"]
-  D --> E["Geists"]
-  E --> F["Filter"]
-  F --> G["Session Note"]
-  style A fill:#dbeafe,stroke:#2563eb,color:#1e3a5f
-  style B fill:#dbeafe,stroke:#2563eb,color:#1e3a5f
-  style C fill:#2563eb,stroke:#2563eb,color:#ffffff
-  style D fill:#2563eb,stroke:#2563eb,color:#ffffff
-  style E fill:#2563eb,stroke:#2563eb,color:#ffffff
-  style F fill:#dbeafe,stroke:#2563eb,color:#1e3a5f
-  style G fill:#dbeafe,stroke:#2563eb,color:#1e3a5f
-  linkStyle default stroke:#2563eb,stroke-width:2px
+```mermaid {scale: 0.75}
+flowchart LR
+    A[Vault Files] --> B[Sync + SQLite]
+    B --> C[Embeddings]
+    C --> D[VaultContext]
+    D --> E[Geists Execute]
+    E --> F[Filter Pipeline]
+    F --> G[Session Note]
+
+    style A fill:#ffffff,stroke:#4a6741,color:#1a1a2e
+    style B fill:#ffffff,stroke:#4a6741,color:#1a1a2e
+    style C fill:#ffffff,stroke:#4a6741,color:#1a1a2e
+    style D fill:#ffffff,stroke:#4a6741,color:#1a1a2e
+    style E fill:#ffffff,stroke:#4a6741,color:#1a1a2e
+    style F fill:#ffffff,stroke:#4a6741,color:#1a1a2e
+    style G fill:#4a6741,stroke:#4a6741,color:#ffffff
+
+    linkStyle default stroke:#4a6741,stroke-width:2px
 ```
 
-Deterministic: same date + same vault = same suggestions. Incremental: only changed files reprocess.
+Your notes are **read-only**. The only output is a linkable session note in `geist journal/`.
 
-<!--
-The data flow is the architectural backbone. Vault.sync() reads Obsidian markdown files into a SQLite database with incremental sync (only changed files are reprocessed). Session.compute_embeddings() generates 384-dimensional vectors using sentence-transformers with batch processing that is 15-20x faster than naive implementation.
-
-VaultContext provides the rich query API that geists use: semantic search, graph operations (orphans, hubs, backlinks), deterministic random sampling, and metadata inference integration. The filtering pipeline applies boundary, novelty, diversity, and quality checks before writing suggestions to a session note in the geist journal.
-
-Deterministic randomness means the same date plus the same vault state always produces the same output. This is intentional — sessions are reproducible and replayable.
+<!-- Walk through the pipeline left to right. Vault files are parsed and synced to SQLite. Embeddings are computed locally via sentence-transformers. VaultContext provides the rich query API. Geists execute against it. A 4-stage filter (boundary, novelty, diversity, quality) reduces noise. The final output is an Obsidian-native journal entry.
 
 Sources:
-- https://github.com/adewale/geist_fabrik/blob/main/README.md — architecture section, data flow, incremental sync, batch embeddings performance
--->
+- file:README.md -- architecture section, data flow diagram, two-layer design description -->
 
 ---
 layout: end
 transition: fade
 ---
 
-# A well-asked question beats a poorly-computed answer
+# Muses, not oracles
 
-That is the design rule behind every geist.
+GeistFabrik asks questions so you can find answers
+
+<!-- Circle back to the through-line. The closing echoes the opening philosophy from the README and the design rule from LESSONS_LEARNED.md. "Muses, not oracles" is the project's own phrase for its core principle.
+
+Sources:
+- file:README.md -- key design principles, "Muses, not oracles"
+- file:LESSONS_LEARNED.md -- the principle stated as a design rule -->

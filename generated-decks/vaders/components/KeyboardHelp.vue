@@ -45,7 +45,7 @@ onKeyStroke('Escape', () => toggleHelp())
             <div class="help-row"><kbd>[</kbd><span>Skip to prev slide</span></div>
             <div class="help-row"><kbd>Home</kbd><span>First slide</span></div>
             <div class="help-row"><kbd>End</kbd><span>Last slide</span></div>
-            <div class="help-row"><kbd>g</kbd><span>Go to slide...</span></div>
+            <div class="help-row"><kbd>g</kbd><span>Go to slide…</span></div>
             <div class="help-row"><kbd>o</kbd><span>All slides</span></div>
           </div>
 
