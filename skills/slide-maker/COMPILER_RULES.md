@@ -269,7 +269,48 @@ Rules:
 - Note source file + section for each extracted fact or story — the provenance chain must survive into the final `Sources:` citations on each slide.
 - If a claim can't be traced to a source, don't include it. Prefer a narrative gap over a fabricated anecdote.
 
-### 1b. Extract the through-line (project decks only)
+### 1b. Find what's surprising (project decks only)
+
+The best project decks surface what's novel, counterintuitive, or unexpected about the project. After reading the source material, actively look for these patterns:
+
+**Surprising constraints adopted by choice:**
+- Read-only access as an architectural decision, not a limitation
+- Zero dependencies when the ecosystem expects many
+- Single-threaded when multi-threaded is the "obvious" choice
+- No network calls in a world that assumes cloud-first
+
+**Unexpected technical choices:**
+- Using SQLite where most people would reach for Postgres
+- Terminal UI for something usually built as a web app
+- Python running inside JavaScript (not alongside it)
+- Property-based testing instead of example-based
+
+**Counterintuitive results from the project's own experience:**
+- A simpler approach outperforming the "proper" one (e.g., Tracery beating code for creative generation)
+- A constraint that turned out to be a feature (e.g., read-only making the system trustworthy)
+- A debugging strategy that contradicted standard practice
+- A metric that surprised the authors themselves
+
+**Notable absences:**
+- No tests, no CI, no config files — and it still works. Why?
+- No external dependencies — what does the project do instead?
+- No documentation of a specific topic — is that a gap or a signal?
+
+**Where to find these:**
+1. LESSONS_LEARNED — explicitly documents surprises and failures
+2. README "Why" or "Philosophy" sections — reveals intentional constraints
+3. The dependency list (or lack thereof) — package.json, pyproject.toml, go.mod
+4. Architecture decisions — especially "why NOT" sections
+5. Issues and PRs — real debates about tradeoffs
+6. Commit history — dramatic changes in direction, reverts, rewrites
+
+**How to use them:**
+- At least one slide should feature a genuinely surprising element of the project
+- Frame surprises as insight slides (`center` or `statement` layout) — they earn the pause
+- Connect the surprise to the through-line when possible — "we expected X but found Y, which is why Z"
+- Don't manufacture surprises. If the project is straightforward, say so. Forced novelty reads as dishonest.
+
+### 1c. Extract the through-line (project decks only)
 
 The through-line is the conceptual thread that runs through every section of the deck. It must come from the source material, not be imposed on it.
 
@@ -293,7 +334,7 @@ The through-line is the conceptual thread that runs through every section of the
 - A decorative metaphor with no analytical function
 - Multiple competing threads (one deck, one through-line)
 
-### 1c. Surface project identity (project decks only)
+### 1d. Surface project identity (project decks only)
 
 Every project deck must communicate what the project actually IS before diving into how it works. Generic decks happen when the compiler skips this step.
 
