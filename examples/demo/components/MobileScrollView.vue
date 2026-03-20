@@ -170,7 +170,7 @@ function scrollToSection(secIdx) {
   flex: 1;
   height: 3px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 20px 0;
   background-clip: content-box;
 }
