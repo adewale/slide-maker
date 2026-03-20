@@ -273,36 +273,44 @@ Rules:
 
 The best project decks surface what's novel, counterintuitive, or unexpected about the project. After reading the source material, actively look for these patterns:
 
+**Ecosystem mismatch — the project uses a language, tool, or pattern that's unusual for its platform:**
+- A Python project on a platform where JavaScript is the norm (e.g., Cloudflare Workers)
+- A CLI tool for a task that's usually a web app
+- A functional approach in an OOP ecosystem, or vice versa
+- Using SQLite where most people would reach for Postgres
+- To detect this: check what language/framework the platform documentation defaults to, then compare with what the project actually uses
+
+**Cross-boundary architecture — the project bridges systems that don't normally talk:**
+- A Python service calling a JavaScript service on the same platform
+- An AI service (TTS, embeddings) integrated into a non-AI pipeline
+- A local tool that reads cloud-generated data, or vice versa
+- To detect this: look at the dependency list, config files, and architecture docs for multiple runtimes, services, or APIs that interact
+
 **Surprising constraints adopted by choice:**
 - Read-only access as an architectural decision, not a limitation
 - Zero dependencies when the ecosystem expects many
 - Single-threaded when multi-threaded is the "obvious" choice
 - No network calls in a world that assumes cloud-first
 
-**Unexpected technical choices:**
-- Using SQLite where most people would reach for Postgres
-- Terminal UI for something usually built as a web app
-- Python running inside JavaScript (not alongside it)
-- Property-based testing instead of example-based
-
 **Counterintuitive results from the project's own experience:**
-- A simpler approach outperforming the "proper" one (e.g., Tracery beating code for creative generation)
-- A constraint that turned out to be a feature (e.g., read-only making the system trustworthy)
+- A simpler approach outperforming the "proper" one
+- A constraint that turned out to be a feature
 - A debugging strategy that contradicted standard practice
-- A metric that surprised the authors themselves
 
-**Notable absences:**
-- No tests, no CI, no config files — and it still works. Why?
-- No external dependencies — what does the project do instead?
-- No documentation of a specific topic — is that a gap or a signal?
+**What is NOT surprising (don't present these as novel):**
+- Standard platform pricing or billing models
+- Using a framework for its intended purpose
+- Having tests, CI, or documentation
+- Feature lists that match the README description
+- Anything that someone familiar with the platform would expect
 
 **Where to find these:**
-1. LESSONS_LEARNED — explicitly documents surprises and failures
-2. README "Why" or "Philosophy" sections — reveals intentional constraints
-3. The dependency list (or lack thereof) — package.json, pyproject.toml, go.mod
-4. Architecture decisions — especially "why NOT" sections
-5. Issues and PRs — real debates about tradeoffs
-6. Commit history — dramatic changes in direction, reverts, rewrites
+1. The language/framework vs the platform's default — compare README with platform docs
+2. Config files (wrangler.jsonc, Dockerfile, etc.) — multiple runtimes or service bindings signal cross-boundary architecture
+3. LESSONS_LEARNED — explicitly documents surprises and failures
+4. README "Why" or "Philosophy" sections — reveals intentional constraints
+5. The dependency list — package.json, pyproject.toml, go.mod
+6. Architecture decisions — especially "why NOT" sections
 
 **How to use them:**
 - At least one slide should feature a genuinely surprising element of the project
@@ -344,6 +352,7 @@ Every project deck must communicate what the project actually IS before diving i
 - If the project has a color identity (from its logo, UI palette, terminal output, or branding), those colors MUST override the preset's accent color via `--deck-accent` and related tokens.
 - If screenshots or demo output images exist in the repo (README images, `docs/` screenshots, example output), at least one must appear in the deck as a `visual-evidence` slide or hero image.
 - The project's README first-paragraph description should appear verbatim or near-verbatim somewhere in the first 3 slides. Do not paraphrase it into generic language.
+- The project's GitHub URL MUST appear in the deck — on the cover slide, the end slide, or both. The audience needs to know where to find the project. Use the `project-url` from the spec.
 
 **Where to find project identity:**
 1. README first paragraph or repo description (one-line summary)
