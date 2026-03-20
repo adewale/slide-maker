@@ -4,7 +4,7 @@ A Claude Code skill that generates [Slidev](https://sli.dev) presentation decks.
 
 Output is native Slidev Markdown: editable by hand, buildable to static HTML and deployable anywhere.
 
-[Live demo](https://adewale.github.io/slide-maker/slide-maker/)
+[Live demo](https://slides-oshineye-dev.adewale-883.workers.dev/slide-maker/)
 
 ## Install
 
@@ -80,7 +80,7 @@ npm run build     # builds all decks to examples/_build/
 npm run serve     # preview at localhost:3030
 ```
 
-Built decks are static SPAs. The build system generates SPA routing configs for GitHub Pages, Cloudflare Workers, and `npx serve`.
+Built decks are static SPAs deployed via Cloudflare Workers, which handles SPA routing server-side (clean URLs like `/olsen/3` survive reload).
 
 Each built deck exposes its Markdown for programmatic access:
 
