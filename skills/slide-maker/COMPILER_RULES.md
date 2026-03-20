@@ -86,6 +86,24 @@ h1 { color: var(--deck-accent); }
 <!-- The data flows from A to B to C -->
 ```
 
+### Generic project introduction
+
+```md
+<!-- NEVER — sounds like every other deck -->
+---
+layout: cover
+---
+# Project Name
+(subtitle is the through-line question)
+
+<!-- ALWAYS — tells the audience what this actually is -->
+---
+layout: cover
+---
+# Project Name
+A self-hosted read-it-later service built on Cloudflare Python Workers
+```
+
 ### Generic closings
 
 ```md
@@ -221,6 +239,7 @@ When `project-url` is declared in the spec, read the project's source documents 
 | CHANGELOG | Temporal narrative — what evolved | Story arc, "before/after" moments, version milestones |
 | ARCHITECTURE | Structural understanding — how pieces connect | Diagrams, code examples, system-level slides |
 | LESSONS_LEARNED | Storytelling gold — what surprised, what broke | War stories, counterintuitive findings, design insights |
+| Project identity | What makes THIS project unique — name, description, differentiators, visual brand | Cover subtitle, "what is this" slide, accent color override |
 | Screenshots | Visual evidence — proof it works | `visual-evidence` slides, hero images |
 | Specs (feature/API/design) | Scope boundaries — inclusions and exclusions | Constraint slides, "what we chose NOT to build" |
 | Research docs | Decision archaeology — why X not Y | Comparison slides, "we tried three approaches" |
@@ -237,7 +256,7 @@ When `project-url` is declared in the spec, read the project's source documents 
 | ARCHITECTURE | System diagrams, component relationships, data flow | Mermaid diagrams, topology slides | Design rationale, alternatives considered | High |
 | Specs | Scope, constraints, non-goals | Constraint slides, design decision slides | Full requirements, acceptance criteria | High for scope |
 | Research docs | Comparisons, benchmarks, decision matrices | Comparison slides, evidence slides | Methodology, raw data | Medium |
-| README | Setup, features, usage examples | Feature inventory, getting started | Installation, contributing guide | Medium for facts |
+| README | Setup, features, usage examples, first-paragraph description | Feature inventory, getting started, project identity slide | Installation, contributing guide | Highest for identity, medium for facts |
 | Config files | Bindings, routes, build steps, deploy targets | Pipeline diagrams, infrastructure slides | Full config, environment variables | Low (supporting) |
 | `package.json` | Dependencies, scripts, versions | Tech stack slides | Exact versions, dev dependencies | Low (supporting) |
 
@@ -273,6 +292,23 @@ The through-line is the conceptual thread that runs through every section of the
 - A tagline that appears only on the cover and closing (bookend syndrome)
 - A decorative metaphor with no analytical function
 - Multiple competing threads (one deck, one through-line)
+
+### 1c. Surface project identity (project decks only)
+
+Every project deck must communicate what the project actually IS before diving into how it works. Generic decks happen when the compiler skips this step.
+
+**Rules:**
+- The cover slide MUST use the project's one-line description as the subtitle — not the through-line. The through-line belongs in section breaks and the closing, not the cover.
+- Slide 2 should explain what the project IS and WHY it exists before diving into architecture or internals. The audience needs context before complexity.
+- If the project has a color identity (from its logo, UI palette, terminal output, or branding), those colors MUST override the preset's accent color via `--deck-accent` and related tokens.
+- If screenshots or demo output images exist in the repo (README images, `docs/` screenshots, example output), at least one must appear in the deck as a `visual-evidence` slide or hero image.
+- The project's README first-paragraph description should appear verbatim or near-verbatim somewhere in the first 3 slides. Do not paraphrase it into generic language.
+
+**Where to find project identity:**
+1. README first paragraph or repo description (one-line summary)
+2. README "Features" or "Why" section (differentiators from alternatives)
+3. Logo file, favicon, or UI screenshots (visual identity / brand colors)
+4. Demo output, terminal screenshots, or example renders (what it looks like in action)
 
 ### 2. Normalize the spec
 Resolve meta, tokens, slide inventory, layout inventory, and component inventory.
@@ -586,8 +622,8 @@ Every deck needs a story structure, not a feature list:
 The through-line is how the deck holds together — not a tagline, but a conceptual thread that gains new meaning each time it surfaces.
 
 **Per slide type:**
-- `cover` — introduce the through-line (pose the question, state the metaphor)
-- `section` — refract the through-line through a new lens ("a function with a name becomes a game server")
+- `cover` — the subtitle must be the project's actual description (see 1c), NOT the through-line. The through-line can appear in the presenter notes or be introduced on slide 2 or 3.
+- `section` — refract the through-line through a new lens ("a function with a name becomes a game server"). Section breaks are the primary home for the through-line.
 - `center` / `statement` — reflect on the through-line at a turning point
 - `end` — resolve the through-line (answer the question, complete the metaphor)
 

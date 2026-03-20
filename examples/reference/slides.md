@@ -71,6 +71,18 @@ src: ./pages/ecosystem.md
 ---
 
 ---
+src: ./pages/infrastructure.md
+---
+
+---
+src: ./pages/progress.md
+---
+
+---
+src: ./pages/presenter.md
+---
+
+---
 src: ./pages/skill.md
 ---
 

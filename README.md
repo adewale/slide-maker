@@ -2,7 +2,7 @@
 
 A Claude Code skill that generates [Slidev](https://sli.dev) presentation decks. It reads a GitHub project's source code and docs to produce slides grounded in what's actually in the repo, or walks through a structured process to create a deck from a brief.
 
-Output is native Slidev Markdown — editable by hand, buildable to static HTML, deployable anywhere.
+Output is native Slidev Markdown: editable by hand, buildable to static HTML and deployable anywhere.
 
 [Live demo](https://adewale.github.io/slide-maker/slide-maker/)
 
