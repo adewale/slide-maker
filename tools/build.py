@@ -358,11 +358,19 @@ _404_HTML = """\
 <head><meta charset="utf-8"><title>Redirecting...</title></head>
 <body>
 <script>
-// GitHub Pages SPA redirect: preserve the path for client-side routing
+// GitHub Pages SPA redirect: convert path-based slide URLs to hash routes.
+// /base/deck-name/3 -> /base/deck-name/#/3
+// /base/deck-name/  -> /base/deck-name/ (no change, index.html serves it)
 var path = window.location.pathname;
-if (path !== '/' && path !== '/index.html') {
-  // Keep the path — let the deck's own index.html handle hash routing
-  window.location.replace(path);
+var parts = path.replace(/\\/$/, '').split('/');
+var last = parts[parts.length - 1];
+if (/^\\d+$/.test(last)) {
+  // Last segment is a slide number — redirect to hash route
+  parts.pop();
+  window.location.replace(parts.join('/') + '/#/' + last);
+} else if (path !== '/' && path !== '/index.html') {
+  // Non-numeric path — try appending / to hit the deck's index.html
+  window.location.replace(path.replace(/\\/?$/, '/'));
 } else {
   window.location.replace('/');
 }
