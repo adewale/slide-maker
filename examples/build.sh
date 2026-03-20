@@ -298,13 +298,10 @@ touch "$OUT/.nojekyll"
   echo '}'
 } > "$OUT/serve.json"
 
-# Generate _redirects for Cloudflare Pages / Workers Static Assets
-# Slidev uses HTML5 history routing — each deck needs SPA fallback
-{
-  for name in "${ALL_DECK_NAMES[@]}"; do
-    printf '/%s/*    /%s/index.html   200\n' "$name" "$name"
-  done
-} > "$OUT/_redirects"
+# Remove _redirects files — Slidev generates per-deck _redirects that
+# conflict with Cloudflare Workers' not_found_handling: "single-page-application".
+# GitHub Pages uses 404.html instead. Only npx serve uses serve.json.
+find "$OUT" -name '_redirects' -delete
 
 # ── Inject <link rel="alternate"> into each deck's index.html ──
 for name in "${ALL_DECK_NAMES[@]}"; do
