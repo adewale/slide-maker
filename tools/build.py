@@ -355,26 +355,14 @@ def _read_count(path: Path) -> str:
 _404_HTML = """\
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"><title>Redirecting...</title></head>
-<body>
-<script>
-// GitHub Pages SPA redirect: convert path-based slide URLs to hash routes.
-// /base/deck-name/3 -> /base/deck-name/#/3
-// /base/deck-name/  -> /base/deck-name/ (no change, index.html serves it)
-var path = window.location.pathname;
-var parts = path.replace(/\\/$/, '').split('/');
-var last = parts[parts.length - 1];
-if (/^\\d+$/.test(last)) {
-  // Last segment is a slide number — redirect to hash route
-  parts.pop();
-  window.location.replace(parts.join('/') + '/#/' + last);
-} else if (path !== '/' && path !== '/index.html') {
-  // Non-numeric path — try appending / to hit the deck's index.html
-  window.location.replace(path.replace(/\\/?$/, '/'));
-} else {
-  window.location.replace('/');
-}
-</script>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found</title>
+</head>
+<body style="font-family:system-ui,sans-serif;padding:3rem 2rem;max-width:36rem;color:#444">
+<h1 style="font-size:1.5rem;font-weight:600;margin-bottom:1rem">Page not found</h1>
+<p><a href="/" style="color:#2563eb">Back to index</a></p>
 </body>
 </html>
 """
