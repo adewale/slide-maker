@@ -1,9 +1,10 @@
 :root {
   --deck-bg: #ffffff;
   --deck-fg: #1a1a2e;
-  --deck-accent: #4a6741;
-  --deck-accent-alt: #7a5c3a;
-  --deck-muted: rgba(26, 26, 46, 0.45);
+  --deck-accent: #16697a;
+  --deck-accent-alt: #0d4f5c;
+  --deck-muted: #6b7280;
+  --deck-border: #e5e7eb;
   --deck-font-display: 'Plus Jakarta Sans', sans-serif;
   --deck-font-body: 'Figtree', sans-serif;
   --deck-font-mono: 'JetBrains Mono', monospace;

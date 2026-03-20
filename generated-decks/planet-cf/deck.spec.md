@@ -2,9 +2,9 @@
 
 ## Meta
 - title: Planet CF
-- purpose: introduce Planet CF as a feed aggregator built entirely in Python on Cloudflare Workers, highlighting the architectural decisions and hard-won lessons from running Python inside V8
-- audience: developers interested in Cloudflare Workers, Python, or feed aggregation
-- tone: practical, curious, workshop-style
+- purpose: present a feed aggregator that runs Python inside JavaScript on Cloudflare's edge
+- audience: developers interested in Cloudflare Workers, Python, and feed aggregation
+- tone: warm, practical, curious
 - target-length: 7
 - notes: yes
 - style-preset: cloudflare
@@ -12,20 +12,20 @@
 - progress: segment-bar
 
 ## Source Materials
-- readme: README.md (project overview — what it does, features, quick start, architecture summary)
-- architecture: docs/ARCHITECTURE.md (system topology — Worker entrypoints, D1, Queues, Vectorize, cron scheduler, edge caching)
-- lessons-learned: docs/LESSONS_LEARNED.md (21 hard-won lessons — JsProxy conversion, boundary layers, embedded templates, hybrid search, FFI type matrix)
-- config: wrangler.jsonc (Cloudflare bindings — D1, Vectorize, Queues, Workers AI, cron triggers)
+- readme: README.md (project overview -- features, quick start, multi-instance deployment, architecture summary)
+- architecture: docs/ARCHITECTURE.md (system topology -- D1, Queues, Vectorize, edge cache, request flows)
+- lessons-learned: docs/LESSONS_LEARNED.md (21 hard-won insights -- JsProxy traps, FFI boundary layers, template embedding, hybrid search)
+- config: wrangler.jsonc (infrastructure bindings -- D1, Vectorize, Queues, Workers AI, cron triggers)
+- code: src/config.py (smart defaults -- 20+ configuration values with sensible fallbacks)
 
 ## Through-Line
-- concept: "Every boundary is a type conversion"
+- concept: "Python inside JavaScript -- and the boundaries that make it work"
 - type: concept
 - appears-in:
-  - slide 2: default — introduced as the central insight after explaining what Planet CF is
-  - slide 4: section — "When Python lives inside V8, every API call crosses a world"
-  - slide 5: default — the boundary layer pattern that quarantines JS types from Python core
-  - slide 6: default — hybrid search as a boundary between semantic and keyword worlds
-  - slide 7: end — resolution: the boundaries that constrain you become the architecture
+  - slide 2: default -- introduces the concept: Python running in V8 via Pyodide/WASM
+  - slide 4: section -- "boundaries that make it work" -- the FFI boundary layer pattern
+  - slide 5: default -- the surprise: `None` is not enough at the FFI boundary
+  - slide 7: end -- resolution: boundaries create reliability
 
 ## Design Tokens
 - colors:
@@ -53,7 +53,8 @@
   - fact
   - end
 - custom-layouts: []
-- components: []
+- components:
+  - ProgressSegmentBar
 - css-files:
   - styles/tokens.css
   - styles/theme.css
@@ -65,52 +66,49 @@
 - layout: cover
 - title: Planet CF
 - subtitle: A feed aggregator built on Cloudflare's Python Workers platform
-- notes:
-  - Planet CF aggregates RSS/Atom feeds from Cloudflare-adjacent blogs, serving www.planetcloudflare.dev. It runs entirely in Python on Cloudflare Workers via Pyodide (Python in WebAssembly inside V8 isolates). The project uses D1, Queues, Vectorize, and Workers AI.
 
 ### Slide 2
 - kind: default-content
 - layout: default
-- title: Five services, one Python Worker
-- body: Planet CF is a feed aggregator built on Cloudflare's Python Workers platform. It aggregates RSS/Atom feeds with hourly updates, offers semantic search via Vectorize and Workers AI, uses GitHub OAuth for admin authentication, and generates HTML/RSS/Atom/OPML on demand with edge caching. The central design insight: every boundary between Python and JavaScript is a type conversion.
+- title: What Is Planet CF?
+- body: RSS/Atom aggregator that runs Python inside V8 isolates via Pyodide/WASM on Cloudflare's edge network. Single worker handles cron scheduling, queue consumption, HTTP serving, and admin UI.
 - sources:
-  - https://github.com/adewale/planet_cf/blob/main/README.md — project description, feature list, architecture summary
+  - https://github.com/adewale/planet_cf/blob/main/README.md -- project overview
+  - file:docs/ARCHITECTURE.md -- system topology
 
 ### Slide 3
-- kind: fact
-- layout: fact
-- title: 768
-- body: Dimensions in the Vectorize semantic search index. Workers AI generates embeddings with bge-base-en-v1.5 using CLS pooling — not mean pooling, because CLS is better for search.
+- kind: default-content
+- layout: default
+- title: The Full Cloudflare Stack
+- body: Architecture diagram showing D1, Queues, Vectorize, Workers AI, and static assets all orchestrated from a single Python worker.
 - sources:
-  - https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — lesson 10: embedding model choice
-  - https://github.com/adewale/planet_cf/blob/main/README.md — search defaults table
+  - file:docs/ARCHITECTURE.md -- binding topology and data flow
 
 ### Slide 4
 - kind: section
 - layout: section
-- title: Every boundary is a type conversion
-- subtitle: When Python lives inside V8, every API call crosses a world.
-- notes:
-  - This is the central architectural insight. Pyodide returns JsProxy objects when interacting with JavaScript APIs. These look like Python objects but are not subscriptable or iterable. JsNull is not Python None. JsUndefined is not Python None. The TypeError for JsProxy was one of the first production failures.
+- title: Boundaries That Make It Work
 
 ### Slide 5
 - kind: default-content
 - layout: default
-- title: The boundary layer that saved us
-- body: JsProxy objects look like Python but are not subscriptable. JsNull is not None. The solution is a thin boundary layer — SafeD1, SafeVectorize, SafeAI — that converts all JS types to Python immediately. Business logic stays pure Python. One conversion point, not dozens.
+- title: None Is Not None
+- body: JavaScript null arrives as JsNull, not Python None. Three null-like values cross the FFI boundary -- and `is None` catches only one. The fix is a boundary function that checks type(x).__name__.
 - sources:
-  - https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — lessons 1, 2, 17: JsProxy, boundary layer, FFI type matrix
+  - file:docs/LESSONS_LEARNED.md -- lesson 21, JsNull trap
+  - file:docs/LESSONS_LEARNED.md -- lesson 17, FFI type-compatibility matrix
 
 ### Slide 6
-- kind: default-content
-- layout: default
-- title: Hybrid search beats pure semantic
-- body: Searching "context" missed articles containing the word "context" because semantic similarity does not guarantee keyword overlap. The fix was three-tier ranking — exact title matches first, semantic results by score second, keyword-only matches by date third. Two search worlds, one boundary.
+- kind: fact
+- layout: fact
+- title: 21
+- body: Hard-won lessons documented. Each traced to a specific production incident.
 - sources:
-  - https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — lessons 5, 15: hybrid search and exact-match ranking
+  - file:docs/LESSONS_LEARNED.md -- full lessons catalog
+  - file:src/config.py -- smart defaults
 
 ### Slide 7
 - kind: end
 - layout: end
-- title: The boundaries that constrain you become the architecture
-- subtitle: github.com/adewale/planet_cf
+- title: Boundaries Create Reliability
+- subtitle: Planet CF -- Python inside JavaScript, made safe by a thin conversion layer

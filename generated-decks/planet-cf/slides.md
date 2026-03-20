@@ -2,153 +2,165 @@
 theme: default
 title: Planet CF
 colorSchema: light
-transition: slide-left
-layout: cover
 fonts:
   sans: Work Sans
   serif: DM Sans
   mono: IBM Plex Mono
   weights: '400,500,600,700'
   italic: false
+transition: slide-left
+layout: cover
 ---
 
 # Planet CF
 
 A feed aggregator built on Cloudflare's Python Workers platform
 
-<!-- Planet CF aggregates RSS/Atom feeds from Cloudflare-adjacent blogs, serving www.planetcloudflare.dev. The entire application runs in Python on Cloudflare Workers via Pyodide — Python compiled to WebAssembly, executing inside V8 isolates. It uses D1 for storage, Queues for feed fetching, Vectorize for semantic search, and Workers AI for embeddings. Created January 2026.
+<!--
+Planet CF is a modern take on the classic "Planet" feed aggregator concept, rebuilt from scratch to run entirely on Cloudflare's edge infrastructure. The name echoes Planet Python, Planet Mozilla, and other community feed aggregators, but the implementation is fundamentally different: Python code running inside JavaScript's V8 engine via Pyodide/WASM.
 
 Sources:
-- https://github.com/adewale/planet_cf/blob/main/README.md — project description and feature list -->
+- https://github.com/adewale/planet_cf/blob/main/README.md -- project overview and description
+-->
 
 ---
 transition: fade
 ---
 
-# Five services, one Python Worker
+# What Is Planet CF?
 
-A feed aggregator built on Cloudflare's Python Workers platform. Five services run inside a single Worker:
+An RSS/Atom feed aggregator where **Python runs inside V8 isolates** via Pyodide/WASM on Cloudflare's global edge network.
 
 <v-clicks>
 
-- **Scheduler** -- cron hourly, enqueues each feed
-- **Queue consumer** -- fetch, parse, sanitize, embed
-- **HTTP handler** -- HTML/RSS/Atom/OPML on demand
-- **Vectorize** -- 768-dim semantic search index
-- **Workers AI** -- `bge-base-en-v1.5`, CLS pooling
+- One worker: scheduler, queue consumer, HTTP server, admin
+- Hourly feed fetching with retries and dead-letter queue
+- Semantic search via **Vectorize** and **Workers AI**
+- On-demand HTML/RSS/Atom/OPML with 1-hour edge caching
+- Multi-instance: Planet Python (500+) or Mozilla (190)
 
 </v-clicks>
 
-<v-click>
-
-The central design insight: every boundary between Python and JavaScript is a type conversion.
-
-</v-click>
-
-<!-- Planet CF runs entirely in Python on Cloudflare Workers. Python executes inside Pyodide (WebAssembly in V8 isolates). There is no filesystem — templates must be embedded as Python strings at build time. The scheduler runs hourly via cron, enqueuing each active feed as a separate queue message. Queue consumers fetch feeds with 30-second HTTP timeouts and 60-second processing timeouts. Failed fetches retry up to 3 times before hitting the dead-letter queue. The HTTP handler generates all content on-demand — no pre-rendering — with Cloudflare's edge cache providing the performance layer.
+<!--
+The key insight here is that this is not Python running alongside JavaScript -- it is Python running INSIDE JavaScript. Pyodide compiles CPython to WebAssembly, which runs inside V8 isolates on Cloudflare's edge. This means Python has no filesystem access, no threading, and no direct network I/O. Every external operation must cross the FFI boundary into JavaScript APIs. Despite these constraints, Planet CF handles feed parsing (feedparser), HTML sanitization (bleach), and template rendering (Jinja2) -- all in Python.
 
 Sources:
-- https://github.com/adewale/planet_cf/blob/main/README.md — project description, feature list, architecture summary
-- https://github.com/adewale/planet_cf/blob/main/docs/ARCHITECTURE.md — system overview, component descriptions, entrypoint handlers -->
+- https://github.com/adewale/planet_cf/blob/main/README.md -- feature list and multi-instance examples
+- https://github.com/adewale/planet_cf/blob/main/docs/ARCHITECTURE.md -- system topology and request flow
+-->
 
 ---
-layout: fact
 transition: slide-up
 ---
 
-# 768
+# The Full Cloudflare Stack
 
-VECTORIZE DIMENSIONS
+A single worker orchestrates five Cloudflare primitives from Python.
 
-Workers AI generates embeddings with `bge-base-en-v1.5` using CLS pooling -- not mean pooling, because CLS captures the sentence-level representation that search needs.
+```mermaid {scale: 0.8}
+graph LR
+  W["Python Worker"] --> D1["D1 Database"]
+  W --> Q["Feed Queue"]
+  W --> V["Vectorize"]
+  W --> AI["Workers AI"]
+  W --> A["Static Assets"]
+  Q --> DLQ["Dead Letter Queue"]
+  style W fill:#ff6633,stroke:#ff6633,color:#fff
+  style D1 fill:#fffbf5,stroke:#ebd5c1,color:#521000
+  style Q fill:#fffbf5,stroke:#ebd5c1,color:#521000
+  style V fill:#fffbf5,stroke:#ebd5c1,color:#521000
+  style AI fill:#fffbf5,stroke:#ebd5c1,color:#521000
+  style A fill:#fffbf5,stroke:#ebd5c1,color:#521000
+  style DLQ fill:#f5f1eb,stroke:#ebd5c1,color:#521000
+  linkStyle default stroke:#521000,stroke-width:2px
+```
 
-<!-- The embedding model choice matters. bge-base-en-v1.5 produces 768-dimensional vectors. CLS pooling takes the [CLS] token's output as the sentence representation, while mean pooling averages all token outputs. For search tasks, CLS pooling produces better results because it was specifically trained to encode full-sentence semantics into a single vector. The Vectorize index must be created with matching dimensions (768) and cosine similarity metric. Configurable via SEARCH_TOP_K (default 50) and SEARCH_SCORE_THRESHOLD (default 0.3).
+<div v-motion :initial="{ y: 20, opacity: 0 }" :enter="{ y: 0, opacity: 1, transition: { delay: 300, duration: 600 } }">
+
+Every binding -- database, queue, vector index, AI model -- is accessed through JavaScript APIs that return `JsProxy` objects, not Python types.
+
+</div>
+
+<!--
+The architecture diagram shows the worker at the center, but the real story is in the arrows. Each arrow crosses the Python/JavaScript FFI boundary. D1 queries return JsProxy objects. Queue messages arrive as JsProxy. Vectorize results need conversion. Workers AI embeddings come back as JavaScript arrays. The worker wraps each binding in a SafeD1, SafeVectorize, SafeAI, or SafeQueue boundary class that converts types at the edge, keeping the core Python logic free of FFI concerns.
 
 Sources:
-- https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — lesson 10: Workers AI embedding model choice, CLS vs mean pooling
-- https://github.com/adewale/planet_cf/blob/main/README.md — search defaults table showing top-K, score threshold, embedding max chars -->
+- https://github.com/adewale/planet_cf/blob/main/docs/ARCHITECTURE.md -- system overview and binding topology
+- https://github.com/adewale/planet_cf/blob/main/wrangler.jsonc -- D1, Vectorize, Queues, AI bindings
+-->
 
 ---
 layout: section
 transition: iris
 ---
 
-# Every boundary is a type conversion
+# Boundaries That Make It Work
 
-When Python lives inside V8, every API call crosses a world.
+Python inside JavaScript, made safe by a thin conversion layer
 
-<!-- This is the central architectural insight of Planet CF. Pyodide (the Python-in-WebAssembly runtime) returns JsProxy objects when interacting with JavaScript APIs. These objects look like Python objects but are neither subscriptable nor iterable. The TypeError: 'pyodide.ffi.JsProxy' object is not subscriptable error was one of the first production failures. More insidiously, JavaScript null does not become Python None — it becomes JsNull, which fails the `is None` check. JavaScript undefined becomes JsUndefined, which also fails `is None`. Python None passed to D1 becomes undefined, which D1 rejects. There are three distinct null-like values at the FFI boundary, and `is None` catches only one of them.
-
-Sources:
-- https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — lessons 1, 17, 21: JsProxy conversion, FFI type matrix, the three nulls -->
-
----
-transition: fade
----
-
-# The boundary layer that saved us
-
-`JsProxy` objects look like Python but crash on subscript. `JsNull` is **not** `None`. The fix: a thin boundary at the edge.
-
-<v-clicks>
-
-- **SafeD1** -- JsProxy results to Python `dict`
-- **SafeVectorize** -- search results + `to_js()` input
-- **SafeAI** -- embedding calls, JsProxy to lists
-- **`_to_d1_value()`** -- Python `None` to JS `null`
-
-</v-clicks>
-
-<v-click>
-
-Business logic stays pure Python. One conversion point, not dozens scattered through the codebase.
-
-</v-click>
-
-<!-- The boundary layer pattern emerged from painful debugging. Initially, JsProxy type checks leaked throughout the codebase — every function that touched a Cloudflare API had its own hasattr(x, 'to_py') guard. The SafeD1, SafeVectorize, and SafeAI wrapper classes quarantine all type conversion at the edge. Python core code never sees JsProxy, JsNull, or JsUndefined. This also makes testing easier — unit tests with Python mocks actually reflect production behavior because the boundary layer guarantees clean types. The two-tier FFI testing strategy (CPython mocks + Pyodide fakes) was adopted from the tasche project to catch boundary bugs that standard mocking misses.
-
-Sources:
-- https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — lessons 2, 3, 20, 21: boundary layer pattern, mock limitations, FFI testing, is-None trap
-- https://github.com/adewale/planet_cf/blob/main/src/wrappers.py — SafeD1, SafeVectorize, SafeAI implementation -->
+<!--
+This section break introduces the core architectural insight of Planet CF: the boundary layer pattern. The through-line of this deck is that running Python inside JavaScript creates unique challenges at the type boundary, and the project's solution is a thin, disciplined conversion layer that quarantines all FFI complexity.
+-->
 
 ---
 transition: morph-fade
 ---
 
-# Hybrid search beats pure semantic
+# `None` Is Not `None`
 
-Searching "context" missed articles with "context" in the title. Semantic similarity does not guarantee keyword overlap.
+JavaScript `null` arrives in Python as `JsNull` -- a falsy value that is **not** Python `None`.
 
 <v-clicks>
 
-- **Tier 1** -- exact title match, score 1.0
-- **Tier 2** -- Vectorize cosine similarity ranking
-- **Tier 3** -- D1 `LIKE` keyword matches, by date
+- `value is None` catches Python `None` only
+- `JsNull` is falsy, but `JsNull is None` is `False`
+- Three null-like values: `None`, `JsNull`, `JsUndefined`
+- Every `if x is None` at the boundary is a lurking bug
 
 </v-clicks>
 
-<v-click>
+<div v-click class="mt-6 p-4 rounded-lg" style="background: var(--deck-surface); border: 1px solid var(--deck-border);">
 
-Two search worlds, one boundary. The ranking function is the conversion layer.
+**The fix:** `_is_js_undefined()` checks `type(x).__name__` at the boundary -- convert once at the edge, keep core logic pure Python.
 
-</v-click>
+</div>
 
-<!-- The hybrid search lesson came from a real failure: a user searched "context is the work" and the article with that exact title was not the first result. Pure Vectorize semantic search found conceptually similar content but ranked it by embedding distance, not title relevance. The fix was three-tier ranking: exact title matches first (score 1.0), partial title matches next (score 0.95), semantic matches by Vectorize score, and finally keyword-only matches by date. Bidirectional title matching was critical — both "what the day-to-day looks like" (exact) and "what the day-to-day looks like now" (query contains title) should match. D1 LIKE queries also need escaping for % and _ characters to prevent SQL injection.
+<!--
+This is the genuinely surprising finding from the project. Every Python developer's instinct is to check `if x is None`. In Pyodide, that check is subtly broken because JavaScript has two null-like values (null and undefined) that become JsNull and JsUndefined in Python -- neither of which is Python None. The project discovered this through production failures: mock tests passed because mocks use real Python None, but production code crashed on JsNull. The fix was a two-tier testing strategy: CPython mocks for logic, Pyodide fakes for FFI boundary verification.
 
 Sources:
-- https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — lessons 5, 6, 15, 16: hybrid search, LIKE escaping, exact-match ranking, real infrastructure tests -->
+- https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md -- lesson 21: is None is never enough at the FFI boundary
+- https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md -- lesson 17: Pyodide FFI type-compatibility matrix
+-->
+
+---
+layout: fact
+transition: fade
+---
+
+# 21
+
+Hard-won lessons documented
+
+Each traced to a specific production incident -- from JsProxy traps to deterministic E2E testing.
+
+<!--
+The LESSONS_LEARNED document is unusually comprehensive for a project of this size. Twenty-one lessons, each with a specific problem, symptom, and solution. Notable entries include: lesson 4 (templates must be embedded as Python strings because Workers have no filesystem), lesson 5 (hybrid search combining Vectorize semantic similarity with D1 keyword LIKE queries), lesson 9 (stateless sessions via HMAC-signed cookies because Workers are stateless), and lesson 19 (synchronous fetch-now endpoints that eliminate flaky sleep-based E2E tests). The document itself is an artifact of disciplined engineering practice.
+
+Sources:
+- https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md -- all 21 lessons
+- https://github.com/adewale/planet_cf/blob/main/src/config.py -- 20+ smart defaults with sensible fallbacks
+-->
 
 ---
 layout: end
 transition: fade
 ---
 
-# The boundaries that constrain you become the architecture
+# Boundaries Create Reliability
 
-JsProxy, JsNull, `is None`. Every conversion is a design decision.
+Python inside JavaScript, made safe by a thin conversion layer.
 
-<!-- Planet CF demonstrates that platform constraints — no filesystem, JsProxy types, three kinds of null — are not obstacles to work around. They are the architecture itself. The boundary layer pattern, the embedded template system, the hybrid search ranking — each emerged from a specific constraint becoming a specific design decision. The project runs at github.com/adewale/planet_cf and serves www.planetcloudflare.dev.
-
-Sources:
-- https://github.com/adewale/planet_cf — project repository
-- https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md — 21 lessons that shaped the architecture -->
+<!--
+The closing resolves the through-line: boundaries are not limitations but architectural strengths. The SafeD1, SafeVectorize, SafeAI wrappers quarantine all JsProxy complexity at the edge, keeping the core Python codebase testable with standard mocks. The boundary layer pattern -- convert everything at the edge, guarantee pure Python types in the core -- is the design decision that makes the project maintainable despite running in an unconventional runtime.
+-->

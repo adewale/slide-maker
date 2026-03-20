@@ -43,7 +43,7 @@ const segmentData = computed(() => {
 <style scoped>
 .progress-segment-bar {
   position: fixed;
-  top: 0;
+  bottom: 0;
   left: 0;
   right: 0;
   height: 3px;
@@ -56,7 +56,7 @@ const segmentData = computed(() => {
 .segment {
   flex: 1;
   height: 100%;
-  transition: background-color 0.2s ease;
+  transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .segment.completed {

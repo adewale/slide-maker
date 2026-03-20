@@ -1,31 +1,12 @@
-/* Design tokens -- bold-modern preset with Tasche monochrome brand override */
 :root {
-  /* Core palette -- Tasche's monochrome identity on dark background */
   --deck-bg: #0a0a0f;
   --deck-fg: #f0f0f5;
-  --deck-accent: #f0f0f5;
-  --deck-accent-alt: #d2d2d7;
-  --deck-muted: #6e6e73;
+  --deck-accent: #e8e8ed;
+  --deck-accent-alt: #b0b0b8;
+  --deck-muted: rgba(240, 240, 245, 0.45);
+  --deck-border: rgba(240, 240, 245, 0.12);
 
-  /* Structural */
-  --deck-rule: #2a2a30;
-  --deck-code-bg: #16161c;
-
-  /* Typography */
   --deck-font-display: 'Bebas Neue', sans-serif;
   --deck-font-body: 'DM Sans', sans-serif;
   --deck-font-mono: 'JetBrains Mono', monospace;
-
-  /* Spacing */
-  --deck-space-sm: 0.5rem;
-  --deck-space-md: 1rem;
-  --deck-space-lg: 2rem;
-  --deck-space-xl: 3rem;
-
-  /* Radius */
-  --deck-radius: 6px;
-
-  /* Shadow */
-  --deck-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  --deck-shadow-lg: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
 }

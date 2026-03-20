@@ -50,7 +50,7 @@ ul li::marker {
   color: var(--deck-accent);
 }
 
-/* v-click animations — cloudflare preset */
+/* v-click animations -- cloudflare preset */
 .slidev-vclick-target {
   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -128,13 +128,13 @@ ul li::marker {
   justify-content: center;
   align-items: center;
   text-align: center;
-  background: var(--deck-fg);
-  color: var(--deck-bg);
+  background: var(--deck-surface);
+  color: var(--deck-fg);
 }
 
 .slidev-layout.end h1 {
   font-size: 3.5rem;
-  color: var(--deck-bg);
+  color: var(--deck-fg);
 }
 
 .slidev-layout.end p {
@@ -167,5 +167,11 @@ ul li::marker {
   font-size: 1rem;
 }
 
-/* Presenter cursor — crosshair when drawing mode is active */
+/* Center layout alignment */
+.slidev-layout.center h1,
+.slidev-layout.center p {
+  text-align: center;
+}
+
+/* Presenter cursor */
 .slidev-drawing-enabled { cursor: crosshair !important; }

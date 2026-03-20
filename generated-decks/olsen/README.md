@@ -1,12 +1,19 @@
 # Olsen
 
-A 7-slide presentation about [Olsen](https://github.com/adewale/olsen), a local-first CLI tool for faceted browsing of photographs.
+A 7-slide deck presenting [Olsen](https://github.com/adewale/olsen), a high-performance photo indexing system for DNG, JPEG, and BMP files.
 
-## Quick start
+## Through-line
+
+"Read-only to sources -- the constraint that became the architecture." Olsen's O_RDONLY guarantee shapes every design decision: all output flows into a single SQLite database, making the catalog portable and the browsing experience local-first.
+
+## Style
+
+Uses the **tufte-data** preset: EB Garamond display, Source Sans 3 body, warm white background, scholarly tone.
+
+## Run
 
 ```bash
-npm install
-npx slidev
+npx slidev slides.md
 ```
 
 ## Build
@@ -15,29 +22,8 @@ npx slidev
 npx slidev build
 ```
 
-Output goes to `dist/`.
-
-## Export to PDF
+## Export PDF
 
 ```bash
 npx slidev export
 ```
-
-## Style
-
-- Preset: tufte-data
-- Typography: EB Garamond (display), Source Sans 3 (body), Source Code Pro (mono)
-- Palette: warm white `#fffff8`, near-black `#111111`, data-blue `#2d5f8a`
-
-## Structure
-
-| File | Purpose |
-|------|---------|
-| `slides.md` | Presentation source |
-| `deck.spec.md` | Planning spec |
-| `styles/` | Tokens, theme, transitions |
-| `setup/` | Keyboard shortcuts, Mermaid renderer |
-| `composables/` | Shared reactive state |
-| `components/` | KeyboardHelp, ProgressTallyMarks |
-| `global-top.vue` | Help overlay + tally marks progress |
-| `global-bottom.vue` | Footer chrome |

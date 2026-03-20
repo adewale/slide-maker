@@ -2,9 +2,9 @@
 
 ## Meta
 - title: Claude History Explorer
-- purpose: present a Python CLI tool that turns raw Claude Code conversation history into searchable insights and narrative stories
-- audience: developers who use Claude Code daily and want to understand their coding patterns
-- tone: sharp, grounded, trust-conscious
+- purpose: present a CLI tool that turns opaque JSONL conversation history into searchable narratives and personality insights
+- audience: developers who use Claude Code and want to understand their own coding patterns
+- tone: serious, restrained, curious
 - target-length: 7
 - notes: yes
 - style-preset: editorial-dark
@@ -12,28 +12,31 @@
 - progress: segment-bar
 
 ## Source Materials
-- readme: README.md (factual backbone -- what it does, CLI commands, installation, how Claude Code stores history)
-- architecture: docs/ARCHITECTURE.md (three-layer architecture -- data models, business logic, CLI; read-only data flow; story generation pipeline)
-- trust: TRUST.md (read-only guarantee, no network calls, minimal dependencies, privacy model)
-- changelog: CHANGELOG.md (v0.1.0 initial release with 9 commands, story generation, data models)
-- roadmap: ROADMAP.md (Wrapped feature -- shareable year-in-review URLs with Cloudflare edge rendering)
-- wrapped-arch: docs/WRAPPED_ARCHITECTURE.md (URL anatomy, privacy architecture, Cloudflare primitives)
+- readme: README.md (project overview -- CLI commands, installation, history format, story generation features, example terminal output)
+- changelog: CHANGELOG.md (v0.1.0 initial release -- 9 commands, story generation, concurrent detection)
+- trust: TRUST.md (trust model -- read-only guarantee, no network calls, 2600 lines auditable, 3 dependencies, five verifiable guarantees)
+- faq: FAQ.md (agent concepts -- main vs agent sessions, concurrent instances, personality classification thresholds)
+- roadmap: ROADMAP.md (wrapped feature -- URL-encoded stats, Cloudflare Workers website, social cards)
 
 ## Through-Line
-- concept: "Read-only to your history. Never silent about what it reads."
-- type: design-rule
+- concept: "What does your conversation history say about you?"
+- type: question
 - appears-in:
-  - slide 2: default-content -- introduces the read-only principle as the project's foundation
-  - slide 4: section -- "read-only by design" as a trust mechanism, verified by tests
-  - slide 5: default-content -- the Wrapped feature encodes stats into the URL, stores nothing
-  - slide 7: end -- resolution: the tool that reads everything writes nothing
+  - slide 1: cover -- the question is implicit in the project's purpose
+  - slide 3: section -- "reading the receipts" -- history files become searchable conversations
+  - slide 5: center -- the surprise: personality analysis uses no AI, just timestamp arithmetic
+  - slide 6: section -- "the trust contract" -- earning the right to read your history
+  - slide 7: end -- resolution: your history is already telling a story
 
 ## Design Tokens
 - colors:
   - bg: "#0a0a0f"
-  - fg: "#e8e4df"
+  - fg: "#e8e4de"
   - accent: "#38bdf8"
-  - muted: "rgba(232, 228, 223, 0.45)"
+  - accent-alt: "#7dd3fc"
+  - muted: "rgba(232, 228, 222, 0.45)"
+  - surface: "#141419"
+  - border: "rgba(232, 228, 222, 0.12)"
 - typography:
   - display: Playfair Display
   - body: Source Sans 3
@@ -48,14 +51,13 @@
   - section
   - default
   - center
-  - fact
   - end
 - custom-layouts: []
-- components: []
+- components:
+  - ProgressSegmentBar
 - css-files:
   - styles/tokens.css
   - styles/theme.css
-  - styles/transitions.css
 
 ## Slides
 
@@ -63,68 +65,48 @@
 - kind: cover
 - layout: cover
 - title: Claude History Explorer
-- subtitle: A Python CLI tool to explore, search and visualise your Claude Code conversation history
-- notes:
-  - The subtitle is the project's actual description from its README first paragraph. The through-line appears starting in slide 2.
+- subtitle: Python CLI tool to explore, search and visualise your Claude Code conversation history
 
 ### Slide 2
 - kind: default-content
 - layout: default
-- title: What it is and why it exists
-- body: A Python CLI tool to explore, search and visualise your Claude Code conversation history. The history is stored locally at ~/.claude/projects/ and this tool turns raw JSONL files into searchable conversations and insights about your coding journey.
+- title: What Is Claude History Explorer?
+- body: Read-only CLI that parses JSONL files from ~/.claude/projects/. Nine commands, streams line-by-line, detects concurrent instances. 2,600 lines of Python with three runtime dependencies.
 - sources:
-  - https://github.com/adewale/claude-history-explorer/blob/main/README.md -- project overview, storage format, feature list
-  - https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md -- read-only and no-network guarantees
-- notes:
-  - This slide establishes what the project IS and WHY before any architecture. The verbatim README description appears here. Read-only + no-network is the trust foundation everything else builds on.
+  - https://github.com/adewale/claude-history-explorer/blob/main/README.md -- project overview and feature list
+  - https://github.com/adewale/claude-history-explorer/blob/main/pyproject.toml -- dependency list
 
 ### Slide 3
-- kind: fact
-- layout: fact
-- title: ~2,600 lines of Python. 3 runtime dependencies.
-- body: click, rich, sparklines. Small enough to audit in an afternoon.
-- sources:
-  - https://github.com/adewale/claude-history-explorer/blob/main/TRUST.md -- "Total: ~2,600 lines of Python" and dependency table
-  - https://github.com/adewale/claude-history-explorer/blob/main/pyproject.toml -- dependency list
-- notes:
-  - The small codebase is not incidental -- it is a trust mechanism. 2,600 lines is auditable. The 3 dependencies (click, rich, sparklines) are all output-formatting libraries with zero file or network capability.
-
-### Slide 4
 - kind: section
 - layout: section
-- title: Read-only by design
-- notes:
-  - Through-line echo. The read-only guarantee is enforced three ways: code design (all opens use 'r' mode), no write imports (no shutil, os.remove), and automated static analysis tests. This is not a policy -- it is a verifiable property.
+- title: Reading the Receipts
+
+### Slide 4
+- kind: default-content
+- layout: default
+- title: From JSONL to Narrative
+- body: Mermaid diagram showing data flow from raw session files through parser, classifier, to story generator. Includes real terminal output from the story command showing delegation style, message rates, and concurrent instance detection.
+- sources:
+  - https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/stories.py -- narrative generation
+  - https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/constants.py -- classification thresholds
+  - https://github.com/adewale/claude-history-explorer/blob/main/README.md -- example output
 
 ### Slide 5
-- kind: default-content
-- layout: default
-- title: Nine commands, zero writes
-- body: projects, sessions, show, search, export, stats, summary, story, wrapped. Personality insights, concurrency detection, shareable year-in-review URLs. Every operation reads JSONL and renders output.
+- kind: center-statement
+- layout: center
+- title: A tool about AI that uses no AI
+- body: Personality traits derived from arithmetic on JSONL timestamps -- not machine learning. The surprising constraint: no NLP, no embeddings, just deterministic thresholds.
 - sources:
-  - https://github.com/adewale/claude-history-explorer/blob/main/README.md -- command inventory and usage
-  - https://github.com/adewale/claude-history-explorer/blob/main/docs/WRAPPED_ARCHITECTURE.md -- URL encoding, privacy architecture
-- notes:
-  - The story command detects concurrent Claude instances, classifies personality traits, and generates timeline sparklines. The wrapped command is the social feature -- it creates a shareable URL where all data lives in the URL itself, not on a server. The privacy model is URL-as-database.
+  - https://github.com/adewale/claude-history-explorer/blob/main/FAQ.md -- personality trait definitions
+  - https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/constants.py -- threshold constants
 
 ### Slide 6
-- kind: default-content
-- layout: default
-- title: The architecture is the argument
-- body: Three layers (CLI, Business Logic, Data Models) with a strict read-only data access pattern. JSONL files stream line-by-line -- no full file loading. Story generation pipeline flows from session discovery through pattern analysis to personality classification.
-- sources:
-  - https://github.com/adewale/claude-history-explorer/blob/main/docs/ARCHITECTURE.md -- three-layer architecture, data flow, story generation pipeline
-- notes:
-  - The streaming JSONL approach handles large history files efficiently. The story generation pipeline is the most interesting part architecturally: it classifies work intensity, collaboration style, and personality traits from session metadata alone.
+- kind: section
+- layout: section
+- title: The Trust Contract
 
 ### Slide 7
 - kind: end
 - layout: end
-- title: The tool that reads everything writes nothing.
-- subtitle: That is the entire trust model.
-- notes:
-  - Resolution of the through-line. The closing echoes the design-rule: read-only to your history, never silent about what it reads. The trust model is not a promise -- it is a testable property of 2,600 lines of code.
-
-## Notes Policy
-- every content slide has presenter notes with 2+ sentences of delivery context
-- every factual slide has a Sources block citing the specific project document
+- title: Your History Is Already Telling a Story
+- subtitle: Claude History Explorer just lets you read it

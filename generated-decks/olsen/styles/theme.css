@@ -1,16 +1,20 @@
-/* Olsen — tufte-data preset */
+/* ── Base ── */
+.slidev-layout {
+  font-family: var(--deck-font-body);
+  color: var(--deck-fg);
+  background: var(--deck-bg);
+}
 
-/* Typography hierarchy */
+/* ── Typographic hierarchy ── */
 .slidev-layout h1 {
   font-family: var(--deck-font-display);
   font-weight: 400;
-  font-style: normal;
-  color: var(--deck-fg);
+  font-style: italic;
   letter-spacing: -0.01em;
+  color: var(--deck-fg);
 }
 
-.slidev-layout h2,
-.slidev-layout h3 {
+.slidev-layout h2 {
   font-family: var(--deck-font-display);
   font-weight: 400;
   color: var(--deck-fg);
@@ -19,21 +23,12 @@
 .slidev-layout p,
 .slidev-layout li {
   font-family: var(--deck-font-body);
-  font-size: 1rem;
+  font-size: 1.05rem;
   line-height: 1.65;
   color: var(--deck-fg);
 }
 
-.slidev-layout code {
-  font-family: var(--deck-font-mono);
-  font-size: 0.85em;
-  color: var(--deck-accent);
-  background: color-mix(in srgb, var(--deck-accent) 8%, transparent);
-  padding: 0.15em 0.35em;
-  border-radius: 3px;
-}
-
-/* Cover layout alignment */
+/* ── Cover layout ── */
 .slidev-layout.cover {
   display: flex;
   flex-direction: column;
@@ -45,89 +40,134 @@
 }
 
 .slidev-layout.cover h1 {
-  font-size: 3rem;
+  font-size: 3.2rem;
+  font-weight: 400;
+  font-style: italic;
   margin-bottom: 0.5rem;
 }
 
 .slidev-layout.cover p {
   font-size: 1.15rem;
   color: var(--deck-muted);
-  max-width: 36rem;
-  line-height: 1.6;
+  max-width: 32em;
 }
 
-/* End layout */
+/* ── Section dividers: inverted ── */
+.slidev-layout.section {
+  background: var(--deck-fg);
+  color: var(--deck-bg);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 3rem 4rem;
+}
+
+.slidev-layout.section h1 {
+  color: var(--deck-bg);
+  font-size: 2.4rem;
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* ── Center layout ── */
+.slidev-layout.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 4rem;
+}
+
+.slidev-layout.center h1 {
+  font-size: 2rem;
+  max-width: 26em;
+  margin-bottom: 1rem;
+}
+
+.slidev-layout.center p {
+  max-width: 30em;
+  text-align: center;
+  color: var(--deck-muted);
+}
+
+/* ── Fact layout ── */
+.slidev-layout.fact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.slidev-layout.fact h1 {
+  font-size: 5rem;
+  font-weight: 500;
+  font-style: normal;
+  color: var(--deck-accent);
+  letter-spacing: -0.03em;
+  margin-bottom: 0.25rem;
+}
+
+.slidev-layout.fact p {
+  max-width: 28em;
+  text-align: center;
+  color: var(--deck-muted);
+}
+
+/* ── End layout: warm white, not black ── */
 .slidev-layout.end {
+  background: var(--deck-bg);
+  color: var(--deck-fg);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  text-align: left;
   padding: 3rem 4rem;
-  background: var(--deck-bg);
+  text-align: left;
 }
 
 .slidev-layout.end h1 {
-  font-size: 2rem;
-  max-width: 30rem;
-  line-height: 1.3;
+  font-size: 2.6rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--deck-fg);
+  margin-bottom: 0.5rem;
 }
 
 .slidev-layout.end p {
+  color: var(--deck-muted);
   font-size: 1.05rem;
-  color: var(--deck-muted);
-  font-style: italic;
-  max-width: 32rem;
-  margin-top: 1rem;
+  max-width: 30em;
 }
 
-/* Center layout */
-.slidev-layout.center {
-  text-align: center;
+/* ── Default content ── */
+.slidev-layout.default {
+  padding: 2.5rem 4rem;
 }
 
-.slidev-layout.center h1 {
-  font-size: 2.2rem;
-  max-width: 32rem;
-  margin: 0 auto 1rem;
-  line-height: 1.3;
+.slidev-layout.default h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1.25rem;
 }
 
-.slidev-layout.center p {
-  text-align: center;
-  max-width: 32rem;
-  margin: 0 auto;
-}
-
-/* Fact layout */
-.slidev-layout.fact h1 {
-  font-size: 3.5rem;
-  color: var(--deck-accent);
-  font-weight: 400;
-}
-
-.slidev-layout.fact p {
-  color: var(--deck-muted);
-  font-size: 0.95rem;
-}
-
-/* List styling */
-.slidev-layout ul li::marker,
+/* ── List markers ── */
 .slidev-layout ol li::marker {
   color: var(--deck-accent);
+  font-weight: 500;
 }
 
-.slidev-layout li {
-  margin-bottom: 0.35rem;
+.slidev-layout ul li::marker {
+  color: var(--deck-accent);
 }
 
-/* Strong text */
-.slidev-layout strong {
-  font-weight: 600;
-  color: var(--deck-fg);
+/* ── Code blocks ── */
+.slidev-layout pre,
+.slidev-layout code {
+  font-family: var(--deck-font-mono);
 }
 
-/* v-click animation — tufte-data preset: simple fade */
+/* ── v-click animation: tufte-data preset ── */
 .slidev-vclick-target {
   transition: all 0.3s ease;
 }

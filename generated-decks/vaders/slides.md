@@ -9,170 +9,135 @@ fonts:
   serif: Plus Jakarta Sans
   mono: Roboto Mono
   weights: '300,400,500,600,700'
-routerMode: hash
-selectable: true
 ---
 
 # Vaders
 
-Multiplayer TUI Space Invaders clone (1-4 players) built with OpenTUI and Cloudflare Durable Objects.
+An OpenTUI Space Invaders clone supporting solo play or 2-4 player co-op, synchronised via Cloudflare Durable Objects.
 
 <!--
-The cover uses the project's actual description from the README as the subtitle, not the through-line. Vaders is a terminal-native game running in a 120x36 character grid with braille pixel art sprites, real-time WebSocket multiplayer, and audio via system players.
+This is a multiplayer terminal game. Not a web app, not a native GUI — a terminal game with real-time multiplayer over Cloudflare Durable Objects. That choice drives everything in the architecture.
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/README.md — project description, first paragraph
+- https://github.com/adewale/vaders — project repository and README description
+-->
+
+---
+transition: slide-left
+---
+
+# Space Invaders in Your Terminal
+
+A 120x36 character grid. Braille pixel art sprites. A 30Hz game loop running inside a Durable Object. 1-4 players connected over WebSocket.
+
+<v-clicks>
+
+- **Bun + OpenTUI** for terminal rendering with React
+- **Cloudflare Durable Objects** for authoritative game state
+- **Hibernatable WebSockets** — the server sleeps between games
+- **Seeded RNG** — deterministic gameplay from identical inputs
+
+</v-clicks>
+
+<!--
+The terminal is not a constraint being worked around — it is the chosen medium. OpenTUI gives React semantics (useKeyboard, box layout, position=absolute) inside a terminal. The server is not a traditional game server; it is a Durable Object that wakes on WebSocket message and sleeps via hibernation between sessions. Every game action flows through a pure reducer function that returns new state, events to broadcast, and whether to persist. The through-line starts here: the terminal constraint is the feature.
+
+Sources:
+- https://github.com/adewale/vaders/blob/main/README.md — architecture overview, tech stack
+- https://github.com/adewale/vaders/blob/main/CLAUDE.md — tick rate (33ms/30Hz), screen size (120x36), state machine
 -->
 
 ---
 transition: slide-up
+layout: image-right
+image: /images/gameplay.png
 ---
 
-# What Vaders is and why it exists
+# Braille Sprites and Alien Marches
 
-Multiplayer TUI Space Invaders clone (1-4 players) built with OpenTUI and Cloudflare Durable Objects.
+Unicode box-drawing characters create recognizable game entities at character scale.
 
 <v-clicks>
 
-- **Solo mode** — 3 lives, 11x5 alien grid, classic march pattern
-- **Co-op** (2-4 players) — 5 shared lives, scaled grids up to 15x6, aliens 1.75x faster
-- **30Hz real-time sync** via Cloudflare Durable Objects and WebSocket
-- **Braille pixel art** — 2-line sprites, box-drawing characters, color cycling
+- **2-line tall sprites** — squids, crabs, octopuses
+- **4 destructible barriers** with per-health color
+- **Rainbow UFO** via color cycling
+- **Dissolve effects** — braille particle system for deaths
 
 </v-clicks>
 
-<div v-click class="mt-4 text-lg" style="color: var(--deck-accent); font-weight: 600;">
-The core philosophy: accept the constraint.
-</div>
-
 <!--
-This slide explains what Vaders IS before diving into architecture. The README description appears verbatim. The through-line is introduced here: the project succeeds by embracing terminal limitations rather than fighting them. Chunky movement is not a bug — it is the correct feel for the genre. Solid foreground colors are not a limitation — they enable Amiga-style color cycling animation.
+Moving from 80x24 to 120x36 allowed 2-line sprites that are much more readable than single-line alternatives. Characters like the box-drawing set create ships and aliens. The UFO uses a color cycling rainbow effect — six colors rotating every 5 ticks. Barriers degrade from both sides, matching the original Space Invaders design where they buy time but are never permanent cover. The dissolve effect uses a braille particle system for entity deaths.
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/README.md — game modes, requirements, feature list
-- https://github.com/adewale/vaders/blob/main/CLAUDE.md — scaling table: 1 player = 3 lives, 2-4 = 5 shared lives
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — braille pixel art sprites, color cycling technique
+- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — Unicode sprites, multi-line sprites, dissolve effects
+- https://github.com/adewale/vaders/blob/main/CHANGELOG.md — braille pixel art sprites, barrier segments, dissolve effects
+-->
+
+---
+transition: fade
+layout: center
+---
+
+# Full state sync at 30Hz. No deltas.
+
+2KB per tick. 4 players. 120 messages per second. The optimisation was not building delta updates.
+
+<!--
+The server broadcasts full game state to every connected client on every tick. At 30Hz with 4 players, that is 120 WebSocket messages per second. Each message is roughly 2KB of JSON. The team considered delta updates but decided against them — full sync is simpler to reason about and debug. The only optimisation applied: omit playerId and config from subsequent syncs (they are sent once on join), roughly halving payload size. Binary protocols were considered and rejected at this scale. This is the through-line in action: the "naive" approach was good enough, and its simplicity became an advantage.
+
+Sources:
+- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — full sync vs delta updates, broadcast frequency optimisations
+- https://github.com/adewale/vaders/blob/main/CLAUDE.md — state sync architecture, WebSocket protocol
 -->
 
 ---
 transition: morph-fade
-layout: two-cols-header
+layout: center
 ---
 
-# Architecture
+# 1980s Amiga Color Cycling in a 2026 Terminal
 
-Three workspaces, one authoritative server
-
-::left::
-
-<v-clicks>
-
-- **Client** — Bun + OpenTUI React terminal app
-- **Worker** — Cloudflare Durable Object game server
-- **Shared** — TypeScript types and protocol definitions
-
-</v-clicks>
-
-::right::
-
-```mermaid {scale: 0.8}
-graph LR
-  C["Client"] --> W["Worker DO"]
-  W --> S["Shared Types"]
-  C --> S
-  style C fill:#B2EBF2,stroke:#00BCD4,color:#1C1B1F
-  style W fill:#FFE0B2,stroke:#FF8800,color:#1C1B1F
-  style S fill:#E8DEF8,stroke:#625B71,color:#1C1B1F
-  linkStyle default stroke:#00BCD4,stroke-width:2px
-```
-
-The Durable Object runs the 30Hz game loop and broadcasts full state via WebSocket. The client renders and sends input. Shared types enforce the contract.
+Brightness ramps, not color jumps. Coprime tick rates across depth layers. Hash-based phase offsets so neighboring stars never pulse in sync.
 
 <!--
-The architecture is a classic authoritative-server split. The Durable Object uses hibernatable WebSockets — it can sleep while maintaining connections, waking on messages or alarms. Alarms replace setInterval for hibernation compatibility. The game loop ticks at 33ms intervals. All game logic flows through a single pure reducer function, making state changes deterministic and testable.
+This is the surprising slide. The Amiga had a 32-color palette and artists developed techniques to create compelling animation from minimal state changes. Those same techniques map directly to terminal cells which also have a single foreground color per cell. The starfield uses multiple depth layers cycling at coprime periods (15, 20, 28 ticks) to prevent lockstep. Rare bright spikes in otherwise dim ramps create scintillation. Spatial phase offsets via hash function distribution ensure neighboring stars desynchronize. The lesson from Lessons_learned.md: "Constraints breed creativity."
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/README.md — architecture section showing three workspaces
-- https://github.com/adewale/vaders/blob/main/CLAUDE.md — tick rate 33ms, full state sync, hibernatable WebSockets
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — pure reducer pattern, alarm-based tick loop
--->
-
----
-layout: section
-transition: iris
----
-
-# Terminal constraints become retro aesthetic
-
-Chunky movement. Solid colors. Character cells. Not bugs — design decisions.
-
-<!--
-Through-line echo: the Lessons Learned document repeatedly returns to this theme. Aliens moving 2 cells every 18 ticks "looks correct for the genre." Color cycling through a palette (the Amiga technique) creates compelling animation from minimal state changes. The 120x36 grid forced 2-line sprites that are more readable than single-line alternatives. Every constraint shaped a better design.
-
-Sources:
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — TUI constraints section, color cycling, sprite design
+- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — Amiga color cycling techniques, visual effects in terminals, color visibility on black backgrounds
 -->
 
 ---
 transition: slide-up
----
-
-# Full sync at 30Hz — simplicity wins
-
-The server broadcasts complete game state every tick.
-
-<v-clicks>
-
-- Game state is ~2KB per tick
-- With 4 players: 120 messages/second — within WebSocket limits
-- Delta updates were considered and rejected
-- Only optimization: omit `config` and `playerId` after initial join
-
-</v-clicks>
-
-```ts
-// Full sync — simple and correct
-this.broadcast({ type: 'sync', state: this.game })
-```
-
-<!--
-Accept the constraint: full sync sounds wasteful, but at this scale the simplicity is worth it. The Lessons Learned document is explicit: "Start with full state sync. Only optimize if bandwidth becomes a problem." Binary protocols and compression were also rejected — JSON at 2KB is below the compression benefit threshold. The one optimization applied (omitting config after join) roughly halved payload size without adding complexity.
-
-Sources:
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — full sync vs delta updates, broadcast optimization
-- https://github.com/adewale/vaders/blob/main/CLAUDE.md — WebSocket protocol: sync messages at 30Hz
--->
-
----
 layout: fact
-transition: fade
 ---
 
 # 620+
-tests across all workspaces
 
-Including property-based tests with `fast-check` that caught a color conversion bug no hand-written test found — gray values 239-248 produced index 256, one past the valid range.
+Tests across all workspaces
+
+Property-based testing with fast-check found a color conversion bug that no hand-written test caught. Gray values 239-248 produced index 256 — out of the valid [16, 255] range.
 
 <!--
-The hexTo256Color function maps 24-bit hex colors to the 256-color terminal palette. It had been working in production and passing all example-based tests. Property-based testing with fast-check immediately found a counterexample: Math.round((243 - 8) / 10) + 232 = 256, which is out of the valid [16, 255] range. The fix was lowering the white detection threshold from > 248 to > 238. This is a concrete example of the through-line: property-based testing accepted that human test authors cannot enumerate every edge case, and let the machine find the gap.
+The hexTo256Color function had been passing all example-based tests. Property-based testing with fast-check immediately found a counterexample: gray = 243 produced Math.round((243-8)/10) + 232 = 256, which is out of range. The white detection threshold was too high (>248 instead of >238). This is a textbook case for property testing: functions that map continuous inputs to bounded outputs. The invariant "output is always in [16, 255]" is trivial to assert but hard to exhaustively verify with examples. IEEE 754 edge cases also surfaced — lerp(-0, 0, 0) returns 0 not -0, Math.floor(-5e-324) returns -1. The solution: constrain generators to realistic ranges rather than patching code.
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/CHANGELOG.md — "620+ tests" in v1.0.0 feature list
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — property-based testing section, hexTo256Color counterexample
+- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — property-based testing, hexTo256Color bug, IEEE 754 edge cases
+- https://github.com/adewale/vaders/blob/main/CHANGELOG.md — 620+ tests, property-based collision tests
 -->
 
 ---
-layout: end
 transition: fade
+layout: end
 ---
 
-# Accept the constraint
+# Accept the constraint. It becomes the feature.
 
-Chunky movement, solid colors, full state sync. The terminal shaped a better game.
+Chunky movement is retro charm. Single-color cells are Amiga cycling. Full sync is simplicity. The terminal was never the limitation.
 
 <!--
-Resolution of the through-line. Every limitation produced a design strength: chunky movement at 2 cells per 18 ticks matches the Space Invaders genre feel. Solid foreground colors enable Amiga-style color cycling. Full state sync keeps the codebase simple at the cost of bandwidth that does not matter at this scale. Property-based testing accepts that humans cannot enumerate every edge case. The constraints were not obstacles to work around — they were the design.
+This resolves the through-line. Every architectural decision that looks like a compromise turned out to be an advantage. Chunky cell-by-cell movement matches the Space Invaders aesthetic. The single foreground color per cell enabled techniques borrowed from 1980s Amiga artists. Full state sync avoided complexity and the simplicity made debugging trivial. The 120x36 grid forced braille sprite art that gives the game its distinctive visual identity. The project proves that working within constraints — rather than fighting them — produces coherent, opinionated software.
 
 Sources:
-- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — summary principles: "Accept terminal constraints. Chunky movement and solid colors are features, not bugs."
+- https://github.com/adewale/vaders/blob/main/Lessons_learned.md — key principles summary, accept terminal constraints
 -->

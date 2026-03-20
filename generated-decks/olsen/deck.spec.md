@@ -2,29 +2,30 @@
 
 ## Meta
 - title: Olsen
-- purpose: introduce Olsen's architecture and design philosophy to developers interested in local-first photo tooling
-- audience: developers who work with photograph collections and care about data sovereignty
+- purpose: present a high-performance photo indexer that treats read-only access as an architectural virtue
+- audience: developers building media pipelines, photo management tools, or local-first applications
 - tone: scholarly, evidence-driven, precise
 - target-length: 7
 - notes: yes
 - style-preset: tufte-data
 - project-url: https://github.com/adewale/olsen
-- progress: tally-marks
+- progress: segment-bar
 
 ## Source Materials
-- readme: README.md (factual backbone — what Olsen does, supported formats, performance benchmarks, safety guarantees)
-- architecture: docs/architecture.md (system layers, worker pool pattern, processing pipeline, storage design)
-- changelog: CHANGELOG.md (v0.1.0 feature inventory — indexer, database, web explorer, CLI)
-- lessons-learned: docs/LESSONS_LEARNED.md (Monochrom DNG thumbnail bug, state machine discovery, debugging methodology)
+- readme: README.md (project overview -- DNG/JPEG/BMP indexing, thumbnail generation, color analysis, perceptual hashing, SQLite storage)
+- specs: specs/olsen_specs.md (system specification -- 50+ metadata fields, four thumbnail sizes, 8-stage pipeline, faceted query engine)
+- specs: specs/facet_state_machine.spec (state machine navigation -- zero-result prevention, data-driven enablement, filter preservation)
+- specs: specs/performance.spec (performance instrumentation -- 8-stage pipeline timing, bottleneck analysis, worker scaling)
+- research: specs/faceted_ux_research_synthesis.md (UX research -- Nielsen Norman Group, Morville, Tunkelang findings on faceted navigation)
 
 ## Through-Line
-- concept: "Read-only to your photos. Read-write to your understanding of them."
+- concept: "Read-only to sources -- the constraint that became the architecture"
 - type: design-rule
 - appears-in:
-  - slide 2: default-content — the read-only guarantee introduced as the foundational design constraint
-  - slide 4: default-content — the processing pipeline extracts without modifying, building a parallel catalog
-  - slide 5: center-statement — the state machine insight: data determines valid paths, not hardcoded hierarchies
-  - slide 7: end — the resolution: your photos stay untouched, your catalog grows richer
+  - slide 2: default -- introduces O_RDONLY as the first design decision, not a limitation
+  - slide 4: section -- "the constraint that became the architecture" reframed
+  - slide 5: default -- read-only forces all output into a single portable SQLite file
+  - slide 7: end -- resolution: the read-only constraint made every other decision simpler
 
 ## Design Tokens
 - colors:
@@ -32,29 +33,29 @@
   - fg: "#111111"
   - accent: "#2d5f8a"
   - accent-alt: "#c0392b"
-  - muted: "#666666"
+  - muted: "rgba(17, 17, 17, 0.5)"
 - typography:
   - display: EB Garamond
   - body: Source Sans 3
   - mono: Source Code Pro
 - motion:
-  - preset: tufte-evidence-reveal
+  - preset: restrained-fade
 
 ## Layout System
 - prefer-builtins: true
 - builtins:
   - cover
+  - section
   - default
   - center
   - fact
-  - two-cols-header
   - end
 - custom-layouts: []
 - components:
-  - KeyboardHelp
-  - ProgressTallyMarks
+  - ProgressSegmentBar
 - css-files:
-  - styles/index.css
+  - styles/tokens.css
+  - styles/theme.css
 
 ## Slides
 
@@ -62,56 +63,49 @@
 - kind: cover
 - layout: cover
 - title: Olsen
-- subtitle: A local-first CLI tool for faceted browsing of photographs in DNG (and other file formats)
-- notes:
-  - Olsen is named after the idea of exploring your own photo library with the rigor of a research tool. The subtitle is the project's actual description from the repo.
+- subtitle: A high-performance photo indexing system for DNG, JPEG, and BMP files
 
 ### Slide 2
 - kind: default-content
 - layout: default
-- title: What Olsen is and why it exists
-- body: A high-performance photo indexing system for DNG (Digital Negative), JPEG, and BMP files that extracts comprehensive metadata, generates aspect-ratio-preserving thumbnails, analyzes color palettes, and computes perceptual hashes for similarity detection. The critical guarantee — Olsen NEVER modifies your photo files. All file access uses read-only mode. Only the SQLite database is modified.
+- title: What Is Olsen?
+- body: A local-first photo cataloger that extracts EXIF metadata, generates aspect-ratio-preserving thumbnails at four sizes, analyzes dominant color palettes via k-means clustering, and computes perceptual hashes for similarity detection. Every file is opened O_RDONLY. The indexer never modifies a source photograph.
 - sources:
-  - https://github.com/adewale/olsen/blob/main/README.md — project description and read-only guarantee
+  - https://github.com/adewale/olsen/blob/main/README.md -- project overview and feature list
+  - https://github.com/adewale/olsen/blob/main/specs/olsen_specs.md -- system specification
 
 ### Slide 3
 - kind: fact
 - layout: fact
-- title: ~62 ms per photo
-- body: File hash 0.4 ms. Thumbnails 34 ms. Color palette 28 ms. Perceptual hash 0.2 ms. 15-25 photos/second on Apple M3 Max.
+- title: 62ms
+- body: Combined processing time per photo on Apple M3 Max -- 34ms thumbnail generation, 28ms color extraction, 0.6ms hashing. At 8 workers, the indexer sustains 15-25 photos per second.
 - sources:
-  - https://github.com/adewale/olsen/blob/main/README.md — performance benchmarks
+  - https://github.com/adewale/olsen/blob/main/specs/performance.spec -- pipeline timing breakdown
 
 ### Slide 4
-- kind: default-content
-- layout: two-cols-header
-- title: The processing pipeline
-- left: Extract (EXIF metadata, 50+ fields), Decode (image into memory), Generate (4 thumbnail sizes), Analyze (k-means color palette), Hash (pHash for similarity)
-- right: Everything extracted lives in a single SQLite file. ~190 KB per photo. 100K photos fit in ~20 GB. The original files are never touched.
-- sources:
-  - https://github.com/adewale/olsen/blob/main/docs/architecture.md — processing pipeline and storage architecture
+- kind: section
+- layout: section
+- title: The Constraint That Became the Architecture
 
 ### Slide 5
-- kind: center-statement
-- layout: center
-- title: Faceted navigation is a state machine
-- body: Users can never transition from a state with results to a state with zero results. SQL queries compute which facet values have results given current filters. No hardcoded hierarchies — data determines valid paths.
-- sources:
-  - https://github.com/adewale/olsen/blob/main/README.md — state machine model description
-  - https://github.com/adewale/olsen/blob/main/docs/LESSONS_LEARNED.md — state machine discovery
-
-### Slide 6
 - kind: default-content
 - layout: default
-- title: The Monochrom thumbnail bug
-- body: ExtractEmbeddedJPEG() returned the FIRST JPEG in the DNG file (160x120 pixels), not the LARGEST (9504x6320). Initial fix patched the UI. The regression — removing isBlackImage() — produced completely black thumbnails. Root cause found only when someone ran exiftool on the actual file.
+- title: One SQLite File Is the Catalog
+- body: Because the indexer cannot write back to source files, every derived artifact -- thumbnails, color palettes, perceptual hashes, burst groups, duplicate clusters -- lives in a single SQLite database. The database IS the catalog. Move the file, move the collection. No sidecar files, no hidden directories, no server process.
 - sources:
-  - https://github.com/adewale/olsen/blob/main/docs/LESSONS_LEARNED.md — Monochrom DNG thumbnail bug timeline
+  - https://github.com/adewale/olsen/blob/main/specs/olsen_specs.md -- "the SQLite database IS the catalog"
+
+### Slide 6
+- kind: center-statement
+- layout: center
+- title: Users can never reach zero results
+- body: Olsen's faceted navigation is a state machine, not a hierarchy. Every filter transition is validated against actual data -- values that would produce empty results are disabled before the user can select them. No dead ends.
+- sources:
+  - https://github.com/adewale/olsen/blob/main/specs/facet_state_machine.spec -- state machine navigation design
+  - https://github.com/adewale/olsen/blob/main/specs/faceted_ux_research_synthesis.md -- UX research synthesis
 
 ### Slide 7
 - kind: end
 - layout: end
-- title: Your photos stay untouched. Your catalog grows richer.
-- subtitle: Read-only to your photos. Read-write to your understanding of them.
-- notes:
-  - Circle back to the through-line. The design constraint that shaped every decision — never modify source files — is also the value proposition.
+- title: Read-Only Made Everything Simpler
+- subtitle: One constraint. One file. One way to browse 100,000 photographs.

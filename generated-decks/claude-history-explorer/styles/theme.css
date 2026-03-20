@@ -1,48 +1,41 @@
-/* ─── Editorial-dark theme for Claude History Explorer ─── */
-
-/* Base typography */
+/* ── Base ── */
 .slidev-layout {
   color: var(--deck-fg);
   font-family: var(--deck-font-body);
 }
 
+/* ── Typography hierarchy ── */
 .slidev-layout h1 {
   font-family: var(--deck-font-display);
   font-weight: 700;
-  letter-spacing: -0.02em;
   color: var(--deck-fg);
+  letter-spacing: -0.02em;
 }
 
-.slidev-layout h2,
-.slidev-layout h3 {
+.slidev-layout h2 {
   font-family: var(--deck-font-display);
   font-weight: 600;
   color: var(--deck-fg);
+  letter-spacing: -0.01em;
 }
 
 .slidev-layout p,
 .slidev-layout li {
   font-family: var(--deck-font-body);
-  font-size: 1.05rem;
-  line-height: 1.6;
   color: var(--deck-fg);
+  line-height: 1.6;
 }
 
 .slidev-layout code {
   font-family: var(--deck-font-mono);
   font-size: 0.85em;
-  background: rgba(56, 189, 248, 0.1);
+  color: var(--deck-accent);
+  background: var(--deck-surface);
   padding: 0.15em 0.35em;
   border-radius: 3px;
-  color: var(--deck-accent);
 }
 
-.slidev-layout strong {
-  color: var(--deck-accent);
-  font-weight: 600;
-}
-
-/* Cover alignment */
+/* ── Cover layout ── */
 .slidev-layout.cover {
   display: flex;
   flex-direction: column;
@@ -54,7 +47,7 @@
 }
 
 .slidev-layout.cover h1 {
-  font-size: 2.8rem;
+  font-size: 3rem;
   font-weight: 900;
   line-height: 1.1;
   margin-bottom: 1rem;
@@ -63,81 +56,93 @@
 .slidev-layout.cover p {
   font-size: 1.15rem;
   color: var(--deck-muted);
-  max-width: 70%;
+  max-width: 32ch;
 }
 
-/* Section dividers: invert palette */
+/* ── Section layout ── */
 .slidev-layout.section {
   background: var(--deck-accent);
   color: var(--deck-bg);
   display: flex;
   align-items: center;
-  justify-content: center;
-  text-align: center;
+  justify-content: flex-start;
+  padding: 3rem 4rem;
 }
 
 .slidev-layout.section h1 {
   color: var(--deck-bg);
   font-size: 2.4rem;
   font-weight: 900;
+  letter-spacing: -0.02em;
 }
 
-/* Fact layout */
-.slidev-layout.fact {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+/* ── Center layout ── */
+.slidev-layout.center {
   text-align: center;
-  background: var(--deck-bg);
 }
 
-.slidev-layout.fact h1 {
-  font-size: 2.2rem;
-  font-weight: 900;
-  color: var(--deck-accent);
-  margin-bottom: 0.75rem;
+.slidev-layout.center h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
 }
 
-.slidev-layout.fact p {
-  font-size: 1.1rem;
+.slidev-layout.center p {
+  text-align: center;
+  max-width: 38ch;
+  margin: 0 auto;
   color: var(--deck-muted);
+  font-size: 1.05rem;
 }
 
-/* End layout */
+/* ── End layout ── */
 .slidev-layout.end {
+  background: var(--deck-surface);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   text-align: left;
   padding: 3rem 4rem;
-  background: var(--deck-bg);
 }
 
 .slidev-layout.end h1 {
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   font-weight: 900;
   color: var(--deck-fg);
-  margin-bottom: 0.5rem;
 }
 
 .slidev-layout.end p {
-  font-size: 1.1rem;
   color: var(--deck-muted);
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
 }
 
-/* List markers */
-.slidev-layout li::marker {
+/* ── Default layout ── */
+.slidev-layout.default {
+  padding: 2.5rem 3.5rem;
+}
+
+.slidev-layout.default h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Bullet markers ── */
+.slidev-layout ul li::marker {
   color: var(--deck-accent);
 }
 
-/* v-click animation — editorial restrained */
+.slidev-layout ol li::marker {
+  color: var(--deck-accent);
+  font-weight: 600;
+}
+
+/* ── v-click animation (editorial-dark preset) ── */
 .slidev-vclick-target {
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.5s ease;
 }
 
 .slidev-vclick-hidden {
   opacity: 0;
-  transform: translateY(6px);
 }

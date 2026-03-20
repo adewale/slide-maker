@@ -1,7 +1,3 @@
-<script setup>
-import ProgressSegmentBar from './components/ProgressSegmentBar.vue'
-</script>
-
 <template>
   <div v-if="!['cover', 'end'].includes($nav.currentLayout)" class="deck-footer">
     <span class="deck-footer-title">{{ $slidev.configs.title }}</span>
@@ -9,6 +5,11 @@ import ProgressSegmentBar from './components/ProgressSegmentBar.vue'
   </div>
   <ProgressSegmentBar />
 </template>
+
+<script setup>
+import ProgressSegmentBar from './components/ProgressSegmentBar.vue'
+</script>
+
 <style scoped>
 .deck-footer {
   position: absolute; bottom: 0; left: 0; right: 0;

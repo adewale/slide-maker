@@ -2,36 +2,35 @@
 
 ## Meta
 - title: GeistFabrik
-- subtitle: A Python-based divergence engine for Obsidian vaults
-- purpose: introduce GeistFabrik's philosophy and architecture to developers who use Obsidian
-- audience: Obsidian power users, PKM enthusiasts, developers interested in tools for thought
-- tone: precise, curious, grounded
+- purpose: introduce a divergence engine for Obsidian vaults that generates creative suggestions through code and Tracery grammars
+- audience: developers and PKM enthusiasts interested in tools for thought
+- tone: curious, precise, grounded
 - target-length: 7
 - notes: yes
 - style-preset: swiss-minimal
-- project-url: https://github.com/adewale/geist_fabrik
 - progress: segment-bar
+- project-url: https://github.com/adewale/geist_fabrik
 
 ## Source Materials
-- readme: README.md (factual backbone -- what it does, how to run, feature inventory, design philosophy)
-- lessons-learned: LESSONS_LEARNED.md (the "muses not oracles" insight -- questions beat computed answers)
+- readme: README.md (project overview — what it does, feature inventory, architecture, design principles)
+- lessons-learned: LESSONS_LEARNED.md (two key insights: questions beat computed answers, API consistency over avoiding breaking changes)
+- status: STATUS.md (611 tests, 99% complete, 57 default geists, schema v6)
 
 ## Through-Line
-- concept: "A well-asked question is better than a poorly-computed answer."
+- concept: "Muses, not oracles"
 - type: design-rule
 - appears-in:
-  - slide 1: cover -- the project's identity and what it is
-  - slide 3: center-statement -- the design rule stated directly
-  - slide 5: default-content -- muses not oracles in practice via Tracery vs code
-  - slide 7: end -- the rule as resolution
+  - slide 2: default — introduced as the governing principle
+  - slide 4: center — the surprising proof: 13 lines of YAML beat 100+ lines of Python
+  - slide 5: section — reframed as architecture: questions win because they work universally
+  - slide 7: end — resolved: the best tool for thought asks, it never answers
 
 ## Design Tokens
 - colors:
   - bg: "#ffffff"
   - fg: "#1a1a2e"
-  - accent: "#4a6741"
-  - accent-alt: "#7a5c3a"
-  - muted: "rgba(26, 26, 46, 0.45)"
+  - accent: "#16697a"
+  - muted: "#6b7280"
 - typography:
   - display: Plus Jakarta Sans
   - body: Figtree
@@ -43,17 +42,22 @@
 - prefer-builtins: true
 - builtins:
   - cover
-  - section
   - default
   - center
-  - fact
+  - section
   - two-cols
+  - fact
   - end
 - custom-layouts: []
-- components: []
+- components:
+  - ProgressSegmentBar
+  - KeyboardHelp
+  - AudienceQRCode
+  - MobileScrollView
 - css-files:
   - styles/tokens.css
   - styles/theme.css
+  - styles/transitions.css
 
 ## Slides
 
@@ -63,73 +67,75 @@
 - title: GeistFabrik
 - subtitle: A Python-based divergence engine for Obsidian vaults
 - notes:
-  - GeistFabrik means "spirit factory" in German. Open by establishing what this project actually is before anything else.
+  - GeistFabrik means "spirit factory" in German. The name captures both the creative and industrial aspects — it manufactures creative provocations.
+  - The subtitle is the project's own README description, verbatim.
 
 ### Slide 2
 - kind: default-content
 - layout: default
-- title: What GeistFabrik is and why it exists
-- body: |
-  GeistFabrik (German for "spirit factory") generates creative suggestions through both code and Tracery grammars. It is a tool for thought that acts as a muse, not an oracle -- offering provocative "What if...?" questions rather than prescriptive answers.
-
-  Inspired by Gordon Brander's work on tools for thought.
+- title: A spirit factory for your notes
+- body: GeistFabrik parses your Obsidian vault into a SQLite database, computes 384-dimensional embeddings via sentence-transformers, then runs 57 "geists" — small programs that generate creative suggestions. The output is always a question, never an answer. All processing is local. Your vault never leaves your machine.
 - sources:
-  - file:README.md -- first paragraph description and attribution
+  - https://github.com/adewale/geist_fabrik/blob/main/README.md — project overview and feature list
 - notes:
-  - This slide grounds the audience. The first paragraph from the README appears verbatim. Emphasize the "muse, not an oracle" framing -- this is the core philosophy.
+  - "Muses, not oracles" is introduced here as the governing design principle. This is the through-line that runs through every design decision.
+  - The 384-dim embeddings use the all-MiniLM-L6-v2 model via sentence-transformers. Emphasize: zero cloud dependency.
 
 ### Slide 3
-- kind: center-statement
-- layout: center
-- title: A WELL-ASKED QUESTION IS BETTER THAN A POORLY-COMPUTED ANSWER
-- subtitle: The design rule that shaped every geist
+- kind: default-content
+- layout: two-cols
+- title: Two kinds of geists
+- left:
+  - Code geists (48 default)
+  - Full Python with VaultContext API
+  - Graph traversal, temporal analysis, semantic search
+  - When computation is truly needed
+- right:
+  - Tracery geists (9 default)
+  - Declarative YAML grammars
+  - Template variations, creative collision
+  - When a question is better than a computation
 - sources:
-  - file:LESSONS_LEARNED.md -- the "muses not oracles" principle
+  - https://github.com/adewale/geist_fabrik/blob/main/README.md — geist inventory and extensibility model
 - notes:
-  - This is the through-line. Pause here. The caps are deliberate -- one-per-section emphasis per PRESENTATION_PHILOSOPHY principle 5.
+  - The two-type system is not arbitrary. Code geists handle objective computation (orphan detection, embedding similarity). Tracery geists handle subjective provocation (what-ifs, contradictions). The ratio tells the story: 48 code to 9 Tracery, but the Tracery geists punch above their weight.
 
 ### Slide 4
-- kind: fact
-- layout: fact
-- title: "57"
-- subtitle: Default geists
-- body: 48 code + 9 Tracery. 611 tests passing. Zero external API calls.
+- kind: center-statement
+- layout: center
+- title: 13 lines of YAML outperformed 100 lines of Python
+- body: The Contradictor geist tried to algorithmically generate opposites of note titles. It succeeded 10% of the time. A simple Tracery question — "What contradicts this note?" — works for every note, every time.
 - sources:
-  - file:README.md -- status section (version 0.9.0, geist count, test count)
+  - https://github.com/adewale/geist_fabrik/blob/main/LESSONS_LEARNED.md — Muses Not Oracles case study
 - notes:
-  - The 57 geists ship out of the box. The "zero external API calls" reinforces local-first. 611 tests is the real number from the README status section.
+  - This is the surprising slide. The LESSONS_LEARNED.md documents this in detail. The Python approach produced absurdities like "The opposite of 2023-09-12" while the YAML question engaged the user's own creativity. The insight: a well-asked question is better than a poorly-computed answer.
 
 ### Slide 5
-- kind: comparison
-- layout: two-cols
-- title: Code geist vs Tracery geist
-- left:
-  - "Code: 100+ lines of pattern matching"
-  - "Contradictor tried to compute opposites"
-  - "Success rate: ~10%"
-- right:
-  - "Tracery: 13 lines of YAML"
-  - "Just asks: 'What contradicts this note?'"
-  - "Success rate: 100%"
-- sources:
-  - file:LESSONS_LEARNED.md -- Contradictor geist comparison (code vs question approach)
+- kind: section
+- layout: section
+- title: Questions scale. Answers don't.
 - notes:
-  - The Contradictor war story from LESSONS_LEARNED.md. The code approach failed because it tried to compute answers. The Tracery approach succeeded because it asked questions. This is the through-line in action.
+  - Through-line echo: "Muses, not oracles" reframed as a scalability argument. A question that works for any note is more valuable than an answer that works for 10% of notes. This is why GeistFabrik deliberately avoids LLM integration — it provokes thinking rather than replacing it.
 
 ### Slide 6
 - kind: default-content
 - layout: default
-- title: The data flow
-- body: Mermaid diagram showing vault files through sync, embeddings, geist execution, filtering, and session notes
+- title: Deterministic randomness
+- body: Same date plus same vault equals same suggestions. GeistFabrik seeds its random number generator with the session date, so results are reproducible. Execution order in config.yaml determines which geist gets which random numbers. Suggestions flow through a 4-stage filter — boundary, novelty, diversity, quality — before reaching the session note.
 - sources:
-  - file:README.md -- architecture section, data flow diagram
+  - https://github.com/adewale/geist_fabrik/blob/main/README.md — configuration and filtering pipeline
 - notes:
-  - Walk through the pipeline. Vault files are read-only. Everything stays local. The output is a linkable Obsidian note.
+  - Deterministic randomness is a counterintuitive design choice. Most creative tools lean into unpredictability. GeistFabrik makes randomness reproducible because the user should be able to replay a productive session. The filtering pipeline is another constraint: not every geist output reaches the user. About 5 suggestions survive from 150+ raw outputs.
 
 ### Slide 7
 - kind: end
 - layout: end
-- title: Muses, not oracles
-- subtitle: GeistFabrik asks questions so you can find answers
+- title: The best tool for thought asks. It never answers.
+- body: github.com/adewale/geist_fabrik
 - notes:
-  - Circle back to the through-line. The closing echoes the opening philosophy. Do not end with an install command.
+  - Resolution of the through-line. "Muses, not oracles" becomes a design philosophy that other tool-for-thought builders can adopt. The closing echoes the opening: GeistFabrik is a divergence engine — it manufactures creative questions, not creative answers.
+
+## Notes Policy
+- style: delivery-oriented, speaker-facing
+- minimum: 2 sentences per content slide
+- include: source citations for all factual claims

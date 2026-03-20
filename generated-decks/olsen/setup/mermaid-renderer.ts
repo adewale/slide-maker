@@ -5,8 +5,8 @@ export default () => {
     const s = getComputedStyle(document.documentElement)
     const v = (prop: string) => s.getPropertyValue(prop).trim()
     return renderMermaidSVG(code, {
-      bg: v('--deck-bg') || '#ffffff',
-      fg: v('--deck-fg') || '#27272a',
+      bg: v('--deck-bg') || '#fffff8',
+      fg: v('--deck-fg') || '#111111',
       accent: v('--deck-accent') || undefined,
       muted: v('--deck-muted') || undefined,
       transparent: true,
