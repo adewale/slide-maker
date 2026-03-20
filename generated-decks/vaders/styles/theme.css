@@ -159,7 +159,7 @@ ul li::marker {
   justify-content: center;
   align-items: center;
   text-align: center;
-  background: var(--deck-primary-container);
+  background: var(--deck-bg);
   color: var(--deck-fg);
 }
 

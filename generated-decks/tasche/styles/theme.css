@@ -81,8 +81,8 @@
 
 /* ─── End layout (dark deck, inversion OK) ─── */
 .slidev-layout.end {
-  background: var(--deck-accent);
-  color: var(--deck-bg);
+  background: var(--deck-bg);
+  color: var(--deck-fg);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -92,7 +92,7 @@
 }
 
 .slidev-layout.end h1 {
-  color: var(--deck-bg);
+  color: var(--deck-fg);
   font-size: 2.8rem;
   line-height: 1.15;
 }

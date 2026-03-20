@@ -68,7 +68,7 @@ ul li::marker {
   align-items: flex-start;
   text-align: left;
   padding: 4rem;
-  background: var(--deck-surface);
+  background: var(--deck-bg);
 }
 
 .slidev-layout.cover h1 {
@@ -128,7 +128,7 @@ ul li::marker {
   justify-content: center;
   align-items: center;
   text-align: center;
-  background: var(--deck-surface);
+  background: var(--deck-bg);
   color: var(--deck-fg);
 }
 
@@ -150,7 +150,7 @@ ul li::marker {
   flex-direction: column;
   justify-content: center;
   padding: 4rem;
-  background: var(--deck-surface);
+  background: var(--deck-bg);
 }
 
 .slidev-layout.quote h1 {

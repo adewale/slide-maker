@@ -705,7 +705,7 @@ Rules:
 - Never close with "Thanks", "Questions?", or a bare URL
 - The final impression should reinforce the deck's core insight
 - The closing must echo or resolve the opening question/metaphor — not be a disconnected install command
-- The end layout must NOT invert to a near-black background on light-themed decks. If `--deck-bg` is light (luminance > 0.5), the end slide should use `--deck-bg` as background with `--deck-fg` as text — matching the deck's primary palette. Inversion (dark background) is only appropriate when the deck is already dark-themed (`colorSchema: dark` or `--deck-bg` luminance < 0.3). An end slide that feels like a black void kills the closing impression.
+- The end slide must use the same `--deck-bg` and `--deck-fg` as every other content slide. No inversion, no accent background, no special color treatment. The end slide should feel like a natural conclusion to the deck, not a jarring palette change. If the deck is dark, the end is dark. If the deck is light, the end is light.
 
 For the full set of rhetorical principles, see [PRESENTATION_PHILOSOPHY.md](../docs/PRESENTATION_PHILOSOPHY.md).
 
