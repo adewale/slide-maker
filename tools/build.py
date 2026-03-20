@@ -352,7 +352,9 @@ def _read_count(path: Path) -> str:
 
 # ── 404.html ────────────────────────────────────────────────────
 
-_404_HTML = """\
+def _make_404_html(base_prefix: str) -> str:
+    index_url = f"{base_prefix}/" if base_prefix else "/"
+    return f"""\
 <!DOCTYPE html>
 <html>
 <head>
@@ -362,7 +364,7 @@ _404_HTML = """\
 </head>
 <body style="font-family:system-ui,sans-serif;padding:3rem 2rem;max-width:36rem;color:#444">
 <h1 style="font-size:1.5rem;font-weight:600;margin-bottom:1rem">Page not found</h1>
-<p><a href="/" style="color:#2563eb">Back to index</a></p>
+<p><a href="{index_url}" style="color:#2563eb">Back to index</a></p>
 </body>
 </html>
 """
@@ -487,7 +489,7 @@ def main() -> None:
     )
 
     # ── 404.html ─────────────────────────────────────────────────
-    (out / "404.html").write_text(_404_HTML)
+    (out / "404.html").write_text(_make_404_html(base_prefix))
 
     # ── Done ─────────────────────────────────────────────────────
     print()
