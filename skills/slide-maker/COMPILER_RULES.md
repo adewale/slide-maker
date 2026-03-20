@@ -351,7 +351,7 @@ Every project deck must communicate what the project actually IS before diving i
 - Slide 2 should explain what the project IS and WHY it exists before diving into architecture or internals. The audience needs context before complexity.
 - If the project has a color identity (from its logo, UI palette, terminal output, or branding), those colors MUST override the preset's accent color via `--deck-accent` and related tokens.
 - If screenshots or demo output images exist in the repo (README images, `docs/` screenshots, example output), at least one must appear in the deck as a `visual-evidence` slide or hero image.
-- The project's README first-paragraph description should appear verbatim or near-verbatim somewhere in the first 3 slides. Do not paraphrase it into generic language.
+- The project's README description should appear on the cover subtitle. Beyond that, don't recite the README — synthesize across all sources.
 - The project's GitHub URL MUST appear in the deck — on the cover slide, the end slide, or both. The audience needs to know where to find the project. Use the `project-url` from the spec.
 
 **Where to find project identity:**
