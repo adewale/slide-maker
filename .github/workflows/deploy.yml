@@ -20,7 +20,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: bash examples/build.sh
+      - run: python3 tools/build.py
         env:
           BASE_PREFIX: /slide-maker
       - uses: actions/upload-pages-artifact@v3

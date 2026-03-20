@@ -2,7 +2,7 @@
   "name": "project2slides",
   "private": true,
   "scripts": {
-    "build": "bash examples/build.sh",
+    "build": "python3 tools/build.py",
     "dev": "npm run build && npx serve examples/_build -l 3030",
     "serve": "npx serve examples/_build -l 3030"
   },
