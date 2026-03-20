@@ -811,6 +811,19 @@ Nothing on the slide should be placed arbitrarily. Every element must align to a
 - Headings appear at the same vertical position across content slides. Theme.css controls this through consistent padding and margin on `.slidev-layout h1`.
 - Content starts at the same vertical offset. Slides where the body text starts at different heights feel unstable.
 
+### No text-on-text overlap
+
+Fixed-position UI elements (progress indicators, footers, nav controls) must never overlap with slide content. This is especially dangerous with:
+- **Bottom-positioned elements** on slides with long bullet lists or tall content
+- **Corner-positioned elements** on slides using full-width layouts
+- **Any overlay** that uses `position: fixed` without checking what's underneath
+
+Rules:
+- Only use **ProgressSegmentBar** (thin 3px top bar) as the default progress indicator. It occupies minimal space and does not conflict with content.
+- Do NOT use ProgressTallyMarks, ProgressArcGauge, or ProgressDotRail — these overlap with content at unpredictable positions.
+- Footer elements (`global-bottom.vue`) must have `pointer-events: none` and must hide on layouts that use the full viewport height (cover, end).
+- If a v-click reveals content that extends to the bottom of the slide, verify that no fixed-position element covers it.
+
 ### Proximity — related things group together
 
 Spatial distance signals conceptual distance. Things that belong together must be visually close. Things that don't must have clear separation.

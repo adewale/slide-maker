@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { showHelp } from './composables/useHelp'
 import KeyboardHelp from './components/KeyboardHelp.vue'
-import ProgressTallyMarks from './components/ProgressTallyMarks.vue'
+import ProgressSegmentBar from './components/ProgressSegmentBar.vue'
 </script>
 
 <template>
-  <ProgressTallyMarks />
+  <ProgressSegmentBar />
   <KeyboardHelp v-if="showHelp" />
 </template>
