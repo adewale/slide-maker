@@ -366,6 +366,8 @@ Use these before creating custom layouts:
 - `image` / `image-left` / `image-right` — pairing content with visuals
 - `end` — closing slide
 
+Two-column layouts (`two-cols`, `two-cols-header`) must have roughly balanced content weight. If one column has 5+ bullet points and the other has 1-2, the content should be reorganized or the layout changed to `default`. An empty or near-empty column wastes space and signals that the split was structural, not meaningful.
+
 #### Structural rhythm
 Alternate slide types to avoid visual monotony:
 1. Section divider (dark, big text, `layout: section`)
@@ -662,6 +664,7 @@ Rules:
 - Never close with "Thanks", "Questions?", or a bare URL
 - The final impression should reinforce the deck's core insight
 - The closing must echo or resolve the opening question/metaphor — not be a disconnected install command
+- The end layout must NOT invert to a near-black background on light-themed decks. If `--deck-bg` is light (luminance > 0.5), the end slide should use `--deck-bg` as background with `--deck-fg` as text — matching the deck's primary palette. Inversion (dark background) is only appropriate when the deck is already dark-themed (`colorSchema: dark` or `--deck-bg` luminance < 0.3). An end slide that feels like a black void kills the closing impression.
 
 For the full set of rhetorical principles, see [PRESENTATION_PHILOSOPHY.md](../docs/PRESENTATION_PHILOSOPHY.md).
 
@@ -759,6 +762,7 @@ The audience must instantly see what matters. Contrast is created by size, weigh
 **Color contrast:**
 - See Color methodology for WCAG AA ratios. CRAP adds: accent color must appear on fewer than 30% of text elements per slide. If everything is accented, nothing is.
 - Section dividers (`layout: section`) must visually invert the default slide — dark-on-light decks get light-on-dark sections, and vice versa. This structural contrast creates chapter rhythm.
+- Check contrast not just for the default palette but for ALL layout variants. If the theme inverts colors for `section` or `end` layouts, the inverted combination must also pass WCAG AA. Light text on a dark accent that passes on the default background may fail when the accent becomes the background.
 
 **Mermaid diagram contrast:**
 - Every flowchart node must have an explicit `style` directive with `fill`, `stroke`, and `color`. Beautiful Mermaid's `color-mix()` auto-theming produces black boxes — never rely on it.
@@ -796,6 +800,7 @@ Nothing on the slide should be placed arbitrarily. Every element must align to a
 - Cover layouts must explicitly set `align-items` and `text-align` in theme.css. Relying on theme defaults causes conflicts when custom CSS partially overrides theme positioning (this caused the tufte cover misalignment).
 - Two-column layouts must use balanced column widths. Asymmetric columns are intentional (e.g., TufteSlide's 60/30 split); unintentional asymmetry from overflow is a bug.
 - Centered layouts (`center`, `statement`, `fact`) must center both headings and body text. A centered heading with left-aligned body text below it breaks the alignment axis.
+- Never mix centered headings with left-aligned body text on the same slide. If the layout centers the heading (e.g., `center`, `fact`), body text must also be centered. If the layout left-aligns (e.g., `default`, `cover`), the heading must also be left-aligned. Mixed alignment creates visual tension that reads as accidental, not intentional.
 
 **Within-slide alignment:**
 - Bullet lists align to a single left edge. Mixed indentation levels signal a nested argument — limit to 2 levels maximum.
@@ -961,10 +966,14 @@ These items must all pass before a deck can be delivered:
 - Mermaid diagram node labels use plain text, no emoji
 - section dividers visually invert the default slide (dark-on-light or light-on-dark)
 - dark-background decks do not use sequenceDiagram or stateDiagram-v2 (convert to flowcharts — see Diagram type reliability matrix)
+- end slide is not a black void on light-themed decks
+- inverted layout variants (`section`, `end`) pass WCAG AA contrast
 
 **Alignment (CRAP):**
 - cover layout in theme.css explicitly sets `align-items` and `text-align` (no relying on theme defaults)
 - centered layouts (`center`, `statement`, `fact`) center both headings and body text consistently
+- no mixed alignment (centered heading + left body, or vice versa) on any slide
+- two-column slides have balanced content weight (neither column less than 30% of the other)
 
 **Structural integrity:**
 - `deck.spec.md` matches `slides.md` (spec-to-slides sync)
