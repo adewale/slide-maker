@@ -152,24 +152,20 @@ ul li::marker {
   margin-top: 0.75rem;
 }
 
-/* End — inverted */
+/* End — same palette as content slides. !important overrides Slidev core end.vue scoped CSS. */
 .slidev-layout.end {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   text-align: center;
-  background: var(--deck-fg);
-  color: var(--deck-bg);
+  background: var(--deck-bg) !important;
+  color: var(--deck-fg) !important;
 }
 
 .slidev-layout.end h1 {
   font-size: 3.5rem;
-  color: var(--deck-bg);
+  color: var(--deck-fg) !important;
 }
 
 .slidev-layout.end p {
-  color: rgba(236, 239, 244, 0.6);
+  color: var(--deck-muted);
   font-family: var(--deck-font-mono);
   font-size: 1.2rem;
   margin-top: 1rem;

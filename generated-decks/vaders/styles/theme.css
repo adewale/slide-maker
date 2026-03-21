@@ -93,21 +93,17 @@
   line-height: 1.5;
 }
 
-/* ── End ── */
+/* End — same palette as content slides. !important overrides Slidev core end.vue scoped CSS. */
 .slidev-layout.end {
-  background: var(--deck-bg);
-  color: var(--deck-fg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   text-align: center;
+  background: var(--deck-bg) !important;
+  color: var(--deck-fg) !important;
 }
 
 .slidev-layout.end h1 {
   font-size: 2.4rem;
   font-weight: 800;
-  color: var(--deck-accent);
+  color: var(--deck-fg) !important;
 }
 
 .slidev-layout.end p {

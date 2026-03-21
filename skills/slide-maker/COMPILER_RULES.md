@@ -844,6 +844,10 @@ The audience must instantly see what matters. Contrast is created by size, weigh
 
 When the same kind of thing always looks the same, the audience stops decoding formatting and starts absorbing content.
 
+**Background consistency:**
+- Every slide uses `--deck-bg` as its background. Only **cover** and **section** layouts may use a different background (typically inverted to `--deck-fg`). All other layouts — `default`, `center`, `statement`, `fact`, `quote`, `end` — must keep the same background as content slides. Changing backgrounds creates visual noise that the audience has to decode instead of absorbing content.
+- The `end` layout is NOT a section break — it is the closing slide and should feel like a continuation of the deck, not a jarring palette switch. Use `--deck-bg` with `!important` (required to override Slidev core's scoped black background).
+
 **Token discipline:**
 - Every color in the deck must come from `var(--deck-*)` tokens. No hardcoded hex in scoped styles (existing rule, reinforced here as a repetition principle).
 - `--deck-accent` must be used for the same semantic purpose across all slides: emphasis, markers, interactive elements. If accent means "important" on slide 3, it must mean "important" on slide 10.

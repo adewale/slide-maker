@@ -876,6 +876,34 @@ function lintDeck(deckDir) {
           }
         }
       }
+
+      // ── Background consistency: only cover and section may change background ──
+      // All other layouts should use --deck-bg. Changing backgrounds on content
+      // slides creates visual noise.
+      const ALLOWED_BG_LAYOUTS = ['cover', 'section'];
+      const bgRuleRe = /([^{}]+)\{([^}]+)\}/g;
+      let bgMatch;
+      while ((bgMatch = bgRuleRe.exec(themeCss)) !== null) {
+        const selGroup = bgMatch[1];
+        const props = bgMatch[2];
+        // Only check rules that set a background property
+        if (!/\bbackground\s*:/.test(props)) continue;
+        // Skip code/pre/inline element backgrounds (decorative)
+        if (/\bcode\b|\bpre\b|\.slidev-code/.test(selGroup)) continue;
+        const sels = selGroup.split(',').map(s => s.trim());
+        for (const sel of sels) {
+          // Match .slidev-layout.LAYOUT (top-level layout background)
+          const layoutMatch = sel.match(/\.slidev-layout\.(\w+)\s*$/);
+          if (!layoutMatch) continue;
+          const layout = layoutMatch[1];
+          if (ALLOWED_BG_LAYOUTS.includes(layout)) continue;
+          // Check if the background is --deck-bg (which is correct)
+          if (/background\s*:\s*var\(--deck-bg\)/.test(props)) continue;
+          warns.push(
+            `CRAP repetition: .slidev-layout.${layout} changes background — only cover and section should differ from --deck-bg`
+          );
+        }
+      }
     }
   }
 
