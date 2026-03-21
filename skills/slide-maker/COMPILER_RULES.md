@@ -405,16 +405,35 @@ Rules:
 
 #### Built-in layouts to use
 Use these before creating custom layouts:
-- `cover` — opening slide only
-- `center` — key statements
-- `statement` — bold assertions
-- `section` — chapter dividers (creates visual rhythm)
-- `fact` — single statistic or number
-- `quote` — attributed quotations
-- `two-cols-header` — comparing two things, dual lists. Title spans both columns (full-width header row), then `::left::` and `::right::` for column content. **Prefer this over `two-cols` when the slide has a heading** — `two-cols` traps the h1 inside the left column at 50% width, causing wrapping and uneven columns.
-- `two-cols` — two equal columns with no shared header. Only use when there is no h1, or when the entire slide is split content with no title row.
-- `image` / `image-left` / `image-right` — pairing content with visuals
-- `end` — closing slide
+
+| Layout | Purpose | Content limits | Slot syntax |
+|--------|---------|---------------|-------------|
+| `default` | Standard content | h1 + subtitle + up to 5 bullets or a code block | default slot |
+| `cover` | Opening slide only | h1 + subtitle + optional tagline | default slot |
+| `section` | Chapter divider | h1 + optional one-line subtitle | default slot |
+| `center` | Key statement or insight | h1 + 1-2 short paragraphs. No bullet lists — use `default` if you need bullets | default slot (inside `my-auto` wrapper) |
+| `fact` | Single statistic | h1 (the number), first p (label), optional second p (context). Three elements max | default slot (inside `my-auto` wrapper) |
+| `quote` | Attributed quotation | h1 (the quote), p (attribution). Two elements only | default slot (inside `my-auto` wrapper) |
+| `statement` | Treat as synonym for `center` — structurally identical (same `my-auto` wrapper, same template). Use `center` instead for consistency | Same as `center` | default slot (inside `my-auto` wrapper) |
+| `two-cols-header` | Comparing two things, dual lists | h1 in header row (spans both columns), then 3-4 items per column. Max 5 per column | `::left::` and `::right::` for columns; content before `::left::` is the full-width header |
+| `two-cols` | Two columns with no title | No h1 — everything before `::right::` goes into the LEFT column at 50% width. Only use when the slide has no heading | `::right::` splits content |
+| `image` / `image-left` / `image-right` | Content paired with visuals | Same as `default` for the content column | default slot (content side) |
+| `end` | Closing slide | h1 + one line (URL or tagline). Minimal content | default slot |
+| `full` | Edge-to-edge, no padding | For full-bleed diagrams or custom HTML | default slot |
+
+**Layout selection rules:**
+1. Two-column slide with a title → `two-cols-header`, never `two-cols`. The `two-cols` layout traps the h1 inside the left column at 50% width, causing wrapping.
+2. Centered text with no bullets → `center`. If you need bullets, use `default` instead — `center` is for impact statements, not lists.
+3. `statement` and `center` are structurally identical — prefer `center` for consistency.
+4. Don't use `intro` — it has no styling in `theme: default` and is indistinguishable from `default`.
+
+**Layout internals that affect theme CSS:**
+- `center`, `fact`, `quote`, `statement` wrap slot content in a `<div class="my-auto">`. Percentage-based `max-width` on children resolves against this wrapper, not the slide. The wrapper shrinks to content width in flex/grid contexts.
+- `end` has scoped CSS (`display: grid; place-content: center; bg-black; text-white`) that custom theme.css cannot override without `!important`. See the end layout CSS pattern in §7.
+- `center` has UnoCSS utility classes (`grid place-content-center`) with low specificity (0,1,0). Custom theme CSS CAN override these, unlike `end`'s scoped CSS.
+- `two-cols-header` has scoped grid-area definitions. The grid structure is locked — theme CSS can style the content but not change the column/row layout.
+
+**`theme: none` warning:** When using `theme: none`, Slidev provides zero base CSS — no padding, no height, no font sizing. The custom `theme.css` must explicitly set `.slidev-layout { padding: 2.5rem 3.5rem; height: 100%; font-size: 1.1rem; }` and base paragraph/heading spacing. Without this, content renders edge-to-edge with no margins.
 
 Two-column layouts (`two-cols`, `two-cols-header`) must have roughly balanced content weight. If one column has 5+ bullet points and the other has 1-2, the content should be reorganized or the layout changed to `default`. An empty or near-empty column wastes space and signals that the split was structural, not meaningful.
 
