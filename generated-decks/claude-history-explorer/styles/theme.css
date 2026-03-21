@@ -131,6 +131,7 @@ ul li::marker {
   margin-top: 2rem;
   color: var(--deck-fg);
   max-width: 60%;
+  margin: 2rem auto 0;
   text-align: center;
 }
 
@@ -152,22 +153,19 @@ ul li::marker {
   margin-top: 0.75rem;
 }
 
-/* End — same bg/fg as content slides, no inversion */
+/* End — Slidev core end.vue uses scoped display: grid with place-content: center.
+   Custom theme cannot override display, so we work within the grid context.
+   background and color need !important to override end.vue's scoped black/white. */
 .slidev-layout.end {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   text-align: center;
-  background: var(--deck-bg);
-  color: var(--deck-fg);
+  background: var(--deck-bg) !important;
+  color: var(--deck-fg) !important;
 }
 
 .slidev-layout.end h1 {
   font-size: 2.75rem;
   color: var(--deck-fg);
   letter-spacing: -0.02em;
-  max-width: 80%;
 }
 
 .slidev-layout.end p {

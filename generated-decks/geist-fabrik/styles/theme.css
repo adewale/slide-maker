@@ -200,7 +200,6 @@ hr {
 .slidev-layout.end h1 {
   font-size: 2.4rem;
   color: var(--deck-fg);
-  max-width: 80%;
   line-height: 1.3;
 }
 

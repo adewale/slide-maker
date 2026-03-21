@@ -587,6 +587,23 @@ When using a non-default theme (`seriph`, `apple-basic`):
 - Do NOT override heading font families — let the theme's typography come through
 - Only set `color: var(--deck-fg)` and accent-color overrides
 
+**End layout specificity:** Slidev's core `end.vue` has scoped CSS (`display: grid; place-content: center; background-color: black; color: white`) that custom `theme.css` cannot override due to higher specificity from `[data-v-*]` attribute selectors. Follow this pattern:
+```css
+.slidev-layout.end {
+  /* Do NOT set display, flex-direction, justify-content, or align-items —
+     they are overridden by end.vue's scoped display: grid */
+  text-align: center;
+  background: var(--deck-bg) !important;    /* !important needed to override scoped bg */
+  color: var(--deck-fg) !important;         /* !important needed to override scoped color */
+}
+.slidev-layout.end h1 {
+  /* Do NOT use max-width without margin: 0 auto — grid items left-align
+     within their cell. Either omit max-width or pair it with auto margins. */
+  font-size: 2.75rem;
+  color: var(--deck-fg) !important;
+}
+```
+
 Always include v-click animation styles matching the deck's style preset (see Animation guidelines for the per-preset table):
 ```css
 /* Example: bold-modern preset */
@@ -849,7 +866,8 @@ Nothing on the slide should be placed arbitrarily. Every element must align to a
 **Layout-level alignment:**
 - Cover layouts must explicitly set `align-items` and `text-align` in theme.css. Relying on theme defaults causes conflicts when custom CSS partially overrides theme positioning (this caused the tufte cover misalignment).
 - Two-column layouts must use balanced column widths. Asymmetric columns are intentional (e.g., TufteSlide's 60/30 split); unintentional asymmetry from overflow is a bug.
-- Centered layouts (`center`, `statement`, `fact`) must center both headings and body text. A centered heading with left-aligned body text below it breaks the alignment axis.
+- Centered layouts (`center`, `statement`, `fact`, `end`) must center both headings and body text. A centered heading with left-aligned body text below it breaks the alignment axis.
+- Never use `max-width` on elements inside `end`, `fact`, or `section` layouts without also adding `margin: 0 auto`. Slidev's core layouts use scoped `display: grid` which custom theme.css cannot override — `max-width` without auto margins pushes items to the left edge of their grid cell.
 - Never mix centered headings with left-aligned body text on the same slide. If the layout centers the heading (e.g., `center`, `fact`), body text must also be centered. If the layout left-aligns (e.g., `default`, `cover`), the heading must also be left-aligned. Mixed alignment creates visual tension that reads as accidental, not intentional.
 
 **Within-slide alignment:**
@@ -1034,7 +1052,8 @@ These items must all pass before a deck can be delivered:
 
 **Alignment (CRAP):**
 - cover layout in theme.css explicitly sets `align-items` and `text-align` (no relying on theme defaults)
-- centered layouts (`center`, `statement`, `fact`) center both headings and body text consistently
+- centered layouts (`center`, `statement`, `fact`, `end`) center both headings and body text consistently
+- no `max-width` on `end`/`fact`/`section` layout children without `margin: 0 auto`
 - no mixed alignment (centered heading + left body, or vice versa) on any slide
 - two-column slides have balanced content weight (neither column less than 30% of the other)
 

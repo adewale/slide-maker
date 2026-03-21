@@ -829,6 +829,53 @@ function lintDeck(deckDir) {
           }
         }
       }
+
+      // ── CRAP Alignment: end layout centering ──
+      // Slidev's core end.vue has scoped `display: grid; place-content: center`
+      // that custom theme.css cannot override. Children with max-width but no
+      // margin: 0 auto will be left-aligned in their grid cell.
+      const endBlock = themeCss.match(/\.slidev-layout\.end\s*\{([^}]+)\}/);
+      if (endBlock) {
+        const endProps = endBlock[1];
+        if (!/text-align\s*:\s*center/.test(endProps)) {
+          warns.push('CRAP alignment: .slidev-layout.end missing text-align: center');
+        }
+        // Warn about properties that Slidev's scoped end.vue CSS will override
+        if (/\bdisplay\s*:/.test(endProps)) {
+          warns.push('CRAP alignment: .slidev-layout.end sets display — this is overridden by Slidev core end.vue scoped CSS (display: grid). Remove it to avoid confusion');
+        }
+      }
+
+      // ── max-width without margin auto in grid-context layouts ──
+      // Layouts where Slidev core uses grid (end, center) or where custom CSS
+      // may use grid: any child selector with max-width needs margin: 0 auto
+      // to stay centered. Without it, the element left-aligns in its grid cell.
+      // Handles both simple selectors (.slidev-layout.end h1 { ... }) and
+      // comma-separated selectors (.slidev-layout.center h1,\n.slidev-layout.statement h1 { ... }).
+      const GRID_CONTEXT_LAYOUTS = ['end', 'center', 'fact', 'statement', 'section'];
+      const cssRuleRe = /([^{}]+)\{([^}]+)\}/g;
+      let ruleMatch;
+      while ((ruleMatch = cssRuleRe.exec(themeCss)) !== null) {
+        const selectorGroup = ruleMatch[1];
+        const props = ruleMatch[2];
+        if (!/max-width\s*:/.test(props)) continue;
+        const hasMarginAuto = /margin\s*:.*auto/.test(props);
+        // Split comma-separated selectors and check each
+        const selectors = selectorGroup.split(',').map(s => s.trim());
+        for (const sel of selectors) {
+          for (const layout of GRID_CONTEXT_LAYOUTS) {
+            const layoutChildRe = new RegExp(
+              `\\.slidev-layout\\.${layout}\\s+([\\w][\\w:()-]*)$`
+            );
+            const m = sel.match(layoutChildRe);
+            if (m && !hasMarginAuto) {
+              warns.push(
+                `CRAP alignment: .slidev-layout.${layout} ${m[1]} has max-width without margin: 0 auto — element will left-align in grid layouts`
+              );
+            }
+          }
+        }
+      }
     }
   }
 
