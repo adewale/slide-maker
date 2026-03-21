@@ -411,8 +411,8 @@ Use these before creating custom layouts:
 - `section` — chapter dividers (creates visual rhythm)
 - `fact` — single statistic or number
 - `quote` — attributed quotations
-- `two-cols` — comparing two things, dual lists
-- `two-cols-header` — header spanning both columns + two columns below
+- `two-cols-header` — comparing two things, dual lists. Title spans both columns (full-width header row), then `::left::` and `::right::` for column content. **Prefer this over `two-cols` when the slide has a heading** — `two-cols` traps the h1 inside the left column at 50% width, causing wrapping and uneven columns.
+- `two-cols` — two equal columns with no shared header. Only use when there is no h1, or when the entire slide is split content with no title row.
 - `image` / `image-left` / `image-right` — pairing content with visuals
 - `end` — closing slide
 
