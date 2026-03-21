@@ -62,11 +62,13 @@ Sources:
 - file:specs/geistfabrik_vision.md -- Gordon Brander's original "tarot for thought" framing -->
 
 ---
-layout: two-cols
+layout: two-cols-header
 transition: slide-left
 ---
 
 # Two-layer architecture
+
+::left::
 
 **Layer 1: Vault** -- raw data
 
@@ -80,8 +82,6 @@ transition: slide-left
 
 ::right::
 
-<div style="padding-top: 3.5rem;">
-
 **Layer 2: VaultContext** -- intelligence
 
 <v-clicks>
@@ -92,8 +92,6 @@ transition: slide-left
 
 </v-clicks>
 
-</div>
-
 <!-- Notes are frozen dataclasses -- lightweight and immutable. All intelligence lives in VaultContext, not in the Note objects themselves. This separation means Layer 1 can be replaced or upgraded (different vault format, different database) without touching the 57 geists that depend on Layer 2's API. The function registry is the critical bridge: it lets Tracery grammars call Python vault functions via the $vault.function() syntax.
 
 Sources:
@@ -101,11 +99,13 @@ Sources:
 - file:src/geistfabrik/vault_context.py -- VaultContext API surface, frozen Note dataclass -->
 
 ---
-layout: two-cols
+layout: two-cols-header
 transition: slide-left
 ---
 
 # Code geists vs Tracery geists
+
+::left::
 
 **Code geists** (Python)
 
@@ -119,8 +119,6 @@ transition: slide-left
 
 ::right::
 
-<div style="padding-top: 3.5rem;">
-
 **Tracery geists** (YAML)
 
 <v-clicks>
@@ -130,8 +128,6 @@ transition: slide-left
 - Non-programmers can create and modify
 
 </v-clicks>
-
-</div>
 
 <!-- The custom Tracery engine is only 283 lines of Python. It intentionally omits standard Tracery features -- modifiers like .capitalize and push-pop stack memory -- in favor of the $vault.function() call system that queries live vault data at expansion time. Standard Tracery requires all content to be pre-computed; GeistFabrik's engine resolves vault queries dynamically during grammar expansion.
 

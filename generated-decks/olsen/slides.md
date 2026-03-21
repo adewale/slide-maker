@@ -84,11 +84,13 @@ Sources:
 - file:docs/HIERARCHICAL_FACETS.md -- discovery narrative -->
 
 ---
-layout: two-cols
+layout: two-cols-header
 transition: wipe-right
 ---
 
 # Hierarchical vs. state machine
+
+::left::
 
 <v-clicks>
 

@@ -2,6 +2,9 @@
   font-family: var(--deck-font-body);
   color: var(--deck-fg);
   background: var(--deck-bg);
+  height: 100%;
+  padding: 2.5rem 3.5rem;
+  font-size: 1.1rem;
 }
 
 h1, h2, h3 {
@@ -13,6 +16,16 @@ h1 {
   font-size: 2.6rem;
   line-height: 1.15;
   letter-spacing: -0.01em;
+}
+
+.slidev-layout h1 {
+  margin-bottom: 1rem;
+}
+
+.slidev-layout p {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.5rem;
 }
 
 h3 {

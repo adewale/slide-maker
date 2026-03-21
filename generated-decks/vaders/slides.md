@@ -85,18 +85,20 @@ Sources:
 -->
 
 ---
-layout: two-cols
+layout: two-cols-header
 transition: slide-left
 ---
 
 # Durable Objects as Game Servers
 
+::left::
+
 <v-clicks>
 
-- Each room is a Durable Object -- single-threaded actor
-- Hibernatable WebSockets: connections survive DO sleep
-- Alarms replace `setInterval` -- hibernation-safe 30 Hz
-- SQLite persists state across hibernation cycles
+- Each room is a single-threaded DO
+- Hibernatable WebSockets survive sleep
+- Alarms replace `setInterval` for 30 Hz
+- SQLite persists state across hibernation
 
 </v-clicks>
 

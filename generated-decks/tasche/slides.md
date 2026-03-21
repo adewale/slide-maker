@@ -78,11 +78,13 @@ Sources:
 -->
 
 ---
-layout: two-cols
+layout: two-cols-header
 transition: slide-left
 ---
 
 # The Platform Stack
+
+::left::
 
 ### Cloudflare Bindings
 
