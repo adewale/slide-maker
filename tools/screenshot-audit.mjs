@@ -14,6 +14,8 @@
 // 7. SVG stroke visibility (lines, polylines, circles vs background)
 // 8. Multiple viewport sizes (1280x720, 1024x768)
 // 9. Empty/blank slide detection
+// 10. Layout geometry (missing padding, uneven columns, off-center headings,
+//     h1 trapped in two-cols left column, empty columns)
 //
 // Requires: playwright (npm install playwright)
 
@@ -188,6 +190,95 @@ async function checkOverflow(page, viewportHeight) {
   }, viewportHeight);
 }
 
+// ── Check: Layout geometry (#10) ─────────────────────────────
+// Catches: missing padding, uneven columns, off-center headings,
+// title trapped in left column of two-cols, content clipped at edges.
+
+async function checkLayoutGeometry(page, viewportWidth) {
+  return page.evaluate((vw) => {
+    const problems = [];
+    const layout = document.querySelector('.slidev-layout');
+    if (!layout) return problems;
+
+    // 1. Missing padding — content touching slide edges
+    const children = layout.querySelectorAll('h1, h2, h3, p, ul, ol, pre');
+    for (const el of children) {
+      if (el.closest('.slidev-vclick-hidden')) continue;
+      if (el.offsetWidth === 0 && el.offsetHeight === 0) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width < 10) continue;
+      // Content within 5px of left or right edge suggests missing padding
+      if (r.left < 5 && !layout.classList.contains('full') && !layout.closest('[class*="none"]')) {
+        problems.push('content touches left edge — missing layout padding');
+        break;
+      }
+    }
+
+    // 2. Uneven two-column layout
+    const colLeft = layout.querySelector('.col-left');
+    const colRight = layout.querySelector('.col-right');
+    if (colLeft && colRight) {
+      const lRect = colLeft.getBoundingClientRect();
+      const rRect = colRight.getBoundingClientRect();
+      // Check column width ratio (should be roughly 1:1)
+      if (lRect.width > 0 && rRect.width > 0) {
+        const ratio = Math.min(lRect.width, rRect.width) / Math.max(lRect.width, rRect.width);
+        if (ratio < 0.7) {
+          problems.push(`uneven columns: ${Math.round(lRect.width)}px vs ${Math.round(rRect.width)}px (ratio ${ratio.toFixed(2)})`);
+        }
+      }
+    }
+
+    // 3. Title wrapping in two-cols (h1 inside col-left means it's trapped at 50%)
+    if (layout.classList.contains('two-columns')) {
+      const leftCol = layout.querySelector('.col-left');
+      if (leftCol) {
+        const h1 = leftCol.querySelector('h1');
+        if (h1) {
+          const h1Rect = h1.getBoundingClientRect();
+          // If h1 height > 1.5x a single line (font-size * line-height * 1.5), it's wrapping
+          const style = getComputedStyle(h1);
+          const singleLineHeight = parseFloat(style.fontSize) * parseFloat(style.lineHeight || '1.2');
+          if (h1Rect.height > singleLineHeight * 1.8) {
+            problems.push('h1 wrapping inside two-cols left column — use two-cols-header so title spans both columns');
+          }
+        }
+      }
+    }
+
+    // 4. Centered layout with off-center content
+    if (layout.classList.contains('end') || layout.classList.contains('center') ||
+        layout.classList.contains('fact') || layout.classList.contains('statement')) {
+      const h1 = layout.querySelector('h1');
+      if (h1 && h1.offsetWidth > 0) {
+        const h1Rect = h1.getBoundingClientRect();
+        const layoutRect = layout.getBoundingClientRect();
+        const h1Center = h1Rect.left + h1Rect.width / 2;
+        const layoutCenter = layoutRect.left + layoutRect.width / 2;
+        const offset = Math.abs(h1Center - layoutCenter);
+        // Allow 40px tolerance (padding asymmetry, etc)
+        if (offset > 40 && h1Rect.width < layoutRect.width * 0.9) {
+          problems.push(`h1 is ${Math.round(offset)}px off-center on centered layout`);
+        }
+      }
+    }
+
+    // 5. Empty column in two-cols
+    if (colLeft && colRight) {
+      const leftText = colLeft.innerText?.trim() || '';
+      const rightText = colRight.innerText?.trim() || '';
+      if (leftText.length > 0 && rightText.length === 0) {
+        problems.push('right column is empty — consider using default layout instead');
+      }
+      if (rightText.length > 0 && leftText.length === 0) {
+        problems.push('left column is empty — consider using default layout instead');
+      }
+    }
+
+    return problems;
+  }, viewportWidth);
+}
+
 // ── Check: SVG stroke visibility (#7) ─────────────────────────
 
 async function checkSvgStrokes(page) {
@@ -289,6 +380,12 @@ async function analyseSlideState(page, slideNum, clickState, vpLabel, vpHeight) 
   // SVG strokes
   const strokes = await checkSvgStrokes(page);
   for (const s of strokes) issues.push({ severity: 'WARN', message: tag + s });
+
+  // Layout geometry (only at click 0 to avoid noise from partial reveals)
+  if (clickState === 0) {
+    const geometry = await checkLayoutGeometry(page, vpHeight > 720 ? 1024 : 1280);
+    for (const g of geometry) issues.push({ severity: 'WARN', message: tag + g });
+  }
 
   return issues;
 }
