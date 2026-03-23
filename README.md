@@ -1,18 +1,16 @@
 # Slide Maker
 
-A Claude Code skill that generates [Slidev](https://sli.dev) presentation decks. It reads a GitHub project's source code and docs to produce slides grounded in what's actually in the repo, or walks through a structured process to create a deck from a brief.
+A Claude Code skill that turns GitHub repositories into [Slidev](https://sli.dev) presentation decks. Point it at a repo and it reads the source code, architecture docs, and lessons learned to produce slides grounded in what's actually there — not a summary of the README.
 
-Output is native Slidev Markdown: editable by hand, buildable to static HTML and deployable anywhere.
+Output is native Slidev Markdown: editable by hand, buildable to static HTML, deployable anywhere.
 
-[Live demo](https://slides-oshineye-dev.adewale-883.workers.dev/slide-maker/)
+**[See example decks live](https://slides-oshineye-dev.adewale-883.workers.dev/slide-maker/)**
 
 ## Install
 
 ```bash
 npx skills add adewale/slide-maker
 ```
-
-Or copy `skills/slide-maker/` into your project's `.claude/skills/` folder manually.
 
 ## Usage
 
@@ -40,22 +38,9 @@ Every deck includes:
 - `styles/theme.css` — layout-specific styling that references the tokens
 - `styles/index.css` — Slidev's auto-discovery entry point
 
-The spec and slides stay in sync. Edit the spec to change direction; edit the slides to change content.
+Edit the spec to change direction; edit the slides to change content.
 
-## How it works
-
-The skill follows an 8-phase process:
-
-1. **Determine mode** — create or update
-2. **Gather sources** — read the project's README, code, architecture docs
-3. **Intake** — normalize the brief into structured inputs
-4. **Style direction** — choose from 6 visual presets
-5. **Write spec** — `deck.spec.md` with tokens, outlines, layout choices
-6. **Compile** — generate `slides.md` and styles from the spec
-7. **Validate** — WCAG contrast, LLM-tell audit, CRAP design principles
-8. **Deliver** — build instructions for the target platform
-
-### Presets
+## Presets
 
 | Preset | Typography | Background |
 |---|---|---|
@@ -66,12 +51,18 @@ The skill follows an 8-phase process:
 | cloudflare | Source Sans 3 / Young Serif | Warm cream |
 | material-design | Roboto | M3 surfaces |
 
-### Validation
+## Validation
 
-The compiler checks its output against:
-- WCAG AA contrast ratios (4.5:1 body text, 3:1 large text)
-- 60+ LLM-tell anti-patterns (generic phrases, overused fonts, purple gradients)
-- CRAP design principles (Contrast, Repetition, Alignment, Proximity)
+The compiler checks its own output against:
+
+- **WCAG AA** contrast ratios (4.5:1 body text, 3:1 large text)
+- **60+ LLM-tell anti-patterns** (generic phrases, overused fonts, purple gradients)
+- **CRAP design principles** (Contrast, Repetition, Alignment, Proximity)
+
+Two CLI tools run post-build:
+
+- `deck-lint` — static analysis of CSS tokens, layout alignment, background consistency, content density
+- `screenshot-audit` — Playwright-based visual checks (contrast, overlap, overflow, column balance, centering)
 
 ## Building and deploying
 
@@ -80,9 +71,7 @@ npm run build     # builds all decks to examples/_build/
 npm run serve     # preview at localhost:3030
 ```
 
-Built decks are static SPAs deployed via Cloudflare Workers, which handles SPA routing server-side (clean URLs like `/olsen/3` survive reload).
-
-Each built deck exposes its Markdown for programmatic access:
+Built decks are static SPAs. Each exposes its Markdown for programmatic access:
 
 | Path | Content |
 |---|---|
@@ -93,29 +82,12 @@ Each built deck exposes its Markdown for programmatic access:
 
 ## Mobile
 
-On portrait phones (< 640px), decks switch to a vertical scroll view. All slides render in a snap-scrolling stack with click animations resolved. No nav chrome.
-
-## Project structure
-
-```
-skills/slide-maker/   # The skill
-  components/         # 29 Vue components (progress bars, QR code, keyboard help, etc.)
-  composables/        # Shared state (useSections, useHelp, useThumbnails)
-  setup/              # Keyboard shortcuts, Mermaid renderer
-  styles/             # 13 transitions, 6 hover interactions
-examples/             # Two core decks (demo + reference)
-  build.sh            # Multi-deck build with per-slide splitting
-tools/                # CLI tools (deck-lint, screenshot-audit, verify-deck, etc.)
-docs/                 # Design philosophy, rubrics, specs
-evals/                # Skill evaluation test cases
-```
-
-See [EXTENSIONS.md](EXTENSIONS.md) for the full component and extension reference.
+On portrait phones (< 640px), decks switch to a vertical scroll view with snap-scrolling and all click animations resolved.
 
 ## Limitations
 
 - Requires Node.js 18+ and npm (Slidev dependency)
-- Decks are 16:9 landscape — portrait/custom aspect ratios are not supported
+- Decks are 16:9 landscape — no portrait or custom aspect ratios
 - Mobile scroll view works but does not reflow content for small screens
 - The 6 presets cover common styles but are not customizable beyond token overrides
 - No PPTX export (Slidev supports PDF export via `slidev export`)
