@@ -34,7 +34,7 @@ transition: fade
 # Metadata Standards Assume You Already Have the Metadata
 
 <!--
-This is the provocation that sets up the through-line. MLCommons Croissant is a well-designed standard, but it solves the representation problem, not the extraction problem. A researcher who publishes a dataset describes it in natural language across 10-20 pages of a paper. The metadata that Croissant needs is in there, but it is buried in prose, tables, footnotes, and appendices. pdf2croissant exists because the hard part was never the schema — it was getting the facts out of the paper.
+This is the provocation that frames the entire deck. MLCommons Croissant is a well-designed standard adopted by HuggingFace, Kaggle, and OpenML. But it solves the representation problem, not the extraction problem. The facts a Croissant file needs — download URLs, file formats, record counts, licensing — live scattered across academic papers that no schema can parse. Someone has to read the paper and extract the truth. That gap is the reason pdf2croissant exists.
 
 Sources:
 - https://github.com/jettyio/pdf2croissant/blob/main/README.md — project motivation: turning papers into structured metadata
@@ -44,49 +44,277 @@ Sources:
 transition: slide-left
 ---
 
-# An Agent That Reads Papers
+# What IS Croissant
 
-Upload a PDF of a paper that introduces an ML dataset. An AI agent reads it, extracts metadata, builds valid Croissant JSON-LD, validates the result, and delivers three files:
+An MLCommons standard for describing ML datasets as JSON-LD. Adopted by HuggingFace, Kaggle, and OpenML as the canonical way to make datasets findable and interoperable.
 
 <v-clicks>
 
-- **croissant.json** — the Croissant JSON-LD metadata file
-- **validation_report.json** — what passed, what failed, what could not be verified
-- **summary.md** — human-readable extraction summary with confidence levels
+- **JSON-LD format** — machine-readable, linked-data compatible
+- **16 core fields** — name, creators, license, distributions, record sets, data types
+- **Validation tooling** — the `mlcroissant` Python library checks schema conformance
+- **The gap** — the standard tells you what to write, not how to find it
 
 </v-clicks>
 
 <!--
-The three-output design is deliberate. croissant.json is the machine-readable payload. validation_report.json is the audit trail — it tells you what the agent verified and what it could not. summary.md is for human review, showing each extracted field with its confidence tag. The architecture is a Next.js 15 frontend with React Query polling a Jetty API backend where the selected model does the comprehension work.
+Croissant was published by MLCommons in 2024 and rapidly adopted by the major dataset platforms. It defines a JSON-LD vocabulary for dataset metadata: what the dataset is, who created it, what format the files are in, what the records look like, and how to load it. The mlcroissant Python library can validate a Croissant file against the schema and even instantiate the dataset from the metadata. The standard is excellent at representation. The problem is that the metadata it needs lives in academic papers as prose, tables, and footnotes — not as structured fields.
 
 Sources:
-- https://github.com/jettyio/pdf2croissant/blob/main/README.md — three output files and architecture overview
-- https://github.com/jettyio/pdf2croissant/blob/main/package.json — Next.js 15, React 19, React Query, Tailwind CSS 4
+- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — 16 field mappings from paper to Croissant, mlcroissant validation
+- https://github.com/jettyio/pdf2croissant/blob/main/README.md — MLCommons standard context
+-->
+
+---
+transition: slide-left
+---
+
+# The Extraction Gap
+
+A researcher publishes a paper describing a new dataset. The dataset name is on page 1. The license is in a footnote on page 12. The column types are in a table on page 4. The download URL might be in an appendix — or missing entirely.
+
+<v-clicks>
+
+- Croissant needs **structured fields**
+- Papers contain **scattered prose**
+- Someone must read the paper, find each fact, and decide what is explicit vs. inferred
+- That someone is now an agent
+
+</v-clicks>
+
+<!--
+This slide makes the gap concrete. A single academic paper can scatter the metadata Croissant needs across 20+ pages. The dataset name is usually clear, but the license might be a footnote, the data format might be described in a methodology section, and the download URL might exist only in a GitHub link buried in the appendix. Some fields — like file sizes or update frequency — may not appear in the paper at all. The extraction problem is not just reading; it is distinguishing between what the paper explicitly states and what you are inferring from context.
+
+Sources:
+- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — "Distinguish between what is explicitly stated vs what you are inferring"
+- https://github.com/jettyio/pdf2croissant/blob/main/README.md — problem statement
+-->
+
+---
+layout: section
+transition: iris
+---
+
+# An Agent That Reads Papers
+
+<!--
+Section break into the core product. The agent is an AI model (Claude or Gemini) running inside a sandboxed Python environment, guided by a runbook that tells it exactly how to extract metadata from academic papers. The word "agent" is precise here: it has a system prompt, access to tools (pip, Python, mlcroissant), and a multi-step workflow it follows autonomously.
+
+Sources:
+- https://github.com/jettyio/pdf2croissant/blob/main/README.md — agent-based extraction overview
+-->
+
+---
+transition: slide-left
+---
+
+# Three Outputs From Every Run
+
+Upload a PDF of a paper that introduces an ML dataset. The agent reads it and delivers three files:
+
+<v-clicks>
+
+- **croissant.json** — the Croissant JSON-LD metadata file, ready for HuggingFace or Kaggle
+- **validation_report.json** — what passed, what failed, how many iterations it took to fix errors
+- **summary.md** — human-readable extraction report with confidence levels per field
+
+</v-clicks>
+
+<p v-click style="color: var(--deck-muted); font-size: 0.95rem; margin-top: 1.5rem;">The validation report and summary exist because the Croissant file alone does not tell you how much to trust it.</p>
+
+<!--
+The three-output design is deliberate. croissant.json is the machine-readable payload — the thing downstream systems consume. validation_report.json is the audit trail: it records which of the three validation stages passed, what errors were encountered, and how many self-healing iterations the agent ran. summary.md is for human review, showing each extracted field with its confidence tag (high, medium, low) and a table of gaps — fields the paper did not address. The summary is what a dataset maintainer reads to decide whether to accept the Croissant file as-is or manually verify specific fields.
+
+Sources:
+- https://github.com/jettyio/pdf2croissant/blob/main/README.md — three output files and their purposes
+-->
+
+---
+transition: slide-left
+---
+
+# The Upload Pipeline
+
+Three stages keep the API server out of the file transfer path:
+
+<v-clicks>
+
+- **Presign** — client requests a signed URL from `/api/presign`
+- **Blob** — client PUTs the PDF directly to Vercel Blob storage (15MB limit, drag-and-drop with progress)
+- **Run** — client POSTs to `/api/run` with the blob reference and selected model
+
+</v-clicks>
+
+<p v-click style="color: var(--deck-muted); font-size: 0.95rem; margin-top: 1rem;">React Query polls for completion. The frontend never touches the PDF after upload.</p>
+
+<!--
+The presigned URL pattern means the Next.js server never buffers the full PDF — the client uploads directly to Vercel Blob storage. The 15MB limit is enforced client-side in the UploadForm component before the upload starts. The XMLHttpRequest-based upload provides real progress tracking for large papers. Once the blob is stored, the POST to /api/run sends only the blob reference and the user's model choice to the Jetty API backend. React Query handles polling the run status until completion. This architecture means the Next.js server handles only lightweight JSON, never large file payloads.
+
+Sources:
+- https://github.com/jettyio/pdf2croissant/blob/main/README.md — upload pipeline: presign, blob, run
+- https://github.com/jettyio/pdf2croissant/blob/main/package.json — React Query, Vercel Blob dependencies
+-->
+
+---
+transition: slide-left
+---
+
+# Architecture
+
+```mermaid {theme: 'base', scale: 0.65}
+graph LR
+  A["Upload PDF"] --> B["Next.js"]
+  B --> C["Blob"]
+  B --> D["Jetty API"]
+  D --> E["Sandbox"]
+  E --> F["Agent"]
+  F --> G["croissant.json"]
+  F --> H["report.json"]
+  F --> I["summary.md"]
+  style A fill:#a06c08,stroke:#a06c08,color:#fff
+  style D fill:#a06c08,stroke:#a06c08,color:#fff
+  style F fill:#a06c08,stroke:#a06c08,color:#fff
+  linkStyle default stroke:#2c1810,stroke-width:2px
+```
+
+<p style="color: var(--deck-muted); font-size: 0.9rem; margin-top: 0.5rem;">Jetty API orchestrates the agent in a sandboxed Python 3.12 environment. One env var (JETTY_API_TOKEN) connects the frontend to the backend.</p>
+
+<!--
+The architecture separates concerns cleanly. The Next.js 15 frontend (React 19, Tailwind CSS 4) handles the upload UI and result display through 8 components: UploadForm, CroissantViewer, ValidationResults, SummaryReport, RunHistory, StepTimeline, RunStatusBanner, and RunbookContent. The Jetty API (flows-api.jetty.io) provides an OpenAI-compatible chat completions endpoint that orchestrates the agent. The sandbox gives each run Python 3.12 with 4 CPUs, 8GB RAM, a 1200-second timeout, and network access (for optional HuggingFace cross-referencing). The single env var deployment means the entire system connects through JETTY_API_TOKEN — no database, no queue, no additional infrastructure.
+
+Sources:
+- https://github.com/jettyio/pdf2croissant/blob/main/README.md — architecture overview, Jetty API, sandbox constraints
+- https://github.com/jettyio/pdf2croissant/blob/main/package.json — Next.js 15, React 19, Tailwind CSS 4, React Query
+-->
+
+---
+layout: center
+transition: fade
+---
+
+# The agent runs in a sandbox. 4 CPUs. 8 GB RAM. 20 minutes. No escape.
+
+<!--
+The sandbox constraints are worth pausing on. Each agent run gets an isolated Python 3.12 process with 4 CPUs, 8GB RAM, and a 1200-second (20-minute) timeout. The agent has network access — it can pip install mlcroissant and optionally query the HuggingFace API — but it runs inside Jetty's sandboxed environment. The 20-minute timeout accommodates complex papers that require multiple validation iterations: a paper with ambiguous metadata might need 2-3 self-healing cycles, each involving a full re-read of the PDF and a re-validation of the Croissant output.
+
+Sources:
+- https://github.com/jettyio/pdf2croissant/blob/main/README.md — sandbox: Python 3.12, 4 CPUs, 8GB RAM, 1200s timeout, network access
+-->
+
+---
+transition: slide-left
+---
+
+# Choose Your Extraction Engine
+
+The model selector lets users pick per run:
+
+<v-clicks>
+
+- **Claude Opus** — highest comprehension quality, best for complex multi-table papers
+- **Claude Sonnet** — faster extraction, good for straightforward papers
+- **Gemini Pro** — the default backend model, balances speed and accuracy
+
+</v-clicks>
+
+<p v-click style="color: var(--deck-muted); font-size: 0.95rem; margin-top: 1.5rem;">Same runbook, same validation pipeline, different reading engine. The rules stay constant; the model varies.</p>
+
+<!--
+Model-agnosticism is an architectural choice, not a feature checkbox. The runbook is the same regardless of which model executes it. The Jetty API backend uses an OpenAI-compatible chat completions endpoint, so swapping models means changing one parameter. The default is gemini-3.1-pro-preview, but the frontend model selector lets users choose Claude Opus or Sonnet for any given run. This matters because different models have different strengths with academic papers: Opus handles dense multi-table papers better, while Gemini Pro is faster for straightforward single-dataset papers.
+
+Sources:
+- https://github.com/jettyio/pdf2croissant/blob/main/README.md — model selector: Claude Opus, Claude Sonnet, Gemini Pro
+-->
+
+---
+layout: section
+transition: iris
+---
+
+# The Runbook Is the System Prompt
+
+<!--
+Section break into the most interesting part of the project. The runbook — RUNBOOK.md — is a 300+ line standard operating procedure that ships as the system prompt with every API request. It is embedded at build time by embed-runbook.ts and sent verbatim. The runbook is not documentation about the agent; it IS the agent's instructions. Every design decision about how extraction works is encoded here.
+
+Sources:
+- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — 300+ line system prompt
+-->
+
+---
+transition: slide-left
+---
+
+# Eight Steps, One Procedure
+
+The runbook defines the agent's complete workflow:
+
+<v-clicks>
+
+- **1. Environment Setup** — `pip install mlcroissant`, create output directories
+- **2. Read and Analyze** — extract dataset identity, creators, structure, characteristics
+- **3. Cross-Reference** — optionally query HuggingFace for supplementary data
+- **4. Build Croissant JSON-LD** — map 16 paper fields to Croissant properties
+- **5. Validate** — three-stage pipeline (syntax, schema, semantics)
+
+</v-clicks>
+
+<p v-click style="color: var(--deck-muted); font-size: 0.95rem; margin-top: 1rem;">Steps 6-8: iterate on errors (max 3), write executive summary, run final checklist. If any item fails, go back and fix it.</p>
+
+<!--
+The 8-step runbook is the entire extraction discipline. Step 2 is where the agent does the actual reading — it extracts dataset identity (name, version), creators (authors, institutions), data structure (columns, types, splits), characteristics (size, format, modality), and additional metadata (license, citation, DOI). The key rule in step 2: "Distinguish between what is explicitly stated vs what you are inferring." Step 3 is optional — the agent can query the HuggingFace API for supplementary data, but the runbook warns: "Do NOT blindly copy. The paper is the primary source." Step 4 uses a field mapping table with 16 specific mappings from paper concepts to Croissant JSON-LD properties.
+
+Sources:
+- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — 8-step extraction procedure
 -->
 
 ---
 transition: morph-fade
 ---
 
-# The Runbook Is the System Prompt
+# Confidence Is a First-Class Output
 
-RUNBOOK.md ships with every API request — embedded at build time, sent verbatim. Three rules make extraction honest:
+Every extracted field gets a confidence tag. The agent cannot skip this.
 
 <v-clicks>
 
-- **Confidence tagging** — every extracted field is marked high, medium, or low
-- **Gap documentation** — if the paper does not mention a download URL, the agent says so
-- **Paper grounding** — every claim must trace to specific text in the PDF, not model knowledge
+- **HIGH** — explicitly stated in the paper: dataset name, authors, license, citation
+- **MEDIUM** — inferred from context: column types, data splits, file formats
+- **LOW** — not in the paper: download URLs, file sizes, update frequency
+- **GAPS** — documented explicitly, never filled with plausible guesses
 
 </v-clicks>
 
-<p v-click style="color: var(--deck-accent); font-size: 0.95rem; margin-top: 1.5rem;">The runbook is a file in the repo. Change the rules, change the agent.</p>
+<p v-click style="color: var(--deck-accent); font-size: 0.95rem; margin-top: 1.5rem;">A Croissant file with documented gaps is more useful than one with confident-looking hallucinations.</p>
 
 <!--
-Sending the runbook as a system prompt rather than fine-tuning it into the model is a key architectural decision. It means the extraction rules are versioned, auditable, and editable without retraining. The embed-runbook.ts build script injects RUNBOOK.md contents at build time so it travels with every request. Confidence tagging is not optional — the runbook requires it on every field. A "high" tag means the paper explicitly states the value. "Medium" means it can be reasonably inferred. "Low" means the agent is guessing. Gap documentation is the most unusual requirement: the agent must explicitly note when information is absent rather than filling the gap with plausible but unsourced data. This is the through-line in action — the paper is the source of truth, and silence is a valid answer.
+The confidence tracking system is what makes the extraction honest. HIGH means the paper literally says "this dataset contains 100,000 training examples" — the agent can point to the sentence. MEDIUM means the agent inferred the information from context — for example, deducing column types from a table in the paper even though the paper does not explicitly list them. LOW means the information is not in the paper at all — the agent is guessing or using external knowledge. GAPS are the most important category: they represent fields the paper simply does not address. The runbook requires the agent to document gaps rather than fill them. This is the core design rule in action.
 
 Sources:
-- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — system prompt with confidence tagging, gap documentation, paper grounding rules
+- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — confidence tracking: HIGH, MEDIUM, LOW definitions and examples
+-->
+
+---
+transition: slide-left
+---
+
+# Gap Documentation
+
+The executive summary includes a mandatory gaps table:
+
+| Gap | Why It Matters |
+|-----|---------------|
+| Download URL not in paper | Croissant distribution object is incomplete |
+| File sizes not mentioned | Cannot verify download integrity |
+| Update frequency unknown | Consumers cannot plan refresh schedules |
+| Data split ratios implied but not stated | Record set definitions are approximations |
+
+<p v-click style="color: var(--deck-muted); font-size: 0.95rem; margin-top: 1rem;">The agent is required to note absence rather than fabricate presence. Silence is data.</p>
+
+<!--
+Gap documentation is the most unusual requirement in the runbook. Most extraction tools optimize for completeness — fill every field, guess if you have to. pdf2croissant inverts this. The executive summary that ships with every run includes three tables: high-confidence fields, medium-confidence fields, and gaps. The gaps table is mandatory. If a paper does not mention where to download the dataset, the agent writes that down rather than guessing a URL from model knowledge. This means downstream consumers of the Croissant file can trust the fields that are present and know exactly which ones need manual verification.
+
+Sources:
+- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — gap documentation requirements, executive summary template
 -->
 
 ---
@@ -131,13 +359,52 @@ Sources:
 -->
 
 ---
+transition: slide-left
+---
+
+# Field Mapping
+
+The runbook defines 16 specific mappings from paper concepts to Croissant JSON-LD:
+
+<v-clicks>
+
+- **Identity** — dataset name, version, description, URL, same-as DOI
+- **Provenance** — creators, date published, citation, license
+- **Structure** — distributions (files), record sets (tables), fields (columns)
+- **Data types** — 7 mappings: text, integer, float, boolean, date, URL, enum
+
+</v-clicks>
+
+<p v-click style="color: var(--deck-muted); font-size: 0.95rem; margin-top: 1.5rem;">Each mapping has a source (paper) and a target (JSON-LD property). The agent fills what it can find and documents the rest as gaps.</p>
+
+<!--
+The field mapping table is the mechanical core of the extraction. It tells the agent exactly which paper concepts map to which Croissant JSON-LD properties. For example, "dataset name as stated in the paper" maps to the name property, "authors and institutions" maps to creator, "file format and access method" maps to distribution. The data type mapping covers 7 types that the mlcroissant library recognizes: sc:Text, sc:Integer, sc:Float, sc:Boolean, sc:Date, sc:URL, and sc:Enum. Each field mapping has a specific instruction about what to look for in the paper and what to do if it is not found.
+
+Sources:
+- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — field mapping table (16 mappings), data type mapping (7 types)
+-->
+
+---
+layout: center
+transition: morph-fade
+---
+
+# The runbook is a file in the repo. Copy it. Use it with Claude Code, Codex, or Gemini CLI. The web app is optional.
+
+<!--
+This is the insight most people miss about the project. The web app at pdf2mlcroissant.vercel.app is a convenient wrapper, but the runbook — RUNBOOK.md — is the actual intellectual contribution. It encodes the extraction discipline: what to look for, how to tag confidence, when to document gaps, how to validate. The /runbook page in the app makes this explicit by inviting users to copy the runbook and use it with whatever agent they already have. This portability is by design. If the rules are right, any sufficiently capable model can follow them. The web app is one instantiation; the runbook works anywhere.
+
+Sources:
+- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — portable runbook designed for use outside the app
+- https://github.com/jettyio/pdf2croissant/blob/main/README.md — /runbook page and portability description
+-->
+
+---
 layout: section
 transition: iris
 ---
 
-# Validation
-
-Three stages, three chances to be wrong
+# Three Stages, Three Chances to Be Wrong
 
 <!--
 Section break for the validation deep-dive. The three-stage validation pipeline is what turns a best-effort extraction into a verified one. Each stage catches a different class of error: malformed JSON, schema violations, and semantic errors that only surface when you try to load the data. The self-healing loop means the agent can fix its own mistakes — but only up to three times, because infinite retries mask fundamental extraction failures.
@@ -150,69 +417,75 @@ Sources:
 transition: slide-up
 ---
 
-# Self-Healing Validation Loop
+# The Validation Pipeline
 
 Three stages catch three classes of error:
 
 <v-clicks>
 
-- **JSON syntax** — is the output valid JSON-LD?
-- **Croissant schema** — does it conform to the MLCommons spec? Validated with `mlcroissant`
-- **Record set generation** — can you actually load the described data?
+- **JSON syntax** — is the output valid JSON-LD? Catches malformed LLM output
+- **Croissant schema** — does it conform to the MLCommons spec? Validated with the `mlcroissant` Python library
+- **Record set generation** — can you actually load the described data? Catches semantic errors that pass schema checks
 
 </v-clicks>
 
-<p v-click style="color: var(--deck-muted); font-size: 0.95rem; margin-top: 1.5rem;">If any stage fails, the agent reads the error, re-reads the paper, and fixes the output. Up to 3 iterations.</p>
+<p v-click style="color: var(--deck-muted); font-size: 0.95rem; margin-top: 1.5rem;">The escalation order matters. Each stage is more expensive and catches a different failure mode.</p>
 
 <!--
-The escalation order matters. JSON syntax is cheap to check and catches the most common failure mode — malformed output from the LLM. Croissant schema validation uses the official mlcroissant Python library, which checks field types, required properties, and cross-references between record sets and distributions. Record set generation is the most expensive check: it actually tries to instantiate the dataset from the metadata. This catches semantic errors like incorrect column names or mismatched file formats that pass schema validation but fail at load time. The sandbox runs Python 3.12 with 4 CPUs, 8GB RAM, and a 1200-second timeout — enough for the mlcroissant library to validate complex datasets. Three retry iterations was chosen empirically: most fixable errors resolve in 1-2 attempts, and errors past 3 are usually fundamental extraction failures.
+The escalation order is deliberate. JSON syntax validation is cheap — it catches the most common failure mode of malformed output from the LLM. Croissant schema validation uses the official mlcroissant Python library, which checks field types, required properties, and cross-references between record sets and distributions. Record set generation is the most expensive check: it actually tries to instantiate the dataset from the metadata. This catches semantic errors like incorrect column names or mismatched file formats that pass schema validation but fail at load time. Each stage produces a pass/fail result with detailed error messages that feed into the self-healing loop.
 
 Sources:
-- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — three-stage validation pipeline and self-healing loop
-- https://github.com/jettyio/pdf2croissant/blob/main/README.md — sandbox constraints: Python 3.12, 4 CPUs, 8GB RAM, 1200s timeout
+- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — three-stage validation pipeline
 -->
 
 ---
 transition: slide-left
 ---
 
-# The Stack
+# Self-Healing: Read the Error, Fix the Output
 
-Upload is three stages:
+When validation fails, the agent does not give up. It reads the error message, re-reads the relevant section of the paper, and fixes the Croissant output.
 
 <v-clicks>
 
-- **Presign** — client requests a signed URL from the API
-- **Blob storage** — client PUTs the PDF directly to Vercel Blob (15MB limit)
-- **Run** — client POSTs to `/api/run` with the blob reference and selected model
+- **8 common error patterns** documented in the runbook with known fixes
+- **Max 3 iterations** — most fixable errors resolve in 1-2 attempts
+- **Errors past 3** are usually fundamental extraction failures, not fixable by retry
+- Each iteration produces an updated `validation_report.json` showing what changed
 
 </v-clicks>
 
-<p v-click style="color: var(--deck-muted); font-size: 0.95rem; margin-top: 1rem;">Model selector: Claude Opus, Claude Sonnet, or Gemini Pro. Backend is a Jetty API orchestrating sandboxed Python 3.12 (4 CPUs, 8GB RAM, 1200s timeout). Frontend polls with React Query.</p>
-
 <!--
-The three-stage upload pipeline is a deliberate design. Presigned URLs keep the API server out of the file transfer path — the client uploads directly to Vercel Blob storage. The 15MB limit is enforced client-side in the UploadForm component via drag-drop validation. The model selector lets users choose between Claude Opus (highest quality), Claude Sonnet (fastest), or Gemini Pro per run — the choice affects comprehension quality and latency. The Jetty API backend handles agent orchestration in a sandboxed environment: each run gets its own Python 3.12 process with 4 CPUs and 8GB RAM. The 1200-second timeout accommodates complex papers that require multiple validation iterations. Eight React components handle the UI: UploadForm, CroissantViewer, ValidationResults, SummaryReport, RunHistory, StepTimeline, RunStatusBanner, and RunbookContent.
+The runbook includes a table of 8 common error patterns the agent encounters during validation, along with their typical fixes. For example, a missing @context is a JSON-LD structural error fixed by adding the standard Croissant context block. A mismatched record set field name is a semantic error fixed by re-reading the paper's data description table. The 3-iteration limit was chosen empirically: in testing against the benchmark suite, most fixable errors resolve in 1-2 attempts. Errors that persist past 3 iterations are usually fundamental — the paper genuinely does not contain enough information to build a valid Croissant file for that field.
 
 Sources:
-- https://github.com/jettyio/pdf2croissant/blob/main/README.md — upload pipeline, model selector, sandbox constraints
-- https://github.com/jettyio/pdf2croissant/blob/main/package.json — Next.js 15, React 19, React Query, Vercel Blob
+- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — common error table (8 patterns), max 3 iterations
 -->
 
 ---
-layout: center
-transition: morph-fade
+transition: slide-left
 ---
 
-# The Runbook Is the Product
+# The Executive Summary
 
-The `/runbook` page tells users to copy it and run it with any agent — Claude Code, Codex, Gemini CLI. No web app needed. The rules are what matter, not the interface.
+Every run produces a human-readable summary with structured confidence tables:
+
+<v-clicks>
+
+- **High confidence table** — fields explicitly stated in the paper, with page references
+- **Medium confidence table** — fields inferred from context, with reasoning
+- **Low confidence table** — fields the agent guessed at, flagged for manual review
+- **Gaps table** — fields the paper does not address at all
+
+</v-clicks>
+
+<p v-click style="color: var(--deck-muted); font-size: 0.95rem; margin-top: 1.5rem;">The summary is what a dataset maintainer reads to decide whether to accept the Croissant file or verify specific fields.</p>
 
 <!--
-This is the insight most people miss about the project. The web app is a convenient wrapper, but the runbook — RUNBOOK.md — is the actual intellectual contribution. It encodes the extraction discipline: what to look for, how to tag confidence, when to document gaps, how to validate. The /runbook page in the app makes this explicit by inviting users to take the runbook and use it with whatever agent they already have. This portability is by design. If the rules are right, any sufficiently capable agent can follow them. The web app is one instantiation; the runbook works anywhere.
+The executive summary template is defined in step 7 of the runbook. It is not optional — the agent must produce it for every run. The high-confidence table lists fields like dataset name, authors, and license that the paper explicitly states. The medium-confidence table lists fields like column types and data splits that can be reasonably inferred from context. The low-confidence table lists fields the agent is uncertain about. The gaps table lists fields the paper simply does not mention — download URLs, file sizes, update frequency. This structured output means a human reviewer can focus their time on the medium, low, and gap categories rather than re-verifying everything.
 
 Sources:
-- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — portable runbook designed for use outside the app
-- https://github.com/jettyio/pdf2croissant/blob/main/README.md — /runbook page and portability description
+- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — executive summary template with confidence tables
 -->
 
 ---
@@ -226,20 +499,46 @@ The repo ships ground-truth Croissant files for five datasets — sourced from H
 <v-clicks>
 
 - **SQuAD 2.0** — reading comprehension with unanswerable questions
-- **GLUE** — natural language understanding benchmark suite
+- **GLUE** — natural language understanding benchmark suite (9 tasks, distinct schemas)
 - **WikiText** — language modeling on Wikipedia articles
 - **CNN/DailyMail** — abstractive text summarization
 - **GSM8K** — grade school math word problems
 
 </v-clicks>
 
-<p v-click style="color: var(--deck-muted); font-size: 0.95rem; margin-top: 1.5rem;">Each pairs the original paper PDF with its known-good Croissant output. Test extraction against reality, not synthetic examples.</p>
+<p v-click style="color: var(--deck-muted); font-size: 0.95rem; margin-top: 1.5rem;">Each pairs the original arXiv paper PDF with its known-good Croissant output. Diff agent output against reality.</p>
 
 <!--
-The benchmark suite is how you test an extraction agent honestly. Each entry has the original academic paper as a PDF and a ground-truth Croissant file from HuggingFace — metadata that was created by humans who actually read the paper and understood the dataset. When pdf2croissant processes the SQuAD 2.0 paper, you can diff the output against HuggingFace's canonical Croissant file to see what the agent got right, what it missed, and what it tagged as low-confidence. This is more rigorous than synthetic test cases because real papers have real ambiguities: SQuAD 2.0 describes multiple data splits across different sections, GLUE is a suite of nine tasks with distinct schemas, and GSM8K focuses on methodology more than dataset format.
+The benchmark suite is how you test an extraction agent honestly. Each entry has the original academic paper as a PDF (sourced from arXiv) and a ground-truth Croissant file from HuggingFace — metadata that was created by humans who actually read the paper and understood the dataset. When pdf2croissant processes the SQuAD 2.0 paper, you can diff the output against HuggingFace's canonical Croissant file to see what the agent got right, what it missed, and what it tagged as low-confidence. This is more rigorous than synthetic test cases because real papers have real ambiguities: GLUE is a suite of nine tasks with distinct schemas, and GSM8K focuses on methodology more than dataset format.
 
 Sources:
 - https://github.com/jettyio/pdf2croissant/tree/main/benchmarks — five benchmark datasets with PDFs and ground-truth Croissant JSON-LD from HuggingFace
+-->
+
+---
+transition: slide-left
+---
+
+# Intentional V1 Constraints
+
+What pdf2croissant does not do — by design:
+
+<v-clicks>
+
+- **No batch processing** — one paper at a time, because each extraction needs full attention
+- **No direct HuggingFace analysis** — the paper is the source, not the platform
+- **No metadata editing UI** — review the output, but edit it in your own tools
+- **No auth system** — single env var deployment, JETTY_API_TOKEN connects everything
+
+</v-clicks>
+
+<p v-click style="color: var(--deck-muted); font-size: 0.95rem; margin-top: 1.5rem;">These are scope decisions, not missing features. Each one keeps the system focused on doing one thing well.</p>
+
+<!--
+The V1 constraints are worth stating explicitly because they reveal what the project values. No batch processing means the agent gives full attention to each paper — it reads the entire PDF, cross-references sections, and validates thoroughly. Batch mode would incentivize shortcuts. No direct HuggingFace analysis means the paper is always the primary source; HuggingFace metadata is supplementary at best (step 3 of the runbook). No editing UI means the project stays focused on extraction and validation, not on building a metadata editor. No auth system means deployment is one env var — JETTY_API_TOKEN — with no user management overhead.
+
+Sources:
+- https://github.com/jettyio/pdf2croissant/blob/main/README.md — V1 limitations and scope decisions
 -->
 
 ---
@@ -247,15 +546,13 @@ layout: center
 transition: fade
 ---
 
-# Silence Is Data
-
-When the paper does not mention a download URL, the agent does not guess one. When the paper is ambiguous about record counts, the confidence tag says so. What the paper does not say is as important as what it does.
+# The system's integrity comes from what it refuses to do. It refuses to guess when the paper is silent. It refuses to fill gaps with plausible but unsourced data. It refuses to skip validation.
 
 <!--
-This slide reinforces the through-line before the closing. Most extraction tools optimize for completeness — fill every field, guess if you have to. pdf2croissant inverts this. The runbook's gap documentation rule means the agent is required to note absence rather than fabricate presence. A Croissant file with documented gaps is more useful than one with confident-looking hallucinations, because downstream consumers can trust the fields that are present and know exactly what needs manual verification. This is the philosophical core: treating the paper as the source of truth means respecting its limits.
+This is the through-line crystallized. Every interesting design decision in pdf2croissant is about a constraint, not a feature. Confidence tagging exists because the agent must distinguish what it knows from what it infers. Gap documentation exists because silence is a valid answer. Three-stage validation exists because the paper's claims must survive mechanical verification. The runbook is portable because the discipline matters more than the interface. Model-agnosticism works because the rules are what matter, not which model follows them. The system earns trust by being explicit about its own limitations.
 
 Sources:
-- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — gap documentation rules and confidence tagging
+- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — "The paper is the primary source of truth. Do not hallucinate metadata."
 -->
 
 ---
@@ -263,16 +560,17 @@ layout: end
 transition: fade
 ---
 
-# If the paper does not say it, the metadata does not claim it.
+# Leave it out and document the gap.
 
 <span style="font-family: var(--deck-font-mono); font-size: 0.95rem;">pdf2mlcroissant.vercel.app</span>
 
 <span style="font-family: var(--deck-font-mono); font-size: 0.85rem; color: var(--deck-muted); display: inline-block; margin-top: 0.5rem;">github.com/jettyio/pdf2croissant</span>
 
 <!--
-Resolve the through-line. "The paper is the source of truth" is not a tagline — it is the design rule that shaped every decision in this project. Confidence tagging exists because the paper's authority varies by field. Gap documentation exists because the paper's silence is data. Three-stage validation exists because the paper's claims must survive mechanical verification. The runbook is portable because the rules transcend any single interface. The live app URL and repo URL are both here — use the tool, or take the runbook and run it yourself.
+The closing echoes the runbook's own language. The runbook literally says: "The paper is the primary source of truth. Do not hallucinate metadata that isn't in the paper. If something is unclear, leave it out and document the gap." That instruction — leave it out and document the gap — is the rule that makes the entire system work. It is the reason confidence tags exist, the reason gaps tables are mandatory, the reason the validation pipeline refuses to pass incomplete metadata silently. The live app URL and repo URL are both here. Use the tool, or take the runbook and run it yourself.
 
 Sources:
 - https://github.com/jettyio/pdf2croissant — project repository
 - https://pdf2mlcroissant.vercel.app — live application
+- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — "If something is unclear, leave it out and document the gap"
 -->

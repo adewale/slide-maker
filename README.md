@@ -50,6 +50,7 @@ Edit the spec to change direction; edit the slides to change content.
 | tufte-data | EB Garamond | Light, 60/30 split |
 | cloudflare | Source Sans 3 / Young Serif | Warm cream |
 | material-design | Roboto | M3 surfaces |
+| croissant-warm | Young Serif | Warm cream |
 
 ## Validation
 
@@ -89,7 +90,7 @@ On portrait phones (< 640px), decks switch to a vertical scroll view with snap-s
 - Requires Node.js 18+ and npm (Slidev dependency)
 - Decks are 16:9 landscape — no portrait or custom aspect ratios
 - Mobile scroll view works but does not reflow content for small screens
-- The 6 presets cover common styles but are not customizable beyond token overrides
+- The 7 presets cover common styles but are not customizable beyond token overrides
 - No PPTX export (Slidev supports PDF export via `slidev export`)
 - The skill loads ~100KB of reference material during compilation, which uses context window
 

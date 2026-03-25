@@ -3,10 +3,10 @@
 ## Meta
 - title: pdf2croissant
 - subtitle: Turn academic papers into MLCommons Croissant JSON-LD metadata
-- purpose: present a tool that extracts machine-readable dataset metadata from PDFs by treating the paper as the source of truth
+- purpose: present a tool that extracts machine-readable dataset metadata from PDFs by treating the paper as the source of truth — and treating silence as data
 - audience: ML engineers, dataset maintainers, and researchers who publish or consume datasets
 - tone: precise, grounded, technically honest
-- target-length: 12
+- target-length: 25
 - notes: yes
 - style-preset: croissant-warm
 - progress: segment-bar
@@ -14,21 +14,22 @@
 
 ## Source Materials
 - readme: README.md (project overview — what it does, upload-to-outputs flow, benchmark datasets)
-- runbook: RUNBOOK.md (system prompt sent with every request — extraction rules, confidence tagging, gap documentation)
+- runbook: RUNBOOK.md (system prompt sent with every request — extraction rules, confidence tagging, gap documentation, 8-step procedure)
 - package: package.json (Next.js 15, React 19, Tailwind CSS 4, React Query — frontend stack)
 - benchmarks: benchmarks/ (five ground-truth Croissant files from HuggingFace — SQuAD 2.0, GLUE, WikiText, CNN/DailyMail, GSM8K)
+- types: types.ts (Trajectory, TrajectoryStep, ValidationStage, ValidationReport type definitions)
 
 ## Through-Line
-- concept: "The paper is the source of truth"
+- concept: "The paper is the source of truth" — and more specifically, the system's integrity comes from what it REFUSES to do. It refuses to guess when the paper is silent. It refuses to fill gaps with plausible but unsourced data. It refuses to skip validation. Every interesting design decision is about a constraint, not a feature.
 - type: design-rule
 - appears-in:
-  - slide 2: center — pose the provocation: metadata standards assume you already have the metadata
-  - slide 4: default — the runbook enforces grounding in the paper text, confidence tagging, gap documentation
-  - slide 5: two-cols-header — input (PDF) vs output (Croissant JSON-LD) shows the paper drives everything
-  - slide 7: default — three-stage validation loops back to what the paper actually said
-  - slide 9: center — the runbook is portable because the rules are what matter, not the app
-  - slide 11: center — reinforce: silence is data, not a gap to fill
-  - slide 12: end — resolve: if the paper does not say it, the metadata does not claim it
+  - slide 2: center — provocation: metadata standards assume you already have the metadata
+  - slide 4: default — the extraction gap: someone must distinguish explicit from inferred
+  - slide 13: default — confidence tracking: high/medium/low with examples
+  - slide 14: default — gap documentation: silence is data, not a gap to fill
+  - slide 17: center — the runbook is portable because the rules are what matter
+  - slide 24: center — crystallized: the system's integrity comes from what it refuses to do
+  - slide 25: end — resolved: "Leave it out and document the gap" (the runbook's own language)
 
 ## Design Tokens
 - colors:
@@ -63,6 +64,14 @@
   - styles/theme.css
   - styles/transitions.css
 
+## Transition Grammar
+- slide-left: global default, content progression
+- fade: reflection/pause — center slides, end slide
+- iris: new chapter — section dividers only (3 uses: slides 5, 11, 18)
+- morph-fade: conceptual shift — confidence tracking, runbook portability
+- wipe-right: comparison/juxtaposition — paper in vs croissant out
+- slide-up: reveal — validation pipeline
+
 ## Slides
 
 ### Slide 1
@@ -77,98 +86,206 @@
 ### Slide 2
 - kind: center
 - layout: center
+- transition: fade
 - title: Metadata Standards Assume You Already Have the Metadata
-- body: Croissant defines the schema. But the facts — download URLs, file formats, record counts, licensing — live scattered across academic papers that no schema can parse. Someone has to read the paper and extract the truth.
+- body: Croissant solves the representation problem, not the extraction problem. The facts live scattered across academic papers that no schema can parse.
 - sources:
   - https://github.com/jettyio/pdf2croissant/blob/main/README.md — project motivation and problem statement
 
 ### Slide 3
 - kind: default-content
 - layout: default
-- title: An Agent That Reads Papers
-- body: Upload a PDF of a paper that introduces an ML dataset. An AI agent reads it, extracts metadata, builds valid Croissant JSON-LD, validates the result, and delivers three outputs: croissant.json, validation_report.json, and summary.md.
+- title: What IS Croissant
+- body: MLCommons standard for describing ML datasets as JSON-LD. Adopted by HuggingFace, Kaggle, and OpenML. JSON-LD format, 16 core fields, mlcroissant validation tooling. The gap: the standard tells you what to write, not how to find it.
 - sources:
-  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — project overview and output description
+  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — 16 field mappings, mlcroissant validation
 
 ### Slide 4
 - kind: default-content
 - layout: default
-- title: The Runbook Is the System Prompt
-- body: RUNBOOK.md ships with every API request as the system prompt. It enforces confidence tagging (high/medium/low per field), gap documentation (silence is data, not a gap to fill), and paper grounding (every claim traces to specific text in the PDF). The runbook is embedded at build time and sent verbatim.
+- title: The Extraction Gap
+- body: A paper scatters metadata across 20+ pages. Dataset name on page 1, license in a footnote on page 12, column types in a table on page 4, download URL maybe in an appendix or missing entirely. Croissant needs structured fields. Papers contain scattered prose. Someone must distinguish explicit from inferred.
 - sources:
-  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — system prompt with extraction rules, confidence tagging, gap documentation
+  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — "Distinguish between what is explicitly stated vs what you are inferring"
 
 ### Slide 5
-- kind: two-cols
-- layout: two-cols-header
-- title: Paper In, Croissant Out
-- left:
-  - PDF of academic paper
-  - Tables, figures, prose
-  - Scattered metadata across sections
-  - Implicit assumptions, missing URLs
-- right:
-  - croissant.json (JSON-LD)
-  - validation_report.json
-  - summary.md
-  - Explicit gaps documented
-- sources:
-  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — three output files
-  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — gap documentation rules
-
-### Slide 6
 - kind: section
 - layout: section
-- title: Validation
-- subtitle: Three stages, three chances to be wrong
+- transition: iris
+- title: An Agent That Reads Papers
+
+### Slide 6
+- kind: default-content
+- layout: default
+- title: Three Outputs From Every Run
+- body: Upload a PDF, get three files: croissant.json (the metadata), validation_report.json (the audit trail), summary.md (human-readable confidence report). The validation report and summary exist because the Croissant file alone does not tell you how much to trust it.
+- sources:
+  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — three output files and their purposes
 
 ### Slide 7
 - kind: default-content
 - layout: default
-- title: Self-Healing Validation Loop
-- body: Three stages catch three classes of error. JSON syntax — is the output valid JSON-LD? Croissant schema — does it conform to the MLCommons spec, validated with mlcroissant? Record set generation — can you actually load the described data? If any stage fails, the agent reads the error, re-reads the paper, and fixes the output. Up to 3 iterations.
+- title: The Upload Pipeline
+- body: Three stages keep the API server out of the file transfer path. Presign (signed URL from /api/presign), Blob (PUT to Vercel Blob, 15MB limit, drag-drop with progress), Run (POST to /api/run with blob reference and selected model). React Query polls for completion.
 - sources:
-  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — three-stage validation pipeline
-  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — sandbox constraints (Python 3.12, 4 CPUs, 8GB, 1200s)
+  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — upload pipeline: presign, blob, run
+  - https://github.com/jettyio/pdf2croissant/blob/main/package.json — React Query, Vercel Blob
 
 ### Slide 8
 - kind: default-content
 - layout: default
-- title: The Stack
-- body: Upload is three stages — presign a URL, PUT to Vercel Blob storage, POST to /api/run. The frontend (Next.js 15, React Query) polls for completion. The backend is a Jetty API orchestrating a sandboxed Python 3.12 agent (4 CPUs, 8GB RAM, 1200s timeout). Model selector lets you choose Claude Opus, Claude Sonnet, or Gemini Pro per run. Eight React components handle the UI: UploadForm, CroissantViewer, ValidationResults, SummaryReport, RunHistory, StepTimeline, RunStatusBanner, RunbookContent.
+- title: Architecture
+- body: Mermaid diagram showing User to Next.js 15 Frontend to Vercel Blob and Jetty API to Sandbox with Agent + mlcroissant to three outputs. One env var (JETTY_API_TOKEN) connects everything. 8 React components handle the UI.
 - sources:
-  - https://github.com/jettyio/pdf2croissant/blob/main/package.json — Next.js 15, React 19, React Query, Tailwind CSS 4
-  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — upload pipeline, model selector, component architecture
+  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — architecture overview, Jetty API, sandbox constraints
+  - https://github.com/jettyio/pdf2croissant/blob/main/package.json — Next.js 15, React 19, Tailwind CSS 4
 
 ### Slide 9
 - kind: center
 - layout: center
-- title: The Runbook Is the Product
-- body: The /runbook page tells users to copy it and run it with any agent — Claude Code, Codex, Gemini CLI. No web app needed. The rules are what matter, not the interface.
+- transition: fade
+- title: The agent runs in a sandbox. 4 CPUs. 8 GB RAM. 20 minutes. No escape.
+- body: Isolated Python 3.12 process per run. Network access for pip and optional HuggingFace queries. 1200-second timeout accommodates complex papers with multiple validation iterations.
 - sources:
-  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — portable runbook designed for use outside the app
-  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — /runbook page description
+  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — sandbox: Python 3.12, 4 CPUs, 8GB RAM, 1200s timeout
 
 ### Slide 10
 - kind: default-content
 - layout: default
-- title: Five Benchmarks, Five Ground Truths
-- body: The repo ships ground-truth Croissant files for SQuAD 2.0, GLUE, WikiText, CNN/DailyMail, and GSM8K — sourced from HuggingFace. Each pairs the original paper PDF with known-good Croissant output. Test extraction against reality, not synthetic examples.
+- title: Choose Your Extraction Engine
+- body: Model selector per run: Claude Opus (highest quality), Claude Sonnet (fastest), Gemini Pro (default, balanced). Same runbook, same validation pipeline, different reading engine. The rules stay constant; the model varies.
 - sources:
-  - https://github.com/jettyio/pdf2croissant/tree/main/benchmarks — five benchmark datasets with ground-truth Croissant files from HuggingFace
+  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — model selector: Claude Opus, Claude Sonnet, Gemini Pro
 
 ### Slide 11
-- kind: center
-- layout: center
-- title: Silence Is Data
-- body: When the paper does not mention a download URL, the agent does not guess one. When the paper is ambiguous about record counts, the confidence tag says so. The through-line holds: what the paper does not say is as important as what it does.
-- sources:
-  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — gap documentation rules and confidence tagging
+- kind: section
+- layout: section
+- transition: iris
+- title: The Runbook Is the System Prompt
 
 ### Slide 12
+- kind: default-content
+- layout: default
+- title: Eight Steps, One Procedure
+- body: The runbook defines the complete workflow. 1. Environment Setup, 2. Read and Analyze, 3. Cross-Reference (optional HuggingFace), 4. Build Croissant JSON-LD (16 field mappings), 5. Validate (3-stage pipeline). Steps 6-8: iterate on errors (max 3), write executive summary, run final checklist.
+- sources:
+  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — 8-step extraction procedure
+
+### Slide 13
+- kind: default-content
+- layout: default
+- transition: morph-fade
+- title: Confidence Is a First-Class Output
+- body: Every field gets a confidence tag. HIGH: explicitly stated (dataset name, authors, license). MEDIUM: inferred from context (column types, data splits). LOW: not in the paper (download URLs, file sizes). GAPS: documented explicitly, never filled. A Croissant file with documented gaps is more useful than one with confident-looking hallucinations.
+- sources:
+  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — confidence tracking: HIGH, MEDIUM, LOW definitions
+
+### Slide 14
+- kind: default-content
+- layout: default
+- title: Gap Documentation
+- body: The executive summary includes a mandatory gaps table. Examples: download URL not in paper, file sizes not mentioned, update frequency unknown, data split ratios implied but not stated. The agent is required to note absence rather than fabricate presence. Silence is data.
+- sources:
+  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — gap documentation requirements, executive summary template
+
+### Slide 15
+- kind: two-cols
+- layout: two-cols-header
+- transition: wipe-right
+- title: Paper In, Croissant Out
+- left:
+  - PDF of academic paper
+  - Tables, figures, prose descriptions
+  - Scattered metadata across sections
+  - Implicit assumptions, missing URLs
+- right:
+  - croissant.json (valid JSON-LD)
+  - validation_report.json (audit trail)
+  - summary.md (confidence per field)
+  - Gaps documented, not filled
+- sources:
+  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — three output files
+  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — gap documentation rules
+
+### Slide 16
+- kind: default-content
+- layout: default
+- title: Field Mapping
+- body: The runbook defines 16 specific mappings from paper concepts to Croissant JSON-LD. Identity (name, version, description, URL, DOI), Provenance (creators, date, citation, license), Structure (distributions, record sets, fields), Data types (7 mappings: text, integer, float, boolean, date, URL, enum). Each mapping has a source and target; gaps are documented.
+- sources:
+  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — field mapping table (16 mappings), data type mapping (7 types)
+
+### Slide 17
+- kind: center
+- layout: center
+- transition: morph-fade
+- title: The runbook is a file in the repo. Copy it. Use it with Claude Code, Codex, or Gemini CLI. The web app is optional.
+- body: The /runbook page invites users to take the runbook and use it with whatever agent they already have. The rules are what matter, not the interface.
+- sources:
+  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — portable runbook
+  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — /runbook page
+
+### Slide 18
+- kind: section
+- layout: section
+- transition: iris
+- title: Three Stages, Three Chances to Be Wrong
+
+### Slide 19
+- kind: default-content
+- layout: default
+- transition: slide-up
+- title: The Validation Pipeline
+- body: Three stages catch three classes of error. JSON syntax (valid JSON-LD?), Croissant schema (conforms to MLCommons spec via mlcroissant?), Record set generation (can you actually load the data?). Escalation order matters — each stage is more expensive and catches a different failure mode.
+- sources:
+  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — three-stage validation pipeline
+
+### Slide 20
+- kind: default-content
+- layout: default
+- title: Self-Healing: Read the Error, Fix the Output
+- body: 8 common error patterns documented in the runbook with known fixes. Max 3 iterations — most fixable errors resolve in 1-2 attempts. Errors past 3 are fundamental extraction failures, not fixable by retry. Each iteration produces an updated validation_report.json.
+- sources:
+  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — common error table (8 patterns), max 3 iterations
+
+### Slide 21
+- kind: default-content
+- layout: default
+- title: The Executive Summary
+- body: Every run produces a structured summary: high confidence table (explicit, with page references), medium confidence table (inferred, with reasoning), low confidence table (guessed, flagged for review), gaps table (not addressed). The summary is what a maintainer reads to decide whether to accept or verify.
+- sources:
+  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — executive summary template with confidence tables
+
+### Slide 22
+- kind: default-content
+- layout: default
+- title: Five Benchmarks, Five Ground Truths
+- body: SQuAD 2.0, GLUE (9 tasks, distinct schemas), WikiText, CNN/DailyMail, GSM8K. Each pairs the original arXiv paper PDF with known-good Croissant output from HuggingFace. Test extraction against reality, not synthetic examples.
+- sources:
+  - https://github.com/jettyio/pdf2croissant/tree/main/benchmarks — five benchmark datasets with ground-truth Croissant from HuggingFace
+
+### Slide 23
+- kind: default-content
+- layout: default
+- title: Intentional V1 Constraints
+- body: No batch processing (each extraction needs full attention). No direct HuggingFace analysis (the paper is the source). No metadata editing UI (review in your own tools). No auth system (one env var deployment). Scope decisions, not missing features.
+- sources:
+  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — V1 limitations and scope decisions
+
+### Slide 24
+- kind: center
+- layout: center
+- transition: fade
+- title: The system's integrity comes from what it refuses to do.
+- body: It refuses to guess when the paper is silent. It refuses to fill gaps with plausible but unsourced data. It refuses to skip validation. Every interesting design decision is about a constraint, not a feature.
+- sources:
+  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — "The paper is the primary source of truth. Do not hallucinate metadata."
+
+### Slide 25
 - kind: end
 - layout: end
-- title: If the paper does not say it, the metadata does not claim it.
-- subtitle: pdf2mlcroissant.vercel.app
+- transition: fade
+- title: Leave it out and document the gap.
+- subtitle: pdf2mlcroissant.vercel.app / github.com/jettyio/pdf2croissant
 - notes:
-  - Resolve the through-line. The design rule — the paper is the source of truth — is what separates extraction from hallucination. Confidence tags, gap documentation, and three-stage validation are all consequences of taking that rule seriously.
+  - Resolve the through-line with the runbook's own language: "If something is unclear, leave it out and document the gap." That instruction is the rule that makes the entire system work — confidence tags, gaps tables, and validation all follow from it.

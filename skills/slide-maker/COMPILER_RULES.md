@@ -378,6 +378,7 @@ Typical fields:
 - `theme` — choose based on deck personality: `default` for bold/energetic, `seriph` for editorial/literary, `apple-basic` for clean/technical
 - `title`
 - `colorSchema`
+- `selectable: true` — always set so audiences can copy text from slides
 - `fonts` — omit when using `seriph` or `apple-basic` to let their native fonts come through. Full options:
   - `sans` — primary sans-serif font family
   - `serif` — primary serif font family

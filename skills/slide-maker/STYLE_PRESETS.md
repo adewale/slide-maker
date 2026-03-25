@@ -54,6 +54,7 @@ Each preset specifies which Google Fonts weights to load. Include these in the `
 | `tufte-data` | `'400,500'` | yes |
 | `cloudflare` | `'400,500,600,700'` | no |
 | `material-design` | `'300,400,500,600,700'` | no |
+| `croissant-warm` | `'400,500,600,700'` | no |
 
 Example frontmatter:
 ```yaml
@@ -341,3 +342,46 @@ Best for:
 - multiplayer/collaborative tool showcases
 - architecture walkthroughs
 - engineering team presentations
+
+## croissant-warm
+
+Mood: warm, scholarly, artisanal, trustworthy. "Golden layers on parchment."
+
+Palette:
+- `#fffbf5` warm cream background
+- `#2c1810` dark chocolate brown foreground
+- `#a06c08` golden amber accent (like baked croissant crust)
+- `#8b5e34` warm brown secondary (like chocolate filling)
+- `rgba(44, 24, 16, 0.45)` muted brown
+
+Typography:
+- display: **Young Serif** (warm, dignified modern serif)
+- body: **Source Sans 3** (readable, friendly sans-serif)
+- mono: **JetBrains Mono**
+- avoid: geometric sans-serifs for display — serif warmth is essential
+
+Layout tendencies:
+- warm section dividers (dark chocolate inversion)
+- scholarly pacing with center slides for key insights
+- evidence-driven content slides
+- two-column comparisons for before/after
+
+Motion:
+- restrained, warm
+- subtle fade-in with translateY(6px)
+- 0.2s cubic-bezier(0.4, 0, 0.2, 1)
+
+Interaction:
+- hover: border accent shift only
+- cursor: default everywhere, pointer on clickable elements
+- spotlight: not recommended — too dramatic for this preset's warm character
+- keep hover transitions at 0.2s ease-out
+
+Transition vocabulary: `fade`, `slide-left`, `morph-fade`
+- Warm and scholarly. 3 transitions max. Prefer `slide-left` as the global default.
+
+Best for:
+- research tools and academic projects
+- data pipeline presentations
+- projects with warm or artisanal names
+- any deck where clinical precision feels wrong

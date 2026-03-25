@@ -8,6 +8,7 @@ fonts:
   weights: '400,500,600,700'
   italic: false
 transition: slide-left
+selectable: true
 layout: cover
 ---
 
