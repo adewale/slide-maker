@@ -552,13 +552,15 @@ layout: center
 transition: fade
 ---
 
-# Metadata you can trust is metadata that tells you what it does not know.
+# Millions of ML datasets exist, described in academic papers. Their metadata is locked in prose that no platform can parse.
+
+pdf2croissant reads the paper and extracts it.
 
 <!--
-This resolves the through-line. The problem was never extraction — it was trust. ML datasets described in papers are hard to find, validate, and reuse because the metadata is trapped in prose. Automated extraction could solve this, but only if the output is honest. A Croissant file that looks complete but silently guessed the download URL, the license, or the column types is worse than one with explicit gaps — because the gaps tell the downstream consumer exactly what to verify. Confidence tags, gap documentation, and three-stage validation all serve this one principle: trustworthy metadata admits its limits.
+This is the through-line stated directly. The deck has been building toward this: slide 2 introduced the extraction gap, slides 3-4 explained what Croissant is and why the metadata is hard to get, slides 5-21 showed how the tool does the extraction and validates it, and slides 22-23 showed the evidence and constraints. Now we land: the metadata was always there, in the paper. The problem was always extraction. pdf2croissant solves it.
 
 Sources:
-- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — "The paper is the primary source of truth. Do not hallucinate metadata."
+- https://github.com/jettyio/pdf2croissant/blob/main/README.md — project description
 -->
 
 ---
@@ -566,14 +568,13 @@ layout: end
 transition: fade
 ---
 
-# Do not hallucinate metadata that is not in the paper.
+# The metadata was always in the paper. Now it is in the JSON.
 
 github.com/jettyio/pdf2croissant
 
 <!--
-The closing uses the runbook's own words — the single instruction that makes the entire system work. This is not a tagline; it is the literal rule from RUNBOOK.md that governs every extraction. Confidence tags exist because of this rule. Gap tables exist because of this rule. Three-stage validation exists because the system must prove it followed this rule. The GitHub URL is here because the runbook is open source — copy it, use it with any agent, verify the discipline yourself.
+The closing resolves the through-line in one sentence. The entire deck argued that dataset metadata is trapped in academic prose. pdf2croissant reads the paper, extracts the fields, validates the output, and delivers a Croissant JSON-LD file. The problem was extraction. The tool does extraction. The metadata was always in the paper — now it is structured, validated, and machine-readable.
 
 Sources:
 - https://github.com/jettyio/pdf2croissant — project repository
-- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — "Do not hallucinate metadata that isn't in the paper."
 -->
