@@ -16,7 +16,7 @@ Load these files **only when entering the relevant phase**. Do not load all file
 |-------|-----------------|---------|
 | 1. Determine mode | (none) | — |
 | 2. Gather sources | (none — read the project's own docs) | — |
-| 3. Intake | [PRESENTATION_PHILOSOPHY.md](../docs/PRESENTATION_PHILOSOPHY.md) | Rhetorical principles for framing |
+| 3. Intake | [PRESENTATION_PHILOSOPHY.md](../docs/PRESENTATION_PHILOSOPHY.md), [STORYTELLING.md](../docs/STORYTELLING.md) | Rhetorical principles, narrative structure, through-line design |
 | 4. Style direction | [STYLE_PRESETS.md](STYLE_PRESETS.md) | Visual presets and token palettes |
 | 5. Write spec | [DECK_SPEC.md](DECK_SPEC.md), [SLIDE_KINDS.md](SLIDE_KINDS.md) | Spec schema and slide type catalog |
 | 6. Compile | [COMPILER_RULES.md](COMPILER_RULES.md), [SLIDEV_REFERENCE.md](SLIDEV_REFERENCE.md) | Compilation phases, Slidev features |
