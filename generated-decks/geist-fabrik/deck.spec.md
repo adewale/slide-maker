@@ -21,15 +21,17 @@
 - changelog: CHANGELOG.md (performance optimizations, O(N^2) fixes, sklearn vectorization, schema migrations)
 
 ## Through-Line
-- concept: "Muses, not oracles"
-- type: design-rule
+- concept: "Your notes know things you have forgotten. GeistFabrik asks them the questions you would not ask yourself."
+- shape: boy-meets-girl
+- type: problem-resolution
 - appears-in:
-  - slide 1: cover -- the project is named as a spirit factory, hinting at generative muses
-  - slide 3: center-statement -- the principle is stated as the governing design rule
-  - slide 5: default-content -- Tracery geists embody the muse principle by asking questions
+  - slide 1: cover -- the project is named as a spirit factory, a divergence engine for vaults
+  - slide 2: default -- name the problem: thousands of notes, connections invisible because you never re-read them
+  - slide 3: default -- introduce GeistFabrik's mechanism: geists that ask "What if...?" questions about your notes
   - slide 6: center-statement -- the surprising finding: 13 lines of YAML outperformed 100+ lines of Python
   - slide 8: default-content -- deterministic randomness makes the muse reproducible
-  - slide 9: end -- the resolution: the geist's job is to ask questions you would not ask yourself
+  - slide 9: default -- build toward resolution: the connections were always in your notes
+  - slide 10: end -- resolve: "The connections were always in your notes. Now something asks you about them."
 
 ## Design Tokens
 - colors:
@@ -79,10 +81,21 @@
 ### Slide 2
 - kind: default-content
 - layout: default
+- title: Thousands of notes. Zero connections visible.
+- body: You have years of notes in your Obsidian vault. The contradictions between them, the forgotten threads, the ideas that link across projects and years -- all invisible because you never re-read them. A note from 2022 contradicts something you wrote last month. Two ideas in different folders are the same idea. What if something could read your vault and ask you the questions you would never think to ask yourself?
+- sources:
+  - file:README.md -- project description, what GeistFabrik does with Obsidian vaults
+  - file:specs/geistfabrik_vision.md -- Gordon Brander's insight about accumulated knowledge
+- notes:
+  - This slide names the problem before introducing the solution. Obsidian vaults grow over years but are rarely re-read at scale. The connections are structurally invisible to the author.
+
+### Slide 3
+- kind: default-content
+- layout: default
 - title: What GeistFabrik does
 - body:
   - Parses Obsidian vaults into SQLite with 384-dim embeddings
-  - 57 geists (48 Python, 9 YAML) ask "What if...?" questions
+  - 57 geists (48 Python, 9 YAML) ask "What if...?" questions about your notes
   - 4-stage filtering samples ~5 suggestions per session
   - 100% local, read-only, deterministic -- same date = same output
 - sources:
@@ -90,19 +103,7 @@
   - file:docs/ARCHITECTURE.md -- two-layer design, session orchestrator flow
 - notes:
   - The 384-dim embeddings come from all-MiniLM-L6-v2 via sentence-transformers, bundled locally -- no API calls.
-  - "Deterministic randomness" means the RNG is seeded by session date. Same vault state on the same date always produces identical suggestions. This is crucial for debugging and replay.
-
-### Slide 3
-- kind: center-statement
-- layout: center
-- title: Muses, not oracles
-- body: Geists provoke thinking. They do not pretend to think for you.
-- sources:
-  - file:LESSONS_LEARNED.md -- "Muses, not oracles" principle
-  - file:specs/geistfabrik_vision.md -- Gordon Brander's "tarot for thought" vision
-- notes:
-  - Gordon Brander described building "a creative oracle that helps provoke ideas... More tarot than flash cards." GeistFabrik grounds this in a concrete, extensible system.
-  - The name "Geists" also invokes Hegel's owl of Minerva -- wisdom comes from reflecting on what has already occurred. Geists work retrospectively, finding patterns in accumulated knowledge.
+  - "Deterministic randomness" means the RNG is seeded by session date. Same vault state on the same date always produces identical suggestions.
 
 ### Slide 4
 - kind: default-content
@@ -192,12 +193,23 @@
   - The deterministic randomness principle enables debugging: if a geist produces a bad suggestion, you can replay the exact session that generated it.
 
 ### Slide 9
+- kind: default-content
+- layout: default
+- title: The connections were always in your notes
+- body: 57 geists. 384-dimensional embeddings. Date-seeded deterministic sampling. But the real mechanism is simpler -- your vault already contains the contradictions, the forgotten threads, the ideas that link across years. GeistFabrik does not create connections. It asks you about the ones that are already there.
+- sources:
+  - file:LESSONS_LEARNED.md -- Contradictor case study, questions vs computed answers
+  - file:README.md -- 57 geists, design philosophy
+- notes:
+  - Build toward the closing resolution. The connections were not created by the tool -- they were surfaced by asking questions about content the author already wrote.
+
+### Slide 10
 - kind: end
 - layout: end
-- title: The geist's job is to ask questions you would not ask yourself
+- title: The connections were always in your notes. Now something asks you about them.
 - body: github.com/adewale/geist_fabrik
 - sources:
   - file:LESSONS_LEARNED.md -- concluding principle from the Contradictor case study
+  - file:specs/geistfabrik_vision.md -- Gordon Brander's "tarot for thought" vision
 - notes:
-  - This line comes directly from the Lessons Learned document. It is the resolution of the "muses, not oracles" through-line.
-  - GeistFabrik is at v0.9.0, approaching 1.0. 611 passing tests, 57 default geists, feature-complete. The project is ready for adventurous users.
+  - Resolve the through-line. Slide 2 said: thousands of notes, zero connections visible. This slide says: the connections were always there. GeistFabrik makes them visible by asking questions drawn from the vault's own content.

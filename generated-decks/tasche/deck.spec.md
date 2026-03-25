@@ -20,15 +20,17 @@
 - design: DESIGN_LANGUAGE.md (monochrome pen-and-ink aesthetic, stroke weight hierarchy)
 
 ## Through-Line
-- concept: "What happens when you run Python where JavaScript is supposed to go?"
-- type: provocation
+- concept: "Links die. Paywalls appear. Domains expire. The article you meant to read is gone. Tasche saves it before that happens."
+- type: man-in-hole
+- shape: problem (link rot) → solution (archive at save time) → architecture (Python + JS on Cloudflare) → resolution (the link died, your copy survived)
 - appears-in:
-  - slide 1: cover — the provocation is implied (Python Workers on Cloudflare)
-  - slide 3: section — Python on Pyodide inside V8: the ecosystem mismatch stated
-  - slide 5: default-content — the FFI boundary as the answer: convert at the border
-  - slide 6: section — through-line refracted: when Python can't do it, call JavaScript
-  - slide 8: center-statement — the resolution: two runtimes, one platform
-  - slide 9: end — the provocation answered: you build a boundary layer
+  - slide 1: cover — Tasche introduced as a self-hosted read-it-later service
+  - slide 2: default-content — the PROBLEM stated viscerally: the link is gone
+  - slide 3: section — Python inside V8: the architectural surprise behind the solution
+  - slide 5: default-content — the FFI boundary layer that makes cross-runtime archival work
+  - slide 6: section — when Python cannot do it, call JavaScript (content extraction)
+  - slide 8: center-statement — two runtimes, one archive: architecture serves the promise
+  - slide 9: end — resolution: the link died, your copy survived
 
 ## Design Tokens
 - colors:
@@ -75,14 +77,14 @@
 ### Slide 2
 - kind: default-content
 - layout: default
-- title: Your Articles Survive
-- body: What Tasche does — save, archive, search, listen. The 14-step pipeline that makes articles permanent.
+- title: The Link Is Gone
+- body: The problem stated viscerally — link rot, paywalls, expired domains. Then the answer: Tasche archives at save time via a 14-step async pipeline.
 - sources:
   - file:specs/tasche-spec.md — core promise and archival pipeline
   - file:README.md — feature list and architecture table
 - notes:
-  - Tasche creates a complete archive at save time: clean HTML, images converted to WebP, markdown for search, and optional TTS audio.
-  - The pipeline runs asynchronously via Cloudflare Queues — the user sees "saving" immediately, processing happens in the background.
+  - The problem is link rot. Articles disappear behind paywalls, domains expire, authors delete posts. Tasche archives at save time: clean HTML, images converted to WebP, markdown for search, and optional TTS audio.
+  - The pipeline runs asynchronously via Cloudflare Queues — the user sees "saving" immediately, processing happens in the background. If the original URL 404s, your copy survived.
 
 ### Slide 3
 - kind: section
@@ -140,17 +142,17 @@
 ### Slide 8
 - kind: center-statement
 - layout: center
-- title: Two Runtimes, One Platform
-- body: Python for the application logic. JavaScript for what Python cannot reach. The boundary layer makes them one system.
+- title: Two Runtimes, One Archive
+- body: Python for the application logic. JavaScript for what Python cannot reach. The boundary layer makes them one system — and your articles survive because of it.
 - notes:
-  - Through-line resolution. The answer to "what happens when you run Python where JS goes" is: you build a boundary layer, you accept the constraints, and when you hit a wall, you bridge to JS via Service Bindings.
-  - This is not a workaround — it is the architecture. The platform supports both runtimes natively.
+  - Connects architecture back to the opening problem. The two-runtime design makes the archival pipeline work. Without the JS Service Binding, content extraction would fail entirely.
+  - The result: when a link dies, the archive is already complete — fetched, extracted, converted, indexed, stored.
 
 ### Slide 9
 - kind: end
 - layout: end
-- title: You Build a Boundary Layer
+- title: The Link Died. Your Copy Survived.
 - subtitle: github.com/adewale/tasche
 - notes:
-  - Echoes the provocation. The answer to running Python where JavaScript goes is not "don't" — it's "build the translation layer."
+  - Resolves the opening tension from slide 2. The problem was link rot; the answer is an archive that outlasts the original.
   - The GitHub URL gives the audience a concrete next step.

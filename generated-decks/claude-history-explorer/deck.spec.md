@@ -25,14 +25,16 @@
 - wrapped: claude_history_explorer/wrapped.py (V3 wrapped format — heatmaps, distributions, fingerprints)
 
 ## Through-Line
-- concept: "Deterministic arithmetic on timestamps — personality without AI"
-- type: provocation
+- concept: "Your Claude conversations contain patterns you cannot see. This tool makes them visible."
+- shape: boy-meets-girl
+- type: problem-resolution
 - appears-in:
-  - slide 2: default — introduce the paradox: an AI tool analyzer that uses no AI
-  - slide 4: center — the classify() function as the mechanism behind the provocation
-  - slide 6: default — how threshold arithmetic produces rich narratives
-  - slide 8: center — the trust model as a consequence of the deterministic philosophy
-  - slide 9: end — resolve with the full provocation
+  - slide 2: default — name the problem: hundreds of conversations in JSONL, zero visibility into patterns
+  - slide 4: center — the classify() function as the mechanism that turns timestamps into visible patterns
+  - slide 6: default — how threshold arithmetic surfaces personality traits from session metadata
+  - slide 8: default — the trust model as a consequence of read-only, offline, deterministic design
+  - slide 9: default — build toward resolution: the patterns were always in the JSONL
+  - slide 10: end — resolve: "The patterns were always in the JSONL. Now you can see them."
 
 ## Design Tokens
 - colors:
@@ -80,11 +82,11 @@
 ### Slide 2
 - kind: default-content
 - layout: default
-- title: An AI Tool Analyzer That Uses Zero AI
-- body: Claude History Explorer reads ~/.claude/projects/ JSONL files and turns raw conversation logs into searchable sessions, statistics, and personality narratives. Every classification — "Heavy delegation", "Marathon sessions", "Rapid-fire development" — comes from deterministic threshold arithmetic on timestamps and message counts. No LLM calls. No embeddings. No inference.
+- title: Hundreds of conversations. Zero visibility.
+- body: You have months of Claude conversations sitting in ~/.claude/projects/ as JSONL files. Session lengths, message rates, tool usage patterns, time-of-day habits -- all recorded, none of it visible. How long are your typical sessions? Are you delegating more over time? The data exists, but you have never looked. What if you could see the patterns?
 - sources:
-  - https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/stories.py — personality classification via threshold arithmetic
-  - https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/constants.py — threshold constants
+  - https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/parser.py — JSONL parsing of conversation logs
+  - https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/models.py — SessionInfo dataclass
 
 ### Slide 3
 - kind: section
@@ -134,9 +136,17 @@
   - https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/wrapped.py — URL encoding with msgpack
 
 ### Slide 9
+- kind: default-content
+- layout: default
+- title: The patterns were always in the JSONL
+- body: Six lines of classify(). Three dependencies. Read-only access. No network. No AI. The data was always there -- session lengths, message rates, time-of-day habits, delegation ratios. Now you can see them.
+- notes:
+  - Build toward the closing resolution. The patterns were not created by the tool -- they were surfaced from data that was already being recorded.
+
+### Slide 10
 - kind: end
 - layout: end
-- title: Personality without AI. Trust without complexity.
+- title: The patterns were always in the JSONL. Now you can see them.
 - subtitle: github.com/adewale/claude-history-explorer
 - notes:
-  - Resolve the through-line. The project proves you can extract meaningful personality insights from AI conversation data using nothing but arithmetic on timestamps. That constraint is what makes the trust model possible.
+  - Resolve the through-line. Slide 2 said: hundreds of conversations, zero visibility. This slide says: the patterns were always there. The tool surfaces structure that the JSONL files already contained.

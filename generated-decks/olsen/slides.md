@@ -29,44 +29,40 @@ Sources:
 transition: slide-up
 ---
 
-# What Olsen does in 62 milliseconds
+# Photos are precious. Indexers are dangerous.
 
-Per photo on an M3 Max, the indexer runs an 8-stage pipeline -- entirely in memory, entirely read-only.
+Every tool that touches your photo library is a risk. EXIF editors rewrite file headers. Catalog apps create sidecar files in your directories. Sync tools rename originals. And the worst part: you discover the corruption months later, when the backup window has closed.
 
 <v-clicks>
 
-- **EXIF extraction** from DNG/JPEG/BMP via `go-exif` -- camera, lens, exposure, GPS, flash
-- **4 thumbnails** at 64, 256, 512, and 1024px longest edge -- aspect ratio preserved, Lanczos3 resampling
-- **5 dominant colors** via k-means clustering on the 256px thumbnail -- stored as both RGB and HSL
-- **Perceptual hash** (pHash) for near-duplicate detection -- 64-bit, Hamming distance threshold of 10
-- **Metadata inference** -- time of day, season, focal length category, shooting conditions
+- A single bad EXIF writeback can silently truncate a DNG file
+- Sidecar files (.xmp, .pp3) accumulate in directories you thought were clean
+- You only notice when you open the photo for a print -- and the file is damaged
 
 </v-clicks>
 
-<div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--deck-border);">
-  <span style="font-family: var(--deck-font-mono); font-size: 0.8rem; color: var(--deck-muted);">15--25 photos/second with 8 workers. 100K photos in under 2 hours. ~250KB per photo in the database.</span>
-</div>
+<p v-click style="color: var(--deck-accent); font-size: 1.05rem; margin-top: 1.5rem; font-family: var(--deck-font-display);">What if the indexer <em>could not</em> write? Not "does not write" -- structurally cannot.</p>
 
-<!-- The performance numbers are real benchmarks from Apple M3 Max hardware. The key insight is that color extraction runs on the 256px thumbnail, not the 40MP original -- 100x faster with no perceptible accuracy loss. Working from the smallest sufficient image is a recurring pattern.
+<!-- This slide names the problem that Olsen solves. Photo libraries are irreplaceable -- originals from travel, family events, professional shoots. Every tool that indexes or catalogs photos requires some level of filesystem access, and most tools write: EXIF editors modify file headers in place, catalog apps create sidecar files, and sync tools rename or move originals. The damage is often silent and discovered only when the file is needed. Olsen's answer is architectural: read-only at the syscall level, not by policy.
 
 Sources:
-- file:README.md -- performance benchmarks
-- file:docs/architecture.md -- processing pipeline stages, time complexity table -->
+- file:README.md -- critical guarantee section, read-only enforcement
+- file:docs/architecture.md -- O_RDONLY enforcement, what the indexer never does -->
 
 ---
 layout: center
 transition: morph-fade
 ---
 
-# Read-only is not a limitation. It is the architecture.
+# Olsen opens every file with `O_RDONLY`. Every one.
 
-Every file open uses `O_RDONLY`. No writes to photo directories -- not temporary files, not EXIF writeback, not renames. Processing happens entirely in memory. The only mutable artifact is the SQLite database.
+No writes to photo directories -- not temporary files, not EXIF writeback, not renames. Processing happens entirely in memory. The only mutable artifact is a single SQLite database that lives outside your photo library.
 
-<!-- This is the through-line crystallized: the read-only constraint is not a missing feature. It is the foundation. By eliminating all write paths to source files, Olsen makes it structurally impossible to corrupt a photo library. The guarantee is enforced at the syscall level, not by convention. Code reviews verify no new write operations are introduced.
+<!-- This is the answer to the problem named in the previous slide. Olsen enforces read-only access at the syscall level, not by convention or documentation. Every file open uses O_RDONLY. The indexer runs an 8-stage pipeline -- EXIF extraction, 4 thumbnail sizes, k-means color clustering, perceptual hashing, metadata inference -- entirely in memory. The result goes into a single portable SQLite file. Your originals are never modified, never renamed, never touched with a write operation.
 
 Sources:
 - file:README.md -- critical guarantee section, enforcement mechanisms
-- file:docs/architecture.md -- O_RDONLY enforcement, what the indexer never does -->
+- file:docs/architecture.md -- O_RDONLY enforcement, processing pipeline, single SQLite output -->
 
 ---
 layout: section
@@ -206,16 +202,30 @@ Sources:
 - file:docs/LESSONS_LEARNED.md -- Monochrom DNG bug timeline, debugging order rule, embedded JPEG extraction algorithm -->
 
 ---
+transition: fade
+---
+
+# Your photos were never touched
+
+100K photos indexed. Four thumbnail sizes generated. Five dominant colors extracted. Perceptual hashes computed. Faceted navigation across every metadata dimension. And through all of it -- every file opened read-only, every result written to a single SQLite database, every original exactly as you left it.
+
+<!-- This penultimate slide resolves the tension from slide 2. The problem was that indexers are dangerous because they write to your photo directories. The resolution: Olsen processed the entire library without a single write to a source file. The catalog is portable (one SQLite file), the originals are untouched (O_RDONLY on every open), and the state machine ensures you can explore every facet without hitting dead ends.
+
+Sources:
+- file:README.md -- read-only guarantee, single SQLite catalog
+- file:docs/architecture.md -- O_RDONLY enforcement, processing pipeline -->
+
+---
 layout: end
 transition: fade
 ---
 
-# Constraints compound into trust
+# Your photos were never touched. Your catalog is a single file. Your originals are exactly as you left them.
 
 github.com/adewale/olsen
 
-<!-- The closing resolves the through-line. Read-only file access means the indexer cannot corrupt photos. The state machine constraint means users cannot reach dead-end filter states. Saturation-first evaluation means B&W photos cannot be misclassified. Each constraint is small. Together, they produce a system that earns trust by eliminating failure modes.
+<!-- The closing h1 resolves the opening tension directly. Slide 2 asked: what if the indexer could not write? This slide answers: it could not, and it did not. Three concrete guarantees -- untouched photos, single-file catalog, originals intact -- map to three architectural decisions: O_RDONLY file access, SQLite as the only mutable artifact, and in-memory processing with no temporary files in source directories.
 
 Sources:
-- file:README.md -- project repository URL
-- file:docs/LESSONS_LEARNED.md -- what made the project successful -->
+- file:README.md -- project repository, read-only guarantee
+- file:docs/LESSONS_LEARNED.md -- what made the project trustworthy -->

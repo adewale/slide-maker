@@ -27,42 +27,54 @@ Sources:
 -->
 
 ---
-layout: center
 transition: fade
 ---
 
-# Metadata Standards Assume You Already Have the Metadata
+# This Was Extracted From a PDF
+
+```json
+{
+  "@type": "sc:Dataset",
+  "name": "SQuAD 2.0",
+  "description": "Reading comprehension dataset combining
+    100,000 answerable questions with 50,000 unanswerable ones",
+  "license": "CC-BY-SA-4.0",
+  "creator": [{ "name": "Pranav Rajpurkar" }]
+}
+```
+
+The paper never had structured metadata. An agent read 20 pages of prose and produced this.
 
 <!--
-This is the provocation that frames the entire deck. MLCommons Croissant is a well-designed standard adopted by HuggingFace, Kaggle, and OpenML. But it solves the representation problem, not the extraction problem. The facts a Croissant file needs — download URLs, file formats, record counts, licensing — live scattered across academic papers that no schema can parse. Someone has to read the paper and extract the truth. That gap is the reason pdf2croissant exists.
+In media res opening. Before explaining what Croissant is, show what the system actually outputs — a fragment of a real Croissant JSON-LD file. The audience sees the end product first. The tension: this structured metadata did not exist anywhere in the paper as structured data. The dataset name was on page 1, the license was in a footnote, the description was scattered across the abstract and introduction. An agent extracted these fields, tagged their confidence, and assembled valid JSON-LD. The rest of the deck explains how.
 
 Sources:
-- https://github.com/jettyio/pdf2croissant/blob/main/README.md — project motivation: turning papers into structured metadata
+- https://github.com/jettyio/pdf2croissant/blob/main/README.md — project overview: agent extracts Croissant JSON-LD from academic papers
+- https://github.com/jettyio/pdf2croissant/tree/main/benchmarks — SQuAD 2.0 benchmark with ground-truth Croissant output
 -->
 
 ---
 transition: slide-left
 ---
 
-# What IS Croissant
+# The Standard That Needs Filling
 
-An MLCommons standard for describing ML datasets as JSON-LD. Adopted by HuggingFace, Kaggle, and OpenML as the canonical way to make datasets findable and interoperable.
+Croissant is the MLCommons standard for dataset metadata. HuggingFace, Kaggle, and OpenML adopted it. It defines 16 fields in JSON-LD: name, creators, license, distributions, record sets, data types.
 
 <v-clicks>
 
-- **JSON-LD format** — machine-readable, linked-data compatible
-- **16 core fields** — name, creators, license, distributions, record sets, data types
-- **Validation tooling** — the `mlcroissant` Python library checks schema conformance
-- **The gap** — the standard tells you what to write, not how to find it
+- **Well-designed schema** — machine-readable, linked-data compatible, validated by `mlcroissant`
+- **Widely adopted** — the three largest dataset platforms use it as their canonical format
+- **But papers don't come with Croissant files** — someone has to read them and extract the fields
 
 </v-clicks>
 
 <!--
-Croissant was published by MLCommons in 2024 and rapidly adopted by the major dataset platforms. It defines a JSON-LD vocabulary for dataset metadata: what the dataset is, who created it, what format the files are in, what the records look like, and how to load it. The mlcroissant Python library can validate a Croissant file against the schema and even instantiate the dataset from the metadata. The standard is excellent at representation. The problem is that the metadata it needs lives in academic papers as prose, tables, and footnotes — not as structured fields.
+Now that the audience has seen the output, explain the context. Croissant was published by MLCommons in 2024 and rapidly adopted by HuggingFace, Kaggle, and OpenML as the standard way to describe ML datasets. It defines a JSON-LD vocabulary with 16 fields covering identity, provenance, structure, and data types. The mlcroissant Python library validates conformance and can even instantiate datasets from the metadata. The standard is excellent. The problem is that papers do not ship with Croissant files. The metadata Croissant needs — names, licenses, column types, download URLs — is scattered across 20 pages of academic prose. Someone has to read the paper and extract it.
 
 Sources:
 - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — 16 field mappings from paper to Croissant, mlcroissant validation
-- https://github.com/jettyio/pdf2croissant/blob/main/README.md — MLCommons standard context
+- https://github.com/jettyio/pdf2croissant/blob/main/README.md — MLCommons standard context, HuggingFace/Kaggle/OpenML adoption
 -->
 
 ---
@@ -552,12 +564,10 @@ layout: center
 transition: fade
 ---
 
-# Millions of ML datasets exist, described in academic papers. Their metadata is locked in prose that no platform can parse.
-
-pdf2croissant reads the paper and extracts it.
+# Millions of datasets. Metadata trapped in prose. pdf2croissant reads the paper and extracts it.
 
 <!--
-This is the through-line stated directly. The deck has been building toward this: slide 2 introduced the extraction gap, slides 3-4 explained what Croissant is and why the metadata is hard to get, slides 5-21 showed how the tool does the extraction and validates it, and slides 22-23 showed the evidence and constraints. Now we land: the metadata was always there, in the paper. The problem was always extraction. pdf2croissant solves it.
+One sentence to land the through-line. The deck opened with a JSON-LD fragment extracted from a PDF — the audience saw the output before they understood the problem. Slides 3-4 established the complication: Croissant is a good standard, but papers do not come with Croissant files. Slides 5-23 showed how the agent reads, extracts, validates, and documents gaps. Now we compress the entire argument into a single claim: the metadata exists, it is trapped in prose, and pdf2croissant extracts it.
 
 Sources:
 - https://github.com/jettyio/pdf2croissant/blob/main/README.md — project description
@@ -573,7 +583,7 @@ transition: fade
 github.com/jettyio/pdf2croissant
 
 <!--
-The closing resolves the through-line in one sentence. The entire deck argued that dataset metadata is trapped in academic prose. pdf2croissant reads the paper, extracts the fields, validates the output, and delivers a Croissant JSON-LD file. The problem was extraction. The tool does extraction. The metadata was always in the paper — now it is structured, validated, and machine-readable.
+The closing resolves the in media res opening. Slide 2 showed a JSON-LD fragment — dataset name, description, license, creator — and said "this was extracted from a PDF." The audience spent 23 slides learning how: the Croissant standard, the extraction gap, the agent, the runbook, the validation pipeline, the confidence tags, the gap documentation. Now we close the loop: the metadata was always in the paper. It is now in the JSON. The JSON on slide 2 is this sentence made concrete.
 
 Sources:
 - https://github.com/jettyio/pdf2croissant — project repository

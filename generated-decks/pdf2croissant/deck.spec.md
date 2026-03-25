@@ -20,16 +20,17 @@
 - types: types.ts (Trajectory, TrajectoryStep, ValidationStage, ValidationReport type definitions)
 
 ## Through-Line
-- concept: "The paper is the source of truth" — and more specifically, the system's integrity comes from what it REFUSES to do. It refuses to guess when the paper is silent. It refuses to fill gaps with plausible but unsourced data. It refuses to skip validation. Every interesting design decision is about a constraint, not a feature.
-- type: design-rule
+- concept: "Dataset metadata is trapped in academic papers. pdf2croissant extracts it."
+- type: in-media-res
 - appears-in:
-  - slide 2: center — provocation: metadata standards assume you already have the metadata
+  - slide 2: default — in media res: show the extracted JSON-LD output before explaining the system
+  - slide 3: default — context: Croissant is the standard, but papers don't come with Croissant files
   - slide 4: default — the extraction gap: someone must distinguish explicit from inferred
   - slide 13: default — confidence tracking: high/medium/low with examples
   - slide 14: default — gap documentation: silence is data, not a gap to fill
   - slide 17: center — the runbook is portable because the rules are what matter
-  - slide 24: center — crystallized: the system's integrity comes from what it refuses to do
-  - slide 25: end — resolved: "Leave it out and document the gap" (the runbook's own language)
+  - slide 24: center — compressed: millions of datasets, metadata trapped in prose, pdf2croissant extracts it
+  - slide 25: end — resolved: "The metadata was always in the paper. Now it is in the JSON." — connects back to slide 2's JSON fragment
 
 ## Design Tokens
 - colors:
@@ -84,21 +85,23 @@
   - The live app URL appears below the subtitle in mono.
 
 ### Slide 2
-- kind: center
-- layout: center
+- kind: default-content
+- layout: default
 - transition: fade
-- title: Metadata Standards Assume You Already Have the Metadata
-- body: Croissant solves the representation problem, not the extraction problem. The facts live scattered across academic papers that no schema can parse.
+- title: This Was Extracted From a PDF
+- body: In media res opening. Show a 5-line JSON-LD snippet (dataset name, description, license, creator from SQuAD 2.0). Then the tension: "The paper never had structured metadata. An agent read 20 pages of prose and produced this."
 - sources:
-  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — project motivation and problem statement
+  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — project overview
+  - https://github.com/jettyio/pdf2croissant/tree/main/benchmarks — SQuAD 2.0 benchmark
 
 ### Slide 3
 - kind: default-content
 - layout: default
-- title: What IS Croissant
-- body: MLCommons standard for describing ML datasets as JSON-LD. Adopted by HuggingFace, Kaggle, and OpenML. JSON-LD format, 16 core fields, mlcroissant validation tooling. The gap: the standard tells you what to write, not how to find it.
+- title: The Standard That Needs Filling
+- body: Croissant is the MLCommons standard for dataset metadata. HuggingFace, Kaggle, and OpenML adopted it. 16 fields in JSON-LD, validated by mlcroissant. Well-designed, widely adopted — but papers don't come with Croissant files. Someone has to read them and extract the fields.
 - sources:
   - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — 16 field mappings, mlcroissant validation
+  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — MLCommons standard context, adoption
 
 ### Slide 4
 - kind: default-content
@@ -276,16 +279,16 @@
 - kind: center
 - layout: center
 - transition: fade
-- title: The system's integrity comes from what it refuses to do.
-- body: It refuses to guess when the paper is silent. It refuses to fill gaps with plausible but unsourced data. It refuses to skip validation. Every interesting design decision is about a constraint, not a feature.
+- title: Millions of datasets. Metadata trapped in prose. pdf2croissant reads the paper and extracts it.
+- body: One sentence landing the through-line. Connects the in media res opening (slide 2's JSON fragment) to the full system the deck has explained.
 - sources:
-  - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — "The paper is the primary source of truth. Do not hallucinate metadata."
+  - https://github.com/jettyio/pdf2croissant/blob/main/README.md — project description
 
 ### Slide 25
 - kind: end
 - layout: end
 - transition: fade
-- title: Leave it out and document the gap.
-- subtitle: pdf2mlcroissant.vercel.app / github.com/jettyio/pdf2croissant
+- title: The metadata was always in the paper. Now it is in the JSON.
+- subtitle: github.com/jettyio/pdf2croissant
 - notes:
-  - Resolve the through-line with the runbook's own language: "If something is unclear, leave it out and document the gap." That instruction is the rule that makes the entire system work — confidence tags, gaps tables, and validation all follow from it.
+  - Resolve the in media res opening. Slide 2 showed a JSON-LD fragment extracted from a PDF. The audience spent 23 slides learning how the system works. This closing connects back: the metadata was always there, now it is structured. The JSON on slide 2 is this sentence made concrete.

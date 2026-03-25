@@ -33,11 +33,11 @@ Sources:
 transition: slide-up
 ---
 
-# Your Articles Survive
+# The Link Is Gone
 
-Save a URL and Tasche creates a **complete, self-contained archive**.
+You saved a link last month. Today it 404s. The site was paywalled, or the domain expired, or the author deleted it. The article is gone.
 
-The original can get paywalled, deleted, or the domain can expire. Tasche already has your copy.
+Tasche creates a **complete archive the moment you save the URL**.
 
 <v-clicks>
 
@@ -50,9 +50,9 @@ The original can get paywalled, deleted, or the domain can expire. Tasche alread
 </v-clicks>
 
 <!--
-The core promise is article permanence. When you save a URL, Tasche fetches the page, resolves redirects, extracts the article via Readability, downloads and converts all images to WebP, stores clean HTML and Markdown in R2, and indexes the content in D1 FTS5.
+The problem is link rot. Articles disappear behind paywalls, domains expire, authors delete posts. The URL you bookmarked last week returns a 404 today. Tasche's answer: archive at save time. When you save a URL, Tasche fetches the page, resolves redirects, extracts the article via Readability, downloads and converts all images to WebP, stores clean HTML and Markdown in R2, and indexes the content in D1 FTS5.
 
-The pipeline runs asynchronously via Cloudflare Queues. The user sees "saving" immediately. Processing happens in the background. If you click the original URL and it 404s -- good thing you saved it.
+The pipeline runs asynchronously via Cloudflare Queues. The user sees "saving" immediately. Processing happens in the background. If you click the original URL and it 404s -- your copy survived.
 
 Sources:
 - https://github.com/adewale/tasche/blob/main/specs/tasche-spec.md -- core promise, archival pipeline, 14-step processing
@@ -210,18 +210,16 @@ transition: fade
 
 <div v-motion :initial="{ y: 40, opacity: 0 }" :enter="{ y: 0, opacity: 1, transition: { duration: 800 } }">
 
-# Two Runtimes, One Platform
+# Two Runtimes, One Archive
 
 </div>
 
-<p style="font-size: 1.25rem; max-width: 36rem; text-align: center; color: var(--deck-muted); line-height: 1.6;">Python for the application logic. JavaScript for what Python cannot reach. The boundary layer makes them one system.</p>
+<p style="font-size: 1.25rem; max-width: 36rem; text-align: center; color: var(--deck-muted); line-height: 1.6;">Python for the application logic. JavaScript for what Python cannot reach. The boundary layer makes them one system -- and your articles survive because of it.</p>
 
 <!--
-Through-line resolution. The answer to "what happens when you run Python where JavaScript goes" is: you build a boundary layer, you accept the constraints, and when you hit a wall you bridge to JS via Service Bindings.
+Connects the architecture back to the opening problem. The two-runtime design is not an abstract pattern -- it is what makes the archival pipeline work. Python handles routing, D1 queries, R2 storage, queue processing. JavaScript handles Readability extraction via Service Binding RPC (in-process, 1-5ms). Without this bridge, content extraction would fail entirely (python-readability uses eval(), blocked in V8; lxml requires C extensions, unavailable in Pyodide).
 
-This is not a workaround. Cloudflare natively supports both runtimes. The Python Worker handles FastAPI routing, D1 queries, R2 storage, queue processing. The JS Worker handles Readability extraction. Service Binding RPC connects them in-process.
-
-The architecture that emerged is genuinely novel: a Python application calling a JavaScript service via in-process RPC, both running on the same edge platform, sharing no state except the function call boundary.
+The result: when a link dies, the archive is already complete -- fetched, extracted, converted, indexed, and stored across D1 and R2.
 
 Sources:
 - https://github.com/adewale/tasche/blob/main/CLAUDE.md -- architecture overview, binding map
@@ -233,12 +231,12 @@ layout: end
 transition: fade
 ---
 
-# You Build a Boundary Layer
+# The Link Died. Your Copy Survived.
 
 github.com/adewale/tasche
 
 <!--
-Echoes the opening provocation. What happens when you run Python where JavaScript is supposed to go? You build wrappers.py. You build Safe* classes. You build a Readability Service Binding. You accept what each runtime does well and connect them at the border.
+Resolves the opening tension. Slide 2 stated the problem: the link is gone, the article disappeared. This slide closes it: Tasche already had the copy. The architecture -- Python Workers, JS Service Binding, D1, R2, Queues -- exists to make that one promise real.
 
 The GitHub URL gives the audience a concrete next step -- the entire project is open source, MIT licensed, deployable with one click.
 

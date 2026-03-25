@@ -96,35 +96,4 @@ During Phase 7 (Validate), check:
 
 ## Deck inventory
 
-### Speakerdeck talks (speakerdeck.com/adewale)
-
-| Deck | Shape | Through-line (tension) | Resolution |
-|------|-------|----------------------|------------|
-| Tools For Thought: From the Memex to Index Cards | Man in Hole | How do we improve thinking and manage cognitive decline? | Build personal systems — "bicycles for the mind" over "spaceships for the mind" |
-| I Never Metaphor I Didn't Like | Man in Hole | Skeuomorphism vs flat design: how should designers use metaphor? | Restrained metaphors (the card interface) balance usability with digital authenticity |
-| Why Is an API Like a Puppy? | Tragedy | APIs look free but demand long-term commitment | "APIs, like puppies, are an expensive long-term commitment. But sometimes they're worth it." |
-| DevRel Leadership: All the Pieces Matter | Man in Hole | What does effective DevRel leadership actually require? | A cycle: purpose → goals → metrics → activities → people → new leaders |
-| The True Nature of the Singleton Pattern | Boy Meets Girl | Is the Singleton really a class? | It's a pattern of four separable concerns: policy, environment, mechanism, subject |
-| Semantic Image Search | Man in Hole | How do you teach machines to understand images without hand-coding rules? | Deep learning discovers patterns from data, but this power requires ethical responsibility |
-| A Web of Identity | Man in Hole | How does identity persist across devices and contexts? | "There isn't a mobile web. There's one web that understands the user, their context, and their journey." |
-| Software Craftsmanship Meets UX | Man in Hole | Why do developers tolerate terrible tools? | Developer Experience: apply UX principles to developer-facing products |
-| GeistFabrik and AI-Augmented Development | Boy Meets Girl | What does AI-assisted software development actually look like? | Practical insights from building a generative text tool with AI |
-| Creating Successful Apps in 2017 | Man in Hole | What distinguishes successful apps? | Evidence-based patterns from app market analysis |
-| What Makes a Popular Android App? | Man in Hole | What separates popular Android apps from the rest? | Data-driven quality signals |
-| A Mobile Web of Apps and Documents | Man in Hole | The web is fragmenting across apps and contexts | Design for the document web, not just the app web |
-| The State of Social | In Media Res | Social platforms are changing faster than our understanding of them | Map the landscape as it shifts |
-| Cross-Context User Journeys | Man in Hole | Users move between devices but products don't follow | Design for journeys, not screens |
-| Introduction to Software Craftsmanship | Boy Meets Girl | What if we treated software development as a craft? | Apprenticeship patterns as a path to mastery |
-| 10 Themes in Social Login | Man in Hole | Social login is full of hidden complexity | Ten patterns that separate good implementations from broken ones |
-
-### Generated project decks (slides-oshineye-dev.adewale-883.workers.dev)
-
-| Deck | Shape | Through-line (tension) | Resolution | Through-line works? |
-|------|-------|----------------------|------------|-------------------|
-| pdf2croissant | Man in Hole | ML dataset metadata is trapped in academic papers that no platform can parse | "The metadata was always in the paper. Now it is in the JSON." | Yes — problem + solution, sustained across 25 slides |
-| claude-history-explorer | Boy Meets Girl | Your Claude conversations contain patterns — can you see them without AI? | Deterministic arithmetic on timestamps reveals personality | Partially — the paradox is strong but "personality without AI" is a curiosity, not a problem the audience has |
-| geist-fabrik | Boy Meets Girl | Your Obsidian notes know things you've forgotten | Geists surface them as questions you wouldn't ask yourself | No — "muses not oracles" is a design principle, not a tension |
-| olsen | Man in Hole | Photo libraries are fragile — every indexer that touches your files risks corrupting them | Read-only architecture makes corruption structurally impossible | No — "constraint as architecture" is an observation, not the problem |
-| tasche | Man in Hole | Links die. Paywalls appear. The article you saved is gone | Tasche archives it before it disappears | No — "Python where JavaScript goes" is an architecture curiosity, not the user's problem |
-| planet-cf | Man in Hole | RSS is dying but developer communities still need aggregated content | A Python feed aggregator on Cloudflare's edge | No — "Python inside JavaScript's house" is the same curiosity framing as tasche |
-| vaders | Tragedy | Terminals can't do smooth animation, sub-pixel rendering, or GPU acceleration | Embrace the constraint: chunky movement IS Space Invaders | Partially — "accept the constraint" is the right conclusion but stated too early |
+See [DECK_INVENTORY.md](DECK_INVENTORY.md) for the full table of all speakerdeck talks and generated project decks with their story shapes, through-lines, and links.

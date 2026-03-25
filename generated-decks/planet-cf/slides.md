@@ -31,9 +31,11 @@ Sources:
 transition: fade
 ---
 
-# What Is Planet CF?
+# The Community Feed Is Dead
 
-An RSS/Atom aggregator where **Python runs inside V8 isolates** via Pyodide/WASM on Cloudflare's global edge network.
+Developer communities used to have Planet pages -- Planet Python, Planet Mozilla, Planet GNOME. Aggregated feeds that showed what the community was writing. Most are dead.
+
+**Planet CF brings it back**, running on Cloudflare's edge, written in Python on a JavaScript platform.
 
 <v-clicks>
 
@@ -46,7 +48,9 @@ An RSS/Atom aggregator where **Python runs inside V8 isolates** via Pyodide/WASM
 </v-clicks>
 
 <!--
-The key surprise here is that Cloudflare Workers is a JavaScript-first platform. The documentation defaults to JavaScript and TypeScript. Python support runs through Pyodide, which compiles CPython to WebAssembly inside V8 isolates. This means no filesystem, no threading, no direct network I/O. Every external operation must cross the FFI boundary into JavaScript APIs. Despite these constraints, Planet CF handles feed parsing (feedparser), HTML sanitization (bleach), and template rendering (Jinja2) -- all in Python.
+Planet pages were how developer communities shared what they were writing. Planet Python aggregated Python blogs, Planet Mozilla aggregated Mozilla contributor blogs, Planet GNOME aggregated GNOME developer blogs. Most of those aggregators are gone -- unmaintained, offline, or broken. Planet CF revives the concept on modern infrastructure: a single Cloudflare Worker that handles scheduling, queue consumption, HTTP serving, and admin -- all in Python, running inside V8 via Pyodide/WASM.
+
+The architectural surprise: Cloudflare Workers is a JavaScript-first platform. Python support runs through Pyodide (CPython compiled to WebAssembly). Despite constraints -- no filesystem, no threading, no direct network I/O -- Planet CF handles feed parsing (feedparser), HTML sanitization (bleach), and template rendering (Jinja2) entirely in Python.
 
 Sources:
 - https://github.com/adewale/planet_cf/blob/main/README.md -- feature list and multi-instance examples
@@ -196,6 +200,11 @@ From JsProxy conversion to SSRF protection, every surprise documented
 
 <!--
 The LESSONS_LEARNED.md file contains 21 hard-won lessons from building Planet CF. They cover: JsProxy conversion (1), boundary layer pattern (2), mock limitations (3), no filesystem (4), hybrid search (5), D1 LIKE escaping (6), SSRF protection (7), feed date handling (8), stateless sessions (9), embedding model choice (10), content sanitization (11), queue error handling (12), structured observability (13), E2E test cleanup (14), search ranking (15), search accuracy testing (16), the full FFI type matrix (17), visual fidelity for conversions (18), deterministic E2E tests (19), two-tier FFI testing (20), and the "is None is never enough" rule (21). Each lesson includes the problem, the symptom, the wrong approach, and the solution with code examples.
+
+These 21 lessons are what it cost to bring the community feed back -- each one a production failure that unit tests missed.
+
+Sources:
+- https://github.com/adewale/planet_cf/blob/main/docs/LESSONS_LEARNED.md -- all 21 lessons
 -->
 
 ---
@@ -203,10 +212,14 @@ layout: end
 transition: fade
 ---
 
-# The boundary layer is the architecture
+# The Community Feed Is Back. It Runs at the Edge.
 
 github.com/adewale/planet_cf
 
 <!--
-The through-line resolves here. What happens when Python wakes up inside JavaScript's house? It builds a wall at the door. The boundary layer -- SafeD1, SafeVectorize, SafeAI, SafeQueue, _to_py_safe, _is_js_undefined -- is not a utility module. It is the architecture. Everything downstream of it is pure Python. Everything upstream of it is JavaScript. The wall is thin (600 lines), but it is load-bearing. Without it, JsProxy objects leak into business logic, mocks lie about production behavior, and None is not None. The 21 lessons document is the proof that this wall was earned, not designed in advance.
+Resolves the opening tension. Slide 2 stated the problem: Planet pages are dead, the community feeds that connected developers are gone. This slide closes it: Planet CF brought them back. Planet Python aggregates 500+ feeds, Planet Mozilla 190. The feed runs on Cloudflare's global edge, written in Python on a JavaScript platform, held together by a 600-line boundary layer that converts every type crossing from one runtime world to the other.
+
+Sources:
+- https://github.com/adewale/planet_cf -- project repository
+- https://github.com/adewale/planet_cf/blob/main/README.md -- multi-instance deployment examples
 -->

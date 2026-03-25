@@ -24,13 +24,16 @@
 - effects: client/src/effects.ts (color cycling implementation)
 
 ## Through-Line
-- concept: "Accept the constraint. The terminal is not a limitation -- it is the design."
-- type: design-rule
+- concept: "Can you build a real-time multiplayer arcade game in a terminal? Vaders did -- and the terminal's constraints made it better."
+- type: tragedy
+- shape: challenge (no GPU, no pixels, no smooth animation) → answers (braille art, color cycling, 30 Hz sync) → acceptance (constraints are permanent but produced simpler solutions)
 - appears-in:
-  - slide 2: default -- terminal constraints force creative solutions (Amiga color cycling, braille sprites)
-  - slide 4: center -- full state sync chosen over delta compression because simplicity wins at this scale
-  - slide 6: center -- the chunky movement is not a bug, it is the genre
-  - slide 9: end -- the constraint produced better architecture than the "proper" approach would have
+  - slide 1: cover -- Vaders introduced as a multiplayer terminal game
+  - slide 2: default -- the CHALLENGE stated as a question: can you build a game here? Then the answer: braille, color cycling, 30 Hz
+  - slide 4: center -- full state sync: simplicity wins at this scale
+  - slide 6: center -- chunky movement is the genre, not a bug
+  - slide 8: fact -- 620+ tests, property-based testing adapted to terminal constraints
+  - slide 9: end -- tragedy's acceptance: the terminal has no pixels, the game has no lag, every constraint produced a simpler answer
 
 ## Design Tokens
 - colors:
@@ -82,17 +85,19 @@
 ### Slide 2
 - kind: default-content
 - layout: default
-- title: Painting with Character Cells
-- body: How 1980s Amiga color cycling and Unicode braille produce arcade visuals in a terminal
+- title: No GPU. No Pixels. No Smooth Animation.
+- body: The challenge stated as a question -- can you build a real-time multiplayer game in a terminal? Then the immediate answer: braille pixel art, Amiga color cycling, 30 Hz full state sync.
 - bullets:
-  - Sprites are 14x8 pixel grids encoded as braille characters -- 7 chars wide, 2 lines tall
-  - Color cycling rotates a 6-color palette every 5 ticks for the UFO rainbow effect
-  - Per-wave gradient borders shift from ocean blues to danger reds as difficulty escalates
-  - ASCII fallback sprites for terminals without Unicode support
+  - Braille pixel art: 14x8 grids encoded as Unicode braille -- sub-character resolution, no GPU
+  - Color cycling: 6-color palette rotates every 5 ticks, the 1980s Amiga technique
+  - Wave gradients: borders shift from ocean blues to danger reds as difficulty escalates
+  - 30 Hz sync: full game state, every 33ms, to every connected client
 - sources:
   - file:Lessons_learned.md -- Amiga color cycling techniques applied to TUI
   - file:client/src/sprites.ts -- braille pixel art system and pixel-to-braille conversion
   - file:client/src/effects.ts -- getUFOColor color cycling implementation
+- notes:
+  - The challenge is stated viscerally: terminals have no GPU, no sub-pixel rendering, no smooth animation. The answer follows immediately -- braille characters give sub-character resolution, Amiga color cycling produces shimmer effects, and full state sync keeps multiplayer in lockstep at 30 Hz.
 
 ### Slide 3
 - kind: section
@@ -156,11 +161,13 @@
 - sources:
   - file:CHANGELOG.md -- "620+ tests" in v1.0.0
   - file:Lessons_learned.md -- Property-Based Testing section, hexTo256Color counterexample
+- notes:
+  - Even testing adapted to the constraint. Property-based tests worked because the terminal's bounded output space (256 colors, character-cell coordinates) made invariants easy to state.
 
 ### Slide 9
 - kind: end
 - layout: end
-- title: Accept the constraint. Ship the game.
-- subtitle: github.com/adewale/vaders
+- title: The Terminal Has No Pixels. The Game Has No Lag.
+- subtitle: Every constraint produced a simpler answer.
 - notes:
-  - Circle back to the through-line. The terminal forced better decisions -- full sync over delta, braille over graphics, alarms over intervals, pure reducer over ECS. Every "limitation" produced simpler, more correct architecture.
+  - Resolves the opening challenge from slide 2. The question was: can you build a real-time multiplayer game in a terminal? The answer: yes, and the constraints are permanent -- no pixels, no GPU, no smooth animation -- but each one produced a simpler solution than the "proper" alternative. The tragedy is accepted, not overcome.

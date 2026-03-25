@@ -30,24 +30,24 @@ Sources:
 transition: slide-left
 ---
 
-# An AI Tool Analyzer That Uses Zero AI
+# Hundreds of conversations. Zero visibility.
 
-Claude History Explorer reads `~/.claude/projects/` JSONL files and turns raw conversation logs into searchable sessions, statistics, and personality narratives.
+You have months of Claude conversations sitting in `~/.claude/projects/` as JSONL files. Session lengths, message rates, tool usage patterns, time-of-day habits -- all recorded, none of it visible.
 
 <v-clicks>
 
-- Every classification comes from **deterministic threshold arithmetic**
-- "Heavy delegation", "Marathon sessions", "Rapid-fire" — all from `classify(value, thresholds, default)`
-- No LLM calls. No embeddings. No inference. Just timestamps and counts.
+- How long are your typical sessions? You do not know.
+- Are you delegating more over time, or less? The data exists, but you have never looked.
+- What if you could see the patterns hiding in your own usage history?
 
 </v-clicks>
 
 <!--
-This is the core provocation: a tool that analyzes AI conversations but uses zero AI itself. All personality classification is deterministic arithmetic on timestamps. The classify() function takes a numeric value, walks a threshold list, and returns the first label that matches. MESSAGE_RATE_HIGH is 30 messages per hour. SESSION_LENGTH_LONG is 2 hours. These are constants, not learned weights.
+This slide names the problem before introducing the solution. Every Claude Code user generates structured JSONL logs -- timestamped messages, tool calls, session boundaries -- but the files are opaque. There is no built-in way to search, aggregate, or visualize usage patterns. The data is rich (start times, message counts, agent flags, tool invocations) but completely inaccessible without tooling. The next slide introduces the architecture section, and then the mechanism: deterministic threshold arithmetic that turns this raw data into readable patterns.
 
 Sources:
-- https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/stories.py — personality classification via threshold arithmetic
-- https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/constants.py — threshold constants (MESSAGE_RATE_HIGH=30, etc.)
+- https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/parser.py — JSONL parsing of ~/.claude/projects/ conversation logs
+- https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/models.py — SessionInfo dataclass capturing timestamps, message counts, agent flags
 -->
 
 ---
@@ -187,16 +187,32 @@ Sources:
 -->
 
 ---
+transition: fade
+---
+
+# The patterns were always in the JSONL
+
+Six lines of `classify()`. Three dependencies. Read-only access. No network. No AI. The data was always there -- session lengths, message rates, time-of-day habits, delegation ratios. Now you can see them.
+
+<!--
+This closing resolves the tension opened in slide 2. The problem was invisible patterns in JSONL files. The resolution is that the patterns were always present in the data -- they just needed deterministic arithmetic to surface them. The classify() function, the three-dependency constraint, and the read-only trust model are the mechanisms that make this possible. The tool does not infer or predict. It makes visible what was already recorded.
+
+Sources:
+- https://github.com/adewale/claude-history-explorer — project repository
+- https://github.com/adewale/claude-history-explorer/blob/main/claude_history_explorer/utils.py — classify() function
+-->
+
+---
 layout: end
 transition: fade
 ---
 
-# Personality without AI. Trust without complexity.
+# The patterns were always in the JSONL. Now you can see them.
 
 github.com/adewale/claude-history-explorer
 
 <!--
-Resolve the through-line. The project proves you can extract meaningful personality insights from AI conversation data using nothing but arithmetic on timestamps. That constraint — no AI, no network, no writes — is what makes the trust model not just possible but inevitable. The classify() function is the entire inference engine: six lines of Python that turn numbers into labels. This is what happens when you decide the tool that reads AI conversations should itself use zero AI.
+The closing h1 resolves the opening. Slide 2 said: you have hundreds of conversations, zero visibility. This slide says: the patterns were always there. The tool did not create insight from nothing -- it surfaced structure that the JSONL files already contained. Timestamps became session lengths. Message counts became usage rates. Agent flags became delegation ratios. All via deterministic arithmetic, all without touching the network or writing a single byte.
 
 Sources:
 - https://github.com/adewale/claude-history-explorer — project repository

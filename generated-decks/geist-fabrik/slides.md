@@ -29,37 +29,47 @@ Sources:
 transition: slide-left
 ---
 
+# Thousands of notes. Zero connections visible.
+
+You have years of notes in your Obsidian vault. The contradictions between them, the forgotten threads, the ideas that link across projects and years -- all invisible because you never re-read them.
+
+<v-clicks>
+
+- A note from 2022 contradicts something you wrote last month. You will never notice.
+- Two ideas in different folders are the same idea, expressed differently. They will never meet.
+- The question that would unlock your next project is already answered, scattered across a dozen notes.
+
+</v-clicks>
+
+<p v-click style="color: var(--deck-accent); font-size: 1.05rem; margin-top: 1.5rem;">What if something could read your entire vault and ask you the questions you would never think to ask yourself?</p>
+
+<!-- This slide names the problem GeistFabrik solves. Obsidian vaults grow over years -- hundreds or thousands of Markdown files, wikilinked and tagged, but rarely re-read. The connections between notes -- semantic similarities, contradictions, forgotten threads -- are structurally invisible to the author because re-reading at scale is impractical. GeistFabrik's answer is not to summarize or search, but to surface provocative questions drawn from the vault's own content. The next slide introduces the mechanism.
+
+Sources:
+- file:README.md -- project description, what GeistFabrik does with Obsidian vaults
+- file:specs/geistfabrik_vision.md -- Gordon Brander's insight about accumulated knowledge, divergent thinking -->
+
+---
+layout: default
+transition: fade
+---
+
 # What GeistFabrik does
 
 <v-clicks>
 
 - Parses Obsidian vaults into SQLite with 384-dim embeddings
-- 57 geists (48 Python, 9 YAML) ask "What if...?" questions
+- 57 geists (48 Python, 9 YAML) ask "What if...?" questions about *your* notes
 - 4-stage filtering samples ~5 suggestions per session
 - 100% local, read-only, deterministic -- same date = same output
 
 </v-clicks>
 
-<!-- The 384-dim embeddings come from all-MiniLM-L6-v2 via sentence-transformers, bundled locally with zero API calls. "Deterministic randomness" means the RNG is seeded by session date -- identical vault state on the same date always produces identical suggestions. This makes debugging reproducible: replay any session by passing its date.
+<!-- The 384-dim embeddings come from all-MiniLM-L6-v2 via sentence-transformers, bundled locally with zero API calls. "Deterministic randomness" means the RNG is seeded by session date -- identical vault state on the same date always produces identical suggestions. This makes debugging reproducible: replay any session by passing its date. The geists do not summarize or search -- they generate provocative questions that surface connections the author would not find by browsing.
 
 Sources:
 - file:README.md -- feature inventory, 57 default geists count, deterministic randomness principle
 - file:docs/ARCHITECTURE.md -- session orchestrator flow, embedding computation details -->
-
----
-layout: center
-transition: fade
----
-
-# Muses, not oracles
-
-Geists provoke thinking. They do not pretend to think for you.
-
-<!-- Gordon Brander described building "a creative oracle that helps provoke ideas... More tarot than flash cards. Tarot for thought." GeistFabrik takes that vision and grounds it in a concrete system. The name "Geists" also invokes Hegel's owl of Minerva -- wisdom comes from reflecting on accumulated knowledge, not from predicting the future.
-
-Sources:
-- file:LESSONS_LEARNED.md -- "Muses, not oracles" as the governing design principle
-- file:specs/geistfabrik_vision.md -- Gordon Brander's original "tarot for thought" framing -->
 
 ---
 layout: two-cols-header
@@ -194,15 +204,30 @@ Sources:
 - file:specs/geistfabrik_vision.md -- diverge/converge feedback loops, Brander's influence -->
 
 ---
+transition: fade
+---
+
+# The connections were always in your notes
+
+57 geists. 384-dimensional embeddings. Date-seeded deterministic sampling. But the real mechanism is simpler: your vault already contains the contradictions, the forgotten threads, the ideas that link across years. GeistFabrik does not create connections. It asks you about the ones that are already there.
+
+<!-- This penultimate slide resolves the tension from slide 2. The problem was invisible connections in a growing vault. The resolution: the connections were always present in the notes -- GeistFabrik surfaces them by asking questions the author would not think to ask. The Contradictor case study proved this: algorithmically generating opposites failed at 10%, but simply asking "What contradicts this note?" succeeded at 100%. The tool's power comes from the vault's own content, not from computation.
+
+Sources:
+- file:LESSONS_LEARNED.md -- Contradictor case study, questions vs computed answers
+- file:README.md -- 57 geists, design philosophy -->
+
+---
 layout: end
 transition: fade
 ---
 
-# The geist's job is to ask questions you would not ask yourself
+# The connections were always in your notes. Now something asks you about them.
 
 github.com/adewale/geist_fabrik
 
-<!-- This line comes directly from the Lessons Learned document and is the resolution of the "muses, not oracles" through-line. GeistFabrik is at v0.9.0, approaching 1.0 -- 611 passing tests, 57 default geists, feature-complete. The Contradictor case study proved the principle: a simple question achieves what complex code cannot.
+<!-- The closing h1 resolves the opening directly. Slide 2 said: you have thousands of notes, the connections between them are invisible. This slide says: the connections were always there -- GeistFabrik makes them visible by asking questions drawn from your own vault. Not summaries, not search results, not AI-generated answers. Questions. The geist's job is not to know things you do not know. It is to ask about things you have forgotten you know.
 
 Sources:
-- file:LESSONS_LEARNED.md -- concluding principle from the Contradictor case study -->
+- file:LESSONS_LEARNED.md -- concluding principle from the Contradictor case study
+- file:specs/geistfabrik_vision.md -- Gordon Brander's "tarot for thought" vision -->

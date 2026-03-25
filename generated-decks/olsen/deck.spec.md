@@ -22,14 +22,17 @@
 - research: docs/HIERARCHICAL_FACETS.md (migration from hierarchical to state machine model, the bug that revealed the truth)
 
 ## Through-Line
-- concept: "Constraint as architecture -- every design decision in Olsen is a deliberate restriction that eliminates a class of problems."
-- type: design-rule
+- concept: "Photo libraries are fragile. Every tool that touches your originals risks corrupting them. What if the indexer couldn't write?"
+- shape: man-in-hole
+- type: problem-resolution
 - appears-in:
-  - slide 1: cover -- the project is introduced as a read-only indexer
-  - slide 3: center-statement -- read-only is not a limitation, it is the architecture
-  - slide 5: default-content -- the state machine constraint prevents zero-result dead ends
+  - slide 1: cover -- the project is introduced as read-only by design, single SQLite catalog
+  - slide 2: default -- name the problem: indexers are dangerous, corruption is silent, discovered too late
+  - slide 3: center-statement -- Olsen's answer: O_RDONLY on every file, structurally cannot write
+  - slide 6: default-content -- the state machine constraint prevents zero-result dead ends
   - slide 7: default-content -- saturation-first is a constraint on color classification order
-  - slide 9: end -- the resolution: constraints compound into trust
+  - slide 9: default -- build toward resolution: your photos were never touched
+  - slide 10: end -- resolve: "Your photos were never touched. Your catalog is a single file. Your originals are exactly as you left them."
 
 ## Design Tokens
 - colors:
@@ -78,20 +81,20 @@
 ### Slide 2
 - kind: default-content
 - layout: default
-- title: What Olsen does in 62 milliseconds
-- body: Per-photo pipeline -- EXIF extraction, 4 thumbnail sizes, k-means color palette, perceptual hash, metadata inference. All read-only. All into a single SQLite file.
+- title: Photos are precious. Indexers are dangerous.
+- body: Every tool that touches your photo library is a risk. EXIF editors rewrite file headers. Catalog apps create sidecar files. Sync tools rename originals. The corruption is silent -- discovered months later, after the backup window has closed. What if the indexer could not write? Not "does not write" -- structurally cannot.
 - sources:
-  - file:README.md -- performance benchmarks on M3 Max
-  - file:docs/architecture.md -- processing pipeline stages
+  - file:README.md -- critical guarantee section, read-only enforcement
+  - file:docs/architecture.md -- O_RDONLY enforcement, what the indexer never does
 
 ### Slide 3
 - kind: center-statement
 - layout: center
-- title: Read-only is not a limitation. It is the architecture.
-- body: O_RDONLY on every file open. No writes to photo directories. Processing happens entirely in memory. The database is the only mutable artifact.
+- title: Olsen opens every file with O_RDONLY. Every one.
+- body: No writes to photo directories -- not temporary files, not EXIF writeback, not renames. Processing happens entirely in memory. The only mutable artifact is a single SQLite database that lives outside your photo library.
 - sources:
   - file:README.md -- read-only guarantee section
-  - file:docs/architecture.md -- enforcement mechanisms
+  - file:docs/architecture.md -- O_RDONLY enforcement, single SQLite output
 
 ### Slide 4
 - kind: section
@@ -136,7 +139,13 @@
   - file:docs/LESSONS_LEARNED.md -- Monochrom DNG thumbnail bug timeline and debugging order
 
 ### Slide 9
+- kind: default-content
+- layout: default
+- title: Your photos were never touched
+- body: 100K photos indexed. Four thumbnail sizes generated. Five dominant colors extracted. Perceptual hashes computed. Faceted navigation across every metadata dimension. And through all of it -- every file opened read-only, every result written to a single SQLite database, every original exactly as you left it.
+
+### Slide 10
 - kind: end
 - layout: end
-- title: Constraints compound into trust
+- title: Your photos were never touched. Your catalog is a single file. Your originals are exactly as you left them.
 - subtitle: github.com/adewale/olsen
