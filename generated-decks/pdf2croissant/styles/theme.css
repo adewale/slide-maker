@@ -6,7 +6,7 @@
 
 h1, h2, h3 {
   font-family: var(--deck-font-display);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 h1 {
@@ -17,7 +17,8 @@ h1 {
 
 h3 {
   color: var(--deck-accent);
-  font-size: 1rem;
+  font-family: var(--deck-font-body);
+  font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.5rem;
@@ -30,7 +31,7 @@ strong {
 code {
   font-family: var(--deck-font-mono);
   color: var(--deck-accent-alt);
-  background: rgba(37, 99, 235, 0.06);
+  background: rgba(160, 108, 8, 0.08);
   padding: 0.15em 0.4em;
   border-radius: 4px;
   font-size: 0.9em;
@@ -42,21 +43,21 @@ ol, ul {
 
 ol li::marker {
   color: var(--deck-accent);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 ul li::marker {
-  color: var(--deck-accent);
+  color: var(--deck-accent-alt);
 }
 
-/* Click animations — swiss-minimal: subtle fade only */
+/* Click animations — cloudflare-warm: subtle fade */
 .slidev-vclick-target {
-  transition: all 0.2s ease-out;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .slidev-vclick-hidden {
   opacity: 0;
-  transform: translateY(4px);
+  transform: translateY(6px);
 }
 
 /* Cover */
@@ -70,13 +71,12 @@ ul li::marker {
 }
 
 .slidev-layout.cover h1 {
-  font-size: 3.5rem;
-  font-weight: 700;
+  font-size: 4rem;
   letter-spacing: -0.02em;
 }
 
 .slidev-layout.cover p {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   color: var(--deck-muted);
   margin-top: 1rem;
 }
@@ -124,7 +124,7 @@ ul li::marker {
   margin: 2rem auto 0;
 }
 
-/* Section — inverted to dark */
+/* Section — inverted to dark chocolate */
 .slidev-layout.section {
   background: var(--deck-fg);
   color: var(--deck-bg);
@@ -137,7 +137,7 @@ ul li::marker {
 }
 
 .slidev-layout.section p {
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 251, 245, 0.55);
   font-size: 1.15rem;
   margin-top: 0.75rem;
 }

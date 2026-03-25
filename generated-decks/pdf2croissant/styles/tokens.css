@@ -1,10 +1,10 @@
 :root {
-  --deck-bg: #ffffff;
-  --deck-fg: #1a1a2e;
-  --deck-accent: #2563eb;
-  --deck-accent-alt: #7c3aed;
-  --deck-muted: rgba(26, 26, 46, 0.45);
-  --deck-font-display: 'DM Sans', sans-serif;
-  --deck-font-body: 'Figtree', sans-serif;
+  --deck-bg: #fffbf5;
+  --deck-fg: #2c1810;
+  --deck-accent: #a06c08;
+  --deck-accent-alt: #8b5e34;
+  --deck-muted: rgba(44, 24, 16, 0.45);
+  --deck-font-display: 'Young Serif', serif;
+  --deck-font-body: 'Source Sans 3', sans-serif;
   --deck-font-mono: 'JetBrains Mono', monospace;
 }
