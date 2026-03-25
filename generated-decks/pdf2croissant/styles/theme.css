@@ -1,0 +1,166 @@
+.slidev-layout {
+  font-family: var(--deck-font-body);
+  color: var(--deck-fg);
+  background: var(--deck-bg);
+}
+
+h1, h2, h3 {
+  font-family: var(--deck-font-display);
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 2.5rem;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  color: var(--deck-accent);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+strong {
+  color: var(--deck-accent);
+}
+
+code {
+  font-family: var(--deck-font-mono);
+  color: var(--deck-accent-alt);
+  background: rgba(37, 99, 235, 0.06);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+ol, ul {
+  line-height: 1.8;
+}
+
+ol li::marker {
+  color: var(--deck-accent);
+  font-weight: 600;
+}
+
+ul li::marker {
+  color: var(--deck-accent);
+}
+
+/* Click animations — swiss-minimal: subtle fade only */
+.slidev-vclick-target {
+  transition: all 0.2s ease-out;
+}
+
+.slidev-vclick-hidden {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+/* Cover */
+.slidev-layout.cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
+  padding: 4rem;
+}
+
+.slidev-layout.cover h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.slidev-layout.cover p {
+  font-size: 1.15rem;
+  color: var(--deck-muted);
+  margin-top: 1rem;
+}
+
+/* Center / Statement */
+.slidev-layout.center h1,
+.slidev-layout.statement h1 {
+  font-size: 2.25rem;
+  max-width: 75%;
+  margin: 0 auto;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.slidev-layout.center p,
+.slidev-layout.statement p {
+  color: var(--deck-muted);
+  max-width: 60%;
+  margin: 1rem auto 0;
+  text-align: center;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* Fact */
+.slidev-layout.fact h1 {
+  font-size: 7rem;
+  color: var(--deck-accent);
+  letter-spacing: -0.04em;
+}
+
+.slidev-layout.fact p:first-of-type {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--deck-muted);
+  margin-top: -0.5rem;
+}
+
+.slidev-layout.fact p:last-of-type {
+  font-size: 1.05rem;
+  margin-top: 2rem;
+  color: var(--deck-fg);
+  max-width: 60%;
+  margin: 2rem auto 0;
+}
+
+/* Section — inverted to dark */
+.slidev-layout.section {
+  background: var(--deck-fg);
+  color: var(--deck-bg);
+}
+
+.slidev-layout.section h1 {
+  font-size: 2.75rem;
+  letter-spacing: -0.01em;
+  color: var(--deck-bg);
+}
+
+.slidev-layout.section p {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 1.15rem;
+  margin-top: 0.75rem;
+}
+
+/* End — same palette as content slides. !important overrides Slidev core end.vue scoped CSS. */
+.slidev-layout.end {
+  text-align: center;
+  background: var(--deck-bg) !important;
+  color: var(--deck-fg) !important;
+}
+
+.slidev-layout.end h1 {
+  font-size: 2.5rem;
+  color: var(--deck-fg) !important;
+  letter-spacing: -0.01em;
+}
+
+.slidev-layout.end p {
+  color: var(--deck-muted);
+  font-family: var(--deck-font-mono);
+  font-size: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* Presenter cursor */
+.slidev-drawing-enabled { cursor: crosshair !important; }
