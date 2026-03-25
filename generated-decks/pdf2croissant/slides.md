@@ -17,10 +17,10 @@ layout: cover
 
 Turn academic papers into MLCommons Croissant JSON-LD metadata
 
-<span style="font-family: var(--deck-font-mono); font-size: 0.85rem; color: var(--deck-muted); margin-top: 1.5rem; display: inline-block;">pdf2mlcroissant.vercel.app</span>
+<span style="font-family: var(--deck-font-mono); font-size: 0.85rem; color: var(--deck-muted); margin-top: 1.5rem; display: inline-block;">github.com/jettyio/pdf2croissant</span>
 
 <!--
-The cover establishes the project identity. The subtitle is the one-line description from the README. The URL points to the live app so the audience can try it immediately. pdf2croissant solves the gap between what Croissant defines as a schema and the messy reality of extracting that metadata from academic papers.
+The cover establishes the project identity. The subtitle is the one-line description from the README. The URL points to the GitHub repo. pdf2croissant solves the gap between what Croissant defines as a schema and the messy reality of extracting that metadata from academic papers.
 
 Sources:
 - https://github.com/jettyio/pdf2croissant — repository description and live app URL
@@ -164,16 +164,22 @@ transition: slide-left
 ```mermaid {theme: 'base', scale: 0.65}
 graph LR
   A["Upload PDF"] --> B["Next.js"]
-  B --> C["Blob"]
+  B --> C["Vercel Blob"]
   B --> D["Jetty API"]
   D --> E["Sandbox"]
   E --> F["Agent"]
   F --> G["croissant.json"]
   F --> H["report.json"]
   F --> I["summary.md"]
-  style A fill:#a06c08,stroke:#a06c08,color:#fff
-  style D fill:#a06c08,stroke:#a06c08,color:#fff
-  style F fill:#a06c08,stroke:#a06c08,color:#fff
+  style A fill:#a06c08,stroke:#a06c08,color:#fffbf5
+  style B fill:#fffbf5,stroke:#2c1810,color:#2c1810
+  style C fill:#fffbf5,stroke:#2c1810,color:#2c1810
+  style D fill:#a06c08,stroke:#a06c08,color:#fffbf5
+  style E fill:#fffbf5,stroke:#2c1810,color:#2c1810
+  style F fill:#a06c08,stroke:#a06c08,color:#fffbf5
+  style G fill:#fffbf5,stroke:#8b5e34,color:#2c1810
+  style H fill:#fffbf5,stroke:#8b5e34,color:#2c1810
+  style I fill:#fffbf5,stroke:#8b5e34,color:#2c1810
   linkStyle default stroke:#2c1810,stroke-width:2px
 ```
 
@@ -546,10 +552,10 @@ layout: center
 transition: fade
 ---
 
-# The system's integrity comes from what it refuses to do. It refuses to guess when the paper is silent. It refuses to fill gaps with plausible but unsourced data. It refuses to skip validation.
+# Metadata you can trust is metadata that tells you what it does not know.
 
 <!--
-This is the through-line crystallized. Every interesting design decision in pdf2croissant is about a constraint, not a feature. Confidence tagging exists because the agent must distinguish what it knows from what it infers. Gap documentation exists because silence is a valid answer. Three-stage validation exists because the paper's claims must survive mechanical verification. The runbook is portable because the discipline matters more than the interface. Model-agnosticism works because the rules are what matter, not which model follows them. The system earns trust by being explicit about its own limitations.
+This resolves the through-line. The problem was never extraction — it was trust. ML datasets described in papers are hard to find, validate, and reuse because the metadata is trapped in prose. Automated extraction could solve this, but only if the output is honest. A Croissant file that looks complete but silently guessed the download URL, the license, or the column types is worse than one with explicit gaps — because the gaps tell the downstream consumer exactly what to verify. Confidence tags, gap documentation, and three-stage validation all serve this one principle: trustworthy metadata admits its limits.
 
 Sources:
 - https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — "The paper is the primary source of truth. Do not hallucinate metadata."
@@ -560,17 +566,14 @@ layout: end
 transition: fade
 ---
 
-# Leave it out and document the gap.
+# Do not hallucinate metadata that is not in the paper.
 
-<span style="font-family: var(--deck-font-mono); font-size: 0.95rem;">pdf2mlcroissant.vercel.app</span>
-
-<span style="font-family: var(--deck-font-mono); font-size: 0.85rem; color: var(--deck-muted); display: inline-block; margin-top: 0.5rem;">github.com/jettyio/pdf2croissant</span>
+github.com/jettyio/pdf2croissant
 
 <!--
-The closing echoes the runbook's own language. The runbook literally says: "The paper is the primary source of truth. Do not hallucinate metadata that isn't in the paper. If something is unclear, leave it out and document the gap." That instruction — leave it out and document the gap — is the rule that makes the entire system work. It is the reason confidence tags exist, the reason gaps tables are mandatory, the reason the validation pipeline refuses to pass incomplete metadata silently. The live app URL and repo URL are both here. Use the tool, or take the runbook and run it yourself.
+The closing uses the runbook's own words — the single instruction that makes the entire system work. This is not a tagline; it is the literal rule from RUNBOOK.md that governs every extraction. Confidence tags exist because of this rule. Gap tables exist because of this rule. Three-stage validation exists because the system must prove it followed this rule. The GitHub URL is here because the runbook is open source — copy it, use it with any agent, verify the discipline yourself.
 
 Sources:
 - https://github.com/jettyio/pdf2croissant — project repository
-- https://pdf2mlcroissant.vercel.app — live application
-- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — "If something is unclear, leave it out and document the gap"
+- https://github.com/jettyio/pdf2croissant/blob/main/RUNBOOK.md — "Do not hallucinate metadata that isn't in the paper."
 -->
