@@ -220,7 +220,7 @@ layout: end
 transition: fade
 ---
 
-# Your photos were never touched. Your catalog is a single file. Your originals are exactly as you left them.
+# 100,000 photos indexed. Zero bytes written to source directories.
 
 github.com/adewale/olsen
 

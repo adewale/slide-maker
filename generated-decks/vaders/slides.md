@@ -191,9 +191,7 @@ layout: end
 transition: fade
 ---
 
-# The Terminal Has No Pixels. The Game Has No Lag.
-
-Every constraint produced a simpler answer.
+# Every limitation was a better design decision.
 
 <span style="font-family: var(--deck-font-mono); font-size: 0.85rem; color: var(--deck-muted); margin-top: 1.5rem; display: block;">github.com/adewale/vaders</span>
 

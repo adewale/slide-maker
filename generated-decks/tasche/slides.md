@@ -231,7 +231,7 @@ layout: end
 transition: fade
 ---
 
-# The Link Died. Your Copy Survived.
+# Save the URL before it disappears.
 
 github.com/adewale/tasche
 

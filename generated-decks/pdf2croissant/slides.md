@@ -578,7 +578,7 @@ layout: end
 transition: fade
 ---
 
-# The metadata was always in the paper. Now it is in the JSON.
+# From 20 pages of prose to validated JSON-LD.
 
 github.com/jettyio/pdf2croissant
 

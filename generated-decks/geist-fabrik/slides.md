@@ -222,7 +222,7 @@ layout: end
 transition: fade
 ---
 
-# The connections were always in your notes. Now something asks you about them.
+# What did you forget to ask your notes?
 
 github.com/adewale/geist_fabrik
 

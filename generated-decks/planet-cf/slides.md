@@ -212,7 +212,7 @@ layout: end
 transition: fade
 ---
 
-# The Community Feed Is Back. It Runs at the Edge.
+# If the community is still writing, the feed should still exist.
 
 github.com/adewale/planet_cf
 

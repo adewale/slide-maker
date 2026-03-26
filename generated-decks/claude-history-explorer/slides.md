@@ -207,7 +207,7 @@ layout: end
 transition: fade
 ---
 
-# The patterns were always in the JSONL. Now you can see them.
+# Six lines of classify(). Zero AI. Every pattern visible.
 
 github.com/adewale/claude-history-explorer
 
