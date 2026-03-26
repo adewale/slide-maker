@@ -212,7 +212,7 @@ layout: end
 transition: fade
 ---
 
-# If the community is still writing, the feed should still exist.
+# 21 lessons. One boundary layer. The feed runs again.
 
 github.com/adewale/planet_cf
 

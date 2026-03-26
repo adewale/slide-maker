@@ -207,7 +207,7 @@ layout: end
 transition: fade
 ---
 
-# Six lines of classify(). Zero AI. Every pattern visible.
+# classify(value, thresholds, default)
 
 github.com/adewale/claude-history-explorer
 

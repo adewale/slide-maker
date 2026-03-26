@@ -220,7 +220,7 @@ layout: end
 transition: fade
 ---
 
-# 100,000 photos indexed. Zero bytes written to source directories.
+# O_RDONLY
 
 github.com/adewale/olsen
 

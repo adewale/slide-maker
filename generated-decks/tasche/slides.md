@@ -231,7 +231,7 @@ layout: end
 transition: fade
 ---
 
-# Save the URL before it disappears.
+# The original can disappear. Tasche already has your copy.
 
 github.com/adewale/tasche
 

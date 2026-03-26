@@ -222,7 +222,7 @@ layout: end
 transition: fade
 ---
 
-# What did you forget to ask your notes?
+# 13 lines of YAML. One well-asked question.
 
 github.com/adewale/geist_fabrik
 

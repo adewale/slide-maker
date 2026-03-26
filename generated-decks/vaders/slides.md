@@ -191,7 +191,7 @@ layout: end
 transition: fade
 ---
 
-# Every limitation was a better design decision.
+# Chunky movement is not a bug. It is the genre.
 
 <span style="font-family: var(--deck-font-mono); font-size: 0.85rem; color: var(--deck-muted); margin-top: 1.5rem; display: block;">github.com/adewale/vaders</span>
 
