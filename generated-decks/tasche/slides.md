@@ -10,6 +10,7 @@ fonts:
   italic: false
 transition: slide-left
 selectable: true
+routerMode: hash
 layout: cover
 ---
 

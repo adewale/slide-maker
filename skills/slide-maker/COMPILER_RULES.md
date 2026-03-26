@@ -379,6 +379,7 @@ Typical fields:
 - `title`
 - `colorSchema`
 - `selectable: true` — always set so audiences can copy text from slides
+- `routerMode: hash` — required for multi-deck deployments where each deck is served from a sub-path
 - `fonts` — omit when using `seriph` or `apple-basic` to let their native fonts come through. Full options:
   - `sans` — primary sans-serif font family
   - `serif` — primary serif font family

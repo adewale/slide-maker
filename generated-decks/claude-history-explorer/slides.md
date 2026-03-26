@@ -11,6 +11,7 @@ fonts:
   weights: '300,400,600,700,900'
   italic: true
 selectable: true
+routerMode: hash
 ---
 
 # Claude History Explorer
