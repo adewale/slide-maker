@@ -64,6 +64,9 @@ transition: iris
 
 <!--
 Section break. The key architectural insight: in Vaders, the server is not a relay -- it IS the game. All game logic runs server-side in a pure reducer function. The client is a dumb terminal that renders whatever state the server sends. This is a deliberate rejection of client-side prediction, which would have been the "proper" networking approach for a real-time game.
+
+Sources:
+- file:Lessons_learned.md -- server-authoritative architecture, pure reducer pattern
 -->
 
 ---

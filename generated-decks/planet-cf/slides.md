@@ -86,6 +86,9 @@ Five Cloudflare primitives, each returning JavaScript types to Python code
 
 <!--
 D1 (database), Queues, Vectorize (vector search), Workers AI (embeddings), and Static Assets -- each is a JavaScript API that returns JsProxy objects when called from Python. The core challenge of the project is not feed aggregation. It is type conversion at the boundary between two runtime worlds.
+
+Sources:
+- https://github.com/adewale/planet_cf -- project repository
 -->
 
 ---
@@ -96,7 +99,7 @@ transition: slide-up
 
 A single worker orchestrates five Cloudflare primitives from Python.
 
-```mermaid {scale: 0.8}
+```mermaid {theme: 'base', scale: 0.8}
 graph LR
   JS["JavaScript APIs"] --> BL["Boundary Layer"]
   BL --> PY["Python Core"]

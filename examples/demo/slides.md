@@ -17,7 +17,11 @@ layout: cover
 
 Decks that survive the podium. Built from specs, not templates.
 
-<!-- The opening line frames the core problem without naming it yet. "Survive the podium" implies fragility; "specs, not templates" hints at the architecture. This is a warm parchment palette with Young Serif display type and Source Sans 3 body. Deliberately light mode, deliberately serif, deliberately not the AI-aesthetic dark-purple-gradient default. -->
+<!-- The opening line frames the core problem without naming it yet. "Survive the podium" implies fragility; "specs, not templates" hints at the architecture. This is a warm parchment palette with Young Serif display type and Source Sans 3 body. Deliberately light mode, deliberately serif, deliberately not the AI-aesthetic dark-purple-gradient default.
+
+Sources:
+- file:README.md — project description and overview
+- file:docs/LLM_TELLS.md — why the visual choices are anti-default -->
 
 ---
 layout: statement
@@ -26,7 +30,11 @@ transition: morph-fade
 
 # Every generated deck looks the same because styling happens last
 
-<!-- The tension. Most AI slide tools apply a "theme" after writing content, which means visual identity is decoration, not direction. The result: interchangeable purple-gradient-on-dark decks with Inter type and rounded-corner cards. This slide names the failure mode. -->
+<!-- The tension. Most AI slide tools apply a "theme" after writing content, which means visual identity is decoration, not direction. The result: interchangeable purple-gradient-on-dark decks with Inter type and rounded-corner cards. This slide names the failure mode.
+
+Sources:
+- file:docs/LLM_TELLS.md — Typography and color tells: Inter/Roboto defaults, purple-to-blue gradients
+- file:docs/PRESENTATION_PHILOSOPHY.md — Principle 11: No decorative imagery, ever -->
 
 ---
 transition: slide-left
@@ -34,7 +42,7 @@ transition: slide-left
 
 # The fix: decide direction before writing a single slide
 
-```mermaid {scale: 0.72}
+```mermaid {theme: 'base', scale: 0.72}
 graph LR
   A["Brief"]
   B["Direction"]
@@ -58,7 +66,11 @@ graph LR
 
 **Direction** is step two — before the spec, before any slides exist. By the time compilation starts, the deck already has a voice.
 
-<!-- The flowchart shows the full user journey: brief (what you want to say), direction (how it should look and feel), spec (the structured plan), compile (Markdown generation), validate (WCAG checks, LLM-tell audit, screenshot review), present. The bold highlight on Direction is the key insight. This is the anti-generic mechanism. No edge labels because Mermaid renders them as black boxes; every node has explicit inline style. -->
+<!-- The flowchart shows the full user journey: brief (what you want to say), direction (how it should look and feel), spec (the structured plan), compile (Markdown generation), validate (WCAG checks, LLM-tell audit, screenshot review), present. The bold highlight on Direction is the key insight. This is the anti-generic mechanism. No edge labels because Mermaid renders them as black boxes; every node has explicit inline style.
+
+Sources:
+- file:skills/slide-maker/COMPILER_RULES.md — Phases: the seven-phase build from gathering source material through validation
+- file:skills/slide-maker/COMPILER_RULES.md — Diagram guidelines: no edge labels, explicit inline style on every node -->
 
 ---
 layout: SplitInsight
@@ -93,7 +105,11 @@ transition: wipe-right
 
 [click] Tokens, layout choices, slide outlines — these are planning concerns, separated from presentation concerns.
 
-[click] Edit the blueprint to change direction — the spec is the steering wheel, the slides are the road. -->
+[click] Edit the blueprint to change direction — the spec is the steering wheel, the slides are the road.
+
+Sources:
+- file:skills/slide-maker/COMPILER_RULES.md — Outputs: deck.spec.md + slides.md as the two required artifacts
+- file:README.md — What it produces: the dual-layer file structure -->
 
 ---
 transition: slide-up
@@ -114,7 +130,11 @@ transition: slide-up
 
 <!-- Each preset controls typography, color, motion character, and layout tendencies. The same content under editorial-dark feels restrained and high-trust; under bold-modern it feels assertive and launch-ready. Presets are not skins applied after the fact. They are directions that influence which layouts get chosen and how transitions behave.
 
-[click] through [click] Each preset is a different opinion about how information should feel. Real designers make these choices deliberately; Slide Maker forces the choice before writing slides. -->
+[click] through [click] Each preset is a different opinion about how information should feel. Real designers make these choices deliberately; Slide Maker forces the choice before writing slides.
+
+Sources:
+- file:skills/slide-maker/STYLE_PRESETS.md — All six preset definitions: editorial-dark through material-design
+- file:skills/slide-maker/STYLE_PRESETS.md — Selection rule: offer 2-3 directions with rationale -->
 
 ---
 layout: section
@@ -125,7 +145,10 @@ transition: iris
 
 Not a template engine. A seven-phase build.
 
-<!-- Section break. The word "actually" signals specificity. This is where the deck gets concrete about the build process. -->
+<!-- Section break. The word "actually" signals specificity. This is where the deck gets concrete about the build process.
+
+Sources:
+- file:skills/slide-maker/COMPILER_RULES.md — seven-phase compilation process -->
 
 ---
 transition: slide-left
@@ -147,7 +170,11 @@ transition: slide-left
 
 <!-- The seven phases are sequential. Validation is not optional — the compiler checks its own output against WCAG AA (4.5:1 for body text, 3:1 for large text), runs an LLM-tell check against the catalog in LLM_TELLS.md, and applies CRAP design principles (Contrast, Repetition, Alignment, Proximity).
 
-[click] through [click] Progressive reveal here earns its place because each phase builds on the previous one. The audience should see the dependency chain forming. -->
+[click] through [click] Progressive reveal here earns its place because each phase builds on the previous one. The audience should see the dependency chain forming.
+
+Sources:
+- file:skills/slide-maker/COMPILER_RULES.md — Phases: the seven-phase build pipeline
+- file:skills/slide-maker/COMPILER_RULES.md — Visual design principles (CRAP): validation against WCAG AA, LLM-tell audit, and CRAP -->
 
 ---
 transition: morph-fade
@@ -180,7 +207,11 @@ WCAG contrast checking, LLM-tell detection, CRAP audit, screenshot validation
 </div>
 </div>
 
-<!-- This is the breadth slide. No v-clicks — the point is volume, not sequence. Two columns keep it scannable. The numbers are specific: 12 transitions (not "many"), 8 Mermaid diagram types (not "various"), 5 v-mark annotation styles. Specificity is the antidote to AI-generated vagueness. -->
+<!-- This is the breadth slide. No v-clicks — the point is volume, not sequence. Two columns keep it scannable. The numbers are specific: 12 transitions (not "many"), 8 Mermaid diagram types (not "various"), 5 v-mark annotation styles. Specificity is the antidote to AI-generated vagueness.
+
+Sources:
+- file:skills/slide-maker/COMPILER_RULES.md — Transition grammar: the 12 semantic transitions and their meanings
+- file:skills/slide-maker/SLIDEV_REFERENCE.md — Mermaid Diagrams and Rough Marker Annotations sections -->
 
 ---
 layout: center
@@ -216,7 +247,11 @@ transition: fade
 
 [click] Reuse — shared presets, shared transitions.
 
-[click] Restraint — use just enough of everything. A good deck has few layouts, readable Markdown, and no wrapper soup. -->
+[click] Restraint — use just enough of everything. A good deck has few layouts, readable Markdown, and no wrapper soup.
+
+Sources:
+- file:skills/slide-maker/COMPILER_RULES.md — Goals: the six optimization targets from readable slides.md to no AI-generated aesthetic
+- file:docs/PRESENTATION_PHILOSOPHY.md — Principle 15: Rules produce structure, not substance -->
 
 ---
 layout: quote
@@ -227,7 +262,11 @@ transition: slide-up
 
 A generic deck leaves nothing. No image, no number, no story. The information was arranged correctly but never argued anything. There was no point of view.
 
-<!-- This is from LLM_TELLS.md's "meta-signal" section — the ultimate test for whether a deck reads as AI-generated. It reframes the opening tension: the problem is not just that generated decks look the same; it is that they say nothing memorable. Direction is not decoration. Direction is the argument. -->
+<!-- This is from LLM_TELLS.md's "meta-signal" section — the ultimate test for whether a deck reads as AI-generated. It reframes the opening tension: the problem is not just that generated decks look the same; it is that they say nothing memorable. Direction is not decoration. Direction is the argument.
+
+Sources:
+- file:docs/LLM_TELLS.md — The meta-signal: a deck that looks competent but says nothing memorable
+- file:docs/PRESENTATION_PHILOSOPHY.md — Principle 7: Decks are arguments, not outlines -->
 
 ---
 layout: end
@@ -238,4 +277,7 @@ transition: iris
 
 That is the entire idea.
 
-<!-- The closing mirrors the opening. "Decks that survive the podium" resolves to "Direction first. Then slides." The second line defuses any impulse to add more — the idea is small enough to hold in one hand. No install command, no URL, no "questions?" — just the thesis. -->
+<!-- The closing mirrors the opening. "Decks that survive the podium" resolves to "Direction first. Then slides." The second line defuses any impulse to add more — the idea is small enough to hold in one hand. No install command, no URL, no "questions?" — just the thesis.
+
+Sources:
+- file:docs/PRESENTATION_PHILOSOPHY.md — Principle 14: Closings: resonance, not courtesy -->
