@@ -3,6 +3,7 @@ theme: default
 title: Vaders
 selectable: true
 routerMode: hash
+download: true
 colorSchema: dark
 transition: slide-left
 layout: cover

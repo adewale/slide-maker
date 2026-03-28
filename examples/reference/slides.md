@@ -3,6 +3,7 @@ theme: apple-basic
 title: Slide Maker Reference
 selectable: true
 routerMode: hash
+download: true
 colorSchema: light
 transition: slide-left
 layout: cover

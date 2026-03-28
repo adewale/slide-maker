@@ -12,6 +12,7 @@ fonts:
   italic: true
 selectable: true
 routerMode: hash
+download: true
 ---
 
 # Claude History Explorer

@@ -11,6 +11,7 @@ fonts:
 transition: slide-left
 selectable: true
 routerMode: hash
+download: true
 layout: cover
 ---
 

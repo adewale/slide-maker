@@ -15,12 +15,12 @@ Load these files **only when entering the relevant phase**. Do not load all file
 | Phase | Load these files | Purpose |
 |-------|-----------------|---------|
 | 1. Determine mode | (none) | — |
-| 2. Gather sources | (none — read the project's own docs) | — |
+| 2. Gather sources | [SOURCES.md](SOURCES.md) (project decks only) | Source-material lookup, extraction heuristics, through-line, project identity |
 | 3. Intake | [PRESENTATION_PHILOSOPHY.md](../docs/PRESENTATION_PHILOSOPHY.md), [STORYTELLING.md](../docs/STORYTELLING.md) | Rhetorical principles, narrative structure, through-line design |
 | 4. Style direction | [STYLE_PRESETS.md](STYLE_PRESETS.md) | Visual presets and token palettes |
 | 5. Write spec | [DECK_SPEC.md](DECK_SPEC.md), [SLIDE_KINDS.md](SLIDE_KINDS.md) | Spec schema and slide type catalog |
 | 6. Compile | [COMPILER_RULES.md](COMPILER_RULES.md), [SLIDEV_REFERENCE.md](SLIDEV_REFERENCE.md) | Compilation phases, Slidev features |
-| 7. Validate | [COMPILER_RULES.md](COMPILER_RULES.md) § Acceptance checklist, [LLM_TELLS.md](../docs/LLM_TELLS.md) | Quality gates |
+| 7. Validate | [ACCEPTANCE_CHECKLIST.md](ACCEPTANCE_CHECKLIST.md), [LLM_TELLS.md](../docs/LLM_TELLS.md) | Quality gates |
 | 8. Deliver | (none — instructions below) | — |
 
 [PROJECT_DECK_RUBRIC.md](../docs/PROJECT_DECK_RUBRIC.md) — load only when scoring a project deck.
@@ -60,12 +60,14 @@ When justified: `styles/tokens.css`, `styles/theme.css`, `layouts/*.vue`, `compo
 New project or update.
 
 ### 2. Gather source material (project decks only)
+→ Load SOURCES.md now.
+
 When the deck presents a project (has `project-url` or references a codebase):
 - Read the project's README, ARCHITECTURE, CHANGELOG, and LESSONS_LEARNED.
 - Collect screenshots or terminal output from the running project.
 - Extract a candidate through-line and note specific numbers, code snippets, quotes.
 
-See COMPILER_RULES.md Phase 1 for the full source-material lookup table.
+See SOURCES.md for the full source-material lookup table, extraction heuristics, and project identity rules.
 
 ### 3. Intake
 → Load PRESENTATION_PHILOSOPHY.md now.
@@ -88,35 +90,47 @@ Do this before implementation-heavy changes.
 Generate or update: `slides.md`, styles, layouts, components, README if usage changed.
 
 ### 7. Validate
-→ Load COMPILER_RULES.md § Acceptance checklist and LLM_TELLS.md now.
+→ Load ACCEPTANCE_CHECKLIST.md and LLM_TELLS.md now.
 
 Check: spec-to-slides sync, slide density, Markdown editability, justified custom code, no unused abstractions.
-For the full 30+ item checklist, load COMPILER_RULES.md § Acceptance checklist.
+For the full 30+ item checklist, see ACCEPTANCE_CHECKLIST.md.
 Project decks: through-line in 3+ slides (ideally 5-6), source materials cited, 1+ visual evidence slide, project colors override preset tokens.
 
 ### 8. Deliver
 
-**Single deck:** `npx slidev build` produces `dist/` for any static host. `npx slidev export` produces PDF. Add `--format png` for slide images. The build is a static SPA — the host must serve `index.html` for all sub-routes; Slidev auto-generates `404.html` and `_redirects`.
+After validation, tell the user their deck is ready and present these next steps:
 
-**Multiple decks (escalation order):**
-1. **Gallery build** (recommended) — `build.sh` builds all decks to `_build/{name}/` with generated `index.html` menu and root `_redirects`. One folder, one deploy.
-2. **Cloudflare Pages** — `build.sh` + `wrangler pages deploy _build`.
-3. **Cloudflare Workers Static Assets** — `build.sh` + Worker with `[assets]` binding. Needs root `_redirects` (auto-generated).
-4. **GitHub Pages + Actions** — push to main, CI builds, deploys to `gh-pages`.
-5. **PDF portfolio** — `slidev export` each deck, bundle in shared folder.
-6. **Containerized** — `_build/` + nginx in Docker.
-7. **Static site wrapper** — Astro/Vite outer shell, each deck becomes a route.
-8. **Single-file HTML** — inline all assets into one `.html` per deck.
-9. **CDN + shareable links** — upload `_build/` to R2/S3, generate URLs.
-10. **Hybrid: gallery + PDF** — web gallery + PDF exports for offline.
+**Preview locally:**
+```
+npx slidev
+```
 
-Default: Option 1 for 2+ decks. For a single deck, just `slidev build` + deploy `dist/`.
+**Share as PDF:**
+```
+npx slidev export
+```
+The built deck also has a PDF download button (from `download: true` in headmatter).
+
+**Deploy to Cloudflare Workers:**
+```
+python tools/deploy-cf.py
+```
+One command: builds the deck, creates a Workers Static Assets project, deploys. Requires `npx wrangler login` first. Pass `--name my-talk` for a custom worker name.
+
+**Deploy manually:** `npx slidev build` produces `dist/` — a static SPA deployable to any host (Cloudflare Pages, Vercel, Netlify, GitHub Pages). The host must serve `index.html` for all sub-routes.
+
+**Post-generation follow-up:** After presenting the next steps, ask: *"Want me to help you deploy this?"* If the user says yes, walk them through `wrangler login` (if needed) and run `deploy-cf.py`.
+
+**Multiple decks (collection):**
+For maintainers hosting multiple decks as a gallery:
+- `python tools/deploy-cf.py --collection` — builds all decks and deploys as a gallery
+- `python tools/build.py` — builds all decks to `examples/_build/` without deploying
+- Gallery includes `index.html` menu, `llms.txt` manifest, per-slide Markdown API
 
 **Updating a collection:**
-- `build.sh` rebuilds all decks (pass specific names for incremental rebuild).
-- Regenerate gallery `index.html` and `_redirects` when decks are added/removed/renamed.
-- Atomic-deploy hosts: redeploy entire `_build/`. S3/R2: use `--sync`.
-- `build.sh` maintains the canonical deck list in its `DECKS` array — update it first when adding/removing decks.
+- `build.py` rebuilds all decks. Generated decks are auto-discovered from `generated-decks/`.
+- Regenerate gallery `index.html` when decks are added/removed.
+- `deploy-cf.py --collection` redeploys everything.
 
 ### Feedback loops
 - If the user rejects style direction → return to Phase 4.

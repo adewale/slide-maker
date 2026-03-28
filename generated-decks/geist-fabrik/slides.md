@@ -3,6 +3,7 @@ theme: default
 title: GeistFabrik
 selectable: true
 routerMode: hash
+download: true
 colorSchema: light
 transition: fade
 layout: cover

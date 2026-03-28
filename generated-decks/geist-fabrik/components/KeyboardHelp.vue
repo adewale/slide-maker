@@ -57,6 +57,7 @@ onKeyStroke('Escape', () => toggleHelp())
             <div class="help-row"><kbd>w</kbd><span>White screen</span></div>
             <div class="help-row"><kbd>p</kbd><span>Presenter view</span></div>
             <div class="help-row"><kbd>e</kbd><span>Draw on slide</span></div>
+            <div class="help-row"><kbd>q</kbd><span>Share QR code</span></div>
           </div>
         </div>
 

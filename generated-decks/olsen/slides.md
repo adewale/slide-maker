@@ -3,6 +3,7 @@ theme: none
 title: Olsen
 selectable: true
 routerMode: hash
+download: true
 colorSchema: light
 transition: fade
 layout: cover

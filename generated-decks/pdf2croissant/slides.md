@@ -3,6 +3,7 @@ theme: default
 title: pdf2croissant
 routerMode: hash
 selectable: true
+download: true
 colorSchema: light
 fonts:
   sans: Source Sans 3
