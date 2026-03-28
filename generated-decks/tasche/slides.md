@@ -209,13 +209,9 @@ layout: center
 transition: fade
 ---
 
-<div v-motion :initial="{ y: 40, opacity: 0 }" :enter="{ y: 0, opacity: 1, transition: { duration: 800 } }">
-
 # Two Runtimes, One Archive
 
-</div>
-
-<p style="font-size: 1.25rem; max-width: 36rem; text-align: center; color: var(--deck-muted); line-height: 1.6;">Python for the application logic. JavaScript for what Python cannot reach. The boundary layer makes them one system -- and your articles survive because of it.</p>
+Python for the application logic. JavaScript for what Python cannot reach. The boundary layer makes them one system -- and your articles survive because of it.
 
 <!--
 Connects the architecture back to the opening problem. The two-runtime design is not an abstract pattern -- it is what makes the archival pipeline work. Python handles routing, D1 queries, R2 storage, queue processing. JavaScript handles Readability extraction via Service Binding RPC (in-process, 1-5ms). Without this bridge, content extraction would fail entirely (python-readability uses eval(), blocked in V8; lxml requires C extensions, unavailable in Pyodide).

@@ -396,7 +396,7 @@ Typical fields:
 Rules:
 - minimal frontmatter
 - clean Markdown
-- no wrapper soup
+- no wrapper soup — especially no `<div v-motion>` around headings on `center`/`fact`/`quote` layouts. The `my-auto` wrapper already handles vertical centering. Adding a `<div>` around the h1 breaks the alignment chain because the div is a block element that doesn't inherit the theme's centering rules. Similarly, never use inline `style="text-align: center"` on `<p>` elements inside centered layouts — let the theme handle it. Mixed alignment sources (theme CSS on h1, inline style on p) create misalignment.
 - notes as end-of-slide comments — must add information the audience cannot see (the story behind the slide, the objection to anticipate, the specific example to give). Notes that merely restate slide content are useless. Minimum: 2 sentences per content slide, each containing information not on the slide.
 - one idea per slide — if you need to scroll, split it
 - use `<v-clicks>` on bullet lists for progressive reveal
