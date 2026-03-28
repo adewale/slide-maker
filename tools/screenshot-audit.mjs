@@ -250,15 +250,29 @@ async function checkLayoutGeometry(page, viewportWidth) {
     if (layout.classList.contains('end') || layout.classList.contains('center') ||
         layout.classList.contains('fact') || layout.classList.contains('statement')) {
       const h1 = layout.querySelector('h1');
+      const layoutRect = layout.getBoundingClientRect();
+      const layoutCenter = layoutRect.left + layoutRect.width / 2;
+
       if (h1 && h1.offsetWidth > 0) {
         const h1Rect = h1.getBoundingClientRect();
-        const layoutRect = layout.getBoundingClientRect();
         const h1Center = h1Rect.left + h1Rect.width / 2;
-        const layoutCenter = layoutRect.left + layoutRect.width / 2;
         const offset = Math.abs(h1Center - layoutCenter);
-        // Allow 40px tolerance (padding asymmetry, etc)
-        if (offset > 40 && h1Rect.width < layoutRect.width * 0.9) {
+        if (offset > 20 && h1Rect.width < layoutRect.width * 0.9) {
           problems.push(`h1 is ${Math.round(offset)}px off-center on centered layout`);
+        }
+      }
+
+      // 4b. h1 vs p alignment mismatch on centered layouts
+      const p = layout.querySelector('p');
+      if (h1 && p && h1.offsetWidth > 0 && p.offsetWidth > 0) {
+        const h1Rect = h1.getBoundingClientRect();
+        const pRect = p.getBoundingClientRect();
+        const h1Center = h1Rect.left + h1Rect.width / 2;
+        const pCenter = pRect.left + pRect.width / 2;
+        const drift = Math.abs(h1Center - pCenter);
+        // h1 and p should share the same center axis — allow 15px for rounding
+        if (drift > 15 && h1Rect.width < layoutRect.width * 0.9 && pRect.width < layoutRect.width * 0.9) {
+          problems.push(`h1 and p are ${Math.round(drift)}px apart on their center axes — alignment mismatch on centered layout`);
         }
       }
     }

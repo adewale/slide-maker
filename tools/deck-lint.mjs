@@ -905,6 +905,47 @@ function lintDeck(deckDir) {
         }
       }
     }
+
+    // ── theme: none missing base padding ──
+    if (fm && (fm.theme === 'none') && themeCss) {
+      const baseBlock = themeCss.match(/\.slidev-layout\s*\{([^}]+)\}/);
+      if (baseBlock) {
+        if (!/padding\s*:/.test(baseBlock[1])) {
+          warns.push('theme: none requires explicit padding on .slidev-layout — Slidev provides no base CSS');
+        }
+        if (!/height\s*:/.test(baseBlock[1])) {
+          warns.push('theme: none requires explicit height on .slidev-layout — Slidev provides no base CSS');
+        }
+      }
+    }
+  }
+
+  // ─── 6b. Slide-level alignment checks ──────────────────────
+
+  // Parse slides for per-slide checks that need layout context
+  const slidesForAlignment = splitSlides(slidesMd);
+
+  for (const slide of slidesForAlignment) {
+    const fm = slide.frontmatter || '';
+    const body = slide.body || '';
+    const isCentered = /layout\s*:\s*(center|statement|fact|quote)/i.test(fm);
+
+    if (isCentered) {
+      // Check: <div> wrapper around h1 on centered layouts
+      if (/<div[\s>][\s\S]*?#\s+/.test(body) || /<div[^>]*>[\s\n]*#\s+/.test(body)) {
+        warns.push(`slide ${slide.index}: <div> wrapper around heading on centered layout — breaks alignment chain. Use plain Markdown.`);
+      }
+
+      // Check: inline text-align on centered layouts
+      if (/style\s*=\s*"[^"]*text-align/.test(body)) {
+        warns.push(`slide ${slide.index}: inline text-align on centered layout — let the theme handle alignment. Mixed sources cause misalignment.`);
+      }
+
+      // Check: inline max-width on centered layouts
+      if (/style\s*=\s*"[^"]*max-width/.test(body)) {
+        warns.push(`slide ${slide.index}: inline max-width on centered layout — use theme CSS instead. Inline widths create a different alignment path than the theme.`);
+      }
+    }
   }
 
   // ─── 7. Slide overflow checks ───────────────────────────────

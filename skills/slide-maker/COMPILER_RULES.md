@@ -888,12 +888,13 @@ When the same kind of thing always looks the same, the audience stops decoding f
 
 Nothing on the slide should be placed arbitrarily. Every element must align to an explicit edge, grid, or center axis.
 
-**Layout-level alignment:**
-- Cover layouts must explicitly set `align-items` and `text-align` in theme.css. Relying on theme defaults causes conflicts when custom CSS partially overrides theme positioning (this caused the tufte cover misalignment).
+**Layout-level alignment** (see also: layout table in §5, layout internals in §5, end layout CSS pattern in §7):
+- Cover layouts must explicitly set `align-items` and `text-align` in theme.css. Relying on theme defaults causes conflicts when custom CSS partially overrides theme positioning.
 - Two-column layouts must use balanced column widths. Asymmetric columns are intentional (e.g., TufteSlide's 60/30 split); unintentional asymmetry from overflow is a bug.
 - Centered layouts (`center`, `statement`, `fact`, `end`) must center both headings and body text. A centered heading with left-aligned body text below it breaks the alignment axis.
 - Never use `max-width` on elements inside `end`, `fact`, or `section` layouts without also adding `margin: 0 auto`. Slidev's core layouts use scoped `display: grid` which custom theme.css cannot override — `max-width` without auto margins pushes items to the left edge of their grid cell.
 - Never mix centered headings with left-aligned body text on the same slide. If the layout centers the heading (e.g., `center`, `fact`), body text must also be centered. If the layout left-aligns (e.g., `default`, `cover`), the heading must also be left-aligned. Mixed alignment creates visual tension that reads as accidental, not intentional.
+- Never wrap headings in `<div>` on centered layouts — the `my-auto` wrapper already handles vertical centering. A `<div>` around the h1 breaks the alignment chain. Never use inline `style="text-align"` or `style="max-width"` on centered layouts — let the theme CSS handle both. Mixed alignment sources (theme on h1, inline on p) cause the exact misalignment this rule prevents.
 
 **Within-slide alignment:**
 - Bullet lists align to a single left edge. Mixed indentation levels signal a nested argument — limit to 2 levels maximum.
