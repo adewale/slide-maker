@@ -1275,6 +1275,136 @@ function lintDeck(deckDir) {
     }
   }
 
+  // ─── 17. Viewport discipline: overflow hidden ─────────────────
+
+  if (existsSync(join(deckDir, 'styles/index.css'))) {
+    const indexCss = readFileSync(join(deckDir, 'styles/index.css'), 'utf-8');
+    if (!/\.slidev-layout\s*\{[^}]*overflow\s*:\s*hidden/.test(indexCss)) {
+      errors.push('styles/index.css missing .slidev-layout { overflow: hidden } — viewport overflow safety net');
+    } else {
+      info.push('viewport overflow: hidden present');
+    }
+  }
+
+  // ─── 18. Required headmatter fields ──────────────────────────
+
+  if (fm) {
+    if (fm.selectable !== 'true') {
+      warns.push('frontmatter: selectable: true missing — audiences cannot copy text');
+    }
+    if (fm.routerMode !== 'hash') {
+      warns.push('frontmatter: routerMode: hash missing — required for multi-deck deployments');
+    }
+    if (fm.download !== 'true') {
+      warns.push('frontmatter: download: true missing — built deck will not have PDF download button');
+    }
+  }
+
+  // ─── 19. Emoji in slide content ──────────────────────────────
+
+  const EMOJI_RE = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}]/u;
+  for (const slide of slides) {
+    const bodyWithoutComments = (slide.body || '').replace(/<!--[\s\S]*?-->/g, '');
+    const bodyWithoutCode = bodyWithoutComments.replace(/```[\s\S]*?```/g, '');
+    if (EMOJI_RE.test(bodyWithoutCode)) {
+      errors.push(`slide ${slide.index}: emoji in slide content — remove all emoji from visible text`);
+    }
+  }
+  // Also check cover
+  if (coverMatch) {
+    const coverBody = coverMatch[1].replace(/<!--[\s\S]*?-->/g, '').replace(/```[\s\S]*?```/g, '');
+    if (EMOJI_RE.test(coverBody)) {
+      errors.push('slide 1 (cover): emoji in slide content — remove all emoji from visible text');
+    }
+  }
+
+  // ─── 20. Spec-slides sync: slide count ───────────────────────
+
+  const specPath = join(deckDir, 'deck.spec.md');
+  if (existsSync(specPath)) {
+    const specText = readFileSync(specPath, 'utf-8');
+
+    // Count slides in deck.spec.md (lines matching "| N |" or "N." in slide inventory)
+    const specSlideLines = specText.match(/^\s*\|\s*\d+\s*\|/gm);
+    const actualSlideCount = slides.length + 1; // +1 for cover
+
+    if (specSlideLines) {
+      const specCount = specSlideLines.length;
+      if (Math.abs(specCount - actualSlideCount) > 1) {
+        warns.push(`spec-slides sync: deck.spec.md lists ${specCount} slides but slides.md has ${actualSlideCount}`);
+      } else {
+        info.push(`spec-slides sync: ${specCount} spec vs ${actualSlideCount} actual`);
+      }
+    }
+
+    // ─── 21. Through-line frequency (project decks) ──────────────
+
+    const throughLineMatch = specText.match(/through-line\s*:\s*(.+)/i);
+    if (throughLineMatch) {
+      const throughLine = throughLineMatch[1].trim()
+        .replace(/^["']|["']$/g, '') // strip quotes
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // escape for regex
+
+      if (throughLine.length > 5) {
+        // Search for key phrases from the through-line (split into 3+ word chunks)
+        const words = throughLine.split(/\s+/);
+        let matchCount = 0;
+
+        // Look for any 3-consecutive-word subsequence appearing in slides
+        for (let i = 0; i <= words.length - 3; i++) {
+          const phrase = words.slice(i, i + 3).join(' ');
+          const phraseRe = new RegExp(phrase, 'gi');
+          const matches = slidesMd.match(phraseRe);
+          if (matches) matchCount += matches.length;
+        }
+
+        // Also count exact matches of the full through-line
+        const fullRe = new RegExp(throughLine, 'gi');
+        const fullMatches = slidesMd.match(fullRe);
+        if (fullMatches) matchCount += fullMatches.length;
+
+        if (matchCount < 3) {
+          warns.push(`through-line "${throughLineMatch[1].trim().slice(0, 50)}" appears ~${matchCount} times — aim for 3+ occurrences across the deck`);
+        } else {
+          info.push(`through-line appears ~${matchCount} times`);
+        }
+      }
+    }
+
+    // ─── 22. Visual evidence slide (project decks) ───────────────
+
+    const hasProjectUrl = /project-url\s*:/i.test(specText);
+    if (hasProjectUrl) {
+      let hasImageLayout = false;
+      for (const slide of slides) {
+        const sfm = slide.frontmatter || '';
+        if (/layout\s*:\s*(image-left|image-right|image)\b/i.test(sfm)) {
+          hasImageLayout = true;
+          break;
+        }
+      }
+      if (!hasImageLayout) {
+        warns.push('project deck has no visual evidence slide (image-left/image-right layout) — add at least one screenshot or output image');
+      }
+    }
+  }
+
+  // ─── 23. Layout variety ────────────────────────────────────────
+
+  const layoutSet = new Set();
+  // Scan entire slides.md for layout: declarations (more reliable than parsed frontmatter)
+  const layoutDecls = slidesMd.match(/^layout:\s*(\S+)/gm) || [];
+  for (const decl of layoutDecls) {
+    const m = decl.match(/^layout:\s*(\S+)/);
+    if (m) layoutSet.add(m[1]);
+  }
+
+  if (layoutSet.size < 3 && slides.length > 5) {
+    warns.push(`only ${layoutSet.size} layout types used — use at least 3 for visual variety (have: ${[...layoutSet].join(', ')})`);
+  } else if (layoutSet.size > 0) {
+    info.push(`${layoutSet.size} layout types: ${[...layoutSet].join(', ')}`);
+  }
+
   return { name, errors, warns, info };
 }
 
@@ -1398,10 +1528,12 @@ function main() {
       return resolved;
     });
   } else {
-    // Auto-discover decks in examples/ (and optionally decks/ if it exists)
+    // Auto-discover decks in examples/, generated-decks/, and optionally decks/
+    const generatedDir = resolve(repoRoot, 'generated-decks');
     const coreDirs = discoverDecks(examplesDir);
+    const generatedDirs = existsSync(generatedDir) ? discoverDecks(generatedDir) : [];
     const localDirs = existsSync(decksDir) ? discoverDecks(decksDir) : [];
-    deckDirs = [...coreDirs, ...localDirs];
+    deckDirs = [...coreDirs, ...generatedDirs, ...localDirs];
     if (deckDirs.length === 0) {
       console.error(`${C.red}No decks found (no subdirectories with slides.md)${C.reset}`);
       process.exit(1);

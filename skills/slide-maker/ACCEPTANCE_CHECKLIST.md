@@ -91,35 +91,50 @@ The CRAP principles and other acceptance criteria are enforced at three levels:
 
 ### Level 1: Automated (deck-lint.mjs)
 
+Run: `node tools/deck-lint.mjs` (auto-discovers all decks in examples/ and generated-decks/).
+
 These checks run automatically and produce errors or warnings:
 
 | Check | Principle | Severity |
 |-------|-----------|----------|
+| `.slidev-layout { overflow: hidden }` in index.css | Viewport | Error |
 | Required tokens present (`--deck-bg`, `--deck-fg`, `--deck-accent`, `--deck-muted`) | Contrast | Error |
+| WCAG AA contrast: `--deck-fg` on `--deck-bg` (4.5:1), `--deck-accent` on `--deck-bg` (3:1) | Contrast | Error |
 | Every flowchart node has explicit `style` with `color` | Contrast | Error |
 | Every flowchart has `linkStyle default` | Contrast | Error |
 | Every `classDef` is assigned to at least one node | Contrast | Error |
-| Bullet length <= 60 characters | Density | Error |
 | Bullet count <= 7 per slide | Density | Error |
 | Code lines <= 8 per block | Density | Error |
 | No hardcoded hex/rgb in scoped styles | Repetition | Error |
 | No emoji in slide content or Mermaid labels | — | Error |
+| `selectable: true`, `routerMode: hash`, `download: true` in headmatter | Structure | Warning |
+| Spec-slides sync: slide count in deck.spec.md matches slides.md | Sync | Warning |
+| Through-line appears in 3+ slides (project decks) | Narrative | Warning |
+| Visual evidence slide present (project decks with project-url) | Narrative | Warning |
+| Layout variety: 3+ distinct layout types for decks > 5 slides | Variety | Warning |
 | Source citations present on factual slides | Narrative | Warning |
+| War story language backed by source citations | Narrative | Warning |
+| Internal consistency: no contradicting claims across slides | Narrative | Warning |
 | v-click density < 50% of slides | — | Warning |
 | Mermaid annotation text present (10+ chars) | Proximity | Warning |
-| Unstyled nodes in flowcharts | Contrast | Warning |
+| Closing slide echoes opening (no install commands) | Narrative | Warning |
+| Cover and end alignment set in theme.css | Alignment | Warning |
+| max-width without margin:auto in grid layouts | Alignment | Warning |
+| Background consistency (only cover/section differ from --deck-bg) | Repetition | Warning |
 
-### Level 2: Semi-automated (style-audit.mjs + visual spot-check)
+### Level 2: Semi-automated (style-audit.mjs + screenshot-audit.mjs)
 
-These require human judgment but are aided by tooling:
+Run: `node tools/style-audit.mjs` (post-build) and `node tools/screenshot-audit.mjs <url>` (needs running server).
 
 | Check | Principle | How to verify |
 |-------|-----------|---------------|
-| Accent color used consistently across slides | Repetition | `style-audit.mjs` flags palette drift; human reviews semantic consistency |
-| Section dividers invert the default palette | Contrast | Visual: section slides should look structurally different from content slides |
-| Cover alignment explicitly set | Alignment | Grep theme.css for `.cover` selector; confirm `align-items` and `text-align` present |
-| Typographic hierarchy visible (h1 > h2 > body) | Contrast | Visual: headings must be obviously larger and heavier than body text |
-| Dark decks don't use sequenceDiagram/stateDiagram-v2 | Contrast | Grep slides.md for `sequenceDiagram\|stateDiagram` when colorSchema is dark |
+| All tokens survive build pipeline | Repetition | `style-audit.mjs` verifies tokens, selectors, and colors in built CSS |
+| Text contrast WCAG AA on rendered slides | Contrast | `screenshot-audit.mjs` checks every slide at every v-click state |
+| Content overflow (scrollHeight > viewport) | Viewport | `screenshot-audit.mjs` detects at 5 viewports including mobile |
+| Column balance in two-column layouts | Alignment | `screenshot-audit.mjs` layout geometry check |
+| Heading centering on centered layouts | Alignment | `screenshot-audit.mjs` measures offset from center |
+| SVG stroke visibility | Contrast | `screenshot-audit.mjs` stroke-vs-background contrast |
+| Hover state contrast | Contrast | `screenshot-audit.mjs` activates hover states and rechecks |
 
 ### Level 3: Manual review (presenter walkthrough)
 

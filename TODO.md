@@ -75,17 +75,18 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [ ] Define pass/fail criteria for each feature the Skill claims to support
 - [ ] Automate: generate a deck from a prompt → diff against expected structure → score
 
-### Acceptance checklist enforcement
-- [ ] Extract the 30+ item acceptance checklist from COMPILER_RULES.md into a machine-readable format
-- [ ] Wire into deck-lint.mjs so it can be run automatically
+### Acceptance checklist enforcement (done)
+- [x] ACCEPTANCE_CHECKLIST.md is the canonical checklist (extracted from COMPILER_RULES.md)
+- [x] deck-lint.mjs now auto-discovers generated-decks/ and runs 23 check groups
+- [x] New automated checks: overflow:hidden, headmatter fields, emoji in content, spec-slides sync, through-line frequency, visual evidence, layout variety
+- [x] SKILL.md Phase 7 instructs skill to run deck-lint before delivery
 - [ ] Fail CI if any hard-fail items are violated
 
 ## Documentation
 
-### README rewrite (high priority)
-Current README assumes the user is a developer who knows Slidev. Should lead with the primary userflow.
-
-- [ ] Identify a complete user journey from creating decks to sharing
+### README rewrite (done)
+- [x] README rewritten to lead with user journey: install, create, preview, share
+- [x] deploy-cf.py referenced as the one-command deploy path
 
 
 ### Skill marketplace metadata

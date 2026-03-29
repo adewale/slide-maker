@@ -92,9 +92,12 @@ Generate or update: `slides.md`, styles, layouts, components, README if usage ch
 ### 7. Validate
 → Load ACCEPTANCE_CHECKLIST.md and LLM_TELLS.md now.
 
-Check: spec-to-slides sync, slide density, Markdown editability, justified custom code, no unused abstractions.
-For the full 30+ item checklist, see ACCEPTANCE_CHECKLIST.md.
+**Automated checks:** Run `node tools/deck-lint.mjs` on the deck directory. Fix all errors before delivery. Warnings are quality flags — address them if feasible.
+
+**Manual checks:** spec-to-slides sync, Markdown editability, justified custom code, no unused abstractions.
 Project decks: through-line in 3+ slides (ideally 5-6), source materials cited, 1+ visual evidence slide, project colors override preset tokens.
+
+For the full checklist with enforcement levels, see ACCEPTANCE_CHECKLIST.md.
 
 ### 8. Deliver
 
