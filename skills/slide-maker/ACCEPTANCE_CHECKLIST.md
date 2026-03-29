@@ -4,8 +4,11 @@
 
 These items must all pass before a deck can be delivered:
 
-**Content density:**
+**Viewport overflow:**
+- `styles/index.css` includes `.slidev-layout { overflow: hidden; }` — CSS safety net against scrolling slides
 - no slide overflows the viewport (7 bullet max, 8 code line max, 60 char bullet max)
+
+**Content density:**
 - no emoji anywhere in slide content or diagrams
 
 **Token and style integrity:**

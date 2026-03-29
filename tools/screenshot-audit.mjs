@@ -28,6 +28,9 @@ import { join } from 'path';
 const VIEWPORTS = [
   { width: 1280, height: 720, label: '720p' },
   { width: 1024, height: 768, label: '1024' },
+  { width: 375, height: 667, label: 'iPhone-SE' },
+  { width: 412, height: 915, label: 'Pixel-7' },
+  { width: 667, height: 375, label: 'iPhone-SE-landscape' },
 ];
 const WAIT_MS = 1500;
 const OUT_DIR = '/tmp/slide-audit';

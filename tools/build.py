@@ -350,6 +350,243 @@ def _read_count(path: Path) -> str:
         return "?"
 
 
+# ── Gallery index.html ──────────────────────────────────────────
+
+def _extract_deck_meta(slides_md: Path) -> dict:
+    """Extract title, description, and accent from a deck's source files."""
+    meta: dict = {"title": slides_md.parent.name, "desc": "", "accent": "#7c3aed", "preset": ""}
+
+    if not slides_md.is_file():
+        return meta
+
+    text = read_file(slides_md)
+
+    # Title from frontmatter
+    for line in text.splitlines():
+        m = re.match(r"^title:\s*(.+)$", line)
+        if m:
+            meta["title"] = m.group(1).strip().strip("'\"")
+            break
+
+    # Description from cover slide (first non-heading, non-comment, non-HTML line after headmatter)
+    parts = re.split(r"^---\s*$", text, flags=re.MULTILINE)
+    if len(parts) > 2:
+        lines = [
+            l.strip() for l in parts[2].strip().splitlines()
+            if l.strip() and not l.strip().startswith("#") and not l.strip().startswith("<!--") and not l.strip().startswith("<")
+        ]
+        if lines:
+            meta["desc"] = lines[0]
+
+    # Accent from tokens.css
+    tokens = slides_md.parent / "styles" / "tokens.css"
+    if tokens.is_file():
+        for line in tokens.read_text().splitlines():
+            m = re.match(r"\s*--deck-accent:\s*(#[0-9a-fA-F]+)", line)
+            if m:
+                meta["accent"] = m.group(1)
+                break
+
+    # Preset from deck.spec.md
+    spec = slides_md.parent / "deck.spec.md"
+    if spec.is_file():
+        for line in spec.read_text().splitlines():
+            m = re.match(r"\s*-\s*style-preset:\s*(.+)$", line)
+            if m:
+                meta["preset"] = m.group(1).strip()
+                break
+
+    return meta
+
+
+def _html_escape(s: str) -> str:
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+
+
+def _card_html(name: str, meta: dict) -> str:
+    title = _html_escape(meta["title"])
+    desc = _html_escape(meta["desc"])
+    accent = _html_escape(meta["accent"])
+    preset = _html_escape(meta.get("preset", ""))
+    tag = f'<span class="tag">{preset}</span>' if preset else ""
+    return f"""\
+    <div class="card" style="--accent: {accent}" data-title="{title}" data-desc="{desc}" data-preset="{preset}">
+      <h2><a href="./{name}/">{title}</a></h2>
+      <div class="desc">{desc}</div>
+      <div class="meta">
+        {tag}
+        <div class="links">
+          <a href="./{name}/slides.md" class="md-link">MD</a>
+        </div>
+      </div>
+    </div>"""
+
+
+def generate_index_html(
+    out: Path,
+    core_decks: list[tuple[str, str]],
+    generated_deck_names: list[str],
+    examples_root: Path,
+    generated_dir: Path,
+) -> None:
+    """Generate the gallery index.html from deck metadata."""
+    # Collect metadata
+    core_cards: list[str] = []
+    for dir_name, name in core_decks:
+        meta = _extract_deck_meta(examples_root / dir_name / "slides.md")
+        core_cards.append(_card_html(name, meta))
+
+    gen_cards: list[str] = []
+    for name in generated_deck_names:
+        meta = _extract_deck_meta(generated_dir / name / "slides.md")
+        gen_cards.append(_card_html(name, meta))
+
+    core_section = "\n".join(core_cards)
+    gen_section = "\n".join(gen_cards)
+
+    html = f"""\
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slide Maker - All Decks</title>
+  <style>
+    *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
+
+    :root {{
+      --bg: #fafafa; --surface: #ffffff; --border: #e4e4e7;
+      --fg: #18181b; --fg-muted: #71717a; --fg-faint: #a1a1aa;
+      --title: #52525b; --tag-bg: #f4f4f5; --tag-fg: #52525b;
+    }}
+
+    @media (prefers-color-scheme: dark) {{
+      :root {{
+        --bg: #0a0a0f; --surface: #18181b; --border: #27272a;
+        --fg: #e4e4e7; --fg-muted: #71717a; --fg-faint: #a1a1aa;
+        --title: #a1a1aa; --tag-bg: #27272a; --tag-fg: #71717a;
+      }}
+    }}
+
+    body {{
+      font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--fg);
+      min-height: 100vh; padding: 3rem 2rem;
+    }}
+
+    header {{ text-align: center; margin-bottom: 3rem; }}
+    header h1 {{ font-size: 2.25rem; font-weight: 700; color: var(--title); letter-spacing: -0.02em; }}
+    header .tagline {{
+      margin-top: 0.75rem; color: var(--fg-muted); font-size: 1rem;
+      line-height: 1.6; max-width: 38rem; margin-left: auto; margin-right: auto;
+    }}
+    header .header-links {{ margin-top: 0.75rem; }}
+    header .header-links a {{ color: var(--fg-faint); font-size: 0.8rem; text-decoration: none; opacity: 0.7; }}
+    header .header-links a:hover {{ opacity: 1; text-decoration: underline; }}
+    header .header-links .sep {{ color: var(--fg-faint); opacity: 0.4; margin: 0 0.25rem; }}
+
+    .filter-bar {{
+      max-width: 72rem; margin: 0 auto 1.5rem;
+      display: flex; gap: 0.5rem; align-items: center;
+    }}
+    .filter-bar input {{
+      flex: 1; padding: 0.5rem 0.75rem; font-size: 0.85rem;
+      border: 1px solid var(--border); border-radius: 6px;
+      background: var(--surface); color: var(--fg);
+      font-family: inherit; outline: none;
+    }}
+    .filter-bar input:focus {{ border-color: var(--fg-muted); }}
+    .filter-bar input::placeholder {{ color: var(--fg-faint); }}
+
+    .section-label {{
+      max-width: 72rem; margin: 2.5rem auto 1rem;
+      font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--fg-faint);
+      border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;
+    }}
+    .section-label:first-of-type {{ margin-top: 0; }}
+
+    .grid {{
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem; max-width: 72rem; margin: 0 auto;
+    }}
+
+    .card {{
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.5rem;
+      display: flex; flex-direction: column; gap: 0.75rem;
+      transition: border-color 0.2s;
+    }}
+    .card:hover {{ border-color: var(--accent); }}
+    .card.hidden {{ display: none; }}
+    .card h2 {{ font-size: 1.25rem; font-weight: 700; color: var(--accent); letter-spacing: -0.01em; }}
+    .card .desc {{ font-size: 0.875rem; color: var(--fg-muted); line-height: 1.5; flex: 1; }}
+    .card .meta {{ display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }}
+    .tag {{
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--tag-fg); background: var(--tag-bg);
+      padding: 0.2rem 0.5rem; border-radius: 4px;
+    }}
+    .card .links {{ display: flex; align-items: center; gap: 0.75rem; }}
+    .card a {{ font-size: 0.8rem; font-weight: 600; color: var(--accent); text-decoration: none; opacity: 0.8; transition: opacity 0.2s; }}
+    .card a:hover {{ opacity: 1; text-decoration: underline; }}
+    .card a.md-link {{ font-size: 0.7rem; opacity: 0.5; color: var(--fg-muted); }}
+    .card a.md-link:hover {{ opacity: 0.9; color: var(--accent); }}
+
+    @media (max-width: 900px) {{ .grid {{ grid-template-columns: repeat(2, 1fr); }} }}
+    @media (max-width: 560px) {{
+      body {{ padding: 1rem 0.75rem; }}
+      header {{ margin-bottom: 1.5rem; }}
+      header h1 {{ font-size: 1.5rem; }}
+      header p {{ font-size: 0.85rem; }}
+      .section-label {{ margin: 1.5rem 0 0.75rem; font-size: 0.7rem; }}
+      .grid {{ grid-template-columns: 1fr; gap: 0.75rem; }}
+      .card {{ padding: 1rem; gap: 0.5rem; border-radius: 8px; }}
+      .card h2 {{ font-size: 1.1rem; }}
+      .card .desc {{ font-size: 0.8rem; }}
+      .card a {{ font-size: 0.85rem; min-height: 2rem; display: inline-flex; align-items: center; }}
+      .card a.md-link {{ font-size: 0.75rem; }}
+    }}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Slide Maker</h1>
+    <p class="tagline">A Claude Code skill that creates native Slidev presentation decks with strong visual direction and minimal abstraction. Decks are built from specs, not templates.</p>
+    <p class="header-links"><a href="https://github.com/adewale/slide-maker">GitHub</a> <span class="sep">&middot;</span> <a href="./llms.txt">llms.txt</a></p>
+  </header>
+
+  <div class="filter-bar">
+    <input type="text" id="filter" placeholder="Filter decks by name, description, or preset..." autocomplete="off">
+  </div>
+
+  <div class="section-label">Core</div>
+  <div class="grid" id="core-grid">
+{core_section}
+  </div>
+
+  <div class="section-label">Project Decks</div>
+  <div class="grid" id="project-grid">
+{gen_section}
+  </div>
+
+  <script>
+    const input = document.getElementById('filter');
+    const cards = document.querySelectorAll('.card');
+    input.addEventListener('input', () => {{
+      const q = input.value.toLowerCase();
+      cards.forEach(c => {{
+        const text = (c.dataset.title + ' ' + c.dataset.desc + ' ' + c.dataset.preset).toLowerCase();
+        c.classList.toggle('hidden', q && !text.includes(q));
+      }});
+    }});
+  </script>
+</body>
+</html>
+"""
+    (out / "index.html").write_text(html)
+
+
 # ── 404.html ────────────────────────────────────────────────────
 
 def _make_404_html(base_prefix: str) -> str:
@@ -461,8 +698,14 @@ def main() -> None:
     for name in generated_deck_names:
         all_deck_names.append(name)
 
-    # ── Copy menu page, viewer, and prevent Jekyll processing ────
-    shutil.copy2(examples_root / "index.html", out / "index.html")
+    # ── Generate gallery index, copy viewer, prevent Jekyll ───────
+    generate_index_html(
+        out=out,
+        core_decks=CORE_DECKS,
+        generated_deck_names=generated_deck_names,
+        examples_root=examples_root,
+        generated_dir=generated_dir,
+    )
     shutil.copy2(examples_root / "view.html", out / "view.html")
     (out / ".nojekyll").touch()
 

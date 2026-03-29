@@ -2,7 +2,12 @@
 @import './theme.css';
 @import './transitions.css';
 
-/* -- Mobile: hide Slidev chrome, fix black bars -- */
+/* ── Viewport discipline: no slide should scroll ── */
+.slidev-layout {
+  overflow: hidden;
+}
+
+/* ── Mobile: hide Slidev chrome, fix black bars ── */
 @media (max-width: 639px) and (orientation: portrait) {
   .slidev-slide-container {
     --slidev-slide-container-background: var(--deck-bg, #fff) !important;

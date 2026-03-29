@@ -1,6 +1,6 @@
 # Slide Maker
 
-A Claude Code skill that turns GitHub repositories into [Slidev](https://sli.dev) presentation decks. Point it at a repo and it reads the source code, architecture docs, and lessons learned to produce slides grounded in what's actually there — not a summary of the README.
+A Claude Code skill that creates [Slidev](https://sli.dev) presentation decks. Point it at a GitHub repo or describe what you want — it reads source code, architecture docs, and lessons learned to produce slides grounded in what's actually there.
 
 Output is native Slidev Markdown: editable by hand, buildable to static HTML, deployable anywhere.
 
@@ -12,7 +12,7 @@ Output is native Slidev Markdown: editable by hand, buildable to static HTML, de
 npx skills add adewale/slide-maker
 ```
 
-## Usage
+## Create a deck
 
 ```
 /slide-maker Create a deck about this project's architecture using the editorial-dark preset
@@ -22,21 +22,37 @@ npx skills add adewale/slide-maker
 /slide-maker Create a 7-slide pitch deck about our API monitoring tool using bold-modern
 ```
 
+The skill walks through intake, style direction, spec writing, compilation, and validation. You approve the visual direction before any slides are written.
+
+## Update a deck
+
 ```
 /slide-maker Update slides.md — split slide 8 into two slides
 ```
 
-The skill works in two modes: **create** (new deck from a project or brief) and **update** (modify an existing deck).
+```
+/slide-maker Add a comparison slide after slide 4, showing before/after latency numbers
+```
+
+## Preview and share
+
+```bash
+npx slidev                # preview locally at localhost:3030
+npx slidev export         # export as PDF
+python tools/deploy-cf.py # deploy to Cloudflare Workers (one command)
+```
+
+Every built deck includes a PDF download button. To deploy manually, `npx slidev build` produces a static `dist/` folder — deploy it to any host (Cloudflare Pages, Vercel, Netlify, GitHub Pages).
 
 ## What it produces
 
-Every deck includes:
-
-- `deck.spec.md` — planning document that locks visual direction before slides are written
-- `slides.md` — the presentation, in standard Slidev Markdown
-- `styles/tokens.css` — color, typography, and spacing tokens (`--deck-*` CSS variables)
-- `styles/theme.css` — layout-specific styling that references the tokens
-- `styles/index.css` — Slidev's auto-discovery entry point
+| File | Purpose |
+|---|---|
+| `deck.spec.md` | Planning document — locks visual direction before slides are written |
+| `slides.md` | The presentation, in standard Slidev Markdown |
+| `styles/tokens.css` | Color, typography, and spacing tokens (`--deck-*` CSS variables) |
+| `styles/theme.css` | Layout-specific styling that references the tokens |
+| `README.md` | Quick start, build, and share instructions |
 
 Edit the spec to change direction; edit the slides to change content.
 
@@ -52,47 +68,47 @@ Edit the spec to change direction; edit the slides to change content.
 | material-design | Roboto | M3 surfaces |
 | croissant-warm | Young Serif | Warm cream |
 
-## Validation
+## Quality checks
 
-The compiler checks its own output against:
+The compiler validates its own output against:
 
 - **WCAG AA** contrast ratios (4.5:1 body text, 3:1 large text)
 - **60+ LLM-tell anti-patterns** (generic phrases, overused fonts, purple gradients)
 - **CRAP design principles** (Contrast, Repetition, Alignment, Proximity)
+- **Viewport overflow** — every slide must fit the screen, no scrolling
 
 Two CLI tools run post-build:
 
-- `deck-lint` — static analysis of CSS tokens, layout alignment, background consistency, content density
-- `screenshot-audit` — Playwright-based visual checks (contrast, overlap, overflow, column balance, centering)
-
-## Building and deploying
-
 ```bash
-npm run build     # builds all decks to examples/_build/
-npm run serve     # preview at localhost:3030
+node tools/deck-lint.mjs          # static analysis: tokens, density, Mermaid, alignment
+node tools/screenshot-audit.mjs   # visual: contrast, overlap, overflow, column balance
 ```
 
-Built decks are static SPAs. Each exposes its Markdown for programmatic access:
+## Keyboard shortcuts
 
-| Path | Content |
+| Key | Action |
 |---|---|
-| `/deck-name/slides.md` | Full presentation source |
-| `/deck-name/slides/1.md` | Individual slide |
-| `/deck-name/slides/count` | Total slide count |
-| `/llms.txt` | Manifest of all decks ([llmstxt.org](https://llmstxt.org/)) |
+| `?` | Toggle shortcut help |
+| `q` | Share current slide as QR code |
+| `p` | Presenter mode |
+| `f` | Fullscreen |
+| `d` | Dark / light mode |
+| `o` | Slide overview |
 
 ## Mobile
 
 On portrait phones (< 640px), decks switch to a vertical scroll view with snap-scrolling and all click animations resolved.
 
-## Limitations
+## Programmatic access
 
-- Requires Node.js 18+ and npm (Slidev dependency)
-- Decks are 16:9 landscape — no portrait or custom aspect ratios
-- Mobile scroll view works but does not reflow content for small screens
-- The 7 presets cover common styles but are not customizable beyond token overrides
-- No PPTX export (Slidev supports PDF export via `slidev export`)
-- The skill loads ~100KB of reference material during compilation, which uses context window
+Built decks expose Markdown for LLMs and tooling:
+
+| Path | Content |
+|---|---|
+| `/slides.md` | Full presentation source |
+| `/slides/1.md` | Individual slide |
+| `/slides/count` | Total slide count |
+| `/llms.txt` | Manifest of all decks ([llmstxt.org](https://llmstxt.org/)) |
 
 ## License
 

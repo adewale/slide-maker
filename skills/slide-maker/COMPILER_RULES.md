@@ -480,13 +480,19 @@ Rules:
 - Do not override preset typography or motion — only palette tokens.
 
 ### 6b. Write styles entry point
-Emit `styles/index.css` — this is the **only** file Slidev auto-discovers. It must `@import` the other style files:
+Emit `styles/index.css` — this is the **only** file Slidev auto-discovers. It must `@import` the other style files and include the viewport overflow safety net:
 ```css
 @import './tokens.css';
 @import './theme.css';
 @import './transitions.css';
+
+/* ── Viewport discipline: no slide should scroll ── */
+.slidev-layout {
+  overflow: hidden;
+}
 ```
 Without `styles/index.css`, neither tokens nor theme styles will be loaded into the build, even if `styles/tokens.css` and `styles/theme.css` exist on disk.
+The `overflow: hidden` rule is a CSS safety net — content that exceeds the viewport is clipped rather than causing a scrollbar. If a slide overflows, the fix is to split the content, not to remove this rule.
 
 ### 7. Write theme styles
 Emit `styles/theme.css` for deck-wide typography, color application, layout shell styling, and small helper classes.

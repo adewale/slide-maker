@@ -37,10 +37,10 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [x] PRESENTATION_PHILOSOPHY.md loaded during Phase 3 (Intake)
 - [x] DECK_SPEC.md loaded during Phase 5
 
-### Viewport discipline (medium priority)
-- [ ] Audit all decks for overflow: any slide that scrolls is a bug
-- [ ] Add viewport overflow to the acceptance checklist as a hard fail
-- [ ] Consider adding `overflow: hidden` to `.slidev-layout` in the universal scaffold
+### Viewport discipline (done)
+- [x] Added `overflow: hidden` to `.slidev-layout` in all 9 deck `styles/index.css` files
+- [x] Added viewport overflow as hard fail in ACCEPTANCE_CHECKLIST.md
+- [x] Added overflow rule to COMPILER_RULES.md § 6b (styles entry point template)
 - [ ] Add `clamp()` for typography in theme.css to handle edge cases
 
 ## Feature gaps
@@ -53,9 +53,9 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [ ] Still generate deck.spec.md, but do it silently/automatically
 
 ### Gallery improvements
-- [ ] Auto-generate `index.html` from deck metadata during `build.sh`
+- [x] Auto-generate `index.html` from deck metadata during `build.py` (title, description, accent, preset extracted per deck)
+- [x] Add search/filter to the gallery page (filters by title, description, and preset)
 - [ ] Add deck thumbnails to the gallery (screenshot of cover slide)
-- [ ] Add search/filter to the gallery page
 
 ### CI/CD
 - [x] GitHub Actions workflow for GitHub Pages (`.github/workflows/deploy.yml`)
@@ -66,7 +66,8 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 
 ### Mobile screenshot testing
 - [x] Playwright capture script for mobile viewports (iPhone SE, iPhone 14, Pixel 7)
-- [ ] Add landscape mobile viewport captures
+- [x] Add landscape mobile viewport captures (iPhone SE landscape added to screenshot-audit.mjs)
+- [x] Mobile viewports added to screenshot-audit.mjs: iPhone SE (375x667), Pixel 7 (412x915), iPhone SE landscape (667x375)
 - [ ] Capture click states (slides with v-click animations at each step)
 
 ### Eval framework

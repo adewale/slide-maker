@@ -2,6 +2,11 @@
 @import "./theme.css";
 @import "./transitions.css";
 
+/* ── Viewport discipline: no slide should scroll ── */
+.slidev-layout {
+  overflow: hidden;
+}
+
 /* ── Mobile: hide Slidev chrome, fix black bars ── */
 @media (max-width: 639px) and (orientation: portrait) {
   .slidev-slide-container {
