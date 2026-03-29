@@ -1384,7 +1384,14 @@ function lintDeck(deckDir) {
         }
       }
       if (!hasImageLayout) {
-        warns.push('project deck has no visual evidence slide (image-left/image-right layout) — add at least one screenshot or output image');
+        // Only warn if images are available but unused — check public/images/
+        const imagesDir = join(deckDir, 'public', 'images');
+        const hasImages = existsSync(imagesDir) && readdirSync(imagesDir).some(f => /\.(png|jpg|jpeg|gif|svg|webp)$/i.test(f));
+        if (hasImages) {
+          warns.push('project deck has images in public/images/ but no visual evidence slide (image-left/image-right layout)');
+        } else {
+          info.push('no visual evidence slide (project repo has no screenshots to include)');
+        }
       }
     }
   }
