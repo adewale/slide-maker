@@ -150,7 +150,7 @@ Sources:
 - file:slide-maker/COMPILER_RULES.md — restraint as priority -->
 
 ---
-layout: two-cols
+layout: two-cols-header
 transition: glide
 ---
 
@@ -158,23 +158,24 @@ transition: glide
 
 ::left::
 
-The `two-cols` layout is a Slidev built-in. It splits the slide into two columns using `::left::` and `::right::` slot syntax.
+The `two-cols-header` layout splits the slide into a full-width header and two columns below using `::left::` and `::right::` slot syntax.
 
-Unlike SplitInsight, it has no header span and no border divider.
+Use this when the slide has a title — `two-cols` traps h1 at 50% width.
 
 ::right::
 
-Use the built-in when:
+Prefer the built-in when:
 
 <v-clicks>
 
 - No visual separator is needed
 - Content is loosely related
-- A spanning header is unnecessary
+- The header just labels the comparison
 
 </v-clicks>
 
-<!-- two-cols is a Slidev built-in layout, not a custom one. The escalation ladder says: prefer built-in layouts before reaching for custom ones. SplitInsight exists because two-cols lacks a shared header and visual divider.
+<!-- two-cols-header is the Slidev built-in for titled two-column slides. The h1 spans both columns in the header row. Prefer this over two-cols when the slide has a heading — two-cols traps h1 inside the left column at 50% width, causing wrapping. SplitInsight adds a border divider and is a custom layout.
 
 Sources:
-- file:slide-maker/COMPILER_RULES.md — escalation ladder: built-in before custom -->
+- file:slide-maker/COMPILER_RULES.md — escalation ladder: built-in before custom
+- file:slide-maker/COMPILER_RULES.md — two-cols-header vs two-cols layout selection -->
