@@ -152,10 +152,12 @@ Sources:
 
 ---
 transition: wipe-right
-layout: two-cols
+layout: two-cols-header
 ---
 
 # Three Null-Like Values
+
+::left::
 
 | Value | `is None` | `bool()` |
 |-------|:---------:|:--------:|

@@ -946,6 +946,30 @@ function lintDeck(deckDir) {
         warns.push(`slide ${slide.index}: inline max-width on centered layout — use theme CSS instead. Inline widths create a different alignment path than the theme.`);
       }
     }
+
+  }
+
+  // ─── 6c. two-cols with h1 (scan raw markdown) ─────────────────
+
+  // splitSlides is unreliable for per-slide frontmatter, so scan raw markdown
+  // Split on --- separators and look for two-cols + h1 in the same slide block
+  const rawBlocks = slidesMd.split(/\n---\s*\n/);
+  for (let i = 0; i < rawBlocks.length; i++) {
+    const block = rawBlocks[i];
+    // Check if this block contains layout: two-cols (but not two-cols-header)
+    if (/layout:\s*two-cols\s*$/m.test(block) && !/layout:\s*two-cols-header/m.test(block)) {
+      // Check next block for h1 (the body is usually in the next block after the --- separator)
+      const nextBlock = rawBlocks[i + 1] || '';
+      const combined = block + '\n' + nextBlock;
+      const withoutComments = combined.replace(/<!--[\s\S]*?-->/g, '');
+      if (/^#\s+/m.test(withoutComments)) {
+        // Estimate slide number from position in file
+        const offset = slidesMd.indexOf(block);
+        const precedingSeps = (slidesMd.slice(0, offset).match(/\n---\s*\n/g) || []).length;
+        const slideNum = Math.floor(precedingSeps / 2) + 1;
+        errors.push(`slide ~${slideNum}: layout: two-cols with h1 heading — use two-cols-header so the title spans both columns`);
+      }
+    }
   }
 
   // ─── 7. Slide overflow checks ───────────────────────────────

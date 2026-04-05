@@ -32,6 +32,7 @@ These items must all pass before a deck can be delivered:
 - no `max-width` on `end`/`fact`/`section` layout children without `margin: 0 auto`
 - no mixed alignment (centered heading + left body, or vice versa) on any slide
 - two-column slides have balanced content weight (neither column less than 30% of the other)
+- `layout: two-cols` never used with an h1 heading — use `two-cols-header` so the title spans both columns
 
 **Structural integrity:**
 - `deck.spec.md` matches `slides.md` (spec-to-slides sync)
@@ -107,6 +108,7 @@ These checks run automatically and produce errors or warnings:
 | Code lines <= 8 per block | Density | Error |
 | No hardcoded hex/rgb in scoped styles | Repetition | Error |
 | No emoji in slide content or Mermaid labels | — | Error |
+| `layout: two-cols` with h1 heading (use `two-cols-header`) | Alignment | Error |
 | `selectable: true`, `routerMode: hash`, `download: true` in headmatter | Structure | Warning |
 | Spec-slides sync: slide count in deck.spec.md matches slides.md | Sync | Warning |
 | Through-line appears in 3+ slides (project decks) | Narrative | Warning |
