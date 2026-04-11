@@ -53,7 +53,6 @@ Sources:
 - file:Lessons_learned.md — Amiga color cycling techniques, "constraints breed creativity"
 - file:client/src/sprites.ts — pixelsToBraille() conversion, PIXEL_ART definitions
 - file:client/src/effects.ts — getUFOColor() cycling through 6 colors every 5 ticks
-- file:client/src/gradient.ts — getWaveGradient() escalation from ocean to danger
 -->
 
 ---
@@ -67,7 +66,7 @@ transition: iris
 Section break. The key architectural insight: in Vaders, the server is not a relay -- it IS the game. All game logic runs server-side in a pure reducer function. The client is a dumb terminal that renders whatever state the server sends. This is a deliberate rejection of client-side prediction, which would have been the "proper" networking approach for a real-time game.
 
 Sources:
-- file:Lessons_learned.md -- server-authoritative architecture, pure reducer pattern
+- file:Lessons_learned.md — server-authoritative architecture, pure reducer pattern
 -->
 
 ---
@@ -153,10 +152,10 @@ transition: slide-up
 
 <v-clicks>
 
-- Barrier hitbox used 1x offset; rendering used 2x -- miss
-- Tests that assert buggy behavior passed green -- false OK
-- Y-axis tolerance compensates for move-before-check
-- Cut: client prediction, seq numbers, ECS, spectator
+- Barrier hitbox used 1x offset; rendering used 2x -- bullets passed through
+- Tests that assert buggy behavior passed green -- false confidence
+- Y-axis tolerance compensates for move-before-check ordering
+- Cut: client prediction, seq numbers, ECS, spectator mode
 
 </v-clicks>
 
@@ -195,7 +194,9 @@ layout: end
 transition: fade
 ---
 
-# Chunky movement is not a bug. It is the genre.
+# The Terminal Has No Pixels. The Game Has No Lag.
+
+Every constraint produced a simpler answer.
 
 <span style="font-family: var(--deck-font-mono); font-size: 0.85rem; color: var(--deck-muted); margin-top: 1.5rem; display: block;">github.com/adewale/vaders</span>
 

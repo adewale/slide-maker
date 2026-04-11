@@ -43,7 +43,7 @@ Developer communities used to have Planet pages -- Planet Python, Planet Mozilla
 
 - One worker: scheduler, queue consumer, HTTP server, admin UI
 - Hourly feed fetching with retries and dead-letter queue
-- Semantic search via **Vectorize** and **Workers AI**
+- Semantic search via Vectorize and Workers AI
 - On-demand HTML/RSS/Atom/OPML with 1-hour edge caching
 - Multi-instance: Planet Python (500+), Mozilla (190)
 
@@ -86,10 +86,10 @@ transition: iris
 Five Cloudflare primitives, each returning JavaScript types to Python code
 
 <!--
-D1 (database), Queues, Vectorize (vector search), Workers AI (embeddings), and Static Assets -- each is a JavaScript API that returns JsProxy objects when called from Python. The core challenge of the project is not feed aggregation. It is type conversion at the boundary between two runtime worlds.
+D1 (database), Queues, Vectorize (vector search), Workers AI (embeddings), and Static Assets -- each is a JavaScript API that returns JsProxy objects when called from Python. The core challenge of the project is not feed aggregation. It is type conversion at the boundary between two runtime worlds. The community feed lives again, but only because every type crossing is handled explicitly.
 
 Sources:
-- https://github.com/adewale/planet_cf -- project repository
+- https://github.com/adewale/planet_cf/blob/main/docs/ARCHITECTURE.md -- system topology showing five Cloudflare bindings
 -->
 
 ---
@@ -100,7 +100,7 @@ transition: slide-up
 
 A single worker orchestrates five Cloudflare primitives from Python.
 
-```mermaid {theme: 'base', scale: 0.8}
+```mermaid {theme: 'base', scale: 0.85}
 graph LR
   JS["JavaScript APIs"] --> BL["Boundary Layer"]
   BL --> PY["Python Core"]

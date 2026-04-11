@@ -24,9 +24,10 @@ github.com/adewale/geist_fabrik
 
 Sources:
 - file:README.md -- project name, description, Gordon Brander attribution
-- file:specs/geistfabrik_vision.md -- Brander's "Building a Second Subconscious" essay, Hegel's owl of Minerva connection -->
+- file:specs/geistfabrik_vision.md -- Brander's "Building a Second Subconscious" essay, tarot for thought concept -->
 
 ---
+layout: default
 transition: slide-left
 ---
 
@@ -36,15 +37,15 @@ You have years of notes in your Obsidian vault. The contradictions between them,
 
 <v-clicks>
 
-- A note from 2022 contradicts something you wrote last month. You will never notice.
-- Two ideas in different folders are the same idea, expressed differently. They will never meet.
-- The question that would unlock your next project is already answered, scattered across a dozen notes.
+- A note from 2022 contradicts something you wrote last month
+- Two ideas in different folders are the same idea, expressed differently
+- The question that would unlock your next project is already answered, scattered across a dozen notes
 
 </v-clicks>
 
-<p v-click style="color: var(--deck-accent); font-size: 1.05rem; margin-top: 1.5rem;">What if something could read your entire vault and ask you the questions you would never think to ask yourself?</p>
+<p v-click style="color: var(--deck-accent); font-size: 1.05rem; margin-top: 1.5rem;">Your notes know things you have forgotten. What if something asked them the questions you would not ask yourself?</p>
 
-<!-- This slide names the problem GeistFabrik solves. Obsidian vaults grow over years -- hundreds or thousands of Markdown files, wikilinked and tagged, but rarely re-read. The connections between notes -- semantic similarities, contradictions, forgotten threads -- are structurally invisible to the author because re-reading at scale is impractical. GeistFabrik's answer is not to summarize or search, but to surface provocative questions drawn from the vault's own content. The next slide introduces the mechanism.
+<!-- This slide names the problem before introducing the solution. Obsidian vaults grow over years but are rarely re-read at scale -- the connections are structurally invisible to the author. The through-line appears here for the first time: your notes already contain the answers, but nobody is asking the right questions.
 
 Sources:
 - file:README.md -- project description, what GeistFabrik does with Obsidian vaults
@@ -52,7 +53,7 @@ Sources:
 
 ---
 layout: default
-transition: fade
+transition: slide-left
 ---
 
 # What GeistFabrik does
@@ -60,7 +61,7 @@ transition: fade
 <v-clicks>
 
 - Parses Obsidian vaults into SQLite with 384-dim embeddings
-- 57 geists (48 Python, 9 YAML) ask "What if...?" questions about *your* notes
+- 57 geists (48 Python, 9 YAML) ask "What if...?" questions about your notes
 - 4-stage filtering samples ~5 suggestions per session
 - 100% local, read-only, deterministic -- same date = same output
 
@@ -74,7 +75,7 @@ Sources:
 
 ---
 layout: two-cols-header
-transition: slide-left
+transition: wipe-right
 ---
 
 # Two-layer architecture
@@ -111,7 +112,7 @@ Sources:
 
 ---
 layout: two-cols-header
-transition: slide-left
+transition: wipe-right
 ---
 
 # Code geists vs Tracery geists
@@ -155,13 +156,14 @@ transition: morph-fade
 
 The Contradictor geist tried to algorithmically generate opposites. 10% success rate. Replaced with questions -- 100% success.
 
-<!-- The original Python approach pattern-matched note titles: "Benefits of Morning Routines" became "Costs of Morning Routines" (works), but "Evergreen notes" became "The opposite of Evergreen notes" (useless), and "Meeting with Sarah" became "The opposite of Meeting with Sarah" (nonsensical). The YAML replacement just asks "What contradicts this note?" -- it works for ANY note because it delegates the hard cognitive work to the human. This is the purest expression of "muses, not oracles": a well-asked question is better than a poorly-computed answer.
+<!-- The original Python approach pattern-matched note titles: "Benefits of Morning Routines" became "Costs of Morning Routines" (works), but "Evergreen notes" became "The opposite of Evergreen notes" (useless). The YAML replacement asks "What contradicts this note?" -- it works for ANY note because it delegates the hard cognitive work to the human. This is the purest expression of the through-line: your notes already contain the contradictions, you just need to be asked about them.
 
 Sources:
 - file:LESSONS_LEARNED.md -- full Contradictor case study, 10% vs 100% comparison table
 - file:src/geistfabrik/default_geists/tracery/contradictor.yaml -- the 13-line replacement -->
 
 ---
+layout: default
 transition: slide-left
 ---
 
@@ -176,13 +178,14 @@ transition: slide-left
 
 </v-clicks>
 
-<!-- This three-layer model is what makes GeistFabrik a platform rather than a tool. A non-programmer can write a Tracery geist that calls vault functions written by a programmer, which use metadata computed by a data scientist. All extensibility is filesystem-based: drop a .py file in the right directory and it becomes available. No configuration beyond the file itself.
+<!-- This three-layer model is what makes GeistFabrik a platform rather than a tool. A non-programmer can write a Tracery geist that calls vault functions written by a programmer, which use metadata computed by a data scientist. All extensibility is filesystem-based: drop a .py file in the right directory and it becomes available with no configuration beyond the file itself.
 
 Sources:
 - file:README.md -- three extensibility dimensions with examples
 - file:docs/ARCHITECTURE.md -- metadata system, function registry, geist executor interaction -->
 
 ---
+layout: default
 transition: slide-left
 ---
 
@@ -198,13 +201,14 @@ transition: slide-left
 
 </v-clicks>
 
-<!-- "Sample, do not rank" is a deliberate choice against recommendation algorithms. Ranking creates preferential attachment where popular notes attract more attention. Sampling ensures orphans and forgotten notes surface with equal probability. The deterministic randomness principle means that if a geist produces a bad suggestion, you can replay the exact session that generated it by passing --date to the CLI.
+<!-- "Sample, do not rank" is a deliberate choice against recommendation algorithms. Ranking creates preferential attachment where popular notes attract more attention. Sampling ensures orphans and forgotten notes surface with equal probability. The deterministic randomness principle means that if a geist produces a bad suggestion, you can replay the exact session that generated it by passing --date to the CLI. These constraints embody the through-line: the tool asks questions about notes you have forgotten, not just the ones you already remember.
 
 Sources:
 - file:README.md -- eight design principles
 - file:specs/geistfabrik_vision.md -- diverge/converge feedback loops, Brander's influence -->
 
 ---
+layout: default
 transition: fade
 ---
 
@@ -223,11 +227,11 @@ layout: end
 transition: fade
 ---
 
-# 13 lines of YAML. One well-asked question.
+# The connections were always in your notes. Now something asks you about them.
 
 github.com/adewale/geist_fabrik
 
-<!-- The closing h1 resolves the opening directly. Slide 2 said: you have thousands of notes, the connections between them are invisible. This slide says: the connections were always there -- GeistFabrik makes them visible by asking questions drawn from your own vault. Not summaries, not search results, not AI-generated answers. Questions. The geist's job is not to know things you do not know. It is to ask about things you have forgotten you know.
+<!-- The closing resolves the opening directly. Slide 2 said: you have thousands of notes, the connections between them are invisible. This slide answers: the connections were always there -- GeistFabrik makes them visible by asking questions drawn from your own vault. Not summaries, not search results, not AI-generated answers. Questions. The geist's job is not to know things you do not know. It is to ask about things you have forgotten you know.
 
 Sources:
 - file:LESSONS_LEARNED.md -- concluding principle from the Contradictor case study

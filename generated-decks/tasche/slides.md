@@ -22,7 +22,7 @@ A self-hosted read-it-later service built on Cloudflare Python Workers
 <p style="color: var(--deck-muted); font-family: var(--deck-font-mono); font-size: 0.85rem; margin-top: 2rem;">github.com/adewale/tasche</p>
 
 <!--
-Tasche is German for "pocket." The name signals exactly what this is -- a Pocket alternative you own and deploy to your own Cloudflare account. One click, your own D1 database, your own R2 bucket, your own Queues.
+Tasche is German for "pocket." The name signals exactly what this is -- a Pocket alternative you own and deploy to your own Cloudflare account. One command, your own D1 database, your own R2 bucket, your own Queues.
 
 The surprising part is not that it exists. It is that it runs Python on a platform where nearly every tutorial, example, and template is JavaScript.
 
@@ -37,7 +37,7 @@ transition: slide-up
 
 # The Link Is Gone
 
-You saved a link last month. Today it 404s. The site was paywalled, or the domain expired, or the author deleted it. The article is gone.
+You saved a link last month. Today it 404s. The domain expired, the author deleted the post, or the site went behind a paywall. The article you meant to read is gone.
 
 Tasche creates a **complete archive the moment you save the URL**.
 
@@ -54,7 +54,7 @@ Tasche creates a **complete archive the moment you save the URL**.
 <!--
 The problem is link rot. Articles disappear behind paywalls, domains expire, authors delete posts. The URL you bookmarked last week returns a 404 today. Tasche's answer: archive at save time. When you save a URL, Tasche fetches the page, resolves redirects, extracts the article via Readability, downloads and converts all images to WebP, stores clean HTML and Markdown in R2, and indexes the content in D1 FTS5.
 
-The pipeline runs asynchronously via Cloudflare Queues. The user sees "saving" immediately. Processing happens in the background. If you click the original URL and it 404s -- your copy survived.
+The pipeline runs asynchronously via Cloudflare Queues. The user sees "saving" immediately. Processing happens in the background. If the original URL 404s, your copy survived.
 
 Sources:
 - https://github.com/adewale/tasche/blob/main/specs/tasche-spec.md -- core promise, archival pipeline, 14-step processing
@@ -73,7 +73,7 @@ Running Pyodide in Cloudflare's JavaScript runtime
 <!--
 This is the ecosystem mismatch that makes Tasche architecturally interesting. Cloudflare Workers documentation defaults to JavaScript and TypeScript. The getting started guides, the templates, the examples -- all JS. Python Workers compile to WebAssembly via Pyodide and run inside V8 isolates.
 
-The through-line surfaces here: what happens when you put Python where JavaScript is supposed to go? You get a set of hard constraints that shape every architectural decision.
+The through-line surfaces here: what happens when you put Python where JavaScript is supposed to go? You get a set of hard constraints that shape every architectural decision. Every handler must be async def. No C extensions. No eval(). No threading.
 
 Sources:
 - https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- lesson 27 (runtime gap between CPython and Pyodide)
@@ -149,9 +149,7 @@ Every Python type crossing into JavaScript needs explicit conversion. `wrappers.
 <!--
 The Pyodide FFI type matrix is the central architectural insight. It took 7 commits across 3 days to centralize this boundary layer -- each commit discovered a new category of FFI leaks the previous one missed.
 
-Safe* wrappers (SafeD1, SafeR2, SafeKV, SafeQueue, SafeAI, SafeReadability) encapsulate both read and write conversions. Application code never touches JsProxy directly.
-
-Through-line deepens: "running Python where JavaScript goes" means building a bidirectional translation layer at every boundary.
+Safe* wrappers (SafeD1, SafeR2, SafeKV, SafeQueue, SafeAI, SafeReadability) encapsulate both read and write conversions. Application code never touches JsProxy directly. Through-line deepens: "running Python where JavaScript goes" means building a bidirectional translation layer at every boundary.
 
 Sources:
 - https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- lesson 29 (FFI type matrix), lesson 30 (bidirectional boundary), pattern 1 (7 commits to centralize)
@@ -169,9 +167,7 @@ Service Binding RPC across runtimes
 <!--
 Through-line refracted through a new lens. python-readability uses eval(), which V8 isolates block with EvalError. Every serious Python content extraction library (Trafilatura, Newspaper4k, Goose3, ReadabiliPy) requires lxml -- a C extension incompatible with Pyodide/WebAssembly.
 
-The solution: a separate JavaScript Worker running Mozilla Readability via linkedom, called from the Python Worker via Service Binding RPC. The call is in-process (1-5ms), not a network round-trip. Two runtimes cooperating on the same platform.
-
-Content extraction was rearchitected 3 times: python-readability (crashed), BeautifulSoup heuristics (lower quality), then the JS Service Binding with BS4 as fallback.
+The solution: a separate JavaScript Worker running Mozilla Readability via linkedom, called from the Python Worker via Service Binding RPC. The call is in-process (1-5ms), not a network round-trip. Content extraction was rearchitected 3 times: python-readability (crashed), BeautifulSoup heuristics (lower quality), then the JS Service Binding with BS4 as fallback.
 
 Sources:
 - https://github.com/adewale/tasche/blob/main/LESSONS_LEARNED.md -- lessons 32-33 (eval blocked, lxml unavailable)
@@ -215,7 +211,7 @@ transition: fade
 Python for the application logic. JavaScript for what Python cannot reach. The boundary layer makes them one system -- and your articles survive because of it.
 
 <!--
-Connects the architecture back to the opening problem. The two-runtime design is not an abstract pattern -- it is what makes the archival pipeline work. Python handles routing, D1 queries, R2 storage, queue processing. JavaScript handles Readability extraction via Service Binding RPC (in-process, 1-5ms). Without this bridge, content extraction would fail entirely (python-readability uses eval(), blocked in V8; lxml requires C extensions, unavailable in Pyodide).
+Connects the architecture back to the opening problem. The two-runtime design is not an abstract pattern -- it is what makes the archival pipeline work. Python handles routing, D1 queries, R2 storage, queue processing. JavaScript handles Readability extraction via Service Binding RPC (in-process, 1-5ms). Without this bridge, content extraction would fail entirely.
 
 The result: when a link dies, the archive is already complete -- fetched, extracted, converted, indexed, and stored across D1 and R2.
 
@@ -229,12 +225,12 @@ layout: end
 transition: fade
 ---
 
-# The original can disappear. Tasche already has your copy.
+# The Link Died. Your Copy Survived.
 
 github.com/adewale/tasche
 
 <!--
-Resolves the opening tension. Slide 2 stated the problem: the link is gone, the article disappeared. This slide closes it: Tasche already had the copy. The architecture -- Python Workers, JS Service Binding, D1, R2, Queues -- exists to make that one promise real.
+Resolves the opening tension. Slide 2 stated the problem: the link is gone, the article disappeared. This slide closes it: the link died, but your copy survived. The architecture -- Python Workers, JS Service Binding, D1, R2, Queues -- exists to make that one promise real.
 
 The GitHub URL gives the audience a concrete next step -- the entire project is open source, MIT licensed, deployable with one click.
 

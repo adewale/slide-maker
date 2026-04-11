@@ -17,11 +17,11 @@ fonts:
 
 # Olsen
 
-A local-first CLI tool for faceted browsing of photographs in DNG, JPEG, and BMP formats. Read-only by design. Single SQLite file as the entire catalog.
+A local-first CLI tool for faceted browsing of photographs
 
 <span style="font-family: var(--deck-font-mono); font-size: 0.85rem; color: var(--deck-accent); margin-top: 1.5rem; display: inline-block;">github.com/adewale/olsen</span>
 
-<!-- Olsen is a Go CLI that indexes photo libraries into a portable SQLite database. The cover establishes the two core constraints: read-only operation, and a single-file catalog. These are not limitations but architectural choices that eliminate entire categories of bugs. The through-line -- constraint as architecture -- begins here.
+<!-- Olsen is a Go CLI that indexes DNG, JPEG, and BMP photo libraries into a single portable SQLite database. It processes files through an 8-stage pipeline entirely in memory, enforcing read-only access at the syscall level. The through-line -- constraint as the source of safety -- begins here with the architectural promise that the indexer structurally cannot write to your photo directories.
 
 Sources:
 - file:README.md -- project description, format support, read-only guarantee -->
@@ -36,9 +36,9 @@ Every tool that touches your photo library is a risk. EXIF editors rewrite file 
 
 <v-clicks>
 
-- A single bad EXIF writeback can silently truncate a DNG file
-- Sidecar files (.xmp, .pp3) accumulate in directories you thought were clean
-- You only notice when you open the photo for a print -- and the file is damaged
+- A bad EXIF writeback silently truncates a DNG file
+- Sidecar files (.xmp, .pp3) fill clean directories
+- You notice months later, opening a photo for print
 
 </v-clicks>
 
@@ -128,10 +128,10 @@ The fundamental guarantee: **users cannot transition from a state with results t
 
 <v-clicks>
 
-- Year, Month, Day, Color, Camera, Lens, Season, Time of Day -- all governed by the same logic
-- No hardcoded clearing rules. No assumed hierarchies between facet types
-- Facet counts are computed by SQL `WHERE` clauses with `GROUP BY` -- the database already knows which transitions are valid
-- Zero-count facet values are visible but not clickable -- the user sees "2025 (0)" and understands *why*
+- Year, Month, Color, Camera, Lens -- same logic
+- No hardcoded clearing, no assumed hierarchies
+- SQL `WHERE` + `GROUP BY` computes valid transitions
+- Zero-count values visible but disabled: "2025 (0)"
 
 </v-clicks>
 
@@ -155,9 +155,9 @@ Olsen classifies dominant colors into the 11 Berlin-Kay universal basic categori
 
 <v-clicks>
 
-- **Achromatic first**: if saturation < 10%, the pixel is black, white, gray, or B&W -- regardless of hue
-- **Brown before orange**: hue 20--40 with lightness < 50% is brown, not orange
-- **Then hue ranges**: red, orange, yellow, green, blue, purple, pink -- only after saturation and lightness checks pass
+- **Achromatic first**: saturation < 10% means gray, not red
+- **Brown before orange**: hue 20-40, lightness < 50%
+- **Then hue ranges**: only after saturation + lightness pass
 
 </v-clicks>
 
@@ -185,11 +185,11 @@ The Leica Monochrom DNG bug took days to fix because debugging started at the wr
 
 <v-clicks>
 
-- **Symptom**: missing images in the web explorer, upscale warnings in logs
-- **First fix** (wrong): added thumbnail fallback in the web UI -- masked the problem
-- **Second fix** (wrong): adjusted database queries -- different wrong layer
-- **Root cause**: `ExtractEmbeddedJPEG()` returned the *first* JPEG marker (160x120 thumbnail), not the *largest* (9504x6320 full preview)
-- **Actual fix**: scan all SOI/EOI marker pairs in the DNG, keep the largest valid JPEG
+- **Symptom**: missing images, upscale warnings in logs
+- **First fix** (wrong): thumbnail fallback in the UI
+- **Second fix** (wrong): adjusted database queries
+- **Root cause**: returned first JPEG (160x120), not largest
+- **Actual fix**: scan all SOI/EOI pairs, keep largest
 
 </v-clicks>
 
