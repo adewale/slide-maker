@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!['cover', 'end'].includes($nav.currentLayout)" class="deck-footer">
+  <div v-if="!['cover', 'end', 'section'].includes($nav.currentLayout)" class="deck-footer">
     <span class="deck-footer-title">{{ $slidev.configs.title }}</span>
     <span class="deck-footer-page">{{ $nav.currentPage }} / {{ $nav.total }}</span>
   </div>
