@@ -155,7 +155,7 @@ backgrounds need a rendered-screenshot check).
 
 - No emoji in slides or Mermaid diagrams
 - No generic stock phrases ("Let's dive in", "In conclusion", "Without further ado")
-- No overused font families across decks (Inter, Inter Tight, Roboto, Arial) — each deck must use fonts from STYLE_PRESETS.md for its preset. Exception: presets that specify these fonts as part of a brand identity.
+- No overused font families across decks (Inter, Inter Tight, Roboto, Arial; and the AI-converged set Geist, Plus Jakarta Sans, Space Grotesk, Fraunces) — each deck must use fonts from STYLE_PRESETS.md for its preset. Exception: presets that specify these fonts as part of a brand identity (e.g. cloudflare uses Inter). See LLM_TELLS.md §Interface slop (from https://impeccable.style/slop).
 - No purple-gradient-on-white cliches
 - No ad-hoc transitions — every transition type must have a consistent semantic meaning (see Transition grammar)
 - No same layout for every content slide — alternate between built-in layouts

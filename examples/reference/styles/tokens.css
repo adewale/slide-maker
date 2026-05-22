@@ -4,7 +4,7 @@
   --deck-accent: #3b5f87;
   --deck-accent-alt: #994050;
   --deck-muted: rgba(46, 52, 64, 0.45);
-  --deck-font-display: 'Inter', sans-serif;
+  --deck-font-display: 'Source Serif 4', serif;
   --deck-font-body: 'Source Sans 3', sans-serif;
   --deck-font-mono: 'JetBrains Mono', monospace;
 }

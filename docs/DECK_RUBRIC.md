@@ -204,6 +204,12 @@ GUARDRAILS (deduct from the total if violated)
   Flash-bang:       −4    Any adjacent slides differ by > 0.5 WCAG relative
                           luminance (e.g. a near-black slide cutting to a
                           near-white one). Detected by `node tools/deck-lint.mjs`.
+  Interface slop:   −2    each, for AI-"slop" tells (see LLM_TELLS.md §Interface
+                          slop, from https://impeccable.style/slop): overused
+                          fonts, gradient text, glassmorphism, justified text,
+                          pure-black #000, flat type hierarchy, nested cards,
+                          hero-metric cliché, bounce easing. Several are caught
+                          by `node tools/deck-lint.mjs`.
 
 TOTAL:              _/20 (visual only) or _/55 (with content)
 ```

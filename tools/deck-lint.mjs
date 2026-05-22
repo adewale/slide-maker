@@ -472,6 +472,77 @@ function checkFlashBang(slidesMd, deckBgRaw) {
   return warnings;
 }
 
+// Overused/generic display & body fonts — the repo's own rule, reinforced by
+// the slop taxonomy at https://impeccable.style/slop. Mono fonts are not
+// checked (monospace families are expected for code).
+const OVERUSED_FONTS = new Set(['inter', 'inter tight', 'roboto', 'arial', 'helvetica']);
+// Presets that legitimately use one of the above as brand identity.
+const FONT_BRAND_EXCEPTIONS = { cloudflare: new Set(['inter']) };
+
+/**
+ * Detect "interface slop" tells (https://impeccable.style/slop) that are
+ * statically checkable from a deck's fonts and stylesheets: overused fonts,
+ * gradient/clipped text, glassmorphism, justified text, and pure-black tokens.
+ * Returns an array of warning strings.
+ */
+function checkSlop(deckDir, slidesMd) {
+  const warnings = [];
+
+  // ── Overused display/body fonts (sans/serif/display slots; skip mono) ──
+  const headMatch = slidesMd.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  const head = headMatch ? headMatch[1] : '';
+  let preset = '';
+  const specPath = join(deckDir, 'deck.spec.md');
+  if (existsSync(specPath)) {
+    const m = readFileSync(specPath, 'utf-8').match(/style-preset:\s*([\w-]+)/i);
+    if (m) preset = m[1].toLowerCase();
+  }
+  const exempt = FONT_BRAND_EXCEPTIONS[preset] || new Set();
+  for (const slot of ['sans', 'serif', 'display']) {
+    const m = head.match(new RegExp(`^\\s*${slot}:\\s*(.+)$`, 'm'));
+    if (!m) continue;
+    const raw = m[1].trim().replace(/^['"]|['"]$/g, '');
+    const font = raw.toLowerCase();
+    if (OVERUSED_FONTS.has(font) && !exempt.has(font)) {
+      warnings.push(`slop: ${slot} font "${raw}" is an overused/generic family — use a preset font, not a brand exception (LLM_TELLS.md §Interface slop)`);
+    }
+  }
+
+  // ── CSS slop tells across stylesheets + inline slide <style> blocks ──
+  const cssSources = [];
+  const stylesDir = join(deckDir, 'styles');
+  if (existsSync(stylesDir)) {
+    for (const f of readdirSync(stylesDir)) {
+      if (f.endsWith('.css')) cssSources.push(readFileSync(join(stylesDir, f), 'utf-8'));
+    }
+  }
+  cssSources.push(slidesMd);
+  const css = cssSources.join('\n');
+
+  if (/background-clip\s*:\s*text/i.test(css)) {
+    warnings.push('slop: gradient/clipped text (background-clip: text) — decorative, hurts scannability (LLM_TELLS.md §Interface slop)');
+  }
+  if (/backdrop-filter\s*:\s*[^;]*blur/i.test(css)) {
+    warnings.push('slop: glassmorphism (backdrop-filter: blur) used as decoration (LLM_TELLS.md §Interface slop)');
+  }
+  if (/text-align\s*:\s*justify/i.test(css)) {
+    warnings.push('slop: justified text creates rivers of whitespace (LLM_TELLS.md §Interface slop)');
+  }
+
+  const tokensPath = join(deckDir, 'styles/tokens.css');
+  if (existsSync(tokensPath)) {
+    const t = readFileSync(tokensPath, 'utf-8');
+    for (const tok of ['--deck-bg', '--deck-fg']) {
+      const m = t.match(new RegExp(`${tok}\\s*:\\s*([^;]+);`));
+      if (m && /^#(000|000000)$/i.test(m[1].trim())) {
+        warnings.push(`slop: ${tok} is pure black ${m[1].trim()} — harsh; use a near-black (LLM_TELLS.md §Interface slop)`);
+      }
+    }
+  }
+
+  return warnings;
+}
+
 /**
  * Validate Mermaid diagram syntax for common issues that cause rendering failures.
  * Returns an array of warning strings.
@@ -1552,6 +1623,13 @@ function lintDeck(deckDir) {
     }
     for (const w of flashBangs) warns.push(w);
   }
+
+  // ─── 25. Interface slop tells ────────────────────────────────
+  const slopWarns = checkSlop(deckDir, slidesMd);
+  if (slopWarns.length === 0) {
+    info.push('no interface-slop tells detected');
+  }
+  for (const w of slopWarns) warns.push(w);
 
   return { name, errors, warns, info };
 }
