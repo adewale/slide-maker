@@ -4,7 +4,9 @@
   "scripts": {
     "build": "python3 tools/build.py",
     "dev": "npm run build && npx serve examples/_build -l 3030",
-    "serve": "npx serve examples/_build -l 3030"
+    "serve": "npx serve examples/_build -l 3030",
+    "lint": "node tools/deck-lint.mjs",
+    "eval": "node tools/eval-runner.mjs"
   },
   "dependencies": {
     "@iconify-json/carbon": "^1.2.19",
@@ -18,6 +20,7 @@
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "latest",
     "pixelmatch": "^7.1.0",
     "playwright": "^1.58.2",
     "playwright-chromium": "^1.58.2",

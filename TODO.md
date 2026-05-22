@@ -71,9 +71,13 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [ ] Capture click states (slides with v-click animations at each step)
 
 ### Eval framework
-- [ ] Use the reference deck (`examples/reference/`) as the primary eval fixture
-- [ ] Define pass/fail criteria for each feature the Skill claims to support
-- [ ] Automate: generate a deck from a prompt → diff against expected structure → score
+- [x] Runner built: `tools/eval-runner.mjs` (`npm run eval`) — resolve output deck → grade → score → report (console + `--json`)
+- [x] `evals/evals.json` assertions carry machine-runnable `assert` specs alongside the prose `check`; deterministic engine runs with zero deps
+- [x] LLM judge (`--judge`): scores semantic assertions + DECK_RUBRIC visual axes (/20) + slop tells via Claude, prompt-caching the rubric (needs `@anthropic-ai/sdk` + `ANTHROPIC_API_KEY`)
+- [x] Generation hook: `--generate "<cmd>"` produces a missing deck before grading ({prompt}/{out}/{id}/{files} substitution)
+- [ ] Add create-eval fixtures under `evals/runs/<id>/` (or wire `--generate` to the skill) so evals 0 and 1 grade end-to-end, not just the update eval
+- [ ] `countSlides` does not follow `src:` page includes — fine for self-contained eval decks, but reference-style decks under-count
+- [ ] Fail CI on eval regressions (runner already exits non-zero on any failing assertion)
 
 ### Acceptance checklist enforcement (done)
 - [x] ACCEPTANCE_CHECKLIST.md is the canonical checklist (extracted from COMPILER_RULES.md)
