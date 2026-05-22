@@ -160,6 +160,24 @@ Alternating layouts prevents visual fatigue.
 | Use `center` or `statement` for thesis slides | Centering a single idea gives it weight. |
 | Use `fact` for hero metrics | The oversized number treatment signals "this is the takeaway." |
 
+### Brightness Continuity (No Flash-Bangs)
+
+Large jumps in background luminance between adjacent slides dazzle a dark-room
+audience — the visual equivalent of a camera flash. A near-black slide cutting
+to a near-white one forces the eye to re-adapt and breaks concentration.
+
+| Practice | Why |
+|----------|-----|
+| Keep adjacent backgrounds in the same luminance band | Continuous brightness lets the audience read the next slide immediately, with no re-adaptation. |
+| Group dark slides together, light slides together | If a deck mixes dark section dividers with light content, cluster them rather than alternating dark/light/dark. |
+| Bridge an intentional dark↔light shift with a transition | A `fade` through an intermediate brightness softens a deliberate mood change. |
+
+**Anti-pattern:** A dark `layout: section` (`background: '#0a0a0f'`) immediately followed by a white content slide. The room gets flash-banged.
+
+**Good example:** A dark-themed deck keeps every slide on `--deck-bg`; the only brightness change is a gentle accent shift on section dividers.
+
+**Automated check:** `node tools/deck-lint.mjs` flags any adjacent slides whose backgrounds differ by more than 0.5 in WCAG relative luminance.
+
 ---
 
 ## Part 2: Quick Scoring Template
@@ -181,6 +199,11 @@ CONTENT (optional, max 35 — use PROJECT_DECK_RUBRIC.md for project decks)
   Storytelling:     _/5   Is there a narrative arc?
   Education:        _/5   Does the audience learn something transferable?
   (Other axes as appropriate for the deck type)
+
+GUARDRAILS (deduct from the total if violated)
+  Flash-bang:       −4    Any adjacent slides differ by > 0.5 WCAG relative
+                          luminance (e.g. a near-black slide cutting to a
+                          near-white one). Detected by `node tools/deck-lint.mjs`.
 
 TOTAL:              _/20 (visual only) or _/55 (with content)
 ```

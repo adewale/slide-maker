@@ -121,6 +121,36 @@ layout: end
 That is the entire idea.
 ```
 
+### Flash-bang brightness jumps
+
+Never follow a dark slide with a much brighter one (or vice versa). The sudden
+jump in screen luminance dazzles a dark-room audience — the visual equivalent
+of a camera flash. Keep background luminance continuous across adjacent slides.
+
+```md
+<!-- NEVER — a near-black slide cutting to a near-white slide flash-bangs the room -->
+---
+background: '#0a0a0f'
+---
+# The problem
+
+---
+background: '#ffffff'
+---
+# The solution
+```
+
+```md
+<!-- ALWAYS — keep adjacent backgrounds in the same brightness band. Group dark
+     slides together; bridge a deliberate dark/light shift with a fade through an
+     intermediate brightness rather than a hard cut. -->
+```
+
+Rule: adjacent slides must not differ by more than **0.5 in WCAG relative
+luminance**. `node tools/deck-lint.mjs` flags violations (flat frontmatter
+`background:` colors only — image, gradient, and theme-driven cover/section
+backgrounds need a rendered-screenshot check).
+
 ### Other rules
 
 - No emoji in slides or Mermaid diagrams

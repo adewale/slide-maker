@@ -368,6 +368,110 @@ function formatRatio(ratio) {
   return `${ratio.toFixed(1)}:1`;
 }
 
+// Max allowed jump in WCAG relative luminance (0..1) between adjacent slides
+// before it reads as a "flash-bang" — a dark slide cutting to a bright one,
+// dazzling a dark-room audience the way a camera flash does.
+const FLASHBANG_LUMA_DELTA = 0.5;
+
+// Slidev per-slide frontmatter keys. Used to tell a frontmatter block apart
+// from a content block when both sit between `---` separators. An allowlist
+// (rather than a generic "key: value" shape test) avoids misreading prose like
+// "Note: ..." as frontmatter.
+const FM_KEYS = new Set([
+  'layout', 'transition', 'background', 'backgroundSize', 'class', 'clicks',
+  'level', 'hide', 'hideInToc', 'title', 'name', 'zoom', 'dragPos',
+  'routeAlias', 'disabled', 'preload', 'src', 'image', 'color',
+]);
+
+/**
+ * Resolve a CSS color string to a measurable hex, or null if it is not a flat
+ * color we can assess statically (images, gradients, rgb()/var() references).
+ */
+function colorToHex(value) {
+  if (!value) return null;
+  const v = value.trim().replace(/^['"]|['"]$/g, '').trim();
+  if (/^#[0-9a-fA-F]{3,8}$/.test(v)) return v;
+  const named = { black: '#000000', white: '#ffffff' };
+  return named[v.toLowerCase()] || null;
+}
+
+/**
+ * Detect "flash-bang" brightness jumps between adjacent slides: a dark slide
+ * followed by a much brighter one (or vice versa). Backgrounds come from the
+ * deck's --deck-bg token, overridden per slide by a frontmatter `background:`.
+ *
+ * Limitation: this only sees flat colors declared in frontmatter. Image,
+ * gradient, and theme/layout-driven backgrounds (cover/section) are not
+ * statically measurable — those need a rendered-screenshot check.
+ *
+ * Returns an array of warning strings.
+ */
+function checkFlashBang(slidesMd, deckBgRaw) {
+  const warnings = [];
+  const deckBg = colorToHex(deckBgRaw);
+  if (!deckBg) return warnings; // can't measure the deck background
+
+  // Split into `---`-delimited blocks (Slidev document structure):
+  // texts[0] = pre-headmatter (empty), [1] = headmatter, [2] = cover body,
+  // then frontmatter/body blocks for each subsequent slide.
+  const blocks = [[]];
+  for (const line of slidesMd.split(/\r?\n/)) {
+    if (/^---\s*$/.test(line)) blocks.push([]);
+    else blocks[blocks.length - 1].push(line);
+  }
+  const texts = blocks.map(b => b.join('\n'));
+  if (texts.length < 3) return warnings;
+
+  const bgOf = (t) => {
+    const m = t.match(/^\s*background\s*:\s*(.+?)\s*$/m);
+    return m ? colorToHex(m[1]) : null;
+  };
+  const isFrontmatter = (t) => {
+    const lines = t.split('\n').map(s => s.trim()).filter(Boolean);
+    if (!lines.length) return false;
+    return lines.every(l => {
+      const m = l.match(/^([A-Za-z_][\w-]*)\s*:/);
+      return m && FM_KEYS.has(m[1]);
+    });
+  };
+
+  // Build the ordered list of slide backgrounds, defaulting to the deck bg.
+  const slideBgs = [];
+  const coverBg = bgOf(texts[1]);
+  slideBgs.push({ num: 1, hex: coverBg || deckBg, explicit: !!coverBg });
+
+  let pendingBg = null;
+  let sawFrontmatter = false;
+  for (let i = 3; i < texts.length; i++) {
+    const t = texts[i];
+    if (!t.trim()) continue;
+    if (isFrontmatter(t)) {
+      sawFrontmatter = true;
+      pendingBg = bgOf(t);
+      continue;
+    }
+    const explicit = sawFrontmatter && !!pendingBg;
+    slideBgs.push({ num: slideBgs.length + 1, hex: explicit ? pendingBg : deckBg, explicit });
+    sawFrontmatter = false;
+    pendingBg = null;
+  }
+
+  for (let i = 1; i < slideBgs.length; i++) {
+    const a = slideBgs[i - 1];
+    const b = slideBgs[i];
+    if (!a.explicit && !b.explicit) continue; // both inherit the deck bg → no jump
+    const delta = Math.abs(relativeLuminance(a.hex) - relativeLuminance(b.hex));
+    if (delta >= FLASHBANG_LUMA_DELTA) {
+      warnings.push(
+        `flash-bang: slide ${a.num} (${a.hex}) to slide ${b.num} (${b.hex}) jumps ` +
+        `${delta.toFixed(2)} in relative luminance (>= ${FLASHBANG_LUMA_DELTA}) — ` +
+        `keep adjacent backgrounds in the same brightness band`
+      );
+    }
+  }
+  return warnings;
+}
+
 /**
  * Validate Mermaid diagram syntax for common issues that cause rendering failures.
  * Returns an array of warning strings.
@@ -1434,6 +1538,19 @@ function lintDeck(deckDir) {
     warns.push(`only ${layoutSet.size} layout types used — use at least 3 for visual variety (have: ${[...layoutSet].join(', ')})`);
   } else if (layoutSet.size > 0) {
     info.push(`${layoutSet.size} layout types: ${[...layoutSet].join(', ')}`);
+  }
+
+  // ─── 24. Flash-bang brightness continuity ────────────────────
+  // Flag a dark slide cutting to a much brighter one (or vice versa).
+  const tokensPath = join(deckDir, 'styles/tokens.css');
+  if (existsSync(tokensPath)) {
+    const tokensCss = readFileSync(tokensPath, 'utf-8');
+    const bgMatch = tokensCss.match(/--deck-bg\s*:\s*([^;]+);/);
+    const flashBangs = checkFlashBang(slidesMd, bgMatch ? bgMatch[1].trim() : null);
+    if (flashBangs.length === 0) {
+      info.push('no flash-bang brightness jumps between adjacent slides');
+    }
+    for (const w of flashBangs) warns.push(w);
   }
 
   return { name, errors, warns, info };
