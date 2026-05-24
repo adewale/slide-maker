@@ -75,9 +75,15 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [x] `evals/evals.json` assertions carry machine-runnable `assert` specs alongside the prose `check`; deterministic engine runs with zero deps
 - [x] LLM judge (`--judge`): scores semantic assertions + DECK_RUBRIC visual axes (/20) + slop tells via Claude, prompt-caching the rubric (needs `@anthropic-ai/sdk` + `ANTHROPIC_API_KEY`)
 - [x] Generation hook: `--generate "<cmd>"` produces a missing deck before grading ({prompt}/{out}/{id}/{files} substitution)
-- [ ] Add create-eval fixtures under `evals/runs/<id>/` (or wire `--generate` to the skill) so evals 0 and 1 grade end-to-end, not just the update eval
-- [ ] `countSlides` does not follow `src:` page includes — fine for self-contained eval decks, but reference-style decks under-count
+- [x] Sub-agent judge handoff: `--emit-judge-tasks` / `--judge-results` so a dispatched grading sub-agent (no API key) can score decks
+- [x] Create-eval fixtures committed under `evals/fixtures/{0,1}/` — evals 0 and 1 now grade end-to-end (7/7 each), not just the update eval
+- [x] `countSlides` (and deck-lint's layout-variety scan) now follow `src:` page includes — reference-style decks count in full
 - [ ] Fail CI on eval regressions (runner already exits non-zero on any failing assertion)
+
+### Rendered-pixel audit (markdown vs pixels)
+- [x] `tools/pixel-audit.mjs` — flash-bang detection from rendered screenshots (per-slide WCAG luminance), catching what the static deck-lint check can't see (images, gradients, theme cover/section backgrounds)
+- [ ] Wire `pixel-audit` into the verify pipeline once a deck is rendered (consumes `screenshot-audit.mjs` output in `/tmp/slide-audit`)
+- [ ] Extend pixel-audit to measure rendered text/background contrast, not just adjacent-slide luminance
 
 ### Acceptance checklist enforcement (done)
 - [x] ACCEPTANCE_CHECKLIST.md is the canonical checklist (extracted from COMPILER_RULES.md)
