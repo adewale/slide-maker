@@ -73,7 +73,7 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 ### Eval framework
 - [x] Runner built: `tools/eval-runner.mjs` (`npm run eval`) — resolve output deck → grade → score → report (console + `--json`)
 - [x] `evals/evals.json` assertions carry machine-runnable `assert` specs alongside the prose `check`; deterministic engine runs with zero deps
-- [x] LLM judge (`--judge`): scores semantic assertions + DECK_RUBRIC visual axes (/20) + slop tells via Claude, prompt-caching the rubric (needs `@anthropic-ai/sdk` + `ANTHROPIC_API_KEY`)
+- [x] Judge scores semantic assertions + DECK_RUBRIC visual axes (/20) + slop tells + a held-out score. Judging is keyless via the sub-agent handoff only (the direct `@anthropic-ai/sdk` path was removed — no API key in the loop)
 - [x] Generation hook: `--generate "<cmd>"` produces a missing deck before grading ({prompt}/{out}/{id}/{files} substitution)
 - [x] Sub-agent judge handoff: `--emit-judge-tasks` / `--judge-results` so a dispatched grading sub-agent (no API key) can score decks
 - [x] Create-eval fixtures committed under `evals/fixtures/{0,1}/` — evals 0 and 1 now grade end-to-end (7/7 each), not just the update eval

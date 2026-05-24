@@ -23,7 +23,6 @@
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
-    "@anthropic-ai/sdk": "latest",
     "pixelmatch": "^7.1.0",
     "playwright": "^1.58.2",
     "playwright-chromium": "^1.58.2",

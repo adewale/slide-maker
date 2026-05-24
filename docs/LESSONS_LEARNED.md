@@ -96,6 +96,54 @@ The time spent building these tools is small compared to the time spent debuggin
 
 ---
 
+## 9. Evals measure what's easy, not what matters (markdown vs pixels)
+
+**What happened:** The flash-bang and contrast checks in `deck-lint.mjs` read Markdown and CSS tokens. They pass cleanly on a deck whose cover is a near-black background *image* over a light `--deck-bg` — the audience still gets flash-banged, but the static check only sees flat colors and reports no jump. An adversarial deck (`evals/adversarial/image-flashbang`) confirmed the blind spot: it passes `deck-lint` clean.
+
+**The lesson:** Measure the artifact the audience experiences (rendered pixels), not its source (Markdown). `tools/pixel-audit.mjs` computes per-slide luminance from screenshots and catches what the static check structurally cannot. A static gate is necessary but never sufficient — pair it with a rendered gate.
+
+---
+
+## 10. A passing checklist is not a good deck (Goodhart / held-out criteria)
+
+**What happened:** The judge grades decks against the same rubric files (`DECK_RUBRIC.md`, `LLM_TELLS.md`) that drive generation. That measures how well the generator satisfied the *known* axes, not whether the deck is good. A graded run scored the demo deck 17/20 on the public visual rubric but only 7/10 on held-out criteria — because the assigned task (splitting a dense slide) was never actually performed. High polish masked undone work.
+
+**The lesson:** When the metric is also the target, it stops measuring (Goodhart). Keep a held-out rubric (`evals/holdout-rubric.md`) the generator never loads — memorability, the skeptic test, numerical integrity, earned endings — and flag decks where the public score is high but the held-out score is low. The divergence is the signal.
+
+---
+
+## 11. Static checks need adversarial probes (self-evolving evals)
+
+**What happened:** The eval suite only tested failure modes we had already imagined. `tools/adversarial.mjs` flips that: sub-agents author decks *designed* to pass the gate while embodying a real defect. Two of two slipped (`image-flashbang`, `sanctioned-font-slop`) — each a genuine blind spot we hadn't encoded.
+
+**The lesson:** A frozen checklist tests last year's failures. Let a model probe the gate; every "false pass" is either a check to harden or a case to canonicalize into `evals.json`. Keep the slipped decks as regression fixtures so a future hardening can prove it now catches them.
+
+---
+
+## 12. Track the distribution over time, not the latest number
+
+**What happened:** A single run reports "17/18 passed." That number can stay flat while the *character* of the scores shifts — e.g. every deck suddenly acing one axis, or visual scores converging to identical values (a gaming tell).
+
+**The lesson:** `--record` appends each run to `evals/history.jsonl`; `--trend` reports drift in pass-rate, mean visual, mean held-out, and slop totals, and flags large moves, Goodhart gaps, and variance collapse. Watch the series, not the snapshot.
+
+---
+
+## 13. Keyless beats keyed inside an agent loop
+
+**What happened:** The judge was first built as a direct Anthropic SDK call needing `ANTHROPIC_API_KEY`. It could never run in the sandbox (no key) and added a dependency and a secret. The sub-agent handoff (`--emit-judge-tasks` → dispatch grading sub-agents → `--judge-results`) does the same grading by reusing the orchestrating agent's own model access — no key, no SDK, runs anywhere. We removed the SDK path entirely.
+
+**The lesson:** When the orchestrating agent already has a capability, hand the work to a sub-agent instead of re-authenticating from a standalone script. Fewer secrets, fewer dependencies, and it works in environments where a raw API key is unavailable.
+
+---
+
+## 14. Distinguish a wrong check from a wrong artifact
+
+**What happened:** Four lint warnings looked alike but had opposite fixes. "Mermaid block counted as a 19-line code overflow" and "reference deck has only 2 layouts" were *linter bugs* — the diagram is fine and the layouts live in `src:`-included pages the scan didn't follow; the fix was in `deck-lint.mjs`. But "accent fails 4.5:1 body contrast" and "Inter as the display font" were *real artifact defects*; the fix was in the deck.
+
+**The lesson:** Before silencing a warning, ask whether the check is wrong or the artifact is. Fix false positives in the rule (and add the missing capability, e.g. following includes); fix true positives in the deck. Never weaken a check just to make a real defect disappear.
+
+---
+
 ## Tool inventory
 
 | Tool | Purpose | When to run |
@@ -108,6 +156,10 @@ The time spent building these tools is small compared to the time spent debuggin
 | `tools/deck-preview.mjs <deck>` | Screenshot all slides to contact sheet | For visual review |
 | `tools/deck-diff.mjs --left A --right B` | Pixel-diff two screenshot sets | For visual regression |
 | `tools/compare-decks.mjs` | Screenshot a reference URL and local build side-by-side, generate HTML comparison report | For comparing local deck against a live reference |
+| `tools/eval-runner.mjs` | Grade decks against `evals/evals.json` — deterministic assertions + sub-agent judge (visual rubric, slop, held-out score) | After generating or updating a deck |
+| `tools/eval-runner.mjs --record / --trend` | Append a run to `evals/history.jsonl`; report score drift and meta-signals over time | Each eval run / when checking for regressions |
+| `tools/pixel-audit.mjs <dir>` | Flash-bang detection from rendered screenshots (per-slide luminance) — the rendered counterpart to deck-lint | After screenshotting (`screenshot-audit.mjs`) |
+| `tools/adversarial.mjs --emit / --screen` | Author decks that try to slip the gate; screen them and report false passes (blind spots) | When hardening the eval gate |
 
 ### Recommended workflow
 
