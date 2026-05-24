@@ -1,0 +1,15 @@
+:root {
+  /* Clean cool-grey palette. Preset-sanctioned fonts, WCAG AA verified:
+       fg on bg     = 14.96:1 (pass 4.5:1 normal)
+       accent on bg = 6.58:1  (pass 4.5:1 normal)
+       muted on bg  = 6.07:1  (pass 4.5:1 normal) */
+  --deck-bg: #f7f8fa;
+  --deck-fg: #1c2230;
+  --deck-accent: #2457a8;
+  --deck-muted: #555f70;
+  --deck-card: #eef1f5;
+  --deck-rule: #d6dbe2;
+  --deck-font-display: 'Source Serif 4', serif;
+  --deck-font-body: 'Source Sans 3', sans-serif;
+  --deck-font-mono: 'Source Code Pro', monospace;
+}

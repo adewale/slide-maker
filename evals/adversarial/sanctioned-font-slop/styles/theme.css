@@ -1,0 +1,155 @@
+/* ─── Base ─── */
+.slidev-layout {
+  font-family: var(--deck-font-body);
+  color: var(--deck-fg);
+  background: var(--deck-bg);
+}
+
+h1, h2, h3 {
+  font-family: var(--deck-font-display);
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 2.4rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: 1.6rem;
+}
+
+h3 {
+  color: var(--deck-fg);
+  font-size: 1.05rem;
+  margin-bottom: 0.35rem;
+  font-family: var(--deck-font-body);
+  font-weight: 600;
+}
+
+strong {
+  color: var(--deck-accent);
+  font-weight: 700;
+}
+
+p {
+  color: var(--deck-muted);
+  line-height: 1.6;
+}
+
+code {
+  font-family: var(--deck-font-mono);
+  color: var(--deck-accent);
+  background: var(--deck-card);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  font-size: 0.88em;
+}
+
+ul {
+  line-height: 1.8;
+}
+
+ul li::marker {
+  color: var(--deck-accent);
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--deck-rule);
+  margin: 1.5rem 0;
+}
+
+/* ─── v-click animation (defined, but the deck never reveals progressively) ─── */
+.slidev-vclick-target {
+  transition: all 0.3s ease;
+}
+
+.slidev-vclick-hidden {
+  opacity: 0;
+}
+
+/* ─── The one card style, reused on every content slide ─── */
+.slop-card {
+  background: var(--deck-card);
+  border: 1px solid var(--deck-rule);
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.slop-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 8px;
+  background: var(--deck-bg);
+  border: 1px solid var(--deck-rule);
+  color: var(--deck-accent);
+  font-family: var(--deck-font-display);
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+
+.slop-card p {
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+/* ─── Cover ─── */
+.slidev-layout.cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 5rem;
+}
+
+.slidev-layout.cover p {
+  font-size: 1.1rem;
+  color: var(--deck-muted);
+  margin-top: 1rem;
+}
+
+/* ─── Fact (the hero-metric cliche) ─── */
+.slidev-layout.fact {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.slidev-layout.fact h1 {
+  font-size: 7rem;
+  color: var(--deck-accent);
+  letter-spacing: -0.03em;
+}
+
+.slidev-layout.fact p {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--deck-muted);
+  margin-top: 0.5rem;
+}
+
+/* ─── End ─── */
+.slidev-layout.end {
+  text-align: center;
+  background: var(--deck-bg) !important;
+  color: var(--deck-fg) !important;
+}
+
+.slidev-layout.end h1 {
+  font-size: 2.6rem;
+  color: var(--deck-fg);
+}
+
+.slidev-layout.end p {
+  color: var(--deck-muted);
+  margin-top: 1rem;
+}
