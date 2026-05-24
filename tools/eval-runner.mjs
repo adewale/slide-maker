@@ -32,9 +32,15 @@
 //     --generate "<cmd>"      run <cmd> to produce a missing deck. Tokens:
 //                             {prompt} {out} {id} are substituted.
 //     --json <path>           also write the report JSON here
+//     --record                append this run to evals/history.jsonl
+//     --trend                 analyse history.jsonl for score drift, then exit
 //     -h, --help              show this help
+//
+// The judge also scores a HELD-OUT rubric (evals/holdout-rubric.md) the deck
+// generator never sees — a deck that aces the public rubric but scores low on
+// holdout is flagged as a Goodhart signal.
 
-import { existsSync, readFileSync, readdirSync, mkdirSync, writeFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, mkdirSync, writeFileSync, appendFileSync, statSync } from 'node:fs';
 import { join, resolve, dirname, basename } from 'node:path';
 import { execSync } from 'node:child_process';
 
@@ -262,9 +268,18 @@ const JUDGE_SCHEMA = {
       required: ['transitions', 'reveals', 'annotations', 'motion', 'layout_variety', 'total'],
     },
     slop_tells: { type: 'array', items: { type: 'string' } },
+    holdout: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        score: { type: 'integer' },
+        notes: { type: 'string' },
+      },
+      required: ['score', 'notes'],
+    },
     summary: { type: 'string' },
   },
-  required: ['assertions', 'visual', 'slop_tells', 'summary'],
+  required: ['assertions', 'visual', 'slop_tells', 'holdout', 'summary'],
 };
 
 const GRADING_INSTRUCTIONS = `You are a strict grader for Slidev presentation decks produced by the slide-maker skill.
@@ -275,14 +290,23 @@ You will receive the eval prompt, a list of semantic assertions to judge, and th
 
 2. Score the deck's VISUAL INTEREST against DECK_RUBRIC.md Part 1: five axes (transitions, reveals, annotations, motion, layout_variety), each 0-4, and their sum as "total" (0-20). Then list any interface-slop tells you find (LLM_TELLS.md "Interface slop"): overused fonts, gradient text, glassmorphism, justified text, pure-black, flat type hierarchy, hero-metric cliche, etc. Empty list means none.
 
+3. Score the deck 0-10 against the HELD-OUT criteria (a separate section below, which the deck's author never saw) and give one or two sentences of notes. Judge these from first principles, NOT from the public rubric. A deck that aces the public rubric but scores low here is the signal to flag — it means the generator satisfied the measured axes without producing something good.
+
 Return ONLY the JSON object matching the provided schema. The rubric definitions follow.`;
+
+// Public rubric files — the same ones the generator compiles against.
+const PUBLIC_RUBRIC_FILES = ['docs/DECK_RUBRIC.md', 'docs/LLM_TELLS.md', 'docs/PROJECT_DECK_RUBRIC.md'];
+// Held-out file — judge-only, never loaded by the generator (anti-Goodhart).
+const HOLDOUT_RUBRIC_FILE = 'evals/holdout-rubric.md';
 
 function readRubricText() {
   const parts = [];
-  for (const f of ['docs/DECK_RUBRIC.md', 'docs/LLM_TELLS.md', 'docs/PROJECT_DECK_RUBRIC.md']) {
+  for (const f of PUBLIC_RUBRIC_FILES) {
     const p = join(repoRoot, f);
     if (existsSync(p)) parts.push(`===== ${f} =====\n${readFileSync(p, 'utf-8')}`);
   }
+  const hp = join(repoRoot, HOLDOUT_RUBRIC_FILE);
+  if (existsSync(hp)) parts.push(`===== HELD-OUT CRITERIA (author never saw these) =====\n${readFileSync(hp, 'utf-8')}`);
   return parts.join('\n\n');
 }
 
@@ -346,7 +370,7 @@ function applyVerdict(results, verdict) {
     if (j) { r.status = j.pass ? 'pass' : 'fail'; r.detail = j.reason; }
     else { r.status = 'manual'; r.detail = 'judge returned no verdict'; }
   }
-  return { visual: verdict.visual ?? null, slopTells: verdict.slop_tells ?? null, summary: verdict.summary ?? null };
+  return { visual: verdict.visual ?? null, slopTells: verdict.slop_tells ?? null, holdout: verdict.holdout ?? null, summary: verdict.summary ?? null };
 }
 
 // ── Sub-agent handoff (request → results) ──────────────────────────────
@@ -378,9 +402,10 @@ function buildJudgeTasks(cases, reports) {
     skill: 'slide-maker',
     when: new Date().toISOString(),
     instructions: GRADING_INSTRUCTIONS,
-    rubric_files: ['docs/DECK_RUBRIC.md', 'docs/LLM_TELLS.md', 'docs/PROJECT_DECK_RUBRIC.md'].filter(f => existsSync(join(repoRoot, f))),
+    rubric_files: PUBLIC_RUBRIC_FILES.filter(f => existsSync(join(repoRoot, f))),
+    holdout_rubric_file: existsSync(join(repoRoot, HOLDOUT_RUBRIC_FILE)) ? HOLDOUT_RUBRIC_FILE : null,
     result_schema: JUDGE_SCHEMA,
-    how_to_respond: 'Dispatch one sub-agent per task. Each reads rubric_files + the task deck_files (under deckDir), grades assertions_to_judge, scores DECK_RUBRIC visual axes, lists slop tells, and appends an object {id, assertions:[{name,pass,reason}], visual:{...,total}, slop_tells:[], summary} to results[]. Write to a JSON file (or one file per deck in a dir), then run: node tools/eval-runner.mjs --judge-results <path>',
+    how_to_respond: 'Dispatch one sub-agent per task. Each reads rubric_files + holdout_rubric_file + the task deck_files (under deckDir), grades assertions_to_judge, scores DECK_RUBRIC visual axes, lists slop tells, scores the held-out criteria 0-10, and appends an object {id, assertions:[{name,pass,reason}], visual:{...,total}, slop_tells:[], holdout:{score,notes}, summary} to results[]. Write to a JSON file (or one file per deck in a dir), then run: node tools/eval-runner.mjs --judge-results <path>',
     results: [],
     tasks,
   };
@@ -426,15 +451,16 @@ async function gradeEval(evalCase, opts, rubricText) {
   let judgeError = null;
   let visual = null;
   let slopTells = null;
+  let holdout = null;
   let summary = null;
   const preset = opts.judgeResults && opts.judgeResults.get(evalCase.id);
   if (preset) {
     // Sub-agent handoff: verdict already produced by a dispatched grading agent.
-    ({ visual, slopTells, summary } = applyVerdict(results, preset));
+    ({ visual, slopTells, holdout, summary } = applyVerdict(results, preset));
   } else if (opts.judge) {
     // SDK judge: call Claude directly.
     try {
-      ({ visual, slopTells, summary } = applyVerdict(results, await judgeDeck(evalCase, deckDir, judgeQueue, rubricText)));
+      ({ visual, slopTells, holdout, summary } = applyVerdict(results, await judgeDeck(evalCase, deckDir, judgeQueue, rubricText)));
     } catch (e) {
       judgeError = e.message;
     }
@@ -446,17 +472,98 @@ async function gradeEval(evalCase, opts, rubricText) {
     id: evalCase.id, deckDir, skipped: false, results,
     passed, counted: counted.length,
     deferred: results.filter(r => r.status === 'judge' || r.status === 'manual').length,
-    visual, slopTells, summary, judgeError,
+    visual, slopTells, holdout, summary, judgeError,
   };
+}
+
+// ── Trend tracking (#1 meta-signals over time) ─────────────────────────
+
+const HISTORY_FILE = 'evals/history.jsonl';
+
+// Append a compact record of this run so drift can be tracked across runs.
+function recordRun(suiteName, reports) {
+  const graded = reports.filter(r => !r.skipped);
+  const rec = {
+    when: new Date().toISOString(),
+    skill: suiteName,
+    totals: { pass: graded.reduce((s, r) => s + r.passed, 0), count: graded.reduce((s, r) => s + r.counted, 0) },
+    evals: graded.map(r => ({
+      id: r.id,
+      passed: r.passed,
+      counted: r.counted,
+      visual: r.visual ? r.visual.total : null,
+      holdout: r.holdout ? r.holdout.score : null,
+      slop: r.slopTells ? r.slopTells.length : null,
+    })),
+  };
+  const out = join(repoRoot, HISTORY_FILE);
+  mkdirSync(dirname(out), { recursive: true });
+  appendFileSync(out, JSON.stringify(rec) + '\n');
+  return rec;
+}
+
+const mean = (xs) => { const v = xs.filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+const stdev = (xs) => { const v = xs.filter(x => x != null); if (v.length < 2) return null; const m = mean(v); return Math.sqrt(v.reduce((a, b) => a + (b - m) ** 2, 0) / v.length); };
+const fmt = (x, d = 1) => (x == null ? '—' : x.toFixed(d));
+
+// Read history.jsonl and report drift — not just the latest number, but how the
+// distribution of scores is shifting (the blog's meta-signal idea).
+function showTrend(limit = 8) {
+  const p = join(repoRoot, HISTORY_FILE);
+  if (!existsSync(p)) { console.log(`${C.dim}no history yet — run with --record first${C.reset}`); return; }
+  const recs = readFileSync(p, 'utf-8').split('\n').filter(Boolean).map(l => JSON.parse(l));
+  const recent = recs.slice(-limit);
+
+  console.log(`${C.bold}${C.magenta}eval-trend${C.reset}  ${C.dim}last ${recent.length} of ${recs.length} run(s)${C.reset}\n`);
+  console.log(`  ${C.dim}${'when'.padEnd(20)} ${'pass%'.padStart(6)} ${'visual̄'.padStart(7)} ${'hold̄'.padStart(6)} ${'slopΣ'.padStart(6)}${C.reset}`);
+  const row = (r) => {
+    const pct = r.totals.count ? Math.round((r.totals.pass / r.totals.count) * 100) : 0;
+    const v = mean(r.evals.map(e => e.visual));
+    const h = mean(r.evals.map(e => e.holdout));
+    const slop = r.evals.reduce((s, e) => s + (e.slop || 0), 0);
+    return { pct, v, h, slop, when: r.when.slice(0, 19).replace('T', ' ') };
+  };
+  for (const r of recent) {
+    const m = row(r);
+    console.log(`  ${m.when.padEnd(20)} ${String(m.pct).padStart(5)}% ${fmt(m.v).padStart(7)} ${fmt(m.h).padStart(6)} ${String(m.slop).padStart(6)}`);
+  }
+
+  console.log('');
+  if (recent.length < 2) { console.log(`  ${C.dim}need 2+ runs to show drift${C.reset}`); return; }
+  const a = row(recent[recent.length - 2]);
+  const b = row(recent[recent.length - 1]);
+  const flags = [];
+  const dPct = b.pct - a.pct;
+  if (Math.abs(dPct) >= 10) flags.push(`assertion pass-rate moved ${dPct > 0 ? '+' : ''}${dPct} points`);
+  if (a.v != null && b.v != null && Math.abs(b.v - a.v) >= 2) flags.push(`mean visual moved ${(b.v - a.v > 0 ? '+' : '')}${(b.v - a.v).toFixed(1)}`);
+  if (a.h != null && b.h != null && Math.abs(b.h - a.h) >= 2) flags.push(`mean holdout moved ${(b.h - a.h > 0 ? '+' : '')}${(b.h - a.h).toFixed(1)}`);
+
+  // Goodhart: public visual high but held-out low on the latest run.
+  const latest = recent[recent.length - 1];
+  if (b.v != null && b.h != null && (b.v / 2 - b.h) >= 3) flags.push(`Goodhart gap: mean visual ${(b.v / 2).toFixed(1)}/10 vs holdout ${b.h.toFixed(1)}/10`);
+
+  // Character shift: visual scores collapsing to uniform across decks can mean gaming.
+  const sdA = stdev(recent[recent.length - 2].evals.map(e => e.visual));
+  const sdB = stdev(latest.evals.map(e => e.visual));
+  if (sdA != null && sdB != null && sdA - sdB >= 2) flags.push(`visual spread collapsed (σ ${sdA.toFixed(1)} → ${sdB.toFixed(1)}) — scores converging, check for gaming`);
+
+  if (flags.length) {
+    console.log(`  ${C.yellow}${C.bold}meta-signals (latest vs previous):${C.reset}`);
+    for (const f of flags) console.log(`  ${DOT} ${C.yellow}${f}${C.reset}`);
+  } else {
+    console.log(`  ${CHECK} no significant drift between the last two runs`);
+  }
 }
 
 // ── CLI ────────────────────────────────────────────────────────────────
 
 function parseArgs(argv) {
-  const opts = { judge: false, only: new Set(), overrides: new Map(), generate: null, json: null, emitJudgeTasks: null, judgeResultsPath: null };
+  const opts = { judge: false, only: new Set(), overrides: new Map(), generate: null, json: null, emitJudgeTasks: null, judgeResultsPath: null, record: false, trend: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--judge') opts.judge = true;
+    else if (a === '--record') opts.record = true;
+    else if (a === '--trend') opts.trend = true;
     else if (a === '--eval') opts.only.add(Number(argv[++i]));
     else if (a === '--generate') opts.generate = argv[++i];
     else if (a === '--json') opts.json = argv[++i];
@@ -481,6 +588,7 @@ async function main() {
     console.log(readFileSync(new URL(import.meta.url)).toString().split('\n').filter(l => l.startsWith('//')).map(l => l.slice(3)).join('\n'));
     return;
   }
+  if (opts.trend) { showTrend(); return; } // read-only: analyse history, don't grade
 
   const evalsPath = join(repoRoot, 'evals', 'evals.json');
   const suite = JSON.parse(readFileSync(evalsPath, 'utf-8'));
@@ -514,6 +622,13 @@ async function main() {
     if (rep.judgeError) console.log(`  ${CROSS} ${C.red}judge error: ${rep.judgeError}${C.reset}`);
     if (rep.visual) console.log(`  ${C.cyan}visual ${rep.visual.total}/20${C.reset} ${C.dim}(transitions ${rep.visual.transitions}, reveals ${rep.visual.reveals}, annotations ${rep.visual.annotations}, motion ${rep.visual.motion}, layout ${rep.visual.layout_variety})${C.reset}`);
     if (rep.slopTells && rep.slopTells.length) console.log(`  ${DOT} ${C.yellow}slop: ${rep.slopTells.join('; ')}${C.reset}`);
+    if (rep.holdout) {
+      console.log(`  ${C.cyan}holdout ${rep.holdout.score}/10${C.reset} ${C.dim}— ${rep.holdout.notes}${C.reset}`);
+      if (rep.visual) {
+        const gap = rep.visual.total / 2 - rep.holdout.score; // both on a /10 scale
+        if (gap >= 3) console.log(`  ${DOT} ${C.yellow}Goodhart signal: public visual ${(rep.visual.total / 2).toFixed(1)}/10 vs holdout ${rep.holdout.score}/10 (gap ${gap.toFixed(1)}) — aces the measured rubric, weak on held-out quality${C.reset}`);
+      }
+    }
   }
 
   // Summary
@@ -540,6 +655,11 @@ async function main() {
     mkdirSync(dirname(out), { recursive: true });
     writeFileSync(out, JSON.stringify({ skill: suite.skill_name, when: new Date().toISOString(), judge: opts.judge || !!opts.judgeResults, reports }, null, 2));
     console.log(`\n${C.dim}report written to ${opts.json}${C.reset}`);
+  }
+
+  if (opts.record) {
+    recordRun(suite.skill_name, reports);
+    console.log(`\n${C.dim}run appended to ${HISTORY_FILE} — see drift with: node tools/eval-runner.mjs --trend${C.reset}`);
   }
 
   const anyFail = graded.some(r => r.results.some(x => x.status === 'fail'));
