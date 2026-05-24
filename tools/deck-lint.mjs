@@ -252,6 +252,9 @@ function checkOverflow(md) {
   // ── Code block overflow ──
   const codeBlocks = md.matchAll(/```[\s\S]*?```/g);
   for (const block of codeBlocks) {
+    // Mermaid blocks render as scaled diagrams, not code text — they have their
+    // own validation (checkMermaidSyntax) and legitimately exceed the line cap.
+    if (/^```\s*mermaid/i.test(block[0])) continue;
     const blockLines = block[0].split('\n');
     // Subtract the opening and closing ``` lines
     const codeLines = blockLines.length - 2;
@@ -1603,6 +1606,17 @@ function lintDeck(deckDir) {
   for (const decl of layoutDecls) {
     const m = decl.match(/^layout:\s*(\S+)/);
     if (m) layoutSet.add(m[1]);
+  }
+  // Follow `src:` page includes — decks that split content into pages/*.md
+  // declare most of their layouts there, not in slides.md.
+  for (const inc of slidesMd.match(/^src:\s*(\S+)/gm) || []) {
+    const rel = inc.replace(/^src:\s*/, '').trim();
+    const incPath = join(deckDir, rel);
+    if (!existsSync(incPath)) continue;
+    for (const decl of readFileSync(incPath, 'utf-8').match(/^layout:\s*(\S+)/gm) || []) {
+      const m = decl.match(/^layout:\s*(\S+)/);
+      if (m) layoutSet.add(m[1]);
+    }
   }
 
   if (layoutSet.size < 3 && slides.length > 5) {

@@ -59,7 +59,9 @@ const FM_KEYS = new Set([
   'routeAlias', 'disabled', 'preload', 'src', 'image', 'color',
 ]);
 
-function countSlides(md) {
+// Count slides, following Slidev `src:` page includes so decks that split
+// content across pages/*.md are counted in full. deckDir resolves includes.
+function countSlides(md, deckDir, seen = new Set()) {
   const blocks = [[]];
   for (const line of md.split(/\r?\n/)) {
     if (/^---\s*$/.test(line)) blocks.push([]);
@@ -75,11 +77,24 @@ function countSlides(md) {
       return m && FM_KEYS.has(m[1]);
     });
   };
-  let count = 1; // cover (texts[2])
-  for (let i = 3; i < texts.length; i++) {
+  const srcOf = (t) => { const m = t.match(/^\s*src:\s*(\S+)/m); return m ? m[1].replace(/['"]/g, '') : null; };
+
+  let count = 0;
+  for (let i = 2; i < texts.length; i++) {
     const t = texts[i];
-    if (!t.trim() || isFrontmatter(t)) continue;
-    count++;
+    if (isFrontmatter(t)) {
+      const src = srcOf(t);
+      const inc = src && deckDir ? join(deckDir, src) : null;
+      if (inc && existsSync(inc) && !seen.has(inc)) {
+        seen.add(inc);
+        count += countSlides(readFileSync(inc, 'utf-8'), dirname(inc), seen);
+      } else {
+        count += 1;
+      }
+      i++; // consume the paired body block
+    } else if (t.trim()) {
+      count += 1; // body-only slide (e.g. the cover)
+    }
   }
   return count;
 }
@@ -124,7 +139,7 @@ function runAssert(spec, deckDir) {
     return { status: ok ? 'pass' : 'fail', detail: spec.file_exists };
   }
   if ('slide_count' in spec) {
-    const actual = countSlides(textOf('slides.md'));
+    const actual = countSlides(textOf('slides.md'), deckDir);
     return { status: actual === spec.slide_count ? 'pass' : 'fail', detail: `expected ${spec.slide_count}, found ${actual}` };
   }
   if ('contains' in spec) {
@@ -196,6 +211,9 @@ function resolveDeckDir(evalCase, overrides) {
     const f = evalCase.files.find(p => p.endsWith('slides.md')) || evalCase.files[0];
     return resolve(repoRoot, dirname(f));
   }
+  // create eval: prefer a committed fixture, else a freshly generated run dir
+  const fixture = resolve(repoRoot, 'evals', 'fixtures', String(evalCase.id));
+  if (existsSync(join(fixture, 'slides.md'))) return fixture;
   return resolve(repoRoot, 'evals', 'runs', String(evalCase.id));
 }
 

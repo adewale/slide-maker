@@ -1,0 +1,20 @@
+.slidev-layout {
+  background: var(--deck-bg);
+  color: var(--deck-fg);
+  font-family: var(--deck-font-body);
+  overflow: hidden;
+}
+
+.slidev-layout h1,
+.slidev-layout h2 {
+  font-family: var(--deck-font-display);
+  color: var(--deck-fg);
+}
+
+.slidev-layout strong {
+  color: var(--deck-accent);
+}
+
+.slidev-layout code {
+  font-family: var(--deck-font-mono);
+}
