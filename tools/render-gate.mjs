@@ -142,7 +142,10 @@ function parseArgs(argv) {
 
 async function runOnViewport(browser, baseUrl, vp, threshold, shotRoot) {
   const page = await browser.newPage({ viewport: { width: vp.w, height: vp.h } });
-  await page.goto(`${baseUrl}/#/999`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => {});
+  // domcontentloaded (not networkidle) — Slidev SPA is rendered by DCL, and
+  // decks with external Google Fonts / image backgrounds keep the network busy
+  // indefinitely so networkidle stalls until each per-nav timeout fires.
+  await page.goto(`${baseUrl}/#/999`, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => {});
   await page.waitForTimeout(800);
   const count = await page.evaluate(() => { const m = location.hash.match(/#\/(\d+)/); return m ? parseInt(m[1], 10) : 1; });
 
@@ -151,7 +154,7 @@ async function runOnViewport(browser, baseUrl, vp, threshold, shotRoot) {
 
   const slides = [];
   for (let i = 1; i <= count; i++) {
-    await page.goto(`${baseUrl}/#/${i}`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => {});
+    await page.goto(`${baseUrl}/#/${i}`, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => {});
     await page.waitForTimeout(700);
     const shot = join(shotDir, `slide-${String(i).padStart(2, '0')}.png`);
     await page.screenshot({ path: shot });
