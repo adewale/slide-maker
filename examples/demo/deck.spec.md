@@ -114,25 +114,34 @@
 ### Slide 8
 - kind: default-content
 - layout: default
-- title: The toolkit
+- title: The toolkit: motion and effects
 - body:
-  - grid: 2-column breadth overview
-  - left: 12 transitions, v-motion, v-mark (5 styles), Shiki Magic Move
-  - right: 8 Mermaid diagram types, WCAG checking, LLM-tell detection, CRAP audit
+  - grid: 2-column
+  - left: 12 transitions (fade, slide-left, slide-up, iris, wipe-right, wipe-up, morph-fade, zoom-in, zoom-out, flip-x, flip-y, blur)
+  - right: v-motion, v-mark (5 styles), Shiki Magic Move
 
 ### Slide 9
+- kind: default-content
+- layout: default
+- title: The toolkit: data and guardrails
+- body:
+  - grid: 2-column
+  - left: 8 Mermaid diagram types with explicit inline styling
+  - right: WCAG contrast, LLM-tell detection, CRAP audit, screenshot validation
+
+### Slide 10
 - kind: center
 - layout: center
 - title: The priority stack
 - body: Editability, Clarity, Coherence, Native Slidev, Reuse, Restraint (opacity gradient, progressive reveal)
 
-### Slide 10
+### Slide 11
 - kind: quote-pull
 - layout: quote
 - title: The test: close the tab. What do you remember?
 - body: A generic deck leaves nothing. No image, no number, no story.
 
-### Slide 11
+### Slide 12
 - kind: end
 - layout: end
 - title: Direction first. Then slides.

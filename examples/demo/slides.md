@@ -181,7 +181,7 @@ Sources:
 transition: morph-fade
 ---
 
-# The toolkit
+# The toolkit: motion and effects
 
 <div class="grid grid-cols-2 gap-8 mt-4">
 <div>
@@ -190,16 +190,37 @@ transition: morph-fade
 
 12 built-in: fade, slide-left, slide-up, iris, wipe-right, wipe-up, morph-fade, zoom-in, zoom-out, flip-x, flip-y, blur
 
+</div>
+<div>
+
 ### Visual effects
 
 v-motion, v-mark (underline, circle, strike, highlight, box), Shiki Magic Move for code transforms
 
 </div>
+</div>
+
+<!-- First half of the toolkit, focused on motion. Two sub-sections instead of four keeps the slide breathable while still emphasising volume (12 transitions, not "many"; 5 v-mark styles, not "various"). The point on this slide is the motion vocabulary.
+
+Sources:
+- file:skills/slide-maker/COMPILER_RULES.md — Transition grammar: the 12 semantic transitions and their meanings
+- file:skills/slide-maker/SLIDEV_REFERENCE.md — Rough Marker Annotations section -->
+
+---
+transition: slide-left
+---
+
+# The toolkit: data and guardrails
+
+<div class="grid grid-cols-2 gap-8 mt-4">
 <div>
 
 ### Data visualization
 
 Mermaid flowcharts, sequence diagrams, mind maps, pie charts, timelines, git graphs, entity-relationship, state diagrams — all with explicit inline styling
+
+</div>
+<div>
 
 ### Design guardrails
 
@@ -208,11 +229,11 @@ WCAG contrast checking, LLM-tell detection, CRAP audit, screenshot validation
 </div>
 </div>
 
-<!-- This is the breadth slide. No v-clicks — the point is volume, not sequence. Two columns keep it scannable. The numbers are specific: 12 transitions (not "many"), 8 Mermaid diagram types (not "various"), 5 v-mark annotation styles. Specificity is the antidote to AI-generated vagueness.
+<!-- Second half of the toolkit: how content gets visualised and how the system protects against AI-generated tells. Slide-left advances from the motion half; the pair reads as a single section of two slides rather than a single dense grid.
 
 Sources:
-- file:skills/slide-maker/COMPILER_RULES.md — Transition grammar: the 12 semantic transitions and their meanings
-- file:skills/slide-maker/SLIDEV_REFERENCE.md — Mermaid Diagrams and Rough Marker Annotations sections -->
+- file:skills/slide-maker/SLIDEV_REFERENCE.md — Mermaid Diagrams section
+- file:docs/LLM_TELLS.md — slop catalog and held-out criteria the guardrails enforce -->
 
 ---
 layout: center
