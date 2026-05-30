@@ -145,9 +145,16 @@ async function runOnViewport(browser, baseUrl, vp, threshold, shotRoot) {
   // domcontentloaded (not networkidle) — Slidev SPA is rendered by DCL, and
   // decks with external Google Fonts / image backgrounds keep the network busy
   // indefinitely so networkidle stalls until each per-nav timeout fires.
-  await page.goto(`${baseUrl}/#/999`, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => {});
-  await page.waitForTimeout(800);
-  const count = await page.evaluate(() => { const m = location.hash.match(/#\/(\d+)/); return m ? parseInt(m[1], 10) : 1; });
+  await page.goto(`${baseUrl}/#/1`, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => {});
+  await page.waitForTimeout(1000);
+  // Slidev's nav footer renders as "N / TOTAL" — the same discovery strategy
+  // screenshot-audit.mjs already uses. The /#/999 trick does NOT redirect on
+  // Slidev 52+, so parsing the hash gives a bogus count and the loop never
+  // terminates within the per-deck timeout.
+  const count = await page.evaluate(() => {
+    const m = document.body.innerText.match(/(\d+)\s*\/\s*(\d+)/);
+    return m ? parseInt(m[2], 10) : 1;
+  });
 
   const shotDir = join(shotRoot, vp.label);
   mkdirSync(shotDir, { recursive: true });
