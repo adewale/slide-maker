@@ -73,8 +73,11 @@ function main() {
   const json = process.argv.includes('--json') ? process.argv[process.argv.indexOf('--json') + 1] : null;
   const record = process.argv.includes('--record');
 
-  // should-pass: the live gallery + committed eval fixtures
-  const shouldPass = [...discover('examples'), ...discover('generated-decks'), ...discover('evals/fixtures')];
+  // should-pass: deliverable gallery decks only. (evals/fixtures are minimal
+  // eval *inputs* graded by assertions, not full deliverables — they
+  // intentionally omit global-bottom.vue etc., so they don't belong in a
+  // "must lint clean" set. Lesson 14: categorize honestly, don't weaken checks.)
+  const shouldPass = [...discover('examples'), ...discover('generated-decks')];
   // should-catch: adversarial decks, each with an intended defect
   const shouldCatch = discover('evals/adversarial');
 
