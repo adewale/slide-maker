@@ -9,6 +9,8 @@
     "eval": "node tools/eval-runner.mjs",
     "eval:trend": "node tools/eval-runner.mjs --trend",
     "pixel-audit": "node tools/pixel-audit.mjs",
+    "render-gate": "node tools/render-gate.mjs",
+    "gate-check": "node tools/gate-check.mjs",
     "adversarial": "node tools/adversarial.mjs"
   },
   "dependencies": {
