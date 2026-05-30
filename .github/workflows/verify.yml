@@ -1,0 +1,42 @@
+name: verify
+
+# Fast static gates — every PR, every push to main. ~30s on a clean cache.
+# Wires the gates we built this session into CI so they actually run instead of
+# decaying to "tools nobody invokes" (LESSONS_LEARNED #17).
+#
+#   deck-lint     structural validation (must be clean)
+#   gate-check    two-sided: should-pass decks lint clean AND adversarial defects
+#                 are each covered by some gate (LESSONS_LEARNED #15)
+#   eval-runner   deterministic assertion suite (must pass)
+#
+# The rendered gate (browser + screenshots) is slow; it lives in
+# rendered-gate.yml (workflow_dispatch + weekly schedule) instead of running here.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  fast-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: deck-lint (structural)
+        run: npm run lint
+
+      - name: gate-check (precision + recall)
+        run: npm run gate-check
+
+      - name: eval-runner (deterministic assertions)
+        run: npm run eval

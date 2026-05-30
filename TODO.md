@@ -78,7 +78,7 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [x] Sub-agent judge handoff: `--emit-judge-tasks` / `--judge-results` so a dispatched grading sub-agent (no API key) can score decks
 - [x] Create-eval fixtures committed under `evals/fixtures/{0,1}/` — evals 0 and 1 now grade end-to-end (7/7 each), not just the update eval
 - [x] `countSlides` (and deck-lint's layout-variety scan) now follow `src:` page includes — reference-style decks count in full
-- [ ] Fail CI on eval regressions (runner already exits non-zero on any failing assertion)
+- [x] CI verify workflow (`.github/workflows/verify.yml`) runs deck-lint + gate-check + eval on every PR / push to main; fails on any failing assertion or static-gate regression. Rendered gate runs in `.github/workflows/rendered-gate.yml` (manual + weekly)
 
 ### Rendered-pixel audit (markdown vs pixels)
 - [x] `tools/pixel-audit.mjs` — flash-bang detection from rendered screenshots (per-slide WCAG luminance), catching what the static deck-lint check can't see (images, gradients, theme cover/section backgrounds)
@@ -90,7 +90,7 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [x] deck-lint.mjs now auto-discovers generated-decks/ and runs 23 check groups
 - [x] New automated checks: overflow:hidden, headmatter fields, emoji in content, spec-slides sync, through-line frequency, visual evidence, layout variety
 - [x] SKILL.md Phase 7 instructs skill to run deck-lint before delivery
-- [ ] Fail CI if any hard-fail items are violated
+- [x] Fail CI if any hard-fail items are violated (via `.github/workflows/verify.yml`)
 
 ## Documentation
 

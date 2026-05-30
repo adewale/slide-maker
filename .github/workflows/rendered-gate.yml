@@ -1,0 +1,41 @@
+name: rendered-gate
+
+# The rendered gate (LESSONS_LEARNED #9: measure the artifact, not the source).
+# Slow because it builds every deck, installs Chromium, and drives a headless
+# browser over every slide — so it runs on demand and weekly, not per-PR.
+#
+# Trigger manually from the Actions tab (workflow_dispatch), or wait for the
+# weekly run. Anything per-PR that needs to be fast lives in verify.yml.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'  # Mondays 06:00 UTC
+
+jobs:
+  rendered:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Build all decks
+        run: npm run build
+
+      - name: build-and-verify --rendered (per-deck render-gate)
+        run: python3 tools/build-and-verify.py --rendered
