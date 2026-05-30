@@ -57,11 +57,12 @@
 
 **The lesson:** Layer your verification:
 - **Layer 1: Structure** (`tools/deck-lint.mjs`) — files exist, imports are correct
-- **Layer 2: Build output** (`tools/style-audit.mjs`, `tools/build-and-verify.sh`) — tokens/selectors survive the build
-- **Layer 3: Visual** (`tools/deck-preview.mjs`) — slides render correctly
-- **Layer 4: Comparison** (`tools/deck-diff.mjs`) — visual regression between versions
+- **Layer 2: Build output** (`tools/style-audit.mjs`, `tools/build-and-verify.py`) — tokens/selectors survive the build
+- **Layer 3: Rendered measurement** (`tools/render-gate.mjs`, `tools/pixel-audit.mjs`) — flash-bang, real contrast, overflow from actual pixels (Layers 1–2 read source; this reads the artifact)
+- **Layer 4: Visual** (`tools/deck-preview.mjs`) — slides render correctly
+- **Layer 5: Comparison** (`tools/deck-diff.mjs`) — visual regression between versions
 
-Never skip to layer 4 without passing layers 1-3.
+Never skip to layer 5 without passing layers 1-3.
 
 ---
 
@@ -144,6 +145,30 @@ The time spent building these tools is small compared to the time spent debuggin
 
 ---
 
+## 15. Test the gate from both sides — precision, not just recall
+
+**What happened:** We had adversarial decks proving the gate *misses* real defects (recall holes), but nothing proving the gate doesn't *invent* defects on good decks (precision). The mermaid-overflow and src-include false positives slipped in precisely because no test asserted "these known-good decks must lint clean."
+
+**The lesson:** `tools/gate-check.mjs` is two-sided. The **should-pass** set (gallery + fixtures) must lint clean — any new warning is a false-positive regression. The **should-catch** set (adversarial) must be caught by *some* gate — static, rendered, or judge. A gate validated in only one direction drifts: too loose (misses defects) or too tight (flags good work). Test both, and fail CI on either.
+
+---
+
+## 16. Meta-signals belong on every gate, not just the evals
+
+**What happened:** We added run-over-run trend tracking to the eval runner (Lesson 12), then realized the static gate has the same blind spot — a rule change can quietly add warnings across the whole gallery and a single green run hides it.
+
+**The lesson:** Any gate that produces a score or a count deserves a longitudinal log. `gate-check.mjs --record/--trend` tracks gallery-wide warning counts over time the same way `eval-runner --trend` tracks eval scores. When you build a meta-signal once, look for every other place the same drift can hide.
+
+---
+
+## 17. Wire the new gate into the pipeline, don't leave it as a loose tool
+
+**What happened:** `pixel-audit.mjs` existed for two sessions as a tool you had to remember to run — so it never ran. The rendered checks only became real once `render-gate.mjs` was wired into `build-and-verify.py --rendered` as a named stage with a pass/fail contribution.
+
+**The lesson:** A check that isn't in the pipeline is documentation, not enforcement. When you build a verifier, give it a home in an existing runner (a flag, a stage, a CI step) — otherwise it decays to a tool nobody invokes. Keep it opt-in if it's slow (the rendered gate needs a browser), but make invoking it one flag, not a remembered ritual.
+
+---
+
 ## Tool inventory
 
 | Tool | Purpose | When to run |
@@ -159,6 +184,8 @@ The time spent building these tools is small compared to the time spent debuggin
 | `tools/eval-runner.mjs` | Grade decks against `evals/evals.json` — deterministic assertions + sub-agent judge (visual rubric, slop, held-out score) | After generating or updating a deck |
 | `tools/eval-runner.mjs --record / --trend` | Append a run to `evals/history.jsonl`; report score drift and meta-signals over time | Each eval run / when checking for regressions |
 | `tools/pixel-audit.mjs <dir>` | Flash-bang detection from rendered screenshots (per-slide luminance) — the rendered counterpart to deck-lint | After screenshotting (`screenshot-audit.mjs`) |
+| `tools/render-gate.mjs <dist>` | Rendered gate: serves a built deck, drives a browser, checks flash-bang + real WCAG contrast + overflow from pixels/DOM | After building; or via `build-and-verify.py --rendered` |
+| `tools/gate-check.mjs [--record/--trend]` | Two-sided gate: should-pass decks lint clean (precision) + adversarial defects all covered (recall); trends gallery warnings | When changing any check; in CI |
 | `tools/adversarial.mjs --emit / --screen` | Author decks that try to slip the gate; screen them and report false passes (blind spots) | When hardening the eval gate |
 
 ### Recommended workflow
