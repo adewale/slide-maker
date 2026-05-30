@@ -37,5 +37,7 @@ jobs:
       - name: Build all decks
         run: npm run build
 
-      - name: build-and-verify --rendered (per-deck render-gate)
-        run: python3 tools/build-and-verify.py --rendered
+      - name: build-and-verify --rendered --mobile (desktop + mobile viewports)
+        # --mobile adds iPhone SE / Pixel 7 / iPhone SE landscape. Desktop-only
+        # would miss anything specific to the MobileScrollView under 640px.
+        run: python3 tools/build-and-verify.py --rendered --mobile

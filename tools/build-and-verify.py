@@ -133,7 +133,7 @@ def extract_fonts_from_frontmatter(slides_file: Path) -> list[str]:
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 
-def verify(decks: list[tuple[str, str]] | None = None, rendered: bool = False) -> int:
+def verify(decks: list[tuple[str, str]] | None = None, rendered: bool = False, mobile: bool = False) -> int:
     """Run all checks. Returns the process exit code (0 = pass, 1 = fail).
 
     When ``rendered`` is set, each built deck is additionally driven through
@@ -296,10 +296,10 @@ def verify(decks: list[tuple[str, str]] | None = None, rendered: bool = False) -
         # real text-on-bg contrast, rendered overflow.
         if rendered:
             gate = TOOLS_DIR / "render-gate.mjs"
-            proc = subprocess.run(
-                ["node", str(gate), str(build_dir), "--name", name],
-                capture_output=True, text=True,
-            )
+            argv = ["node", str(gate), str(build_dir), "--name", name]
+            if mobile:
+                argv.append("--mobile")
+            proc = subprocess.run(argv, capture_output=True, text=True)
             if proc.returncode == 0:
                 pass_msg("Rendered gate clean (flash-bang, contrast, overflow)")
             elif proc.returncode == 1:
@@ -368,6 +368,16 @@ def main() -> None:
             "browser. Slower; requires playwright + chromium."
         ),
     )
+    parser.add_argument(
+        "--mobile",
+        action="store_true",
+        help=(
+            "When combined with --rendered, also check mobile viewports "
+            "(iPhone SE, Pixel 7, iPhone SE landscape). The deck system ships "
+            "a distinct MobileScrollView under 640px portrait, so a "
+            "desktop-only render misses what users on phones see."
+        ),
+    )
     args = parser.parse_args()
 
     if args.decks:
@@ -380,7 +390,7 @@ def main() -> None:
     else:
         deck_list = None  # use all defaults
 
-    sys.exit(verify(deck_list, rendered=args.rendered))
+    sys.exit(verify(deck_list, rendered=args.rendered, mobile=args.mobile))
 
 
 if __name__ == "__main__":
