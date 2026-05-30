@@ -97,6 +97,10 @@ Generate or update: `slides.md`, styles, layouts, components, README if usage ch
 **Manual checks:** spec-to-slides sync, Markdown editability, justified custom code, no unused abstractions.
 Project decks: through-line in 3+ slides (ideally 5-6), source materials cited, 1+ visual evidence slide, project colors override preset tokens.
 
+**Rendered gate (image/gradient/per-slide-background decks):** static lint cannot see rendered brightness or contrast. Build the deck, then run `node tools/render-gate.mjs <built-dist>` (or `python tools/build-and-verify.py <dir>:<name> --rendered`). Fix any flash-bang, contrast, or overflow it reports.
+
+**Held-out quality check:** for a quality (not just structural) judgment, dispatch a fresh grading **sub-agent** to score the deck against `evals/holdout-rubric.md` — criteria deliberately *not* in the generation docs, so the review judges blind rather than re-checking the rules you optimized for. Use a sub-agent (it reuses your own model access — no API key); do not call an external API. A high structural score with a low held-out score means the deck is competent but forgettable.
+
 For the full checklist with enforcement levels, see ACCEPTANCE_CHECKLIST.md.
 
 ### 8. Deliver
