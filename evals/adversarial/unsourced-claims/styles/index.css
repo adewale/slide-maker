@@ -1,0 +1,7 @@
+@import './tokens.css';
+@import './theme.css';
+
+/* Viewport discipline: no slide should scroll. */
+.slidev-layout {
+  overflow: hidden;
+}
