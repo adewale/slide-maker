@@ -55,7 +55,7 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 ### Gallery improvements
 - [x] Auto-generate `index.html` from deck metadata during `build.py` (title, description, accent, preset extracted per deck)
 - [x] Add search/filter to the gallery page (filters by title, description, and preset)
-- [ ] Add deck thumbnails to the gallery (screenshot of cover slide)
+- [x] Add deck thumbnails to the gallery — `tools/thumbnail-gen.mjs` screenshots the cover at 1280×720 and writes `<deck>/thumb.png`; `tools/build.py` calls it after every deck build (best-effort, doesn't fail the build); the gallery card includes `<img class="thumb" src="./<deck>/thumb.png">` with a CSS fallback to a flat tile if the file is missing. Verified live: 35KB PNG from a `/tmp/fb-dist` cover in ~10s.
 
 ### CI/CD
 - [x] GitHub Actions workflow for GitHub Pages (`.github/workflows/deploy.yml`)
@@ -68,7 +68,7 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [x] Playwright capture script for mobile viewports (iPhone SE, iPhone 14, Pixel 7)
 - [x] Add landscape mobile viewport captures (iPhone SE landscape added to screenshot-audit.mjs)
 - [x] Mobile viewports added to screenshot-audit.mjs: iPhone SE (375x667), Pixel 7 (412x915), iPhone SE landscape (667x375)
-- [ ] Capture click states (slides with v-click animations at each step)
+- [x] Capture click states at every viewport — `tools/screenshot-audit.mjs` secondary-viewport loop now cycles v-clicks the same way the primary viewport does, so a mobile click state that overflows when click 0 looks clean is finally surfaced.
 
 ### Eval framework
 - [x] Runner built: `tools/eval-runner.mjs` (`npm run eval`) — resolve output deck → grade → score → report (console + `--json`)

@@ -217,10 +217,12 @@ def build_deck(
     base_prefix: str,
     label: str = "",
 ) -> None:
-    """Run ``npx slidev build`` for one deck and copy source Markdown."""
+    """Run ``npx slidev build`` for one deck, copy source Markdown, and
+    generate a cover-slide thumbnail for the gallery."""
     tag = f" ({label})" if label else ""
     print(f"\nBuilding {name}{tag}...")
     deck_out = out / name
+    tools_dir = Path(__file__).resolve().parent
     run(
         ["npx", "slidev", "build", "--base", f"{base_prefix}/{name}/", "--out", str(deck_out)],
         cwd=deck_src_dir,
@@ -231,6 +233,18 @@ def build_deck(
     pages_dir = deck_src_dir / "pages"
     if pages_dir.is_dir():
         shutil.copytree(pages_dir, deck_out / "pages", dirs_exist_ok=True)
+    # Cover-slide thumbnail for the gallery (best-effort: don't fail the build
+    # if playwright/chromium isn't available — the gallery falls back to a
+    # plain card without an image).
+    thumb_gen = tools_dir / "thumbnail-gen.mjs"
+    if thumb_gen.is_file():
+        try:
+            subprocess.run(
+                ["node", str(thumb_gen), str(deck_out), str(deck_out / "thumb.png")],
+                check=False, timeout=60, capture_output=True,
+            )
+        except Exception as exc:
+            print(f"  thumbnail-gen skipped for {name}: {exc}")
 
 
 # ── serve.json ──────────────────────────────────────────────────
@@ -411,6 +425,9 @@ def _card_html(name: str, meta: dict) -> str:
     tag = f'<span class="tag">{preset}</span>' if preset else ""
     return f"""\
     <div class="card" style="--accent: {accent}" data-title="{title}" data-desc="{desc}" data-preset="{preset}">
+      <a class="thumb-link" href="./{name}/" aria-label="Open {title}">
+        <img class="thumb" src="./{name}/thumb.png" alt="" loading="lazy" onerror="this.style.display='none'">
+      </a>
       <h2><a href="./{name}/">{title}</a></h2>
       <div class="desc">{desc}</div>
       <div class="meta">
@@ -513,10 +530,16 @@ def generate_index_html(
 
     .card {{
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 1.5rem;
+      border-radius: 12px;
       display: flex; flex-direction: column; gap: 0.75rem;
       transition: border-color 0.2s;
+      overflow: hidden;
     }}
+    .card > h2, .card > .desc, .card > .meta {{ margin-left: 1.5rem; margin-right: 1.5rem; }}
+    .card > h2 {{ margin-top: 1.25rem; }}
+    .card > .meta {{ margin-bottom: 1.5rem; }}
+    .thumb-link {{ display: block; aspect-ratio: 16 / 9; background: var(--tag-bg); }}
+    .thumb {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
     .card:hover {{ border-color: var(--accent); }}
     .card.hidden {{ display: none; }}
     .card h2 {{ font-size: 1.25rem; font-weight: 700; color: var(--accent); letter-spacing: -0.01em; }}
