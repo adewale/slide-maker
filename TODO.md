@@ -48,9 +48,9 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 ## Build and tooling
 
 ### Quickstart mode
-- [ ] Add a `--quick` flag or mode that skips the spec phase for simple decks
-- [ ] For a user who says "make me 10 slides about X", don't force them through deck.spec.md
-- [ ] Still generate deck.spec.md, but do it silently/automatically
+- [x] Add a quickstart mode that skips the spec phase for simple decks (SKILL.md phase 1 now declares three modes; phase 5 carries a quickstart variant)
+- [x] For a user who says "make me 10 slides about X", don't force them through deck.spec.md (handled by quickstart-trigger heuristic in SKILL.md phase 1)
+- [x] Still generate deck.spec.md, but do it silently/automatically (phase 5 quickstart variant requires the artifact, skips the user-facing dialogue)
 
 ### Gallery improvements
 - [x] Auto-generate `index.html` from deck metadata during `build.py` (title, description, accent, preset extracted per deck)
@@ -100,9 +100,9 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 
 
 ### Skill marketplace metadata
-- [ ] Add marketplace-compatible metadata (icon, category, tags, version)
-- [ ] Write a compelling skill description for marketplace listings
-- [ ] Add usage examples that show the skill in action
+- [x] Add marketplace-compatible metadata — `.claude-plugin/marketplace.json` now carries `version` (0.2.0), `icon`, `category` (Content Creation), `tags` (9), `keywords`, and `homepage`
+- [x] Write a compelling skill description for marketplace listings — `description` rewritten to lead with the value (project-grounded decks, WCAG validation, anti-slop discipline, rendered + held-out gates, keyless sub-agent judge)
+- [x] Add usage examples that show the skill in action — `USAGE.md` covers quickstart, create, project, and update prompts, plus what the skill refuses
 
 ## Done
 

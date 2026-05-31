@@ -1,6 +1,31 @@
 {
   "name": "slide-maker",
-  "description": "Generate presentation decks grounded in real GitHub projects using a structured brief-to-slides process with WCAG-validated visual direction.",
+  "description": "Generate presentation decks grounded in real GitHub projects. A structured brief-to-slides process with WCAG-validated visual direction, anti-slop typography and palette discipline, rendered-pixel and held-out quality gates, and a sub-agent grading judge that never needs an API key.",
+  "version": "0.2.0",
+  "icon": "🎞️",
+  "category": "Content Creation",
+  "tags": [
+    "slidev",
+    "presentations",
+    "decks",
+    "talks",
+    "pitches",
+    "documentation",
+    "github-projects",
+    "wcag",
+    "design-system"
+  ],
+  "homepage": "https://github.com/adewale/slide-maker",
+  "keywords": [
+    "presentation",
+    "slide deck",
+    "talk",
+    "pitch",
+    "keynote",
+    "slidev",
+    "project deck",
+    "wcag"
+  ],
   "plugins": [
     {
       "name": "slide-maker",

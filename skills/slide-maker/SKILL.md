@@ -57,7 +57,14 @@ When justified: `styles/tokens.css`, `styles/theme.css`, `layouts/*.vue`, `compo
 ## Workflow
 
 ### 1. Determine mode
-New project or update.
+
+Three modes:
+
+- **create** — a new deck from scratch (most common). Follow phases 2–8 in order.
+- **update** — modify an existing deck. Same phases, but only the affected ones.
+- **quickstart** — short turnaround for a small ad-hoc deck (no project, no brand constraints, no source material to digest). Enter quickstart when the user's request is shaped like *"make me N slides about X"*, *"quick deck on Y"*, *"draft a short talk on Z"* and explicitly does **not** ask for a spec, brand alignment, or project sourcing. In quickstart, **skip phase 5's user-facing spec dialogue**: generate `deck.spec.md` silently from the brief (still required as the source-of-truth artifact), pick a sensible preset without asking, and proceed straight to compile. Still run phase 7 validate before delivery — the gates do not bend.
+
+Default to **create**. Quickstart is opt-in based on the user's wording; never assume it for project decks or for updates.
 
 ### 2. Gather source material (project decks only)
 → Load SOURCES.md now.
@@ -83,6 +90,8 @@ Offer 2-3 directions in words only — preset/mood, typography, token direction,
 → Load DECK_SPEC.md and SLIDE_KINDS.md now.
 
 Do this before implementation-heavy changes.
+
+**Quickstart variant.** When phase 1 selected quickstart, still write `deck.spec.md` (it is the source-of-truth artifact and downstream tooling reads it), but generate it silently from the user's one-line brief instead of running the usual spec dialogue. Infer title, goal, audience, target-length, and tone from the request; pick a preset that matches the topic; do not ask the user to review the spec — just compile and deliver. The user can edit the spec after delivery if they want a richer pass.
 
 ### 6. Compile the project
 → Load COMPILER_RULES.md and SLIDEV_REFERENCE.md now.
