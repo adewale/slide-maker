@@ -83,7 +83,7 @@ ul li::marker {
 }
 
 .slidev-layout.cover h1 {
-  font-size: 4.5rem;
+  font-size: clamp(2.7rem, 1.8rem + 4.5vw, 4.5rem);
   letter-spacing: -0.03em;
 }
 
@@ -115,7 +115,7 @@ ul li::marker {
 
 /* Fact */
 .slidev-layout.fact h1 {
-  font-size: 7rem;
+  font-size: clamp(4.2rem, 2.8rem + 7.0vw, 7.0rem);
   color: var(--deck-accent);
   letter-spacing: -0.04em;
 }
@@ -141,7 +141,7 @@ ul li::marker {
 }
 
 .slidev-layout.section h1 {
-  font-size: 3rem;
+  font-size: clamp(1.8rem, 1.2rem + 3.0vw, 3.0rem);
   letter-spacing: -0.02em;
   color: var(--deck-bg);
 }
@@ -160,7 +160,7 @@ ul li::marker {
 }
 
 .slidev-layout.end h1 {
-  font-size: 3.5rem;
+  font-size: clamp(2.1rem, 1.4rem + 3.5vw, 3.5rem);
   color: var(--deck-fg) !important;
 }
 

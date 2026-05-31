@@ -41,7 +41,7 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [x] Added `overflow: hidden` to `.slidev-layout` in all 9 deck `styles/index.css` files
 - [x] Added viewport overflow as hard fail in ACCEPTANCE_CHECKLIST.md
 - [x] Added overflow rule to COMPILER_RULES.md § 6b (styles entry point template)
-- [ ] Add `clamp()` for typography in theme.css to handle edge cases
+- [x] Add `clamp()` for typography in theme.css to handle edge cases — applied to every `font-size: Xrem` with X≥3 across all 9 themed decks (cover h1, fact h1, end h1). Pattern: `clamp(0.6×X rem, 0.4×X rem + vw, X rem)` — never exceeds the original size, gracefully shrinks on narrow viewports.
 
 ## Feature gaps
 
@@ -59,7 +59,7 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 
 ### CI/CD
 - [x] GitHub Actions workflow for GitHub Pages (`.github/workflows/deploy.yml`)
-- [ ] Fix GitHub Pages environment protection rules — `main` branch blocked from deploying
+- [ ] Fix GitHub Pages environment protection rules — `main` branch blocked from deploying (**blocked: requires repo-admin action in GitHub Settings → Environments → github-pages → Deployment branches; cannot be done from a PR**)
 - [x] Cloudflare Workers deployment (`slides.oshineye.dev/`)
 
 ## Quality and testing
@@ -82,8 +82,8 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 
 ### Rendered-pixel audit (markdown vs pixels)
 - [x] `tools/pixel-audit.mjs` — flash-bang detection from rendered screenshots (per-slide WCAG luminance), catching what the static deck-lint check can't see (images, gradients, theme cover/section backgrounds)
-- [ ] Wire `pixel-audit` into the verify pipeline once a deck is rendered (consumes `screenshot-audit.mjs` output in `/tmp/slide-audit`)
-- [ ] Extend pixel-audit to measure rendered text/background contrast, not just adjacent-slide luminance
+- [x] ~~Wire `pixel-audit` into the verify pipeline~~ — superseded by `tools/render-gate.mjs` (wired via `build-and-verify.py --rendered`), which serves + renders + measures flash-bang from screenshots in one step. `pixel-audit.mjs` remains as a standalone tool for ad-hoc screenshot directories.
+- [x] ~~Extend pixel-audit to measure rendered text/background contrast~~ — superseded by `render-gate.mjs`, which samples computed `color`/`background` per text element via the DOM and grades WCAG AA from the rendered tree.
 
 ### Acceptance checklist enforcement (done)
 - [x] ACCEPTANCE_CHECKLIST.md is the canonical checklist (extracted from COMPILER_RULES.md)

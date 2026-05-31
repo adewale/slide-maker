@@ -81,7 +81,7 @@ hr {
 }
 
 .slidev-layout.cover h1 {
-  font-size: 3.4rem;
+  font-size: clamp(2.04rem, 1.36rem + 3.4vw, 3.4rem);
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -124,7 +124,7 @@ hr {
 
 /* ─── Fact ─── */
 .slidev-layout.fact h1 {
-  font-size: 5.5rem;
+  font-size: clamp(3.3rem, 2.2rem + 5.5vw, 5.5rem);
   color: var(--deck-accent);
   letter-spacing: -0.03em;
 }
