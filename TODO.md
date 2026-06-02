@@ -41,25 +41,25 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [x] Added `overflow: hidden` to `.slidev-layout` in all 9 deck `styles/index.css` files
 - [x] Added viewport overflow as hard fail in ACCEPTANCE_CHECKLIST.md
 - [x] Added overflow rule to COMPILER_RULES.md § 6b (styles entry point template)
-- [ ] Add `clamp()` for typography in theme.css to handle edge cases
+- [x] Add `clamp()` for typography in theme.css to handle edge cases — applied to every `font-size: Xrem` with X≥3 across all 9 themed decks (cover h1, fact h1, end h1). Pattern: `clamp(0.6×X rem, 0.4×X rem + vw, X rem)` — never exceeds the original size, gracefully shrinks on narrow viewports.
 
 ## Feature gaps
 
 ## Build and tooling
 
 ### Quickstart mode
-- [ ] Add a `--quick` flag or mode that skips the spec phase for simple decks
-- [ ] For a user who says "make me 10 slides about X", don't force them through deck.spec.md
-- [ ] Still generate deck.spec.md, but do it silently/automatically
+- [x] Add a quickstart mode that skips the spec phase for simple decks (SKILL.md phase 1 now declares three modes; phase 5 carries a quickstart variant)
+- [x] For a user who says "make me 10 slides about X", don't force them through deck.spec.md (handled by quickstart-trigger heuristic in SKILL.md phase 1)
+- [x] Still generate deck.spec.md, but do it silently/automatically (phase 5 quickstart variant requires the artifact, skips the user-facing dialogue)
 
 ### Gallery improvements
 - [x] Auto-generate `index.html` from deck metadata during `build.py` (title, description, accent, preset extracted per deck)
 - [x] Add search/filter to the gallery page (filters by title, description, and preset)
-- [ ] Add deck thumbnails to the gallery (screenshot of cover slide)
+- [x] Add deck thumbnails to the gallery — `tools/thumbnail-gen.mjs` screenshots the cover at 1280×720 and writes `<deck>/thumb.png`; `tools/build.py` calls it after every deck build (best-effort, doesn't fail the build); the gallery card includes `<img class="thumb" src="./<deck>/thumb.png">` with a CSS fallback to a flat tile if the file is missing. Verified live: 35KB PNG from a `/tmp/fb-dist` cover in ~10s.
 
 ### CI/CD
 - [x] GitHub Actions workflow for GitHub Pages (`.github/workflows/deploy.yml`)
-- [ ] Fix GitHub Pages environment protection rules — `main` branch blocked from deploying
+- [ ] Fix GitHub Pages environment protection rules — `main` branch blocked from deploying (**blocked: requires repo-admin action in GitHub Settings → Environments → github-pages → Deployment branches; cannot be done from a PR**)
 - [x] Cloudflare Workers deployment (`slides.oshineye.dev/`)
 
 ## Quality and testing
@@ -68,19 +68,29 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [x] Playwright capture script for mobile viewports (iPhone SE, iPhone 14, Pixel 7)
 - [x] Add landscape mobile viewport captures (iPhone SE landscape added to screenshot-audit.mjs)
 - [x] Mobile viewports added to screenshot-audit.mjs: iPhone SE (375x667), Pixel 7 (412x915), iPhone SE landscape (667x375)
-- [ ] Capture click states (slides with v-click animations at each step)
+- [x] Capture click states at every viewport — `tools/screenshot-audit.mjs` secondary-viewport loop now cycles v-clicks the same way the primary viewport does, so a mobile click state that overflows when click 0 looks clean is finally surfaced.
 
 ### Eval framework
-- [ ] Use the reference deck (`examples/reference/`) as the primary eval fixture
-- [ ] Define pass/fail criteria for each feature the Skill claims to support
-- [ ] Automate: generate a deck from a prompt → diff against expected structure → score
+- [x] Runner built: `tools/eval-runner.mjs` (`npm run eval`) — resolve output deck → grade → score → report (console + `--json`)
+- [x] `evals/evals.json` assertions carry machine-runnable `assert` specs alongside the prose `check`; deterministic engine runs with zero deps
+- [x] Judge scores semantic assertions + DECK_RUBRIC visual axes (/20) + slop tells + a held-out score. Judging is keyless via the sub-agent handoff only (the direct `@anthropic-ai/sdk` path was removed — no API key in the loop)
+- [x] Generation hook: `--generate "<cmd>"` produces a missing deck before grading ({prompt}/{out}/{id}/{files} substitution)
+- [x] Sub-agent judge handoff: `--emit-judge-tasks` / `--judge-results` so a dispatched grading sub-agent (no API key) can score decks
+- [x] Create-eval fixtures committed under `evals/fixtures/{0,1}/` — evals 0 and 1 now grade end-to-end (7/7 each), not just the update eval
+- [x] `countSlides` (and deck-lint's layout-variety scan) now follow `src:` page includes — reference-style decks count in full
+- [x] CI verify workflow (`.github/workflows/verify.yml`) runs deck-lint + gate-check + eval on every PR / push to main; fails on any failing assertion or static-gate regression. Rendered gate runs in `.github/workflows/rendered-gate.yml` (manual + weekly)
+
+### Rendered-pixel audit (markdown vs pixels)
+- [x] `tools/pixel-audit.mjs` — flash-bang detection from rendered screenshots (per-slide WCAG luminance), catching what the static deck-lint check can't see (images, gradients, theme cover/section backgrounds)
+- [x] ~~Wire `pixel-audit` into the verify pipeline~~ — superseded by `tools/render-gate.mjs` (wired via `build-and-verify.py --rendered`), which serves + renders + measures flash-bang from screenshots in one step. `pixel-audit.mjs` remains as a standalone tool for ad-hoc screenshot directories.
+- [x] ~~Extend pixel-audit to measure rendered text/background contrast~~ — superseded by `render-gate.mjs`, which samples computed `color`/`background` per text element via the DOM and grades WCAG AA from the rendered tree.
 
 ### Acceptance checklist enforcement (done)
 - [x] ACCEPTANCE_CHECKLIST.md is the canonical checklist (extracted from COMPILER_RULES.md)
 - [x] deck-lint.mjs now auto-discovers generated-decks/ and runs 23 check groups
 - [x] New automated checks: overflow:hidden, headmatter fields, emoji in content, spec-slides sync, through-line frequency, visual evidence, layout variety
 - [x] SKILL.md Phase 7 instructs skill to run deck-lint before delivery
-- [ ] Fail CI if any hard-fail items are violated
+- [x] Fail CI if any hard-fail items are violated (via `.github/workflows/verify.yml`)
 
 ## Documentation
 
@@ -90,9 +100,9 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 
 
 ### Skill marketplace metadata
-- [ ] Add marketplace-compatible metadata (icon, category, tags, version)
-- [ ] Write a compelling skill description for marketplace listings
-- [ ] Add usage examples that show the skill in action
+- [x] Add marketplace-compatible metadata — `.claude-plugin/marketplace.json` now carries `version` (0.2.0), `icon`, `category` (Content Creation), `tags` (9), `keywords`, and `homepage`
+- [x] Write a compelling skill description for marketplace listings — `description` rewritten to lead with the value (project-grounded decks, WCAG validation, anti-slop discipline, rendered + held-out gates, keyless sub-agent judge)
+- [x] Add usage examples that show the skill in action — `USAGE.md` covers quickstart, create, project, and update prompts, plus what the skill refuses
 
 ## Done
 

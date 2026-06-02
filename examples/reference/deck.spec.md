@@ -32,7 +32,7 @@
   - accent-alt: "#994050"
   - muted: "rgba(46, 52, 64, 0.45)"
 - typography:
-  - display: Inter
+  - display: Source Serif 4
   - body: Source Sans 3
   - mono: JetBrains Mono
 - motion:

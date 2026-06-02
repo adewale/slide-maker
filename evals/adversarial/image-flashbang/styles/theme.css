@@ -1,0 +1,127 @@
+/* ─── Base ─── */
+.slidev-layout {
+  font-family: var(--deck-font-body);
+  color: var(--deck-fg);
+  background: var(--deck-bg);
+}
+
+h1, h2, h3 {
+  font-family: var(--deck-font-display);
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 2.6rem;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  color: var(--deck-accent);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.5rem;
+  font-family: var(--deck-font-body);
+  font-weight: 600;
+}
+
+strong {
+  color: var(--deck-accent);
+  font-weight: 700;
+}
+
+code {
+  font-family: var(--deck-font-mono);
+  color: var(--deck-accent);
+  background: var(--deck-rule);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  font-size: 0.88em;
+}
+
+ul {
+  line-height: 1.9;
+}
+
+ul li::marker {
+  color: var(--deck-accent);
+}
+
+hr {
+  border: none;
+  border-top: 1.5px solid var(--deck-rule);
+  margin: 1.5rem 0;
+}
+
+/* ─── v-click animation ─── */
+.slidev-vclick-target {
+  transition: all 0.35s cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+.slidev-vclick-hidden {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+/* ─── Cover ─── */
+/* No flat background here — the dark image background is supplied per-slide in
+   frontmatter, which the static linter cannot read for luminance. Cover text
+   uses the light cover-fg token so it stays legible over the dark photo. */
+.slidev-layout.cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
+  padding: 4rem 5rem;
+  color: var(--deck-cover-fg);
+}
+
+.slidev-layout.cover h1 {
+  font-size: 3.6rem;
+  letter-spacing: -0.02em;
+  color: var(--deck-cover-fg);
+}
+
+.slidev-layout.cover p {
+  font-size: 1.2rem;
+  color: var(--deck-cover-fg);
+  margin-top: 1rem;
+  max-width: 70%;
+  line-height: 1.6;
+}
+
+/* ─── Center ─── */
+.slidev-layout.center h1 {
+  font-size: 2.4rem;
+  max-width: 75%;
+  margin: 0 auto;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.slidev-layout.center p {
+  color: var(--deck-muted);
+  max-width: 60%;
+  margin: 1.25rem auto 0;
+  text-align: center;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+/* ─── Section ─── */
+.slidev-layout.section {
+  border-top: 4px solid var(--deck-accent);
+}
+
+.slidev-layout.section h1 {
+  font-size: 2.8rem;
+  letter-spacing: -0.01em;
+}
+
+.slidev-layout.section p {
+  color: var(--deck-muted);
+  font-size: 1.1rem;
+  margin-top: 0.75rem;
+}

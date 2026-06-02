@@ -252,6 +252,9 @@ function checkOverflow(md) {
   // ── Code block overflow ──
   const codeBlocks = md.matchAll(/```[\s\S]*?```/g);
   for (const block of codeBlocks) {
+    // Mermaid blocks render as scaled diagrams, not code text — they have their
+    // own validation (checkMermaidSyntax) and legitimately exceed the line cap.
+    if (/^```\s*mermaid/i.test(block[0])) continue;
     const blockLines = block[0].split('\n');
     // Subtract the opening and closing ``` lines
     const codeLines = blockLines.length - 2;
@@ -366,6 +369,181 @@ function hexLuminance(hex) {
  */
 function formatRatio(ratio) {
   return `${ratio.toFixed(1)}:1`;
+}
+
+// Max allowed jump in WCAG relative luminance (0..1) between adjacent slides
+// before it reads as a "flash-bang" — a dark slide cutting to a bright one,
+// dazzling a dark-room audience the way a camera flash does.
+const FLASHBANG_LUMA_DELTA = 0.5;
+
+// Slidev per-slide frontmatter keys. Used to tell a frontmatter block apart
+// from a content block when both sit between `---` separators. An allowlist
+// (rather than a generic "key: value" shape test) avoids misreading prose like
+// "Note: ..." as frontmatter.
+const FM_KEYS = new Set([
+  'layout', 'transition', 'background', 'backgroundSize', 'class', 'clicks',
+  'level', 'hide', 'hideInToc', 'title', 'name', 'zoom', 'dragPos',
+  'routeAlias', 'disabled', 'preload', 'src', 'image', 'color',
+]);
+
+/**
+ * Resolve a CSS color string to a measurable hex, or null if it is not a flat
+ * color we can assess statically (images, gradients, rgb()/var() references).
+ */
+function colorToHex(value) {
+  if (!value) return null;
+  const v = value.trim().replace(/^['"]|['"]$/g, '').trim();
+  if (/^#[0-9a-fA-F]{3,8}$/.test(v)) return v;
+  const named = { black: '#000000', white: '#ffffff' };
+  return named[v.toLowerCase()] || null;
+}
+
+/**
+ * Detect "flash-bang" brightness jumps between adjacent slides: a dark slide
+ * followed by a much brighter one (or vice versa). Backgrounds come from the
+ * deck's --deck-bg token, overridden per slide by a frontmatter `background:`.
+ *
+ * Limitation: this only sees flat colors declared in frontmatter. Image,
+ * gradient, and theme/layout-driven backgrounds (cover/section) are not
+ * statically measurable — those need a rendered-screenshot check.
+ *
+ * Returns an array of warning strings.
+ */
+function checkFlashBang(slidesMd, deckBgRaw) {
+  const warnings = [];
+  const deckBg = colorToHex(deckBgRaw);
+  if (!deckBg) return warnings; // can't measure the deck background
+
+  // Split into `---`-delimited blocks (Slidev document structure):
+  // texts[0] = pre-headmatter (empty), [1] = headmatter, [2] = cover body,
+  // then frontmatter/body blocks for each subsequent slide.
+  const blocks = [[]];
+  for (const line of slidesMd.split(/\r?\n/)) {
+    if (/^---\s*$/.test(line)) blocks.push([]);
+    else blocks[blocks.length - 1].push(line);
+  }
+  const texts = blocks.map(b => b.join('\n'));
+  if (texts.length < 3) return warnings;
+
+  const bgOf = (t) => {
+    const m = t.match(/^\s*background\s*:\s*(.+?)\s*$/m);
+    return m ? colorToHex(m[1]) : null;
+  };
+  const isFrontmatter = (t) => {
+    const lines = t.split('\n').map(s => s.trim()).filter(Boolean);
+    if (!lines.length) return false;
+    return lines.every(l => {
+      const m = l.match(/^([A-Za-z_][\w-]*)\s*:/);
+      return m && FM_KEYS.has(m[1]);
+    });
+  };
+
+  // Build the ordered list of slide backgrounds, defaulting to the deck bg.
+  const slideBgs = [];
+  const coverBg = bgOf(texts[1]);
+  slideBgs.push({ num: 1, hex: coverBg || deckBg, explicit: !!coverBg });
+
+  let pendingBg = null;
+  let sawFrontmatter = false;
+  for (let i = 3; i < texts.length; i++) {
+    const t = texts[i];
+    if (!t.trim()) continue;
+    if (isFrontmatter(t)) {
+      sawFrontmatter = true;
+      pendingBg = bgOf(t);
+      continue;
+    }
+    const explicit = sawFrontmatter && !!pendingBg;
+    slideBgs.push({ num: slideBgs.length + 1, hex: explicit ? pendingBg : deckBg, explicit });
+    sawFrontmatter = false;
+    pendingBg = null;
+  }
+
+  for (let i = 1; i < slideBgs.length; i++) {
+    const a = slideBgs[i - 1];
+    const b = slideBgs[i];
+    if (!a.explicit && !b.explicit) continue; // both inherit the deck bg → no jump
+    const delta = Math.abs(relativeLuminance(a.hex) - relativeLuminance(b.hex));
+    if (delta >= FLASHBANG_LUMA_DELTA) {
+      warnings.push(
+        `flash-bang: slide ${a.num} (${a.hex}) to slide ${b.num} (${b.hex}) jumps ` +
+        `${delta.toFixed(2)} in relative luminance (>= ${FLASHBANG_LUMA_DELTA}) — ` +
+        `keep adjacent backgrounds in the same brightness band`
+      );
+    }
+  }
+  return warnings;
+}
+
+// Overused/generic display & body fonts — the repo's own rule, reinforced by
+// the slop taxonomy at https://impeccable.style/slop. Mono fonts are not
+// checked (monospace families are expected for code).
+const OVERUSED_FONTS = new Set(['inter', 'inter tight', 'roboto', 'arial', 'helvetica']);
+// Presets that legitimately use one of the above as brand identity.
+const FONT_BRAND_EXCEPTIONS = { cloudflare: new Set(['inter']) };
+
+/**
+ * Detect "interface slop" tells (https://impeccable.style/slop) that are
+ * statically checkable from a deck's fonts and stylesheets: overused fonts,
+ * gradient/clipped text, glassmorphism, justified text, and pure-black tokens.
+ * Returns an array of warning strings.
+ */
+function checkSlop(deckDir, slidesMd) {
+  const warnings = [];
+
+  // ── Overused display/body fonts (sans/serif/display slots; skip mono) ──
+  const headMatch = slidesMd.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  const head = headMatch ? headMatch[1] : '';
+  let preset = '';
+  const specPath = join(deckDir, 'deck.spec.md');
+  if (existsSync(specPath)) {
+    const m = readFileSync(specPath, 'utf-8').match(/style-preset:\s*([\w-]+)/i);
+    if (m) preset = m[1].toLowerCase();
+  }
+  const exempt = FONT_BRAND_EXCEPTIONS[preset] || new Set();
+  for (const slot of ['sans', 'serif', 'display']) {
+    const m = head.match(new RegExp(`^\\s*${slot}:\\s*(.+)$`, 'm'));
+    if (!m) continue;
+    const raw = m[1].trim().replace(/^['"]|['"]$/g, '');
+    const font = raw.toLowerCase();
+    if (OVERUSED_FONTS.has(font) && !exempt.has(font)) {
+      warnings.push(`slop: ${slot} font "${raw}" is an overused/generic family — use a preset font, not a brand exception (LLM_TELLS.md §Interface slop)`);
+    }
+  }
+
+  // ── CSS slop tells across stylesheets + inline slide <style> blocks ──
+  const cssSources = [];
+  const stylesDir = join(deckDir, 'styles');
+  if (existsSync(stylesDir)) {
+    for (const f of readdirSync(stylesDir)) {
+      if (f.endsWith('.css')) cssSources.push(readFileSync(join(stylesDir, f), 'utf-8'));
+    }
+  }
+  cssSources.push(slidesMd);
+  const css = cssSources.join('\n');
+
+  if (/background-clip\s*:\s*text/i.test(css)) {
+    warnings.push('slop: gradient/clipped text (background-clip: text) — decorative, hurts scannability (LLM_TELLS.md §Interface slop)');
+  }
+  if (/backdrop-filter\s*:\s*[^;]*blur/i.test(css)) {
+    warnings.push('slop: glassmorphism (backdrop-filter: blur) used as decoration (LLM_TELLS.md §Interface slop)');
+  }
+  if (/text-align\s*:\s*justify/i.test(css)) {
+    warnings.push('slop: justified text creates rivers of whitespace (LLM_TELLS.md §Interface slop)');
+  }
+
+  const tokensPath = join(deckDir, 'styles/tokens.css');
+  if (existsSync(tokensPath)) {
+    const t = readFileSync(tokensPath, 'utf-8');
+    for (const tok of ['--deck-bg', '--deck-fg']) {
+      const m = t.match(new RegExp(`${tok}\\s*:\\s*([^;]+);`));
+      if (m && /^#(000|000000)$/i.test(m[1].trim())) {
+        warnings.push(`slop: ${tok} is pure black ${m[1].trim()} — harsh; use a near-black (LLM_TELLS.md §Interface slop)`);
+      }
+    }
+  }
+
+  return warnings;
 }
 
 /**
@@ -1429,12 +1607,43 @@ function lintDeck(deckDir) {
     const m = decl.match(/^layout:\s*(\S+)/);
     if (m) layoutSet.add(m[1]);
   }
+  // Follow `src:` page includes — decks that split content into pages/*.md
+  // declare most of their layouts there, not in slides.md.
+  for (const inc of slidesMd.match(/^src:\s*(\S+)/gm) || []) {
+    const rel = inc.replace(/^src:\s*/, '').trim();
+    const incPath = join(deckDir, rel);
+    if (!existsSync(incPath)) continue;
+    for (const decl of readFileSync(incPath, 'utf-8').match(/^layout:\s*(\S+)/gm) || []) {
+      const m = decl.match(/^layout:\s*(\S+)/);
+      if (m) layoutSet.add(m[1]);
+    }
+  }
 
   if (layoutSet.size < 3 && slides.length > 5) {
     warns.push(`only ${layoutSet.size} layout types used — use at least 3 for visual variety (have: ${[...layoutSet].join(', ')})`);
   } else if (layoutSet.size > 0) {
     info.push(`${layoutSet.size} layout types: ${[...layoutSet].join(', ')}`);
   }
+
+  // ─── 24. Flash-bang brightness continuity ────────────────────
+  // Flag a dark slide cutting to a much brighter one (or vice versa).
+  const tokensPath = join(deckDir, 'styles/tokens.css');
+  if (existsSync(tokensPath)) {
+    const tokensCss = readFileSync(tokensPath, 'utf-8');
+    const bgMatch = tokensCss.match(/--deck-bg\s*:\s*([^;]+);/);
+    const flashBangs = checkFlashBang(slidesMd, bgMatch ? bgMatch[1].trim() : null);
+    if (flashBangs.length === 0) {
+      info.push('no flash-bang brightness jumps between adjacent slides');
+    }
+    for (const w of flashBangs) warns.push(w);
+  }
+
+  // ─── 25. Interface slop tells ────────────────────────────────
+  const slopWarns = checkSlop(deckDir, slidesMd);
+  if (slopWarns.length === 0) {
+    info.push('no interface-slop tells detected');
+  }
+  for (const w of slopWarns) warns.push(w);
 
   return { name, errors, warns, info };
 }

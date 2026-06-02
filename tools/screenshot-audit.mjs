@@ -492,7 +492,10 @@ async function main() {
     const hoverIssues = await checkHoverStates(page);
     for (const h of hoverIssues) allIssues.push({ severity: 'WARN', message: h });
 
-    // ── Blind spot #5: Secondary viewport ──
+    // ── Blind spot #5: Secondary viewports ──
+    // Each secondary viewport runs the same v-click cycle the primary does —
+    // a mobile click state can overflow even when click 0 is clean, and the
+    // primary-only cycle (TODO item 7) missed those.
     for (let v = 1; v < VIEWPORTS.length; v++) {
       const vp = VIEWPORTS[v];
       await page.setViewportSize(vp);
@@ -500,6 +503,21 @@ async function main() {
       await page.waitForTimeout(800);
       const vpIssues = await analyseSlideState(page, i, 0, vp.label, vp.height);
       allIssues.push(...vpIssues);
+      // Cycle v-clicks at this viewport too.
+      const vpClickTargets = await getClickCount(page);
+      if (vpClickTargets > 0) {
+        const maxVpClicks = Math.min(vpClickTargets, 10);
+        for (let c = 1; c <= maxVpClicks; c++) {
+          await advanceClick(page);
+          const stillHere = await page.evaluate(() => {
+            const footer = document.body.innerText.match(/(\d+) \/ \d+/);
+            return footer ? parseInt(footer[1]) : 0;
+          });
+          if (stillHere !== i) break;
+          const vpClickIssues = await analyseSlideState(page, i, c, vp.label, vp.height);
+          allIssues.push(...vpClickIssues);
+        }
+      }
     }
 
     // Deduplicate issues (same message from different click states)

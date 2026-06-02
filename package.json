@@ -4,7 +4,15 @@
   "scripts": {
     "build": "python3 tools/build.py",
     "dev": "npm run build && npx serve examples/_build -l 3030",
-    "serve": "npx serve examples/_build -l 3030"
+    "serve": "npx serve examples/_build -l 3030",
+    "lint": "node tools/deck-lint.mjs",
+    "eval": "node tools/eval-runner.mjs",
+    "eval:trend": "node tools/eval-runner.mjs --trend",
+    "pixel-audit": "node tools/pixel-audit.mjs",
+    "render-gate": "node tools/render-gate.mjs",
+    "render-probe": "node tools/render-probe.mjs",
+    "gate-check": "node tools/gate-check.mjs",
+    "adversarial": "node tools/adversarial.mjs"
   },
   "dependencies": {
     "@iconify-json/carbon": "^1.2.19",

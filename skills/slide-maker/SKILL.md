@@ -57,7 +57,14 @@ When justified: `styles/tokens.css`, `styles/theme.css`, `layouts/*.vue`, `compo
 ## Workflow
 
 ### 1. Determine mode
-New project or update.
+
+Three modes:
+
+- **create** — a new deck from scratch (most common). Follow phases 2–8 in order.
+- **update** — modify an existing deck. Same phases, but only the affected ones.
+- **quickstart** — short turnaround for a small ad-hoc deck (no project, no brand constraints, no source material to digest). Enter quickstart when the user's request is shaped like *"make me N slides about X"*, *"quick deck on Y"*, *"draft a short talk on Z"* and explicitly does **not** ask for a spec, brand alignment, or project sourcing. In quickstart, **skip phase 5's user-facing spec dialogue**: generate `deck.spec.md` silently from the brief (still required as the source-of-truth artifact), pick a sensible preset without asking, and proceed straight to compile. Still run phase 7 validate before delivery — the gates do not bend.
+
+Default to **create**. Quickstart is opt-in based on the user's wording; never assume it for project decks or for updates.
 
 ### 2. Gather source material (project decks only)
 → Load SOURCES.md now.
@@ -84,6 +91,8 @@ Offer 2-3 directions in words only — preset/mood, typography, token direction,
 
 Do this before implementation-heavy changes.
 
+**Quickstart variant.** When phase 1 selected quickstart, still write `deck.spec.md` (it is the source-of-truth artifact and downstream tooling reads it), but generate it silently from the user's one-line brief instead of running the usual spec dialogue. Infer title, goal, audience, target-length, and tone from the request; pick a preset that matches the topic; do not ask the user to review the spec — just compile and deliver. The user can edit the spec after delivery if they want a richer pass.
+
 ### 6. Compile the project
 → Load COMPILER_RULES.md and SLIDEV_REFERENCE.md now.
 
@@ -96,6 +105,10 @@ Generate or update: `slides.md`, styles, layouts, components, README if usage ch
 
 **Manual checks:** spec-to-slides sync, Markdown editability, justified custom code, no unused abstractions.
 Project decks: through-line in 3+ slides (ideally 5-6), source materials cited, 1+ visual evidence slide, project colors override preset tokens.
+
+**Rendered gate (image/gradient/per-slide-background decks):** static lint cannot see rendered brightness or contrast. Build the deck, then run `node tools/render-gate.mjs <built-dist>` (or `python tools/build-and-verify.py <dir>:<name> --rendered`). Fix any flash-bang, contrast, or overflow it reports.
+
+**Held-out quality check:** for a quality (not just structural) judgment, dispatch a fresh grading **sub-agent** to score the deck against `evals/holdout-rubric.md` — criteria deliberately *not* in the generation docs, so the review judges blind rather than re-checking the rules you optimized for. Use a sub-agent (it reuses your own model access — no API key); do not call an external API. A high structural score with a low held-out score means the deck is competent but forgettable.
 
 For the full checklist with enforcement levels, see ACCEPTANCE_CHECKLIST.md.
 

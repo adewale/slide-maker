@@ -14,6 +14,7 @@ Exit 0 if all decks pass, exit 1 if any deck has a FAIL-level issue.
 
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -132,8 +133,13 @@ def extract_fonts_from_frontmatter(slides_file: Path) -> list[str]:
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 
-def verify(decks: list[tuple[str, str]] | None = None) -> int:
-    """Run all checks. Returns the process exit code (0 = pass, 1 = fail)."""
+def verify(decks: list[tuple[str, str]] | None = None, rendered: bool = False, mobile: bool = False) -> int:
+    """Run all checks. Returns the process exit code (0 = pass, 1 = fail).
+
+    When ``rendered`` is set, each built deck is additionally driven through
+    tools/render-gate.mjs (Lesson 9: measure the rendered artifact, not just the
+    Markdown/CSS source) — flash-bang, rendered WCAG contrast, and overflow.
+    """
     if decks is None:
         decks = DECKS
 
@@ -284,6 +290,30 @@ def verify(decks: list[tuple[str, str]] | None = None) -> int:
             fail_msg(f"Missing critical entry point: {index_css}")
             deck_fail = True
 
+        # ── 7. Rendered gate (opt-in) ────────────────────────────────────────
+        # Static checks above read source. This drives the BUILT deck through a
+        # headless browser to catch what source can't: image/gradient flash-bang,
+        # real text-on-bg contrast, rendered overflow.
+        if rendered:
+            gate = TOOLS_DIR / "render-gate.mjs"
+            argv = ["node", str(gate), str(build_dir), "--name", name]
+            if mobile:
+                argv.append("--mobile")
+            proc = subprocess.run(argv, capture_output=True, text=True)
+            if proc.returncode == 0:
+                pass_msg("Rendered gate clean (flash-bang, contrast, overflow)")
+            elif proc.returncode == 1:
+                viol = [
+                    ln.strip()
+                    for ln in proc.stdout.splitlines()
+                    if "flash-bang:" in ln or "contrast" in ln or "overflow:" in ln
+                ]
+                fail_msg("Rendered gate found violations: " + ("; ".join(viol[:3]) or "see render-gate output"))
+                deck_fail = True
+            else:
+                warn_msg(f"Rendered gate could not run (exit {proc.returncode}); skipping")
+                deck_warn = True
+
         # ── Per-deck summary ─────────────────────────────────────────────────
         if deck_fail:
             failed += 1
@@ -329,6 +359,25 @@ def main() -> None:
             "If omitted, all configured decks are checked."
         ),
     )
+    parser.add_argument(
+        "--rendered",
+        action="store_true",
+        help=(
+            "Also run the rendered gate (tools/render-gate.mjs) per deck: "
+            "flash-bang, real WCAG contrast, and overflow from a headless "
+            "browser. Slower; requires playwright + chromium."
+        ),
+    )
+    parser.add_argument(
+        "--mobile",
+        action="store_true",
+        help=(
+            "When combined with --rendered, also check mobile viewports "
+            "(iPhone SE, Pixel 7, iPhone SE landscape). The deck system ships "
+            "a distinct MobileScrollView under 640px portrait, so a "
+            "desktop-only render misses what users on phones see."
+        ),
+    )
     args = parser.parse_args()
 
     if args.decks:
@@ -341,7 +390,7 @@ def main() -> None:
     else:
         deck_list = None  # use all defaults
 
-    sys.exit(verify(deck_list))
+    sys.exit(verify(deck_list, rendered=args.rendered, mobile=args.mobile))
 
 
 if __name__ == "__main__":

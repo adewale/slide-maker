@@ -5,3 +5,6 @@ _preview/
 _compare/
 _diff/
 slide-maker-workspace/
+evals/runs/
+evals/results/
+__pycache__/

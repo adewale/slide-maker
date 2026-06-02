@@ -8,7 +8,8 @@ colorSchema: light
 transition: slide-left
 layout: cover
 fonts:
-  sans: Inter
+  sans: Source Sans 3
+  serif: Source Serif 4
   mono: JetBrains Mono
   weights: '400,500,600,700'
 ---
