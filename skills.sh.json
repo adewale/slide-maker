@@ -1,0 +1,11 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Slide Decks",
+      "description": "Slidev deck generation, visual direction, compilation, and validation workflows.",
+      "skills": ["slide-maker"]
+    }
+  ]
+}

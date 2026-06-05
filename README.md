@@ -1,5 +1,7 @@
 # Slide Maker
 
+[![skills.sh](https://skills.sh/b/adewale/slide-maker)](https://skills.sh/adewale/slide-maker)
+
 A Claude Code skill that creates [Slidev](https://sli.dev) presentation decks. Point it at a GitHub repo or describe what you want — it reads source code, architecture docs, and lessons learned to produce slides grounded in what's actually there.
 
 Output is native Slidev Markdown: editable by hand, buildable to static HTML, deployable anywhere.
@@ -11,6 +13,8 @@ Output is native Slidev Markdown: editable by hand, buildable to static HTML, de
 ```bash
 npx skills add adewale/slide-maker
 ```
+
+Skills appear on skills.sh automatically after users install the repo with the skills CLI. Install counts and leaderboard rankings come from anonymous CLI telemetry; opt out with `DISABLE_TELEMETRY=1`. The repo page customization in `skills.sh.json` is picked up after the repository is seen by telemetry and the cache refreshes.
 
 ## Create a deck
 
