@@ -14,7 +14,7 @@
         {"name": "slide-count-is-5", "check": "slides.md contains exactly 5 slides (count slide separators)", "assert": {"slide_count": 5}},
         {"name": "references-build-sh", "check": "slides.md mentions build.sh, build pipeline, or the build system with specific details from the repo", "assert": {"contains_any": ["build.sh", "build pipeline", "build system"], "file": "slides.md", "ci": true}},
         {"name": "uses-cloudflare-tokens", "check": "tokens.css contains warm cream/orange color values consistent with the cloudflare preset", "assert": {"judge": true}},
-        {"name": "no-hardcoded-colors", "check": "No hex color literals inside <style scoped> blocks in slides.md — must use var(--deck-*) tokens", "assert": {"no_hardcoded_colors_scoped": true}}
+        {"name": "no-hardcoded-colors", "check": "No hex/rgb/hsl color literals inside <style scoped> blocks in slides/layouts/components — must use var(--deck-*) tokens", "assert": {"no_hardcoded_colors_scoped": true}}
       ]
     },
     {
@@ -29,7 +29,8 @@
         {"name": "uses-editorial-dark", "check": "tokens.css has dark background color and references Playfair Display font", "assert": {"all": [{"token_luma": {"token": "--deck-bg", "max": 0.15}}, {"contains": "Playfair Display", "file": "styles/tokens.css"}]}},
         {"name": "no-generic-phrases", "check": "slides.md does not contain 'Let's dive in', 'In conclusion', 'Without further ado', or similar generic stock phrases", "assert": {"not_contains_any": ["Let's dive in", "In conclusion", "Without further ado"], "file": "slides.md", "ci": true}},
         {"name": "has-v-clicks", "check": "slides.md contains at least one <v-clicks> or <v-click> for progressive reveal", "assert": {"contains_any": ["<v-clicks", "<v-click", "v-click="], "file": "slides.md"}},
-        {"name": "no-emoji", "check": "slides.md contains no emoji characters", "assert": {"no_emoji": "slides.md"}}
+        {"name": "no-emoji", "check": "slides.md contains no emoji characters", "assert": {"no_emoji": "slides.md"}},
+        {"name": "no-hardcoded-colors", "check": "No hex/rgb/hsl color literals inside <style scoped> blocks in slides/layouts/components — must use var(--deck-*) tokens", "assert": {"no_hardcoded_colors_scoped": true}}
       ]
     },
     {
