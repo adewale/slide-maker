@@ -8,3 +8,5 @@ slide-maker-workspace/
 evals/runs/
 evals/results/
 __pycache__/
+
+eval-runs/

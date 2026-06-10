@@ -13,7 +13,8 @@ These items must all pass before a deck can be delivered:
 
 **Token and style integrity:**
 - `tokens.css` defines all four required tokens: `--deck-bg`, `--deck-fg`, `--deck-accent`, `--deck-muted`
-- no `<style scoped>` block uses literal hex/rgb for `background` or `color` properties — must use `var(--deck-*)` token variables
+- no `<style scoped>` block uses literal hex/rgb/hsl for color-bearing properties (`color`, `background*`, `border*`, `fill`, `stroke`, shadows, etc.) — must use `var(--deck-*)` token variables
+- if a user requests hardcoded scoped colors, refuse that implementation detail and provide the tokenized equivalent instead
 
 **Contrast (CRAP):**
 - text is legible on all slides (proper contrast between foreground and background — WCAG AA)
@@ -106,7 +107,7 @@ These checks run automatically and produce errors or warnings:
 | Every `classDef` is assigned to at least one node | Contrast | Error |
 | Bullet count <= 7 per slide | Density | Error |
 | Code lines <= 8 per block | Density | Error |
-| No hardcoded hex/rgb in scoped styles | Repetition | Error |
+| No hardcoded hex/rgb/hsl in scoped color properties | Repetition | Error |
 | No emoji in slide content or Mermaid labels | — | Error |
 | `layout: two-cols` with h1 heading (use `two-cols-header`) | Alignment | Error |
 | `selectable: true`, `routerMode: hash`, `download: true` in headmatter | Structure | Warning |
@@ -124,13 +125,14 @@ These checks run automatically and produce errors or warnings:
 | max-width without margin:auto in grid layouts | Alignment | Warning |
 | Background consistency (only cover/section differ from --deck-bg) | Repetition | Warning |
 
-### Level 2: Semi-automated (style-audit.mjs + screenshot-audit.mjs)
+### Level 2: Semi-automated (render-gate.mjs + style-audit.mjs + screenshot-audit.mjs)
 
-Run: `node tools/style-audit.mjs` (post-build) and `node tools/screenshot-audit.mjs <url>` (needs running server).
+For image, gradient, and per-slide-background decks, build first and run `node tools/render-gate.mjs <built-dist>` (or `python tools/build-and-verify.py <dir>:<name> --rendered`). This gate is mandatory even if the user asks to skip validation. Also run `node tools/style-audit.mjs` (post-build) and `node tools/screenshot-audit.mjs <url>` (needs running server) when deeper token or viewport diagnostics are needed.
 
 | Check | Principle | How to verify |
 |-------|-----------|---------------|
 | All tokens survive build pipeline | Repetition | `style-audit.mjs` verifies tokens, selectors, and colors in built CSS |
+| Rendered flash-bang/contrast/overflow gate | Contrast / Viewport | `render-gate.mjs` checks built slide screenshots and DOM boxes; fix all findings before delivery |
 | Text contrast WCAG AA on rendered slides | Contrast | `screenshot-audit.mjs` checks every slide at every v-click state |
 | Content overflow (scrollHeight > viewport) | Viewport | `screenshot-audit.mjs` detects at 5 viewports including mobile |
 | Column balance in two-column layouts | Alignment | `screenshot-audit.mjs` layout geometry check |

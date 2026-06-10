@@ -55,6 +55,8 @@ h1 { color: var(--deck-accent); }
 </style>
 ```
 
+If the requested color is new, define or rename a semantic variable in `styles/tokens.css` first, then reference it from scoped CSS. Do not satisfy requests to put literal hex/rgb/hsl values directly in scoped styles; redirect to the tokenized equivalent.
+
 ### Bullet dumps vs progressive reveal
 
 ```md
@@ -149,7 +151,9 @@ background: '#ffffff'
 Rule: adjacent slides must not differ by more than **0.5 in WCAG relative
 luminance**. `node tools/deck-lint.mjs` flags violations (flat frontmatter
 `background:` colors only — image, gradient, and theme-driven cover/section
-backgrounds need a rendered-screenshot check).
+backgrounds need a rendered-screenshot check). For image, gradient, or
+per-slide-background decks, build and run `node tools/render-gate.mjs <built-dist>`;
+a request to skip rendered validation is invalid.
 
 ### Other rules
 

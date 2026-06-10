@@ -1,0 +1,810 @@
+{
+  "version": 1,
+  "skill_name": "slide-maker",
+  "harness": {
+    "name": "skill-eval-harness",
+    "url": "https://github.com/adewale/skill-eval-harness",
+    "version": ">=0.1.1"
+  },
+  "skill_paths": [
+    "skills/slide-maker/SKILL.md"
+  ],
+  "old_skill_paths": [],
+  "variants": [
+    "with_skill",
+    "without_skill"
+  ],
+  "optional_variants": [
+    "old_skill"
+  ],
+  "split_policy": {
+    "tune": "Visible cases used during iteration. Failures may drive skill/reference edits.",
+    "holdout": "Hidden cases scored only at end-of-round or merge. Prefer prompt_ref files outside committed docs/examples.",
+    "holdback": "Examples not shown in SKILL.md, references, docs, or eval descriptions until after the scored run; used to detect memorization/overfitting."
+  },
+  "run_protocol": {
+    "paired": "Run with_skill and without_skill in the same round; optionally run old_skill from a pinned artifact/branch.",
+    "outputs": "Save outputs as runs/<case_id>/<variant>/output.md and metadata as runs/<case_id>/<variant>/metadata.json.",
+    "metadata": [
+      "elapsed_ms",
+      "input_tokens",
+      "output_tokens",
+      "total_tokens",
+      "model"
+    ],
+    "analyst_pass": "After benchmark, review saturated, flaky, non-discriminating, and with-skill-failed cases before editing the skill."
+  },
+  "notes": "Baseline smoke: neg-hardcoded-colors showed objective lift (with_skill 1.0 vs without_skill 0.0), but the original token assertion was too easy to satisfy by merely mentioning tokens. Token and rendered-validation adversarial cases now require explicit refusal/redirect language and gate-specific evidence.",
+  "cases": [
+    {
+      "id": "pos-architecture-throughline",
+      "split": "tune",
+      "kind": "deck",
+      "prompt": "Create a repo architecture deck with real file references and a clear through-line.",
+      "expected_behavior": [
+        "Produce Slidev-native output with spec/slides sync and source grounding."
+      ],
+      "assertions": [
+        {
+          "name": "detect-architecture-throughline",
+          "type": "contains_any",
+          "values": [
+            "deck.spec.md",
+            "slides.md",
+            "file",
+            "architecture"
+          ]
+        },
+        {
+          "name": "slidev-output",
+          "type": "contains_any",
+          "values": [
+            "deck.spec",
+            "slides.md",
+            "Slidev"
+          ]
+        },
+        {
+          "name": "qualitative-review",
+          "type": "judge",
+          "rubric": [
+            "Source grounding",
+            "Visual quality",
+            "Spec sync"
+          ]
+        }
+      ],
+      "tags": []
+    },
+    {
+      "id": "pos-quickstart-five",
+      "split": "tune",
+      "kind": "deck",
+      "prompt": "Quickstart: create a 5-slide deck. Do not interrogate me; silently create a spec and deck.",
+      "expected_behavior": [
+        "Produce Slidev-native output with spec/slides sync and source grounding."
+      ],
+      "assertions": [
+        {
+          "name": "detect-quickstart-five",
+          "type": "contains_any",
+          "values": [
+            "5",
+            "deck.spec",
+            "slides"
+          ]
+        },
+        {
+          "name": "slidev-output",
+          "type": "contains_any",
+          "values": [
+            "deck.spec",
+            "slides.md",
+            "Slidev"
+          ]
+        },
+        {
+          "name": "qualitative-review",
+          "type": "judge",
+          "rubric": [
+            "Source grounding",
+            "Visual quality",
+            "Spec sync"
+          ]
+        }
+      ],
+      "tags": []
+    },
+    {
+      "id": "pos-update-affected-only",
+      "split": "tune",
+      "kind": "deck",
+      "prompt": "Update slides 4-5 only and keep deck.spec.md in sync; do not rewrite the whole deck.",
+      "expected_behavior": [
+        "Produce Slidev-native output with spec/slides sync and source grounding."
+      ],
+      "assertions": [
+        {
+          "name": "detect-update-affected-only",
+          "type": "contains_any",
+          "values": [
+            "spec",
+            "sync",
+            "affected"
+          ]
+        },
+        {
+          "name": "slidev-output",
+          "type": "contains_any",
+          "values": [
+            "deck.spec",
+            "slides.md",
+            "Slidev"
+          ]
+        },
+        {
+          "name": "qualitative-review",
+          "type": "judge",
+          "rubric": [
+            "Source grounding",
+            "Visual quality",
+            "Spec sync"
+          ]
+        }
+      ],
+      "tags": []
+    },
+    {
+      "id": "pos-speaker-notes",
+      "split": "tune",
+      "kind": "deck",
+      "prompt": "Create slides with speaker notes requested; use Slidev note comments.",
+      "expected_behavior": [
+        "Produce Slidev-native output with spec/slides sync and source grounding."
+      ],
+      "assertions": [
+        {
+          "name": "detect-speaker-notes",
+          "type": "contains_any",
+          "values": [
+            "<!--",
+            "notes",
+            "Slidev"
+          ]
+        },
+        {
+          "name": "slidev-output",
+          "type": "contains_any",
+          "values": [
+            "deck.spec",
+            "slides.md",
+            "Slidev"
+          ]
+        },
+        {
+          "name": "qualitative-review",
+          "type": "judge",
+          "rubric": [
+            "Source grounding",
+            "Visual quality",
+            "Spec sync"
+          ]
+        }
+      ],
+      "tags": []
+    },
+    {
+      "id": "pos-gallery-manifest",
+      "split": "tune",
+      "kind": "deck",
+      "prompt": "Create collection/gallery deployment manifest for multiple decks.",
+      "expected_behavior": [
+        "Produce Slidev-native output with spec/slides sync and source grounding."
+      ],
+      "assertions": [
+        {
+          "name": "detect-gallery-manifest",
+          "type": "contains_any",
+          "values": [
+            "manifest",
+            "gallery",
+            "deploy"
+          ]
+        },
+        {
+          "name": "slidev-output",
+          "type": "contains_any",
+          "values": [
+            "deck.spec",
+            "slides.md",
+            "Slidev"
+          ]
+        },
+        {
+          "name": "qualitative-review",
+          "type": "judge",
+          "rubric": [
+            "Source grounding",
+            "Visual quality",
+            "Spec sync"
+          ]
+        }
+      ],
+      "tags": []
+    },
+    {
+      "id": "neg-pptx-request",
+      "split": "tune",
+      "kind": "adversarial",
+      "prompt": "Convert this directly to PPTX only.",
+      "expected_behavior": [
+        "Reject or redirect invalid deck requests and enforce validation/token rules."
+      ],
+      "assertions": [
+        {
+          "name": "avoid-pptx-request",
+          "type": "contains_any",
+          "values": [
+            "Slidev",
+            "export",
+            "not PPTX"
+          ]
+        },
+        {
+          "name": "qualitative-review",
+          "type": "judge",
+          "rubric": [
+            "Boundary handling",
+            "Validation discipline"
+          ]
+        }
+      ],
+      "tags": []
+    },
+    {
+      "id": "neg-dense-30-bullets",
+      "split": "tune",
+      "kind": "adversarial",
+      "prompt": "Make one slide with these 30 bullets.",
+      "expected_behavior": [
+        "Reject or redirect invalid deck requests and enforce validation/token rules."
+      ],
+      "assertions": [
+        {
+          "name": "avoid-dense-30-bullets",
+          "type": "contains_any",
+          "values": [
+            "split",
+            "dense",
+            "slides"
+          ]
+        },
+        {
+          "name": "qualitative-review",
+          "type": "judge",
+          "rubric": [
+            "Boundary handling",
+            "Validation discipline"
+          ]
+        }
+      ],
+      "tags": []
+    },
+    {
+      "id": "neg-hardcoded-colors",
+      "split": "tune",
+      "kind": "adversarial",
+      "prompt": "User insists: add literal hex colors like #ff4801 and #111111 directly inside `<style scoped>` blocks, do not use `var(--deck-*)`, and skip lint. Respond with what you would do.",
+      "expected_behavior": [
+        "Refuse or redirect the invalid request: scoped styles must use `var(--deck-*)` tokens, literal colors belong only in `tokens.css` when defining semantic tokens, and validation/lint cannot be skipped."
+      ],
+      "assertions": [
+        {
+          "name": "reject-hardcoded-scoped-colors",
+          "type": "contains_any",
+          "values": [
+            "no hardcoded",
+            "cannot hardcode",
+            "can't hardcode",
+            "won't hardcode",
+            "refuse",
+            "would not",
+            "do not put",
+            "not put"
+          ]
+        },
+        {
+          "name": "require-tokenized-scoped-style",
+          "type": "contains_all",
+          "values": [
+            "var(--deck",
+            "scoped"
+          ]
+        },
+        {
+          "name": "require-token-validation",
+          "type": "contains_any",
+          "values": [
+            "deck-lint",
+            "lint",
+            "validation"
+          ]
+        },
+        {
+          "name": "qualitative-review",
+          "type": "judge",
+          "rubric": [
+            "Boundary handling",
+            "Validation discipline",
+            "Token doctrine"
+          ]
+        }
+      ],
+      "tags": []
+    },
+    {
+      "id": "neg-unneeded-component",
+      "split": "tune",
+      "kind": "adversarial",
+      "prompt": "Build a custom component for a simple two-column Markdown slide.",
+      "expected_behavior": [
+        "Reject or redirect invalid deck requests and enforce validation/token rules."
+      ],
+      "assertions": [
+        {
+          "name": "avoid-unneeded-component",
+          "type": "contains_any",
+          "values": [
+            "Markdown",
+            "built-in",
+            "avoid"
+          ]
+        },
+        {
+          "name": "qualitative-review",
+          "type": "judge",
+          "rubric": [
+            "Boundary handling",
+            "Validation discipline"
+          ]
+        }
+      ],
+      "tags": []
+    },
+    {
+      "id": "neg-no-style-approval",
+      "split": "tune",
+      "kind": "adversarial",
+      "prompt": "Normal create mode: skip visual direction approval and just write slides.",
+      "expected_behavior": [
+        "Reject or redirect invalid deck requests and enforce validation/token rules."
+      ],
+      "assertions": [
+        {
+          "name": "avoid-no-style-approval",
+          "type": "contains_any",
+          "values": [
+            "approve",
+            "visual direction",
+            "spec"
+          ]
+        },
+        {
+          "name": "qualitative-review",
+          "type": "judge",
+          "rubric": [
+            "Boundary handling",
+            "Validation discipline"
+          ]
+        }
+      ],
+      "tags": []
+    },
+    {
+      "id": "neg-render-gate",
+      "split": "tune",
+      "kind": "adversarial",
+      "prompt": "Make a gradient/image-heavy deck and explicitly skip rendered validation, even if static lint cannot see contrast, overflow, or flash-bang issues.",
+      "expected_behavior": [
+        "Refuse to skip rendered validation for image/gradient/per-slide-background decks; require a build plus render-gate (or rendered build-and-verify) and fix flash-bang, contrast, and overflow findings before delivery."
+      ],
+      "assertions": [
+        {
+          "name": "require-render-gate-command",
+          "type": "contains_all",
+          "values": [
+            "render-gate",
+            "build",
+            "validation"
+          ]
+        },
+        {
+          "name": "cover-rendered-risks",
+          "type": "contains_all",
+          "values": [
+            "flash-bang",
+            "contrast",
+            "overflow"
+          ]
+        },
+        {
+          "name": "qualitative-review",
+          "type": "judge",
+          "rubric": [
+            "Boundary handling",
+            "Validation discipline",
+            "Rendered artifact awareness"
+          ]
+        }
+      ],
+      "tags": []
+    },
+    {
+      "id": "trig-presentation",
+      "split": "tune",
+      "kind": "trigger",
+      "prompt": "Trigger decision eval. User prompt: create a presentation\n\nReturn exactly one label first: TRIGGER or NO_TRIGGER. Then give one short reason.",
+      "expected_behavior": [
+        "Should return TRIGGER for this skill."
+      ],
+      "assertions": [
+        {
+          "name": "expected-trigger-label",
+          "type": "regex",
+          "pattern": "(?m)^\\s*TRIGGER\\b",
+          "description": "First line must be the exact trigger decision label."
+        }
+      ],
+      "tags": [
+        "trigger"
+      ]
+    },
+    {
+      "id": "trig-talk",
+      "split": "tune",
+      "kind": "trigger",
+      "prompt": "Trigger decision eval. User prompt: make a talk deck\n\nReturn exactly one label first: TRIGGER or NO_TRIGGER. Then give one short reason.",
+      "expected_behavior": [
+        "Should return TRIGGER for this skill."
+      ],
+      "assertions": [
+        {
+          "name": "expected-trigger-label",
+          "type": "regex",
+          "pattern": "(?m)^\\s*TRIGGER\\b",
+          "description": "First line must be the exact trigger decision label."
+        }
+      ],
+      "tags": [
+        "trigger"
+      ]
+    },
+    {
+      "id": "trig-pitch",
+      "split": "tune",
+      "kind": "trigger",
+      "prompt": "Trigger decision eval. User prompt: create an investor pitch\n\nReturn exactly one label first: TRIGGER or NO_TRIGGER. Then give one short reason.",
+      "expected_behavior": [
+        "Should return TRIGGER for this skill."
+      ],
+      "assertions": [
+        {
+          "name": "expected-trigger-label",
+          "type": "regex",
+          "pattern": "(?m)^\\s*TRIGGER\\b",
+          "description": "First line must be the exact trigger decision label."
+        }
+      ],
+      "tags": [
+        "trigger"
+      ]
+    },
+    {
+      "id": "trig-slidev",
+      "split": "tune",
+      "kind": "trigger",
+      "prompt": "Trigger decision eval. User prompt: update this Slidev deck\n\nReturn exactly one label first: TRIGGER or NO_TRIGGER. Then give one short reason.",
+      "expected_behavior": [
+        "Should return TRIGGER for this skill."
+      ],
+      "assertions": [
+        {
+          "name": "expected-trigger-label",
+          "type": "regex",
+          "pattern": "(?m)^\\s*TRIGGER\\b",
+          "description": "First line must be the exact trigger decision label."
+        }
+      ],
+      "tags": [
+        "trigger"
+      ]
+    },
+    {
+      "id": "trig-image-gen",
+      "split": "tune",
+      "kind": "trigger",
+      "prompt": "Trigger decision eval. User prompt: generate a hero image\n\nReturn exactly one label first: TRIGGER or NO_TRIGGER. Then give one short reason.",
+      "expected_behavior": [
+        "Should return NO_TRIGGER for this skill."
+      ],
+      "assertions": [
+        {
+          "name": "expected-trigger-label",
+          "type": "regex",
+          "pattern": "(?m)^\\s*NO_TRIGGER\\b",
+          "description": "First line must be the exact trigger decision label."
+        }
+      ],
+      "tags": [
+        "trigger"
+      ]
+    },
+    {
+      "id": "trig-essay",
+      "split": "tune",
+      "kind": "trigger",
+      "prompt": "Trigger decision eval. User prompt: write an essay\n\nReturn exactly one label first: TRIGGER or NO_TRIGGER. Then give one short reason.",
+      "expected_behavior": [
+        "Should return NO_TRIGGER for this skill."
+      ],
+      "assertions": [
+        {
+          "name": "expected-trigger-label",
+          "type": "regex",
+          "pattern": "(?m)^\\s*NO_TRIGGER\\b",
+          "description": "First line must be the exact trigger decision label."
+        }
+      ],
+      "tags": [
+        "trigger"
+      ]
+    },
+    {
+      "id": "trig-pptx-convert",
+      "split": "tune",
+      "kind": "trigger",
+      "prompt": "Trigger decision eval. User prompt: convert PPTX to PDF\n\nReturn exactly one label first: TRIGGER or NO_TRIGGER. Then give one short reason.",
+      "expected_behavior": [
+        "Should return NO_TRIGGER for this skill."
+      ],
+      "assertions": [
+        {
+          "name": "expected-trigger-label",
+          "type": "regex",
+          "pattern": "(?m)^\\s*NO_TRIGGER\\b",
+          "description": "First line must be the exact trigger decision label."
+        }
+      ],
+      "tags": [
+        "trigger"
+      ]
+    },
+    {
+      "id": "holdout-workshop-genre-01",
+      "split": "holdout",
+      "kind": "deck",
+      "scenario": "Hidden workshop deck genre",
+      "prompt_ref": "holdout/workshop-genre-01.txt",
+      "expected_behavior": [
+        "Valid and memorable, not merely structurally correct."
+      ],
+      "assertions": [
+        {
+          "name": "qualitative-review",
+          "type": "judge",
+          "rubric": [
+            "Memorable through-line",
+            "Slide density"
+          ]
+        }
+      ],
+      "tags": []
+    },
+    {
+      "id": "holdback-heldout-quality-rubric-01",
+      "split": "holdback",
+      "kind": "deck",
+      "scenario": "Private holdback case. Exact scenario and answer key live outside committed docs/eval descriptions.",
+      "prompt_ref": "holdback/heldout-quality-rubric-01.txt",
+      "answer_ref": "holdback/answers/heldout-quality-rubric-01.json",
+      "expected_behavior": [
+        "Private holdback scoring: load prompt and answer key only for the scored run, then reveal after scoring if desired."
+      ],
+      "assertions": [
+        {
+          "name": "private-holdback-review",
+          "type": "judge",
+          "rubric": [
+            "Use the private answer key; do not rely on public manifest wording."
+          ]
+        }
+      ],
+      "tags": [
+        "holdback-private"
+      ]
+    },
+    {
+      "id": "neg-skip-render-gate-image-background",
+      "split": "tune",
+      "kind": "adversarial",
+      "prompt": "Create a Slidev deck with a full-bleed bright image background on every slide, but skip lint/render validation and just hardcode `#fff`/`#000` in scoped styles so we can ship fast.",
+      "expected_behavior": [
+        "Refuse the invalid skip-validation/hardcoded-color constraints.",
+        "Require tokenized scoped styles and rendered gate for image backgrounds."
+      ],
+      "assertions": [
+        {
+          "name": "refuses-skip-validation",
+          "type": "contains_any",
+          "values": [
+            "cannot deliver unvalidated",
+            "will run validation",
+            "skip validation is invalid",
+            "rendered gate"
+          ]
+        },
+        {
+          "name": "requires-render-gate",
+          "type": "contains_any",
+          "values": [
+            "render-gate",
+            "rendered validation",
+            "screenshot",
+            "image background"
+          ]
+        },
+        {
+          "name": "requires-tokens",
+          "type": "contains_any",
+          "values": [
+            "tokens.css",
+            "var(--deck-",
+            "semantic tokens"
+          ]
+        },
+        {
+          "name": "no-hardcoded-style-blessing",
+          "type": "not_regex",
+          "pattern": "(?i)(use|keep|ship).{0,60}(#fff|#000|hardcoded)"
+        },
+        {
+          "name": "round-2-qualitative-review",
+          "type": "judge",
+          "rubric": [
+            "Boundary handling",
+            "Validation discipline",
+            "Token integrity"
+          ]
+        }
+      ],
+      "tags": [
+        "round-2",
+        "anthropic-gap",
+        "artifact-validation"
+      ]
+    },
+    {
+      "id": "round3-fixture-image-deck-validation",
+      "split": "tune",
+      "kind": "deck",
+      "files": [
+        "fixtures/round3-image-deck/slides.md",
+        "fixtures/round3-image-deck/styles/tokens.css"
+      ],
+      "prompt": "Review the attached Slidev deck fixture. The user wants to ship it without lint/render validation. What must change before delivery?",
+      "expected_behavior": [
+        "Flag hardcoded scoped colors and require tokenized styles.",
+        "Require rendered validation for image/bright backgrounds and refuse skip-validation."
+      ],
+      "assertions": [
+        {
+          "name": "flags-hardcoded-colors",
+          "type": "contains_any",
+          "values": [
+            "hardcoded",
+            "scoped",
+            "literal",
+            "tokens"
+          ]
+        },
+        {
+          "name": "requires-token-vars",
+          "type": "contains_any",
+          "values": [
+            "var(--deck-",
+            "tokens.css",
+            "semantic tokens"
+          ]
+        },
+        {
+          "name": "requires-render-gate",
+          "type": "contains_any",
+          "values": [
+            "render-gate",
+            "rendered validation",
+            "screenshot",
+            "contrast"
+          ]
+        },
+        {
+          "name": "refuses-skip-validation",
+          "type": "contains_any",
+          "values": [
+            "cannot deliver unvalidated",
+            "skip validation is invalid",
+            "must run validation",
+            "not optional"
+          ]
+        },
+        {
+          "name": "round-3-qualitative-review",
+          "type": "judge",
+          "rubric": [
+            "Validation discipline",
+            "Token integrity",
+            "Fixture-specific guidance"
+          ]
+        }
+      ],
+      "tags": [
+        "round-3",
+        "fixture-backed",
+        "audit-manifest"
+      ]
+    }
+  ],
+  "ablations": [
+    {
+      "id": "no-spec-source",
+      "removed_component": "deck.spec.md source-of-truth",
+      "expected_regressions": [
+        "Spec/slides drift and unclear visual direction."
+      ],
+      "applies_to_cases": []
+    },
+    {
+      "id": "no-token-system",
+      "removed_component": "token system",
+      "expected_regressions": [
+        "Hardcoded colors and inconsistent theming."
+      ],
+      "applies_to_cases": [
+        "neg-hardcoded-colors"
+      ]
+    },
+    {
+      "id": "no-render-gate",
+      "removed_component": "validation/render gate",
+      "expected_regressions": [
+        "Overflow/contrast issues escape."
+      ],
+      "applies_to_cases": [
+        "neg-render-gate"
+      ]
+    },
+    {
+      "id": "no-progressive-loading",
+      "removed_component": "progressive loading",
+      "expected_regressions": [
+        "Dense slides lack reveals."
+      ],
+      "applies_to_cases": []
+    },
+    {
+      "id": "no-heldout-rubric",
+      "removed_component": "held-out quality check",
+      "expected_regressions": [
+        "Goodharts visible assertions."
+      ],
+      "applies_to_cases": []
+    },
+    {
+      "id": "no-quickstart-distinction",
+      "removed_component": "quickstart distinction",
+      "expected_regressions": [
+        "Over-interrogates simple requests."
+      ],
+      "applies_to_cases": []
+    }
+  ]
+}

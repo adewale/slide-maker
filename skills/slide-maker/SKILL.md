@@ -35,6 +35,17 @@ Unsupported: standalone HTML, PPTX, HTML-to-Slidev, non-project artifacts. Redir
 Always: `deck.spec.md`, `slides.md`, `README.md`.
 When justified: `styles/tokens.css`, `styles/theme.css`, `layouts/*.vue`, `components/*.vue`, `public/images/*`.
 
+## Bounded/no-write mode
+
+If the environment does not expose file-writing or shell/build tools, or the user asks for a project/repo deck without a concrete project path, URL, or source bundle, do **not** enter an open-ended build/validation loop. Instead, return a compact source-grounded draft with these exact sections:
+
+1. `deck.spec.md` — title, audience, through-line, source assumptions, slide list.
+2. `slides.md` — Slidev-native Markdown draft with file-reference placeholders or the bounded files actually inspected.
+3. `README.md` — preview/export commands and validation status.
+4. `Validation status` — state what was not run and the smallest next command to validate.
+
+For repo architecture decks, do one bounded source pass only: inspect top-level README/docs/package/config files and 3-5 representative source paths if available, then stop. If no sources are available, say which files are needed rather than scanning indefinitely.
+
 ## Source-of-truth model
 
 `deck.spec.md` is the planning source. `slides.md` is the presentation source. `styles/`, `layouts/`, `components/` are the implementation layer. Structural changes start in `deck.spec.md` and must stay in sync with `slides.md`.
@@ -51,7 +62,8 @@ When justified: `styles/tokens.css`, `styles/theme.css`, `layouts/*.vue`, `compo
 - Follow the escalation ladder: Markdown > built-in layout > custom layout > custom component > inline HTML. Do not skip levels without a real reason.
 - Split dense material across slides instead of cramming
 - Remove dead abstractions when updating
-- Never bypass the token system with hardcoded colors in `<style scoped>` blocks — use `var(--deck-*)` variables exclusively
+- Never bypass the token system with hardcoded colors in `<style scoped>` blocks — use `var(--deck-*)` variables exclusively. If the user explicitly asks for literal hex/rgb/hsl in scoped styles, refuse that part and redirect to semantic tokens: define colors in `styles/tokens.css`, then reference them with `var(--deck-*)`.
+- Validation gates are not optional. If the user asks to skip lint or rendered validation, state that the deck cannot be delivered unvalidated; run the required gate(s), fix failures, then deliver.
 - When notes are requested, keep them slide-local and delivery-oriented using Slidev note comments (see COMPILER_RULES.md § Notes for quality criteria and click marker sync)
 
 ## Workflow
@@ -101,12 +113,12 @@ Generate or update: `slides.md`, styles, layouts, components, README if usage ch
 ### 7. Validate
 → Load ACCEPTANCE_CHECKLIST.md and LLM_TELLS.md now.
 
-**Automated checks:** Run `node tools/deck-lint.mjs` on the deck directory. Fix all errors before delivery. Warnings are quality flags — address them if feasible.
+**Automated checks:** Run `node tools/deck-lint.mjs` on the deck directory. Fix all errors before delivery. Warnings are quality flags — address them if feasible. A request to skip lint is an invalid constraint, not a user preference.
 
 **Manual checks:** spec-to-slides sync, Markdown editability, justified custom code, no unused abstractions.
 Project decks: through-line in 3+ slides (ideally 5-6), source materials cited, 1+ visual evidence slide, project colors override preset tokens.
 
-**Rendered gate (image/gradient/per-slide-background decks):** static lint cannot see rendered brightness or contrast. Build the deck, then run `node tools/render-gate.mjs <built-dist>` (or `python tools/build-and-verify.py <dir>:<name> --rendered`). Fix any flash-bang, contrast, or overflow it reports.
+**Rendered gate (image/gradient/per-slide-background decks):** static lint cannot see rendered brightness, contrast, or overflow. Build the deck, then run `node tools/render-gate.mjs <built-dist>` (or `python tools/build-and-verify.py <dir>:<name> --rendered`). Fix every flash-bang, contrast, or overflow finding before delivery. If the user asks to skip rendered validation, refuse that constraint and run the gate anyway.
 
 **Held-out quality check:** for a quality (not just structural) judgment, dispatch a fresh grading **sub-agent** to score the deck against `evals/holdout-rubric.md` — criteria deliberately *not* in the generation docs, so the review judges blind rather than re-checking the rules you optimized for. Use a sub-agent (it reuses your own model access — no API key); do not call an external API. A high structural score with a low held-out score means the deck is competent but forgettable.
 

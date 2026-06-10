@@ -129,6 +129,73 @@ function tokenValue(deckDir, token) {
   return m ? m[1].trim() : null;
 }
 
+function collectRelativeFiles(deckDir, relDir, exts) {
+  const abs = join(deckDir, relDir);
+  if (!existsSync(abs)) return [];
+  const out = [];
+  const visit = (dir, relBase) => {
+    for (const entry of readdirSync(dir)) {
+      const p = join(dir, entry);
+      const rel = `${relBase}/${entry}`;
+      const st = statSync(p);
+      if (st.isDirectory()) visit(p, rel);
+      else if (exts.some(ext => entry.endsWith(ext))) out.push(rel);
+    }
+  };
+  visit(abs, relDir);
+  return out;
+}
+
+function scopedStyleSources(deckDir) {
+  const rels = ['slides.md'];
+  try {
+    for (const entry of readdirSync(deckDir)) if (entry.endsWith('.vue')) rels.push(entry);
+  } catch {}
+  rels.push(...collectRelativeFiles(deckDir, 'layouts', ['.vue']));
+  rels.push(...collectRelativeFiles(deckDir, 'components', ['.vue']));
+  return [...new Set(rels)].filter(rel => existsSync(join(deckDir, rel)));
+}
+
+function isColorBearingProperty(prop) {
+  const p = prop.toLowerCase();
+  return p === 'color'
+    || p.startsWith('background')
+    || p.endsWith('color')
+    || p === 'fill'
+    || p === 'stroke'
+    || p === 'box-shadow'
+    || p === 'text-shadow'
+    || p === 'border'
+    || p.startsWith('border-')
+    || p === 'outline'
+    || p.startsWith('outline-');
+}
+
+function scopedColorLiteralViolations(deckDir) {
+  const violations = [];
+  const styleRe = /<style\b(?=[^>]*\bscoped\b)[^>]*>([\s\S]*?)<\/style>/gi;
+  const declRe = /(^|[;{}\n])\s*([-\w]+)\s*:\s*([^;{}]+);?/g;
+  const literalRe = /#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)|hsla?\([^)]*\)/i;
+
+  for (const rel of scopedStyleSources(deckDir)) {
+    const text = readDeckFile(deckDir, rel) || '';
+    for (const block of text.matchAll(styleRe)) {
+      const cssStart = (block.index ?? 0) + block[0].indexOf(block[1]);
+      const css = block[1].replace(/\/\*[\s\S]*?\*\//g, m => ' '.repeat(m.length));
+      for (const decl of css.matchAll(declRe)) {
+        const prop = decl[2];
+        const value = decl[3];
+        if (!isColorBearingProperty(prop) || /var\(/.test(value)) continue;
+        const literal = value.match(literalRe)?.[0];
+        if (!literal) continue;
+        const line = text.slice(0, cssStart + decl.index).split(/\r?\n/).length;
+        violations.push({ rel, line, prop, literal });
+      }
+    }
+  }
+  return violations;
+}
+
 // Returns { status: 'pass'|'fail'|'manual'|'judge', detail }
 function runAssert(spec, deckDir) {
   if (!spec) return { status: 'manual', detail: 'no machine assertion' };
@@ -170,13 +237,12 @@ function runAssert(spec, deckDir) {
     return { status: ok ? 'pass' : 'fail', detail: ok ? 'no emoji' : 'emoji present' };
   }
   if ('no_hardcoded_colors_scoped' in spec) {
-    const md = textOf('slides.md');
-    const styleBlocks = md.match(/<style[^>]*>[\s\S]*?<\/style>/g) || [];
-    for (const block of styleBlocks) {
-      const m = block.match(/#[0-9a-fA-F]{3,8}\b/);
-      if (m) return { status: 'fail', detail: `hardcoded ${m[0]} in scoped style` };
+    const violations = scopedColorLiteralViolations(deckDir);
+    if (violations.length) {
+      const v = violations[0];
+      return { status: 'fail', detail: `hardcoded ${v.literal} in scoped style ${v.rel}:${v.line} (${v.prop})` };
     }
-    return { status: 'pass', detail: 'tokens only' };
+    return { status: 'pass', detail: 'scoped styles use deck tokens' };
   }
   if ('token_luma' in spec) {
     const { token, min, max } = spec.token_luma;
