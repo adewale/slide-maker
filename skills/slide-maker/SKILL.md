@@ -2,6 +2,7 @@
 name: slide-maker
 description: Generate presentation decks grounded in real GitHub projects, or walk through a structured brief-to-slides process. Use when the user asks to create a presentation, slide deck, talk, pitch, keynote, or Slidev project — especially when they want slides based on an existing codebase, architecture, or project documentation.
 argument-hint: [goal or update instructions]
+compatibility: Agent Skills clients including Codex, OpenCode, Pi, Gemini CLI, and Claude Code.
 ---
 
 # slidev-project-studio
@@ -16,14 +17,14 @@ Load these files **only when entering the relevant phase**. Do not load all file
 |-------|-----------------|---------|
 | 1. Determine mode | (none) | — |
 | 2. Gather sources | [SOURCES.md](SOURCES.md) (project decks only) | Source-material lookup, extraction heuristics, through-line, project identity |
-| 3. Intake | [PRESENTATION_PHILOSOPHY.md](../docs/PRESENTATION_PHILOSOPHY.md), [STORYTELLING.md](../docs/STORYTELLING.md) | Rhetorical principles, narrative structure, through-line design |
+| 3. Intake | [PRESENTATION_PHILOSOPHY.md](references/PRESENTATION_PHILOSOPHY.md), [STORYTELLING.md](references/STORYTELLING.md) | Rhetorical principles, narrative structure, through-line design |
 | 4. Style direction | [STYLE_PRESETS.md](STYLE_PRESETS.md) | Visual presets and token palettes |
 | 5. Write spec | [DECK_SPEC.md](DECK_SPEC.md), [SLIDE_KINDS.md](SLIDE_KINDS.md) | Spec schema and slide type catalog |
 | 6. Compile | [COMPILER_RULES.md](COMPILER_RULES.md), [SLIDEV_REFERENCE.md](SLIDEV_REFERENCE.md) | Compilation phases, Slidev features |
-| 7. Validate | [ACCEPTANCE_CHECKLIST.md](ACCEPTANCE_CHECKLIST.md), [LLM_TELLS.md](../docs/LLM_TELLS.md) | Quality gates |
+| 7. Validate | [ACCEPTANCE_CHECKLIST.md](ACCEPTANCE_CHECKLIST.md), [LLM_TELLS.md](references/LLM_TELLS.md) | Quality gates |
 | 8. Deliver | (none — instructions below) | — |
 
-[PROJECT_DECK_RUBRIC.md](../docs/PROJECT_DECK_RUBRIC.md) — load only when scoring a project deck.
+[PROJECT_DECK_RUBRIC.md](references/PROJECT_DECK_RUBRIC.md) — load only when scoring a project deck.
 
 ## Scope
 
@@ -113,12 +114,12 @@ Generate or update: `slides.md`, styles, layouts, components, README if usage ch
 ### 7. Validate
 → Load ACCEPTANCE_CHECKLIST.md and LLM_TELLS.md now.
 
-**Automated checks:** Run `node tools/deck-lint.mjs` on the deck directory. Fix all errors before delivery. Warnings are quality flags — address them if feasible. A request to skip lint is an invalid constraint, not a user preference.
+**Automated checks:** When this repo's `tools/` directory is available, run `node tools/deck-lint.mjs` on the deck directory. If the repo tools are not available in the host agent, run the native Slidev build/export command plus `ACCEPTANCE_CHECKLIST.md` manually. Fix all errors before delivery. Warnings are quality flags — address them if feasible. A request to skip validation is an invalid constraint, not a user preference.
 
 **Manual checks:** spec-to-slides sync, Markdown editability, justified custom code, no unused abstractions.
 Project decks: through-line in 3+ slides (ideally 5-6), source materials cited, 1+ visual evidence slide, project colors override preset tokens.
 
-**Rendered gate (image/gradient/per-slide-background decks):** static lint cannot see rendered brightness, contrast, or overflow. Build the deck, then run `node tools/render-gate.mjs <built-dist>` (or `python tools/build-and-verify.py <dir>:<name> --rendered`). Fix every flash-bang, contrast, or overflow finding before delivery. If the user asks to skip rendered validation, refuse that constraint and run the gate anyway.
+**Rendered gate (image/gradient/per-slide-background decks):** static lint cannot see rendered brightness, contrast, or overflow. When this repo's `tools/` directory is available, build the deck, then run `node tools/render-gate.mjs <built-dist>` (or `python tools/build-and-verify.py <dir>:<name> --rendered`). If those tools are unavailable, inspect the rendered deck manually against the contrast, overflow, and flash-bang checks in `ACCEPTANCE_CHECKLIST.md`. Fix every flash-bang, contrast, or overflow finding before delivery. If the user asks to skip rendered validation, refuse that constraint and validate anyway.
 
 **Held-out quality check:** for a quality (not just structural) judgment, dispatch a fresh grading **sub-agent** to score the deck against `evals/holdout-rubric.md` — criteria deliberately *not* in the generation docs, so the review judges blind rather than re-checking the rules you optimized for. Use a sub-agent (it reuses your own model access — no API key); do not call an external API. A high structural score with a low held-out score means the deck is competent but forgettable.
 
@@ -143,14 +144,14 @@ The built deck also has a PDF download button (from `download: true` in headmatt
 ```
 python tools/deploy-cf.py
 ```
-One command: builds the deck, creates a Workers Static Assets project, deploys. Requires `npx wrangler login` first. Pass `--name my-talk` for a custom worker name.
+When this repo's `tools/` directory is available, that one command builds the deck, creates a Workers Static Assets project, and deploys. Requires `npx wrangler login` first. Pass `--name my-talk` for a custom worker name. If the tools are unavailable, run `npx slidev build` and deploy the static output manually.
 
 **Deploy manually:** `npx slidev build` produces `dist/` — a static SPA deployable to any host (Cloudflare Pages, Vercel, Netlify, GitHub Pages). The host must serve `index.html` for all sub-routes.
 
 **Post-generation follow-up:** After presenting the next steps, ask: *"Want me to help you deploy this?"* If the user says yes, walk them through `wrangler login` (if needed) and run `deploy-cf.py`.
 
 **Multiple decks (collection):**
-For maintainers hosting multiple decks as a gallery:
+For maintainers hosting multiple decks as a gallery when this repo's `tools/` directory is available:
 - `python tools/deploy-cf.py --collection` — builds all decks and deploys as a gallery
 - `python tools/build.py` — builds all decks to `examples/_build/` without deploying
 - Gallery includes `index.html` menu, `llms.txt` manifest, per-slide Markdown API

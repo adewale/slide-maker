@@ -1,7 +1,7 @@
 {
   "name": "slide-maker",
   "description": "Generate presentation decks grounded in real GitHub projects. A structured brief-to-slides process with WCAG-validated visual direction, anti-slop typography and palette discipline, rendered-pixel and held-out quality gates, and a sub-agent grading judge that never needs an API key.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "icon": "🎞️",
   "category": "Content Creation",
   "tags": [
@@ -30,7 +30,9 @@
     {
       "name": "slide-maker",
       "source": "./",
-      "skills": ["./skills/slide-maker"]
+      "skills": [
+        "./skills/slide-maker"
+      ]
     }
   ]
 }
