@@ -30,5 +30,30 @@
     "playwright": "^1.58.2",
     "playwright-chromium": "^1.58.2",
     "pngjs": "^7.0.0"
+  },
+  "version": "0.2.1",
+  "license": "MIT",
+  "keywords": [
+    "agent-skills",
+    "codex",
+    "opencode",
+    "pi",
+    "gemini",
+    "claude-code"
+  ],
+  "skill": {
+    "entry": "skills/slide-maker/SKILL.md",
+    "harnesses": [
+      "codex",
+      "opencode",
+      "pi",
+      "gemini",
+      "claude-code"
+    ]
+  },
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
   }
 }

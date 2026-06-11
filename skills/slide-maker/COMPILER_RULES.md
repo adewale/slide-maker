@@ -149,10 +149,10 @@ background: '#ffffff'
 ```
 
 Rule: adjacent slides must not differ by more than **0.5 in WCAG relative
-luminance**. `node tools/deck-lint.mjs` flags violations (flat frontmatter
+luminance**. When this repo's `tools/` directory is available, `node tools/deck-lint.mjs` flags violations (flat frontmatter
 `background:` colors only — image, gradient, and theme-driven cover/section
 backgrounds need a rendered-screenshot check). For image, gradient, or
-per-slide-background decks, build and run `node tools/render-gate.mjs <built-dist>`;
+per-slide-background decks, build and run `node tools/render-gate.mjs <built-dist>` when this repo's `tools/` directory is available;
 a request to skip rendered validation is invalid.
 
 ### Other rules
@@ -165,7 +165,7 @@ a request to skip rendered validation is invalid.
 - No same layout for every content slide — alternate between built-in layouts
 - No blanket `.slidev-layout { background }` overrides when using a non-default theme
 
-For the full catalog of AI-generated aesthetic tells to avoid, see [LLM_TELLS.md](../docs/LLM_TELLS.md).
+For the full catalog of AI-generated aesthetic tells to avoid, see [LLM_TELLS.md](references/LLM_TELLS.md).
 
 ## Inputs
 
@@ -683,7 +683,7 @@ Rules:
 - The closing must echo or resolve the opening question/metaphor — not be a disconnected install command
 - The end slide must use the same `--deck-bg` and `--deck-fg` as every other content slide. No inversion, no accent background, no special color treatment. The end slide should feel like a natural conclusion to the deck, not a jarring palette change. If the deck is dark, the end is dark. If the deck is light, the end is light.
 
-For the full set of rhetorical principles, see [PRESENTATION_PHILOSOPHY.md](../docs/PRESENTATION_PHILOSOPHY.md).
+For the full set of rhetorical principles, see [PRESENTATION_PHILOSOPHY.md](references/PRESENTATION_PHILOSOPHY.md).
 
 ## Diagram guidelines
 

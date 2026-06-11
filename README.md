@@ -2,7 +2,7 @@
 
 [![skills.sh](https://skills.sh/b/adewale/slide-maker)](https://skills.sh/adewale/slide-maker)
 
-A Claude Code skill that creates [Slidev](https://sli.dev) presentation decks. Point it at a GitHub repo or describe what you want — it reads source code, architecture docs, and lessons learned to produce slides grounded in what's actually there.
+An Agent Skill that creates [Slidev](https://sli.dev) presentation decks. Point it at a GitHub repo or describe what you want — it reads source code, architecture docs, and lessons learned to produce slides grounded in what's actually there.
 
 Output is native Slidev Markdown: editable by hand, buildable to static HTML, deployable anywhere.
 
@@ -15,6 +15,20 @@ npx skills add adewale/slide-maker
 ```
 
 Skills appear on skills.sh automatically after users install the repo with the skills CLI. Install counts and leaderboard rankings come from anonymous CLI telemetry; opt out with `DISABLE_TELEMETRY=1`. The repo page customization in `skills.sh.json` is picked up after the repository is seen by telemetry and the cache refreshes.
+
+## Agent compatibility
+
+The installable skill directory is `skills/slide-maker`. It uses the Agent Skills `SKILL.md` format and is configured for Codex, OpenCode, Pi, Gemini CLI, and Claude Code.
+
+Slide Maker can be loaded by any Agent Skills-compatible client. Full rendered validation uses this repo's `tools/` directory; when only `skills/slide-maker` is copied, run the bundled checklist plus native Slidev build/export commands instead of repo-specific tools.
+
+| Agent/client | Install or use |
+|---|---|
+| Codex | `cp -R skills/slide-maker ~/.codex/skills/slide-maker` |
+| OpenCode | `cp -R skills/slide-maker ~/.config/opencode/skills/slide-maker` or use `.opencode/skills/slide-maker` in a project |
+| Pi | `pi install https://github.com/adewale/slide-maker` or `pi --skill skills/slide-maker` |
+| Gemini CLI | `gemini skills install https://github.com/adewale/slide-maker --path skills/slide-maker` or copy to `.gemini/skills/slide-maker` |
+| Claude Code | `npx skills add adewale/slide-maker` or copy to `.claude/skills/slide-maker` |
 
 ## Create a deck
 
@@ -43,7 +57,7 @@ The skill walks through intake, style direction, spec writing, compilation, and 
 ```bash
 npx slidev                # preview locally at localhost:3030
 npx slidev export         # export as PDF
-python tools/deploy-cf.py # deploy to Cloudflare Workers (one command)
+python tools/deploy-cf.py # deploy when this repo's tools/ are available
 ```
 
 Every built deck includes a PDF download button. To deploy manually, `npx slidev build` produces a static `dist/` folder — deploy it to any host (Cloudflare Pages, Vercel, Netlify, GitHub Pages).

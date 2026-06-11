@@ -93,7 +93,7 @@ The CRAP principles and other acceptance criteria are enforced at three levels:
 
 ### Level 1: Automated (deck-lint.mjs)
 
-Run: `node tools/deck-lint.mjs` (auto-discovers all decks in examples/ and generated-decks/).
+When this repo's `tools/` directory is available, run: `node tools/deck-lint.mjs` (auto-discovers all decks in examples/ and generated-decks/). If the tools are unavailable in the host agent, run a native Slidev build/export and apply this checklist manually.
 
 These checks run automatically and produce errors or warnings:
 
@@ -127,7 +127,7 @@ These checks run automatically and produce errors or warnings:
 
 ### Level 2: Semi-automated (render-gate.mjs + style-audit.mjs + screenshot-audit.mjs)
 
-For image, gradient, and per-slide-background decks, build first and run `node tools/render-gate.mjs <built-dist>` (or `python tools/build-and-verify.py <dir>:<name> --rendered`). This gate is mandatory even if the user asks to skip validation. Also run `node tools/style-audit.mjs` (post-build) and `node tools/screenshot-audit.mjs <url>` (needs running server) when deeper token or viewport diagnostics are needed.
+For image, gradient, and per-slide-background decks, build first. When this repo's `tools/` directory is available, run `node tools/render-gate.mjs <built-dist>` (or `python tools/build-and-verify.py <dir>:<name> --rendered`). If the tools are unavailable, inspect the rendered deck manually for flash-bang transitions, contrast failures, and overflow. This gate is mandatory even if the user asks to skip validation. Also run `node tools/style-audit.mjs` (post-build) and `node tools/screenshot-audit.mjs <url>` (needs running server) when deeper token or viewport diagnostics are needed and the tools are available.
 
 | Check | Principle | How to verify |
 |-------|-----------|---------------|
