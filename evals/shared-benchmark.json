@@ -74,7 +74,13 @@
           ]
         }
       ],
-      "tags": []
+      "tags": [],
+      "domain": "slide-design",
+      "difficulty": "core",
+      "success_goals": [
+        "outcome",
+        "style"
+      ]
     },
     {
       "id": "pos-quickstart-five",
@@ -113,7 +119,13 @@
           ]
         }
       ],
-      "tags": []
+      "tags": [],
+      "domain": "slide-design",
+      "difficulty": "core",
+      "success_goals": [
+        "outcome",
+        "style"
+      ]
     },
     {
       "id": "pos-update-affected-only",
@@ -152,7 +164,13 @@
           ]
         }
       ],
-      "tags": []
+      "tags": [],
+      "domain": "slide-design",
+      "difficulty": "core",
+      "success_goals": [
+        "outcome",
+        "style"
+      ]
     },
     {
       "id": "pos-speaker-notes",
@@ -191,7 +209,13 @@
           ]
         }
       ],
-      "tags": []
+      "tags": [],
+      "domain": "slide-design",
+      "difficulty": "core",
+      "success_goals": [
+        "outcome",
+        "style"
+      ]
     },
     {
       "id": "pos-gallery-manifest",
@@ -230,7 +254,13 @@
           ]
         }
       ],
-      "tags": []
+      "tags": [],
+      "domain": "slide-design",
+      "difficulty": "core",
+      "success_goals": [
+        "outcome",
+        "style"
+      ]
     },
     {
       "id": "neg-pptx-request",
@@ -259,7 +289,13 @@
           ]
         }
       ],
-      "tags": []
+      "tags": [],
+      "domain": "slide-design",
+      "difficulty": "extended",
+      "success_goals": [
+        "outcome",
+        "style"
+      ]
     },
     {
       "id": "neg-dense-30-bullets",
@@ -288,7 +324,13 @@
           ]
         }
       ],
-      "tags": []
+      "tags": [],
+      "domain": "slide-design",
+      "difficulty": "extended",
+      "success_goals": [
+        "outcome",
+        "style"
+      ]
     },
     {
       "id": "neg-hardcoded-colors",
@@ -340,7 +382,13 @@
           ]
         }
       ],
-      "tags": []
+      "tags": [],
+      "domain": "slide-design",
+      "difficulty": "extended",
+      "success_goals": [
+        "outcome",
+        "style"
+      ]
     },
     {
       "id": "neg-unneeded-component",
@@ -369,7 +417,13 @@
           ]
         }
       ],
-      "tags": []
+      "tags": [],
+      "domain": "slide-design",
+      "difficulty": "extended",
+      "success_goals": [
+        "outcome",
+        "style"
+      ]
     },
     {
       "id": "neg-no-style-approval",
@@ -398,7 +452,13 @@
           ]
         }
       ],
-      "tags": []
+      "tags": [],
+      "domain": "slide-design",
+      "difficulty": "extended",
+      "success_goals": [
+        "outcome",
+        "style"
+      ]
     },
     {
       "id": "neg-render-gate",
@@ -437,7 +497,13 @@
           ]
         }
       ],
-      "tags": []
+      "tags": [],
+      "domain": "slide-design",
+      "difficulty": "extended",
+      "success_goals": [
+        "outcome",
+        "style"
+      ]
     },
     {
       "id": "trig-presentation",
@@ -457,7 +523,13 @@
       ],
       "tags": [
         "trigger"
-      ]
+      ],
+      "domain": "slide-design",
+      "difficulty": "core",
+      "success_goals": [
+        "trigger"
+      ],
+      "trigger_type": "implicit"
     },
     {
       "id": "trig-talk",
@@ -477,7 +549,13 @@
       ],
       "tags": [
         "trigger"
-      ]
+      ],
+      "domain": "slide-design",
+      "difficulty": "core",
+      "success_goals": [
+        "trigger"
+      ],
+      "trigger_type": "implicit"
     },
     {
       "id": "trig-pitch",
@@ -497,7 +575,13 @@
       ],
       "tags": [
         "trigger"
-      ]
+      ],
+      "domain": "slide-design",
+      "difficulty": "core",
+      "success_goals": [
+        "trigger"
+      ],
+      "trigger_type": "implicit"
     },
     {
       "id": "trig-slidev",
@@ -517,7 +601,13 @@
       ],
       "tags": [
         "trigger"
-      ]
+      ],
+      "domain": "slide-design",
+      "difficulty": "core",
+      "success_goals": [
+        "trigger"
+      ],
+      "trigger_type": "implicit"
     },
     {
       "id": "trig-image-gen",
@@ -537,7 +627,13 @@
       ],
       "tags": [
         "trigger"
-      ]
+      ],
+      "domain": "slide-design",
+      "difficulty": "core",
+      "success_goals": [
+        "trigger"
+      ],
+      "trigger_type": "negative-near-miss"
     },
     {
       "id": "trig-essay",
@@ -557,7 +653,13 @@
       ],
       "tags": [
         "trigger"
-      ]
+      ],
+      "domain": "slide-design",
+      "difficulty": "core",
+      "success_goals": [
+        "trigger"
+      ],
+      "trigger_type": "negative-near-miss"
     },
     {
       "id": "trig-pptx-convert",
@@ -577,7 +679,13 @@
       ],
       "tags": [
         "trigger"
-      ]
+      ],
+      "domain": "slide-design",
+      "difficulty": "core",
+      "success_goals": [
+        "trigger"
+      ],
+      "trigger_type": "negative-near-miss"
     },
     {
       "id": "holdout-workshop-genre-01",
@@ -598,7 +706,13 @@
           ]
         }
       ],
-      "tags": []
+      "tags": [],
+      "domain": "slide-design",
+      "difficulty": "extended",
+      "success_goals": [
+        "outcome",
+        "style"
+      ]
     },
     {
       "id": "holdback-heldout-quality-rubric-01",
@@ -621,6 +735,12 @@
       ],
       "tags": [
         "holdback-private"
+      ],
+      "domain": "slide-design",
+      "difficulty": "extended",
+      "success_goals": [
+        "outcome",
+        "style"
       ]
     },
     {
@@ -681,6 +801,12 @@
         "round-2",
         "anthropic-gap",
         "artifact-validation"
+      ],
+      "domain": "slide-design",
+      "difficulty": "extended",
+      "success_goals": [
+        "outcome",
+        "style"
       ]
     },
     {
@@ -763,6 +889,12 @@
         "round-3",
         "fixture-backed",
         "audit-manifest"
+      ],
+      "domain": "slide-design",
+      "difficulty": "extended",
+      "success_goals": [
+        "outcome",
+        "style"
       ]
     }
   ],
