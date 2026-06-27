@@ -8,6 +8,12 @@ All notable changes to the slide-maker project and its Slidev extensions.
 - **Mobile scroll view spec** — design for vertically scrollable card view on portrait phones
 - **Slidev vs Reveal.js comparison** — comprehensive feature matrix
 
+### Changed
+- **Bumped Slidev 52.14.1 → 52.16.0** — picks up the native laser pointer, `--router-mode` build flag, named `v-click` animation presets, `markdown-it-github-alerts`, and the 52.15.2 security hardening (removed unsafe `exec()` from the resolver, filesystem-access guards)
+
+### Removed
+- **Custom laser pointer** — deleted the hand-rolled red-dot overlay from `global-top.vue` (demo deck + skill scaffold). Slidev now ships a native laser pointer; enable it from the nav-bar cursor-style menu → "Laser"
+
 ### Fixed
 - **Cross-platform build** — `sed -i.bak` replaces macOS-only `sed -i ''` in build.sh
 

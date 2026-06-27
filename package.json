@@ -18,7 +18,7 @@
     "@iconify-json/carbon": "^1.2.19",
     "@iconify-json/logos": "^1.2.10",
     "@iconify-json/mdi": "^1.2.3",
-    "@slidev/cli": "^52",
+    "@slidev/cli": "^52.16.0",
     "@slidev/theme-apple-basic": "latest",
     "@slidev/theme-default": "latest",
     "@slidev/theme-seriph": "latest",
