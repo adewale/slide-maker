@@ -35,7 +35,7 @@ not part of the slide-maker skill.
 | **PresenterClickDots** | Inline SVG dots showing click progress within current slide |
 | **PresenterLayoutPicker** | 3-mode toggle: notes-focus (70/30), balanced (50/50), slides-focus (30/70). Persists to localStorage |
 | **PresenterSectionLabel** | Displays "Section N of M" in presenter view |
-| **Laser pointer** | Red dot following mouse cursor in presenter mode. Auto-hides after 3s inactivity. Implemented in global-top.vue |
+| **Laser pointer** | Provided natively by Slidev (>=52.15.0). Enable via the nav bar cursor-style menu → "Laser" |
 
 ### Data Visualization
 
@@ -227,7 +227,6 @@ import AudienceQRCode from './components/AudienceQRCode.vue'
   <ProgressSegmentBar />
   <KeyboardHelp v-if="showHelp" />
   <AudienceQRCode />
-  <!-- Laser pointer (presenter-only) -->
 </template>
 ```
 

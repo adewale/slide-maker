@@ -1,0 +1,67 @@
+name: Deploy to GitHub Pages
+
+# Publishes the built decks to GitHub Pages at
+# https://adewale.github.io/slide-maker/. Decks use routerMode: hash, so
+# deep links survive reload on a plain static host with no server-side
+# SPA fallback (that is why this works on Pages as well as Cloudflare).
+#
+# Cloudflare Workers remains a separate, manual deploy target via
+# tools/deploy-cf.py; this workflow does not touch it.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one in-flight deploy at a time; never cancel a running publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Project pages live under /<repo>/, so every deck is based at
+      # /slide-maker/<deck>/ and llms.txt links resolve absolutely.
+      BASE_PREFIX: /slide-maker
+      SITE_URL: https://adewale.github.io/slide-maker
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      # `npm ci` installs playwright-chromium, whose postinstall downloads
+      # the browser. The build needs it: decks set `download: true`, so
+      # `slidev build` exports a PDF at build time (and that step launches
+      # Chromium). Do NOT set PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD here.
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build all decks
+        run: python3 tools/build.py
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: examples/_build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
