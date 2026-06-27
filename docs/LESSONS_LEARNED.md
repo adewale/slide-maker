@@ -169,6 +169,14 @@ The time spent building these tools is small compared to the time spent debuggin
 
 ---
 
+## 18. After a Slidev bump, page through a deck in a browser — the version number won't warn you
+
+**What happened:** Bumping Slidev 52.14.1 → 52.16.0 looked safe: same major, caret range, all decks lint-clean, demo built fine. But 52.16.0 shipped a navigation regression (slidevjs/slidev#2562) — `getSlidePath` double-prefixes `BASE_URL`, so on a subdirectory deploy (GitHub Pages, base `/slide-maker/slide-maker/`) paging to the next slide produced `#/slide-maker/slide-maker/2`, then navigation jammed and reloads 404'd. `deck-lint`, `style-audit`, and a static build all passed it; only *clicking through the deck in a real browser* exposed it. We pinned to 52.15.2 (last good release that still has the native laser + security fixes).
+
+**The lesson:** "Same major version = safe" is a hope, not a guarantee — a minor bump can break routing without tripping any structural check. The only thing that caught this was a headless page-through: load a subdirectory-based deck, press Right a few times, assert the hash route is `#/N` (not `#/<base>/N`), then reload a deep link and confirm it resolves. Make that the smoke test after *any* Slidev bump, before deploying. When you pin around an upstream bug, record the cause/fix issue numbers and the un-pin trigger (here: slidevjs/slidev#2630) so the freeze is removable, not mysterious.
+
+---
+
 ## Tool inventory
 
 | Tool | Purpose | When to run |
