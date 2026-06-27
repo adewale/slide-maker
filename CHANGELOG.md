@@ -9,12 +9,13 @@ All notable changes to the slide-maker project and its Slidev extensions.
 - **Slidev vs Reveal.js comparison** — comprehensive feature matrix
 
 ### Changed
-- **Bumped Slidev 52.14.1 → 52.16.0** — picks up the native laser pointer, `--router-mode` build flag, named `v-click` animation presets, `markdown-it-github-alerts`, and the 52.15.2 security hardening (removed unsafe `exec()` from the resolver, filesystem-access guards)
+- **Bumped Slidev 52.14.1 → 52.15.2** (pinned exact) — picks up the native laser pointer (52.15.0), `--router-mode` build flag, named `v-click` animation presets, `markdown-it-github-alerts`, and the 52.15.2 security hardening (removed unsafe `exec()` from the resolver, filesystem-access guards)
 
 ### Removed
 - **Custom laser pointer** — deleted the hand-rolled red-dot overlay from `global-top.vue` (demo deck + skill scaffold). Slidev now ships a native laser pointer; enable it from the nav-bar cursor-style menu → "Laser"
 
 ### Fixed
+- **Slidev pinned to 52.15.2, not 52.16.0** — 52.16.0 has a navigation regression: `getSlidePath` prepends `BASE_URL` to the router path, which double-counts the base in hash mode. On a subdirectory deploy (e.g. GitHub Pages, base `/slide-maker/slide-maker/`) paging to the next slide produced `#/slide-maker/slide-maker/2` instead of `#/2`, then navigation jammed and reloads 404'd. 52.15.2 is the newest release that still has the native laser + security fixes but predates the regression. Caret pin avoided so npm cannot auto-jump back to the broken 52.16.0.
 - **Cross-platform build** — `sed -i.bak` replaces macOS-only `sed -i ''` in build.sh
 
 ---
