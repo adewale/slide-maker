@@ -16,6 +16,7 @@ All notable changes to the slide-maker project and its Slidev extensions.
 
 ### Fixed
 - **Slidev pinned to 52.15.2, not 52.16.0** — 52.16.0 has a navigation regression: `getSlidePath` prepends `BASE_URL` to the router path, which double-counts the base in hash mode. On a subdirectory deploy (e.g. GitHub Pages, base `/slide-maker/slide-maker/`) paging to the next slide produced `#/slide-maker/slide-maker/2` instead of `#/2`, then navigation jammed and reloads 404'd. 52.15.2 is the newest release that still has the native laser + security fixes but predates the regression. Caret pin avoided so npm cannot auto-jump back to the broken 52.16.0.
+  - Upstream: introduced by slidevjs/slidev#2562 (shipped in 52.16.0), tracked in slidevjs/slidev#2629/#2635, fixed by slidevjs/slidev#2630 (still open/unreleased as of this pin). **Un-pin when #2630 ships in a release (likely 52.16.1+): bump, re-run the page-through smoke test, then drop the exact pin.**
 - **Cross-platform build** — `sed -i.bak` replaces macOS-only `sed -i ''` in build.sh
 
 ---
