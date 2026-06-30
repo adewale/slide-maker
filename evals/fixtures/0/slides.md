@@ -44,7 +44,7 @@ transition: iris
 
 # Deploy
 
-The build output is a static SPA; `tools/deploy.py` publishes it to Cloudflare Workers with an SPA fallback so every sub-route serves `index.html`.
+The build output is a static SPA; `tools/deploy-cf.py` publishes it to Cloudflare Workers with an SPA fallback so every sub-route serves `index.html`.
 
 ---
 layout: end
