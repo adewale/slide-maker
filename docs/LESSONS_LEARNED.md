@@ -2,7 +2,7 @@
 
 ## 1. The styles/index.css discovery rule
 
-**What happened:** Every deck in the monorepo (10 decks) had `styles/tokens.css` and `styles/theme.css` but no `styles/index.css`. Slidev only auto-loads `./style.css` or `./styles/index.css` as its global style entry point. Neither tokens nor theme styles were ever loaded into any build.
+**What happened:** Every deck in the monorepo (10 decks at the time) had `styles/tokens.css` and `styles/theme.css` but no `styles/index.css`. Slidev only auto-loads `./style.css` or `./styles/index.css` as its global style entry point. Neither tokens nor theme styles were ever loaded into any build.
 
 **Why it wasn't caught:** Decks that appeared to work (sumi-e, material) had custom Vue components (layouts, global layers) whose scoped `<style>` blocks referenced `var(--deck-*)` tokens or hardcoded colors inline. Fonts loaded via the headmatter `fonts:` config, which Slidev processes separately. So decks looked "close enough" without any global styles actually loading.
 
@@ -177,13 +177,21 @@ The time spent building these tools is small compared to the time spent debuggin
 
 ---
 
+## 19. Reference docs drift from the tree — audit prose against `git ls-files`, not memory
+
+**What happened:** A four-way consistency audit found that the prose docs had silently fallen out of sync with the code in ways no test caught: `EXTENSIONS.md` listed three progress components (ProgressDotRail/TallyMarks/ArcGauge) as shipping after they'd been removed; pointed at a renamed workflow (`deploy.yml` → `deploy-pages.yml`); cited a Cloudflare host (`slides.oshineye.dev`) that no longer resolves; and called the project's ~25 tools "four." `SLIDEV_REFERENCE.md` advertised a `v52.13+` floor below the `52.15` the project actually requires. `LESSONS_LEARNED` itself recommended a build command and scaffold paths (`examples/my-deck`) that don't match where `new-deck` writes (`decks/`). Each change (remove a component, rename a workflow, switch hosts) updated the code and *one* doc, never all of them.
+
+**The lesson:** Prose has no compiler, so it rots wherever a change touches code + one doc but not the others. Two defenses: (1) when you remove/rename a component, script, workflow, URL, or version floor, grep the whole repo for the old name in the same change — the tree is the source of truth, so verify claims with `git ls-files`/`grep`, not memory; (2) distinguish **present-tense reference docs** (must match the tree now — fix them) from **dated CHANGELOG entries** (historical record — leave them). A periodic audit that diffs documented inventories (components, tools, deck count, hosts, version floors) against the actual tree catches the drift that no unit test will.
+
+---
+
 ## Tool inventory
 
 | Tool | Purpose | When to run |
 |------|---------|-------------|
 | `tools/new-deck.sh <name> <preset>` | Scaffold a new deck from preset template | When creating a new deck |
 | `tools/deck-lint.mjs [deck...]` | Validate structure, tokens, imports, overflow | Before building |
-| `examples/build.sh` | Build all decks | After code changes |
+| `npm run build` (`tools/build.py`) | Build all decks (canonical entry; `examples/build.sh` is the legacy bash equivalent) | After code changes |
 | `tools/style-audit.mjs [deck...]` | Verify CSS tokens/selectors in build output | After building |
 | `tools/build-and-verify.sh` | Full post-build smoke test (tokens, fonts, counts) | After building |
 | `tools/deck-preview.mjs <deck>` | Screenshot all slides to contact sheet | For visual review |
@@ -199,11 +207,11 @@ The time spent building these tools is small compared to the time spent debuggin
 ### Recommended workflow
 
 ```
-cd tools && bash new-deck.sh my-deck cloudflare   # scaffold
-# ... edit examples/my-deck/slides.md ...
-cd tools && node deck-lint.mjs ../examples/my-deck # validate structure
-cd examples && bash build.sh                       # build all
-cd tools && node style-audit.mjs my-deck           # verify CSS in build
+bash tools/new-deck.sh my-deck cloudflare          # scaffold into decks/my-deck
+# ... edit decks/my-deck/slides.md ...
+node tools/deck-lint.mjs decks/my-deck             # validate structure
+npm run build                                       # build all (python3 tools/build.py)
+node tools/style-audit.mjs my-deck                 # verify CSS in build
 cd tools && bash build-and-verify.sh               # full smoke test
-cd tools && node deck-preview.mjs my-deck          # visual review
+node tools/deck-preview.mjs my-deck                # visual review
 ```

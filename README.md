@@ -6,7 +6,7 @@ An Agent Skill that creates [Slidev](https://sli.dev) presentation decks. Point 
 
 Output is native Slidev Markdown: editable by hand, buildable to static HTML, deployable anywhere.
 
-**[See example decks live](https://slides-oshineye-dev.adewale-883.workers.dev/slide-maker/)**
+**See example decks live: [GitHub Pages](https://adewale.github.io/slide-maker/) · [Cloudflare](https://slides-oshineye-dev.adewale-883.workers.dev/slide-maker/)**
 
 ## Install
 

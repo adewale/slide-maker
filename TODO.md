@@ -60,7 +60,7 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 ### CI/CD
 - [x] GitHub Actions workflow for GitHub Pages (`.github/workflows/deploy-pages.yml`)
 - [x] GitHub Pages environment protection no longer blocks `main` — Actions deploys now run end-to-end (build + deploy jobs green, no approval hold). Live at `https://adewale.github.io/slide-maker/`
-- [x] Cloudflare Workers deployment (`slides.oshineye.dev/`)
+- [x] Cloudflare Workers deployment (`https://slides-oshineye-dev.adewale-883.workers.dev/`)
 
 ## Quality and testing
 
@@ -133,7 +133,7 @@ access for the judge).
 - [x] QR shortcut added to keyboard help Screen column
 - [x] Cross-platform build.sh — `sed -i.bak` replaces macOS-only `sed -i ''`
 - [x] Cloudflare Workers deployment with SPA fallback
-- [x] GitHub Actions workflow (build succeeds, deploy blocked by environment rules)
+- [x] GitHub Actions workflow (`deploy-pages.yml`) — build + deploy both succeed end-to-end
 - [x] Mobile screenshot testing at 3 viewport sizes (33 screenshots across 11 slides)
 - [x] Mobile scroll view spec written (`specs/mobile-scroll-view.md`)
 - [x] EXTENSIONS.md — complete reference for all custom Slidev extensions

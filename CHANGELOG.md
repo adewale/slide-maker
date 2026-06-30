@@ -7,8 +7,12 @@ All notable changes to the slide-maker project and its Slidev extensions.
 ### Added
 - **Mobile scroll view spec** — design for vertically scrollable card view on portrait phones
 - **Slidev vs Reveal.js comparison** — comprehensive feature matrix
+- **GitHub Pages deploy workflow restored** — `.github/workflows/deploy-pages.yml` (Actions → `https://adewale.github.io/slide-maker/`); works without server-side SPA fallback because decks use `routerMode: hash`. Cloudflare Workers stays a separate manual target
+- **In-repo eval leakage lint** — `tools/leakage-lint.mjs` (`npm run leak-lint`, wired into `verify.yml`); a network-free reimplementation of the harness's prompt/assertion leakage check
 
 ### Changed
+- **De-leaked 10 benchmark assertions** in `evals/shared-benchmark.json` — retargeted from parroted prompt-words to behavior-evidencing artifacts (18 raw prompt-echo leaks → 0 unexpected; 5 remain documented as intentional `contains_all` coverage checks)
+- **Documentation consistency audit** — corrected stale references across `EXTENSIONS.md`, `SLIDEV_REFERENCE.md`, `README.md`, `TODO.md`, `LESSONS_LEARNED.md`: removed three never-shipped progress components, fixed the deploy workflow name (`deploy.yml` → `deploy-pages.yml`), replaced the non-resolving `slides.oshineye.dev` host with the live `*.workers.dev` URL, raised the Slidev floor to `v52.15+`, and pointed build/scaffold docs at the canonical `npm run build` / `decks/` paths
 - **Bumped Slidev 52.14.1 → 52.15.2** (pinned exact) — picks up the native laser pointer (52.15.0), `--router-mode` build flag, named `v-click` animation presets, `markdown-it-github-alerts`, and the 52.15.2 security hardening (removed unsafe `exec()` from the resolver, filesystem-access guards)
 
 ### Removed
