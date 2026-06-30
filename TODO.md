@@ -58,8 +58,8 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [x] Add deck thumbnails to the gallery — `tools/thumbnail-gen.mjs` screenshots the cover at 1280×720 and writes `<deck>/thumb.png`; `tools/build.py` calls it after every deck build (best-effort, doesn't fail the build); the gallery card includes `<img class="thumb" src="./<deck>/thumb.png">` with a CSS fallback to a flat tile if the file is missing. Verified live: 35KB PNG from a `/tmp/fb-dist` cover in ~10s.
 
 ### CI/CD
-- [x] GitHub Actions workflow for GitHub Pages (`.github/workflows/deploy.yml`)
-- [ ] Fix GitHub Pages environment protection rules — `main` branch blocked from deploying (**blocked: requires repo-admin action in GitHub Settings → Environments → github-pages → Deployment branches; cannot be done from a PR**)
+- [x] GitHub Actions workflow for GitHub Pages (`.github/workflows/deploy-pages.yml`)
+- [x] GitHub Pages environment protection no longer blocks `main` — Actions deploys now run end-to-end (build + deploy jobs green, no approval hold). Live at `https://adewale.github.io/slide-maker/`
 - [x] Cloudflare Workers deployment (`slides.oshineye.dev/`)
 
 ## Quality and testing
@@ -104,8 +104,18 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [x] Write a compelling skill description for marketplace listings — `description` rewritten to lead with the value (project-grounded decks, WCAG validation, anti-slop discipline, rendered + held-out gates, keyless sub-agent judge)
 - [x] Add usage examples that show the skill in action — `USAGE.md` covers quickstart, create, project, and update prompts, plus what the skill refuses
 
+## Eval harness (active thread)
+
+The shared Skill Eval Harness is wired up (manifest, splits, oracles, CI). Remaining
+loose ends from the build-out, in tractability order:
+
+- [x] Reduce prompt/assertion leakage-lint warnings in `evals/shared-benchmark.json` — retargeted 10 assertions from parroted prompt-words to behavior-evidencing artifacts (18 raw prompt-echo leaks → 0 unexpected; 5 remain documented as intentional `contains_all` coverage checks). Added `tools/leakage-lint.mjs` (in-repo, network-free reimplementation of the harness's leakage check), wired into `npm run leak-lint` + `verify.yml` CI
+- [ ] Run the declared ablation variants for real (PR #3 declared them opt-in; no ablation benchmark rows claimed yet) — `skill-benchmark prepare … --include-ablations` then benchmark
+- [ ] Supply the private holdout/holdback prompts before scoring (currently placeholder files) — owner-provided, not generatable in-repo
+
 ## Done
 
+- [x] Slidev pinned to 52.15.2 (was 52.16.0) — 52.16.0 had a hash-mode navigation regression (`getSlidePath` double-prefixes `BASE_URL`); see CHANGELOG + LESSONS_LEARNED #18. Native laser pointer adopted (custom one pruned). GitHub Pages deploy workflow restored
 - [x] AudienceQRCode component — press Q to share slide URL as QR code
 - [x] Keyboard help d-pad redesign — spatial layout distinguishing step vs slide navigation
 - [x] QR shortcut added to keyboard help Screen column

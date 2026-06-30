@@ -51,8 +51,8 @@
           "values": [
             "deck.spec.md",
             "slides.md",
-            "file",
-            "architecture"
+            "```",
+            "src/"
           ]
         },
         {
@@ -95,9 +95,9 @@
           "name": "detect-quickstart-five",
           "type": "contains_any",
           "values": [
-            "5",
-            "deck.spec",
-            "slides"
+            "deck.spec.md",
+            "---",
+            "layout:"
           ]
         },
         {
@@ -140,9 +140,9 @@
           "name": "detect-update-affected-only",
           "type": "contains_any",
           "values": [
-            "spec",
-            "sync",
-            "affected"
+            "affected",
+            "deck.spec.md",
+            "slides.md"
           ]
         },
         {
@@ -186,7 +186,6 @@
           "type": "contains_any",
           "values": [
             "<!--",
-            "notes",
             "Slidev"
           ]
         },
@@ -230,8 +229,8 @@
           "name": "detect-gallery-manifest",
           "type": "contains_any",
           "values": [
-            "manifest",
-            "gallery",
+            "index.html",
+            "serve.json",
             "deploy"
           ]
         },
@@ -368,8 +367,7 @@
           "type": "contains_any",
           "values": [
             "deck-lint",
-            "lint",
-            "validation"
+            "deck-lint.mjs"
           ]
         },
         {
@@ -403,9 +401,9 @@
           "name": "avoid-unneeded-component",
           "type": "contains_any",
           "values": [
-            "Markdown",
             "built-in",
-            "avoid"
+            "avoid",
+            "two-cols"
           ]
         },
         {
@@ -439,7 +437,6 @@
           "type": "contains_any",
           "values": [
             "approve",
-            "visual direction",
             "spec"
           ]
         },
@@ -474,8 +471,7 @@
           "type": "contains_all",
           "values": [
             "render-gate",
-            "build",
-            "validation"
+            "build"
           ]
         },
         {
@@ -769,8 +765,7 @@
           "values": [
             "render-gate",
             "rendered validation",
-            "screenshot",
-            "image background"
+            "screenshot"
           ]
         },
         {

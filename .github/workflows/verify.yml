@@ -35,6 +35,9 @@ jobs:
       - name: deck-lint (structural)
         run: npm run lint
 
+      - name: leakage-lint (eval prompt/assertion leakage)
+        run: npm run leak-lint
+
       - name: gate-check (precision + recall)
         run: npm run gate-check
 
