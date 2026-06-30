@@ -210,6 +210,10 @@ SCAFFOLD_COPIES: dict[str, str] = {
     "setup/shortcuts.ts": "setup/shortcuts.ts",
     "setup/mermaid-renderer.ts": "setup/mermaid-renderer.ts",
     "components/KeyboardHelp.vue": "components/KeyboardHelp.vue",
+    # global-top.vue imports these three — vendor them so the scaffolded deck builds
+    "components/ProgressSegmentBar.vue": "components/ProgressSegmentBar.vue",
+    "components/AudienceQRCode.vue": "components/AudienceQRCode.vue",
+    "components/MobileScrollView.vue": "components/MobileScrollView.vue",
     "global-top.vue": "global-top.vue",
     "styles/transitions.css": "styles/transitions.css",
 }
