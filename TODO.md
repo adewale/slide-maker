@@ -110,8 +110,20 @@ The shared Skill Eval Harness is wired up (manifest, splits, oracles, CI). Remai
 loose ends from the build-out, in tractability order:
 
 - [x] Reduce prompt/assertion leakage-lint warnings in `evals/shared-benchmark.json` — retargeted 10 assertions from parroted prompt-words to behavior-evidencing artifacts (18 raw prompt-echo leaks → 0 unexpected; 5 remain documented as intentional `contains_all` coverage checks). Added `tools/leakage-lint.mjs` (in-repo, network-free reimplementation of the harness's leakage check), wired into `npm run leak-lint` + `verify.yml` CI
-- [ ] Run the declared ablation variants for real (PR #3 declared them opt-in; no ablation benchmark rows claimed yet) — `skill-benchmark prepare … --include-ablations` then benchmark
-- [ ] Supply the private holdout/holdback prompts before scoring (currently placeholder files) — owner-provided, not generatable in-repo
+
+### Blocked — needs an environment we don't have in the web sandbox
+
+These require the external Skill Eval Harness and/or private inputs that are out
+of reach from a Claude-Code-on-the-web session. **Why blocked:** the network
+policy scopes git/HTTPS to `adewale/slide-maker`, so `uv tool install
+git+https://github.com/adewale/skill-eval-harness…` returns 403 — the harness
+CLI (`skill-benchmark`) cannot be installed or run here. Running these needs a
+local/CI environment that can reach the harness repo (and, for scoring, model
+access for the judge).
+
+- [ ] **Run the declared ablation variants for real** (PR #3 declared them opt-in; no ablation benchmark rows claimed yet) — needs `skill-benchmark prepare … --include-ablations` then `benchmark` with the harness installed + model access. Not runnable in this sandbox (harness repo 403).
+- [ ] **Score against the private holdout/holdback prompts** — the prompt refs are intentionally withheld (`evals/holdout/`, `evals/holdback/` are placeholders). Owner-supplied before scoring; cannot be generated in-repo, and `skill-benchmark` to consume them is unavailable here.
+- [ ] **(stretch) Make the in-repo `leakage-lint` reach assertion↔expected-behavior overlap too** — current lint covers prompt-echo only; the harness also weighs expected-answer leakage. Low priority; the prompt-echo class was the Goodhart-significant one.
 
 ## Done
 
