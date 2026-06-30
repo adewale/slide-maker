@@ -21,7 +21,7 @@ transition: iris
 
 # The build pipeline
 
-`build.sh` orchestrates the compile: it normalizes each deck spec, runs the Slidev build, and writes static output to `examples/_build`.
+`tools/build.py` orchestrates the compile: it normalizes each deck spec, runs the Slidev build, and writes static output to `examples/_build`.
 
 ---
 transition: slide-left
@@ -31,7 +31,7 @@ transition: slide-left
 
 <v-clicks>
 
-- `tools/build.py` resolves tokens and theme per deck
+- it resolves tokens and theme per deck
 - the build system renders Markdown to a static single-page app
 - `deck-lint.mjs` validates structure before anything publishes
 
@@ -44,7 +44,7 @@ transition: iris
 
 # Deploy
 
-The build output is a static SPA; `tools/deploy.py` publishes it to Cloudflare Workers with an SPA fallback so every sub-route serves `index.html`.
+The build output is a static SPA; `tools/deploy-cf.py` publishes it to Cloudflare Workers with an SPA fallback so every sub-route serves `index.html`.
 
 ---
 layout: end
@@ -53,4 +53,4 @@ transition: fade
 
 # Direction first. Then slides.
 
-slides.oshineye.dev
+slides-oshineye-dev.adewale-883.workers.dev

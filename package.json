@@ -6,6 +6,7 @@
     "dev": "npm run build && npx serve examples/_build -l 3030",
     "serve": "npx serve examples/_build -l 3030",
     "lint": "node tools/deck-lint.mjs",
+    "leak-lint": "node tools/leakage-lint.mjs",
     "eval": "node tools/eval-runner.mjs",
     "eval:trend": "node tools/eval-runner.mjs --trend",
     "pixel-audit": "node tools/pixel-audit.mjs",

@@ -1,6 +1,6 @@
 # Slidev Comprehensive Reference
 
-Complete reference for building high-quality Slidev slide decks. Covers every feature, layout, component, directive, and configuration option available in Slidev v52.13+.
+Complete reference for building high-quality Slidev slide decks. Covers every feature, layout, component, directive, and configuration option available in Slidev v52.15+.
 
 ---
 

@@ -4,7 +4,7 @@
     {
       "id": 0,
       "prompt": "Create a short 5-slide deck about the architecture of this project. Focus on how the build system works and how decks get deployed. Use the cloudflare preset.",
-      "expected_output": "A complete Slidev deck with deck.spec.md, slides.md, styles/tokens.css, styles/theme.css, and styles/index.css. The deck should reference real files from this repo (build.sh, deploy workflow) and use cloudflare preset tokens.",
+      "expected_output": "A complete Slidev deck with deck.spec.md, slides.md, styles/tokens.css, styles/theme.css, and styles/index.css. The deck should reference real files from this repo (tools/build.py, deploy workflow) and use cloudflare preset tokens.",
       "files": [],
       "assertions": [
         {"name": "has-deck-spec", "check": "deck.spec.md exists in outputs", "assert": {"file_exists": "deck.spec.md"}},
@@ -12,7 +12,7 @@
         {"name": "has-tokens-css", "check": "styles/tokens.css exists in outputs", "assert": {"file_exists": "styles/tokens.css"}},
         {"name": "has-styles-index", "check": "styles/index.css exists in outputs", "assert": {"file_exists": "styles/index.css"}},
         {"name": "slide-count-is-5", "check": "slides.md contains exactly 5 slides (count slide separators)", "assert": {"slide_count": 5}},
-        {"name": "references-build-sh", "check": "slides.md mentions build.sh, build pipeline, or the build system with specific details from the repo", "assert": {"contains_any": ["build.sh", "build pipeline", "build system"], "file": "slides.md", "ci": true}},
+        {"name": "references-build-py", "check": "slides.md mentions tools/build.py, build pipeline, or the build system with specific details from the repo", "assert": {"contains_any": ["build.py", "build pipeline", "build system"], "file": "slides.md", "ci": true}},
         {"name": "uses-cloudflare-tokens", "check": "tokens.css contains warm cream/orange color values consistent with the cloudflare preset", "assert": {"judge": true}},
         {"name": "no-hardcoded-colors", "check": "No hex/rgb/hsl color literals inside <style scoped> blocks in slides/layouts/components — must use var(--deck-*) tokens", "assert": {"no_hardcoded_colors_scoped": true}}
       ]

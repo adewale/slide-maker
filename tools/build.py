@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Build all Slidev presentation decks.
+"""Build all Slidev presentation decks into examples/_build/.
 
-Python equivalent of examples/build.sh. Produces identical output in
-examples/_build/.
+The canonical builder. Discovers and builds the core decks (examples/), the
+generated showcase decks (generated-decks/), and any personal decks (decks/ or
+$DECKS_DIR).
 
 Environment variables:
     BASE_PREFIX  — URL prefix for each deck (e.g. "" or "/slides")
-    DECKS_DIR    — optional directory containing external decks
+    DECKS_DIR    — directory of personal/external decks (defaults to ./decks if present)
     SITE_URL     — base URL for links in llms.txt
 """
 
@@ -681,8 +682,18 @@ def main() -> None:
             if entry.is_dir() and (entry / "slides.md").is_file():
                 generated_deck_names.append(entry.name)
 
-    # External decks placeholder (populated when DECKS_DIR is used)
+    # ── Discover personal/external decks (decks/ or $DECKS_DIR) ──
+    # Defaults to the repo's decks/ directory when present, so a deck scaffolded
+    # by tools/new-deck.py is picked up automatically. Each subdir with a
+    # slides.md becomes a (dir_name, name) pair.
+    if not decks_dir:
+        default_decks = repo_root / "decks"
+        decks_dir = str(default_decks) if default_decks.is_dir() else ""
     local_decks: list[tuple[str, str]] = []
+    if decks_dir and Path(decks_dir).is_dir():
+        for entry in sorted(Path(decks_dir).iterdir()):
+            if entry.is_dir() and (entry / "slides.md").is_file():
+                local_decks.append((entry.name, entry.name))
 
     # ── Build core decks ─────────────────────────────────────────
     for dir_name, name in CORE_DECKS:

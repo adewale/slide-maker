@@ -44,7 +44,7 @@ try {
   if (!s.isDirectory()) throw new Error();
 } catch {
   console.error(`Error: build directory not found: ${deckBuildDir}`);
-  console.error('Run build.sh first to build the deck.');
+  console.error('Run `npm run build` first to build the deck.');
   process.exit(1);
 }
 

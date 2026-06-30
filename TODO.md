@@ -52,15 +52,23 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [x] For a user who says "make me 10 slides about X", don't force them through deck.spec.md (handled by quickstart-trigger heuristic in SKILL.md phase 1)
 - [x] Still generate deck.spec.md, but do it silently/automatically (phase 5 quickstart variant requires the artifact, skips the user-facing dialogue)
 
+### Builder consolidation (`build.sh` → `build.py`) — done
+`tools/build.py` is now the sole builder. `examples/build.sh` (the legacy bash
+equivalent that kept drifting — twice now) has been retired.
+- [x] Retired `examples/build.sh`. Both scaffolders (`new-deck.py` and `new-deck.sh`) no longer edit a `LOCAL_DECKS` array (already broken in both — the anchor didn't exist); removed the orphaned static `examples/index.html` (build.py generates the gallery dynamically).
+- [x] `tools/build.py` now discovers personal decks in `decks/` (or `$DECKS_DIR`) automatically — the previously-stubbed external-deck path — so a deck scaffolded by `new-deck.py` builds with plain `npm run build`.
+- [x] Retired the remaining `.sh`/`.py` duplicates: deleted `tools/new-deck.sh` and `tools/build-and-verify.sh` (both verified strict supersets exist in `.py`). Fixed two latent bugs in the survivors — `new-deck.py` now vendors the components `global-top.vue` imports (ProgressSegmentBar/AudienceQRCode/MobileScrollView) so scaffolded decks build, and `build-and-verify.py` now discovers decks dynamically instead of a hardcoded list (dropped non-existent `tufte`/`durable-objects`, picked up `pdf2croissant`). Repointed all docs at the `.py` tools.
+- [x] Retired `tools/deploy.py` (the legacy gh-pages-branch deployer). GitHub Pages now deploys via `.github/workflows/deploy-pages.yml` (Actions, source = GitHub Actions — *not* the `gh-pages` branch); Cloudflare via `tools/deploy-cf.py`. Also corrected docs that mis-attributed Cloudflare deploys to `deploy.py` (it was the Pages deployer; `deploy-cf.py` is Cloudflare's).
+
 ### Gallery improvements
 - [x] Auto-generate `index.html` from deck metadata during `build.py` (title, description, accent, preset extracted per deck)
 - [x] Add search/filter to the gallery page (filters by title, description, and preset)
 - [x] Add deck thumbnails to the gallery — `tools/thumbnail-gen.mjs` screenshots the cover at 1280×720 and writes `<deck>/thumb.png`; `tools/build.py` calls it after every deck build (best-effort, doesn't fail the build); the gallery card includes `<img class="thumb" src="./<deck>/thumb.png">` with a CSS fallback to a flat tile if the file is missing. Verified live: 35KB PNG from a `/tmp/fb-dist` cover in ~10s.
 
 ### CI/CD
-- [x] GitHub Actions workflow for GitHub Pages (`.github/workflows/deploy.yml`)
-- [ ] Fix GitHub Pages environment protection rules — `main` branch blocked from deploying (**blocked: requires repo-admin action in GitHub Settings → Environments → github-pages → Deployment branches; cannot be done from a PR**)
-- [x] Cloudflare Workers deployment (`slides.oshineye.dev/`)
+- [x] GitHub Actions workflow for GitHub Pages (`.github/workflows/deploy-pages.yml`)
+- [x] GitHub Pages environment protection no longer blocks `main` — Actions deploys now run end-to-end (build + deploy jobs green, no approval hold). Live at `https://adewale.github.io/slide-maker/`
+- [x] Cloudflare Workers deployment (`https://slides-oshineye-dev.adewale-883.workers.dev/`)
 
 ## Quality and testing
 
@@ -104,14 +112,36 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [x] Write a compelling skill description for marketplace listings — `description` rewritten to lead with the value (project-grounded decks, WCAG validation, anti-slop discipline, rendered + held-out gates, keyless sub-agent judge)
 - [x] Add usage examples that show the skill in action — `USAGE.md` covers quickstart, create, project, and update prompts, plus what the skill refuses
 
+## Eval harness (active thread)
+
+The shared Skill Eval Harness is wired up (manifest, splits, oracles, CI). Remaining
+loose ends from the build-out, in tractability order:
+
+- [x] Reduce prompt/assertion leakage-lint warnings in `evals/shared-benchmark.json` — retargeted 10 assertions from parroted prompt-words to behavior-evidencing artifacts (18 raw prompt-echo leaks → 0 unexpected; 5 remain documented as intentional `contains_all` coverage checks). Added `tools/leakage-lint.mjs` (in-repo, network-free reimplementation of the harness's leakage check), wired into `npm run leak-lint` + `verify.yml` CI
+
+### Blocked — needs an environment we don't have in the web sandbox
+
+These require the external Skill Eval Harness and/or private inputs that are out
+of reach from a Claude-Code-on-the-web session. **Why blocked:** the network
+policy scopes git/HTTPS to `adewale/slide-maker`, so `uv tool install
+git+https://github.com/adewale/skill-eval-harness…` returns 403 — the harness
+CLI (`skill-benchmark`) cannot be installed or run here. Running these needs a
+local/CI environment that can reach the harness repo (and, for scoring, model
+access for the judge).
+
+- [ ] **Run the declared ablation variants for real** (PR #3 declared them opt-in; no ablation benchmark rows claimed yet) — needs `skill-benchmark prepare … --include-ablations` then `benchmark` with the harness installed + model access. Not runnable in this sandbox (harness repo 403).
+- [ ] **Score against the private holdout/holdback prompts** — the prompt refs are intentionally withheld (`evals/holdout/`, `evals/holdback/` are placeholders). Owner-supplied before scoring; cannot be generated in-repo, and `skill-benchmark` to consume them is unavailable here.
+- [ ] **(stretch) Make the in-repo `leakage-lint` reach assertion↔expected-behavior overlap too** — current lint covers prompt-echo only; the harness also weighs expected-answer leakage. Low priority; the prompt-echo class was the Goodhart-significant one.
+
 ## Done
 
+- [x] Slidev pinned to 52.15.2 (was 52.16.0) — 52.16.0 had a hash-mode navigation regression (`getSlidePath` double-prefixes `BASE_URL`); see CHANGELOG + LESSONS_LEARNED #18. Native laser pointer adopted (custom one pruned). GitHub Pages deploy workflow restored
 - [x] AudienceQRCode component — press Q to share slide URL as QR code
 - [x] Keyboard help d-pad redesign — spatial layout distinguishing step vs slide navigation
 - [x] QR shortcut added to keyboard help Screen column
 - [x] Cross-platform build.sh — `sed -i.bak` replaces macOS-only `sed -i ''`
 - [x] Cloudflare Workers deployment with SPA fallback
-- [x] GitHub Actions workflow (build succeeds, deploy blocked by environment rules)
+- [x] GitHub Actions workflow (`deploy-pages.yml`) — build + deploy both succeed end-to-end
 - [x] Mobile screenshot testing at 3 viewport sizes (33 screenshots across 11 slides)
 - [x] Mobile scroll view spec written (`specs/mobile-scroll-view.md`)
 - [x] EXTENSIONS.md — complete reference for all custom Slidev extensions

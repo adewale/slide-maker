@@ -9,7 +9,7 @@ defect no static check can catch: there is no real content.
 The deck keyword-stuffs the literal strings the assertions look for, dropped
 into otherwise content-free slides:
 
-- `build.sh`, `build pipeline`, `build system` (eval 0, `references-build-sh`)
+- `build.py`, `build pipeline`, `build system` (eval 0, `references-build-py`)
 - `transition`, `visual effect` (eval 2, `transitions-content-preserved`)
 - `data visualization`, `guardrail` (eval 2, `dataviz-content-preserved`)
 - `<v-clicks>`, `<v-click>` (eval 1, `has-v-clicks`)

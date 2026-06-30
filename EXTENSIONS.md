@@ -20,10 +20,9 @@ not part of the slide-maker skill.
 
 | Component | Position | Style |
 |---|---|---|
-| **ProgressSegmentBar** | Fixed top | Thin bar (3px) divided into sections. Current section fills with `--deck-accent`. Most commonly used |
-| **ProgressDotRail** | Fixed right | Vertical dot column. Current dot highlighted. Hides on cover/end layouts. z-index: 100 |
-| **ProgressTallyMarks** | Fixed bottom-left | SVG tally marks grouped in fives. z-index: 100 |
-| **ProgressArcGauge** | Fixed bottom-right | Quarter-circle SVG arc. 36x36px. z-index: 100 |
+| **ProgressSegmentBar** | Fixed top | Thin bar (3px) divided into sections. Current section fills with `--deck-accent`. The shipped progress indicator |
+
+> ProgressDotRail, ProgressTallyMarks, and ProgressArcGauge were prototyped and removed (they overlapped slide content — see COMPILER_RULES.md and the reference deck's progress page). ProgressSegmentBar is the one that shipped.
 
 ### Presenter Mode
 
@@ -152,7 +151,7 @@ reference them for consistent theming.
 
 ## Build System
 
-`examples/build.sh` compiles all decks into a deployable static site.
+`npm run build` (`python3 tools/build.py`) compiles all decks into a deployable static site. It discovers the core decks (`examples/`), generated showcases (`generated-decks/`), and any personal decks (`decks/`).
 
 ### Features
 
@@ -178,7 +177,7 @@ BASE_PREFIX=/slide-maker npm run build # for GitHub Pages subdirectory
 
 ## Tooling
 
-Four CLI tools in `tools/`:
+Key CLI tools in `tools/` (over two dozen in total):
 
 | Tool | Purpose | Usage |
 |---|---|---|
@@ -195,13 +194,15 @@ Two deployment targets are supported:
 
 ### GitHub Pages
 
-Automated via `.github/workflows/deploy.yml`. Triggers on push to `main`.
-Sets `BASE_PREFIX=/slide-maker` for subdirectory hosting.
+Automated via `.github/workflows/deploy-pages.yml`. Triggers on push to `main`.
+Sets `BASE_PREFIX=/slide-maker` for subdirectory hosting. Live at
+`https://adewale.github.io/slide-maker/`.
 
 ### Cloudflare Workers
 
-Separate project at `slides.oshineye.dev/`. Uses `wrangler.jsonc` with static
-asset hosting and SPA fallback (`not_found_handling: "single-page-application"`).
+Separate project at `https://slides-oshineye-dev.adewale-883.workers.dev/`. Uses
+`wrangler.jsonc` with static asset hosting and SPA fallback
+(`not_found_handling: "single-page-application"`).
 
 ```bash
 # From the Cloudflare project

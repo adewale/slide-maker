@@ -23,6 +23,21 @@ Validate from this repo root:
 skill-benchmark validate evals/shared-benchmark.json
 ```
 
+### In-repo leakage lint (no network)
+
+The harness's prompt/assertion leakage check is also reimplemented in-repo so it
+can run without cloning the harness (e.g. in CI / sandboxed runs):
+
+```sh
+npm run leak-lint   # node tools/leakage-lint.mjs
+```
+
+It flags assertion match-values that echo the case prompt verbatim (a Goodhart
+hole — the assertion could pass by parroting the prompt). It exits non-zero on
+any *unexpected* leak; intentional `contains_all` coverage/remediation checks
+are allow-listed with a reason inside the script. This gate runs in
+`.github/workflows/verify.yml`.
+
 Prepare paired run tasks:
 
 ```sh

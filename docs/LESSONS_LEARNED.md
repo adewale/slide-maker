@@ -2,7 +2,7 @@
 
 ## 1. The styles/index.css discovery rule
 
-**What happened:** Every deck in the monorepo (10 decks) had `styles/tokens.css` and `styles/theme.css` but no `styles/index.css`. Slidev only auto-loads `./style.css` or `./styles/index.css` as its global style entry point. Neither tokens nor theme styles were ever loaded into any build.
+**What happened:** Every deck in the monorepo (10 decks at the time) had `styles/tokens.css` and `styles/theme.css` but no `styles/index.css`. Slidev only auto-loads `./style.css` or `./styles/index.css` as its global style entry point. Neither tokens nor theme styles were ever loaded into any build.
 
 **Why it wasn't caught:** Decks that appeared to work (sumi-e, material) had custom Vue components (layouts, global layers) whose scoped `<style>` blocks referenced `var(--deck-*)` tokens or hardcoded colors inline. Fonts loaded via the headmatter `fonts:` config, which Slidev processes separately. So decks looked "close enough" without any global styles actually loading.
 
@@ -16,7 +16,7 @@
 
 **What happened:** `build.sh` completed successfully for all 10 decks. No errors. No warnings. But the CSS was silently absent from every build. The only way to detect this was to grep the build output CSS for expected values.
 
-**The lesson:** A successful build is not a successful product. Post-build verification (`tools/style-audit.mjs`, `tools/build-and-verify.sh`) catches the gap between "the build ran" and "the build produced correct output." This is especially important in monorepos where configuration errors compound silently across all projects.
+**The lesson:** A successful build is not a successful product. Post-build verification (`tools/style-audit.mjs`, `tools/build-and-verify.py`) catches the gap between "the build ran" and "the build produced correct output." This is especially important in monorepos where configuration errors compound silently across all projects.
 
 ---
 
@@ -28,8 +28,8 @@
 
 **The priority order:**
 1. `tools/deck-lint.mjs` (structural validation before build)
-2. `examples/build.sh` (build)
-3. `tools/style-audit.mjs` + `tools/build-and-verify.sh` (verify build output)
+2. `npm run build` (`tools/build.py`) (build)
+3. `tools/style-audit.mjs` + `tools/build-and-verify.py` (verify build output)
 4. `tools/deck-preview.mjs` (visual inspection)
 5. `tools/deck-diff.mjs` (visual regression comparison)
 
@@ -47,7 +47,7 @@
 
 **What happened:** The cloudflare deck was hand-created and used `theme: default` while sumi-e used `theme: seriph`. Both were missing `styles/index.css`. These subtle differences were invisible until build time (or later).
 
-**The lesson:** `tools/new-deck.sh` now generates every required file from a known-good template for each preset. This eliminates configuration drift between decks and ensures structural parity. When you find yourself creating the third instance of a pattern, automate it.
+**The lesson:** `tools/new-deck.py` now generates every required file from a known-good template for each preset. This eliminates configuration drift between decks and ensures structural parity. When you find yourself creating the third instance of a pattern, automate it.
 
 ---
 
@@ -88,9 +88,9 @@ Similarly, Slidev auto-discovers:
 **What happened:** We built 10 decks, a transition library, animation components, a keyboard help panel, a presenter enhancement system, and a complete Cloudflare theme — all without any build verification tooling. The styles/index.css bug existed from the very first deck and was never caught.
 
 **The lesson:** Invest in tooling early:
-- `tools/new-deck.sh` before creating the second deck
+- `tools/new-deck.py` before creating the second deck
 - `tools/deck-lint.mjs` before the first build
-- `tools/build-and-verify.sh` after the first build
+- `tools/build-and-verify.py` after the first build
 - `tools/style-audit.mjs` after the first themed deck
 
 The time spent building these tools is small compared to the time spent debugging a systemic issue across 11 projects.
@@ -177,15 +177,23 @@ The time spent building these tools is small compared to the time spent debuggin
 
 ---
 
+## 19. Reference docs drift from the tree — audit prose against `git ls-files`, not memory
+
+**What happened:** A four-way consistency audit found that the prose docs had silently fallen out of sync with the code in ways no test caught: `EXTENSIONS.md` listed three progress components (ProgressDotRail/TallyMarks/ArcGauge) as shipping after they'd been removed; pointed at a renamed workflow (`deploy.yml` → `deploy-pages.yml`); cited a Cloudflare host (`slides.oshineye.dev`) that no longer resolves; and called the project's ~25 tools "four." `SLIDEV_REFERENCE.md` advertised a `v52.13+` floor below the `52.15` the project actually requires. `LESSONS_LEARNED` itself recommended a build command and scaffold paths (`examples/my-deck`) that don't match where `new-deck` writes (`decks/`). Each change (remove a component, rename a workflow, switch hosts) updated the code and *one* doc, never all of them.
+
+**The lesson:** Prose has no compiler, so it rots wherever a change touches code + one doc but not the others. Two defenses: (1) when you remove/rename a component, script, workflow, URL, or version floor, grep the whole repo for the old name in the same change — the tree is the source of truth, so verify claims with `git ls-files`/`grep`, not memory; (2) distinguish **present-tense reference docs** (must match the tree now — fix them) from **dated CHANGELOG entries** (historical record — leave them). A periodic audit that diffs documented inventories (components, tools, deck count, hosts, version floors) against the actual tree catches the drift that no unit test will.
+
+---
+
 ## Tool inventory
 
 | Tool | Purpose | When to run |
 |------|---------|-------------|
-| `tools/new-deck.sh <name> <preset>` | Scaffold a new deck from preset template | When creating a new deck |
+| `tools/new-deck.py <name> <preset>` | Scaffold a new deck from preset template | When creating a new deck |
 | `tools/deck-lint.mjs [deck...]` | Validate structure, tokens, imports, overflow | Before building |
-| `examples/build.sh` | Build all decks | After code changes |
+| `npm run build` (`tools/build.py`) | Build all decks | After code changes |
 | `tools/style-audit.mjs [deck...]` | Verify CSS tokens/selectors in build output | After building |
-| `tools/build-and-verify.sh` | Full post-build smoke test (tokens, fonts, counts) | After building |
+| `tools/build-and-verify.py` | Full post-build smoke test (tokens, fonts, counts) | After building |
 | `tools/deck-preview.mjs <deck>` | Screenshot all slides to contact sheet | For visual review |
 | `tools/deck-diff.mjs --left A --right B` | Pixel-diff two screenshot sets | For visual regression |
 | `tools/compare-decks.mjs` | Screenshot a reference URL and local build side-by-side, generate HTML comparison report | For comparing local deck against a live reference |
@@ -199,11 +207,11 @@ The time spent building these tools is small compared to the time spent debuggin
 ### Recommended workflow
 
 ```
-cd tools && bash new-deck.sh my-deck cloudflare   # scaffold
-# ... edit examples/my-deck/slides.md ...
-cd tools && node deck-lint.mjs ../examples/my-deck # validate structure
-cd examples && bash build.sh                       # build all
-cd tools && node style-audit.mjs my-deck           # verify CSS in build
-cd tools && bash build-and-verify.sh               # full smoke test
-cd tools && node deck-preview.mjs my-deck          # visual review
+python3 tools/new-deck.py my-deck cloudflare       # scaffold into decks/my-deck
+# ... edit decks/my-deck/slides.md ...
+node tools/deck-lint.mjs decks/my-deck             # validate structure
+npm run build                                       # build all (python3 tools/build.py)
+node tools/style-audit.mjs my-deck                 # verify CSS in build
+python3 tools/build-and-verify.py                  # full smoke test
+node tools/deck-preview.mjs my-deck                # visual review
 ```

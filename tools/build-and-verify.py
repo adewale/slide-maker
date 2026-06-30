@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """build-and-verify.py -- Post-build smoke test for the Slidev monorepo
 
-Checks every deck in the DECKS list for:
+Checks every built deck (core + discovered generated/personal decks) for:
   1. Build output exists (_build/<name>/index.html)
   2. CSS design tokens propagated into built CSS bundles
   3. Theme selectors present in built CSS
@@ -23,6 +23,7 @@ from pathlib import Path
 TOOLS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TOOLS_DIR.parent
 EXAMPLES = REPO_ROOT / "examples"
+GENERATED_DIR = REPO_ROOT / "generated-decks"
 DECKS_DIR = REPO_ROOT / "decks"
 BUILD = EXAMPLES / "_build"
 
@@ -38,26 +39,25 @@ if sys.stdout.isatty():
 else:
     GREEN = YELLOW = RED = BOLD = DIM = RESET = ""
 
-# ── Decks — mirrors build.sh ────────────────────────────────────────────────
+# ── Decks — mirrors tools/build.py ──────────────────────────────────────────
 
-# (directory, name) tuples
+# (directory, name) tuples. Core decks are fixed; generated + personal decks are
+# discovered the same way tools/build.py builds them, so this verifier tracks
+# exactly what got built (no hand-maintained list to drift).
 CORE_DECKS = [
     ("demo", "slide-maker"),
     ("reference", "reference"),
 ]
 
-LOCAL_DECKS = [
-    ("vaders", "vaders"),
-    ("planet-cf", "planet-cf"),
-    ("claude-history-explorer", "claude-history-explorer"),
-    ("geist-fabrik", "geist-fabrik"),
-    ("olsen", "olsen"),
-    ("tasche", "tasche"),
-    ("tufte", "tufte"),
-    ("durable-objects", "durable-objects"),
-]
 
-DECKS = CORE_DECKS + LOCAL_DECKS
+def discover_decks() -> list[tuple[str, str]]:
+    decks = list(CORE_DECKS)
+    for base in (GENERATED_DIR, DECKS_DIR):
+        if base.is_dir():
+            for entry in sorted(base.iterdir()):
+                if entry.is_dir() and (entry / "slides.md").is_file():
+                    decks.append((entry.name, entry.name))
+    return decks
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -141,7 +141,7 @@ def verify(decks: list[tuple[str, str]] | None = None, rendered: bool = False, m
     Markdown/CSS source) — flash-bang, rendered WCAG contrast, and overflow.
     """
     if decks is None:
-        decks = DECKS
+        decks = discover_decks()
 
     total = 0
     passed = 0
@@ -149,8 +149,11 @@ def verify(decks: list[tuple[str, str]] | None = None, rendered: bool = False, m
     failed = 0
 
     for dir_name, name in decks:
-        # Resolve source directory (core decks in examples/, local decks in decks/)
-        src = EXAMPLES / dir_name if (EXAMPLES / dir_name).is_dir() else DECKS_DIR / dir_name
+        # Resolve source dir: core in examples/, generated in generated-decks/, personal in decks/
+        src = next(
+            (base / dir_name for base in (EXAMPLES, GENERATED_DIR, DECKS_DIR) if (base / dir_name).is_dir()),
+            DECKS_DIR / dir_name,
+        )
 
         build_dir = BUILD / name
         deck_fail = False

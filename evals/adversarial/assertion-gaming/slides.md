@@ -22,13 +22,13 @@ A short walk through the build pipeline and the build system.
 transition: fade
 ---
 
-# The build.sh script
+# The build.py script
 
-The build.sh script is part of the build pipeline in the build system.
+The build.py script is part of the build pipeline in the build system.
 
 <v-clicks>
 
-- A note about build.sh
+- A note about build.py
 
 </v-clicks>
 
@@ -62,4 +62,4 @@ transition: fade
 
 # Notes complete
 
-The build.sh, the transition, the data visualization, and the guardrail are all listed above.
+The build.py, the transition, the data visualization, and the guardrail are all listed above.
