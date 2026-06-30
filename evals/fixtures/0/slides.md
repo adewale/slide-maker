@@ -53,4 +53,4 @@ transition: fade
 
 # Direction first. Then slides.
 
-slides.oshineye.dev
+slides-oshineye-dev.adewale-883.workers.dev

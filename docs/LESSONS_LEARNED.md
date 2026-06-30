@@ -28,7 +28,7 @@
 
 **The priority order:**
 1. `tools/deck-lint.mjs` (structural validation before build)
-2. `examples/build.sh` (build)
+2. `npm run build` (`tools/build.py`) (build)
 3. `tools/style-audit.mjs` + `tools/build-and-verify.sh` (verify build output)
 4. `tools/deck-preview.mjs` (visual inspection)
 5. `tools/deck-diff.mjs` (visual regression comparison)

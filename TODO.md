@@ -55,7 +55,7 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 ### Builder consolidation (`build.sh` → `build.py`) — done
 `tools/build.py` is now the sole builder. `examples/build.sh` (the legacy bash
 equivalent that kept drifting — twice now) has been retired.
-- [x] Retired `examples/build.sh`. `tools/new-deck.py` no longer edits a `LOCAL_DECKS` array (it was already broken — the anchor it looked for didn't exist).
+- [x] Retired `examples/build.sh`. Both scaffolders (`new-deck.py` and `new-deck.sh`) no longer edit a `LOCAL_DECKS` array (already broken in both — the anchor didn't exist); removed the orphaned static `examples/index.html` (build.py generates the gallery dynamically).
 - [x] `tools/build.py` now discovers personal decks in `decks/` (or `$DECKS_DIR`) automatically — the previously-stubbed external-deck path — so a deck scaffolded by `new-deck.py` builds with plain `npm run build`.
 - [x] Retired `tools/deploy.py` (the legacy gh-pages-branch deployer). GitHub Pages now deploys via `.github/workflows/deploy-pages.yml` (Actions, source = GitHub Actions — *not* the `gh-pages` branch); Cloudflare via `tools/deploy-cf.py`. Also corrected docs that mis-attributed Cloudflare deploys to `deploy.py` (it was the Pages deployer; `deploy-cf.py` is Cloudflare's).
 

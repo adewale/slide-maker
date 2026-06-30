@@ -1004,26 +1004,6 @@ MERMAIDRENDERER
 
 cp "$ROOT/../slide-maker/styles/transitions.css" "$DECK_DIR/styles/transitions.css"
 
-# ─── Update build.sh LOCAL_DECKS array ────────────────────────
-
-BUILD_FILE="$ROOT/../examples/build.sh"
-
-if [[ -f "$BUILD_FILE" ]]; then
-  if grep -q "\"${DECK_NAME}:${DECK_NAME}\"" "$BUILD_FILE"; then
-    echo "Note: '$DECK_NAME' is already in build.sh LOCAL_DECKS array."
-  else
-    # Insert new entry before the closing ) of the LOCAL_DECKS array
-    # Find the last entry in LOCAL_DECKS and add after it
-    sed -i '' "/^# Build local decks/i\\
-" "$BUILD_FILE" 2>/dev/null || true
-    # Simpler: just append to LOCAL_DECKS
-    sed -i '' "s|\"durable-objects:durable-objects\"|\"durable-objects:durable-objects\"\n  \"${DECK_NAME}:${DECK_NAME}\"|" "$BUILD_FILE"
-    echo "Added '${DECK_NAME}:${DECK_NAME}' to build.sh LOCAL_DECKS array."
-  fi
-else
-  echo "Warning: build.sh not found at $BUILD_FILE — skipping LOCAL_DECKS update."
-fi
-
 # ─── Done ──────────────────────────────────────────────────────
 
 echo ""
@@ -1047,4 +1027,4 @@ echo "Next steps:"
 echo "  1. Edit deck.spec.md — fill in purpose, audience, tone, and slide plan"
 echo "  2. Edit slides.md — build your slides"
 echo "  3. Preview:  cd decks/$DECK_NAME && npx slidev"
-echo "  4. Build:    cd examples && bash build.sh"
+echo "  4. Build:    npm run build   # builds all decks, including decks/$DECK_NAME"
