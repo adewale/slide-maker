@@ -151,7 +151,7 @@ reference them for consistent theming.
 
 ## Build System
 
-`npm run build` (`python3 tools/build.py`) compiles all decks into a deployable static site. (`examples/build.sh` is the original bash equivalent, still used by `tools/deploy.py` and updated by `tools/new-deck.py`; `tools/build.py` is the canonical entry point.)
+`npm run build` (`python3 tools/build.py`) compiles all decks into a deployable static site. It discovers the core decks (`examples/`), generated showcases (`generated-decks/`), and any personal decks (`decks/`).
 
 ### Features
 

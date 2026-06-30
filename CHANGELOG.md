@@ -17,12 +17,12 @@ All notable changes to the slide-maker project and its Slidev extensions.
 
 ### Removed
 - **Custom laser pointer** — deleted the hand-rolled red-dot overlay from `global-top.vue` (demo deck + skill scaffold). Slidev now ships a native laser pointer; enable it from the nav-bar cursor-style menu → "Laser"
+- **`examples/build.sh`** — retired the legacy bash builder. `tools/build.py` is now the sole builder: `tools/deploy.py` runs it, and `tools/build.py` now discovers personal decks in `decks/` (or `$DECKS_DIR`) automatically — the previously-stubbed external-deck path — so `new-deck.py` output builds with plain `npm run build`. The two builders had drifted twice (most recently the 404.html: build.sh still emitted the old redirect hack); consolidating to one removes the drift class. `new-deck.py` no longer edits build.sh's `LOCAL_DECKS` array (that registration was already broken — the anchor it sought didn't exist)
 
 ### Fixed
 - **Slidev pinned to 52.15.2, not 52.16.0** — 52.16.0 has a navigation regression: `getSlidePath` prepends `BASE_URL` to the router path, which double-counts the base in hash mode. On a subdirectory deploy (e.g. GitHub Pages, base `/slide-maker/slide-maker/`) paging to the next slide produced `#/slide-maker/slide-maker/2` instead of `#/2`, then navigation jammed and reloads 404'd. 52.15.2 is the newest release that still has the native laser + security fixes but predates the regression. Caret pin avoided so npm cannot auto-jump back to the broken 52.16.0.
   - Upstream: introduced by slidevjs/slidev#2562 (shipped in 52.16.0), tracked in slidevjs/slidev#2629/#2635, fixed by slidevjs/slidev#2630 (still open/unreleased as of this pin). **Un-pin when #2630 ships in a release (likely 52.16.1+): bump, re-run the page-through smoke test, then drop the exact pin.**
-- **`examples/build.sh` 404 synced to the canonical builder** — the legacy bash builder still emitted the old `window.location.replace` SPA-redirect `404.html` (which looped on non-matching paths) while `tools/build.py` emits a plain "Page not found" page. build.sh now writes a base-prefix-aware plain 404, verified byte-identical to `tools/build.py`'s `_make_404_html` for both `BASE_PREFIX` set and empty. (Remaining build.sh↔build.py divergences — static-copied vs dynamically-generated gallery `index.html`, and missing per-deck thumbnails — are tracked; the real fix is to retire build.sh in favor of build.py.)
-- **Cross-platform build** — `sed -i.bak` replaces macOS-only `sed -i ''` in build.sh
+- **Cross-platform build** — `sed -i.bak` replaces macOS-only `sed -i ''` (the bash builder, since retired)
 
 ---
 

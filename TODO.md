@@ -52,13 +52,12 @@ SKILL.md is a lean 130-line entry point. Supporting files are loaded only when e
 - [x] For a user who says "make me 10 slides about X", don't force them through deck.spec.md (handled by quickstart-trigger heuristic in SKILL.md phase 1)
 - [x] Still generate deck.spec.md, but do it silently/automatically (phase 5 quickstart variant requires the artifact, skips the user-facing dialogue)
 
-### Builder consolidation (`build.sh` ↔ `build.py`)
-`tools/build.py` is canonical (package.json, CI, SKILL.md); `examples/build.sh` is the
-original bash equivalent, still load-bearing (`tools/deploy.py` runs it; `tools/new-deck.py`
-edits its `LOCAL_DECKS` array). The two are supposed to produce identical output.
-- [x] Sync `build.sh`'s `404.html` to `build.py` (was the old redirect hack; now a plain 404, verified byte-identical)
-- [ ] **Remaining divergences** — `build.sh` copies a static `examples/index.html` while `build.py` generates the gallery dynamically (title/desc/accent/preset, search/filter), and `build.sh` does not run `thumbnail-gen.mjs` (no per-deck `thumb.png`). `serve.json` formatting also differs (cosmetic; both valid JSON).
-- [ ] **Recommended fix: retire `build.sh`** — point `tools/deploy.py` and `tools/new-deck.py` at `tools/build.py` and delete the bash builder, instead of maintaining two builders that keep drifting. (Decision pending.)
+### Builder consolidation (`build.sh` → `build.py`) — done
+`tools/build.py` is now the sole builder. `examples/build.sh` (the legacy bash
+equivalent that kept drifting — twice now) has been retired.
+- [x] Retired `examples/build.sh`. `tools/deploy.py` runs `tools/build.py`; `tools/new-deck.py` no longer edits a `LOCAL_DECKS` array (it was already broken — the anchor it looked for didn't exist).
+- [x] `tools/build.py` now discovers personal decks in `decks/` (or `$DECKS_DIR`) automatically — the previously-stubbed external-deck path — so a deck scaffolded by `new-deck.py` builds with plain `npm run build`.
+- [x] Updated all references (deploy.py, new-deck.py, deck-preview.mjs, build-and-verify.py, eval fixture, EXTENSIONS.md, LESSONS_LEARNED).
 
 ### Gallery improvements
 - [x] Auto-generate `index.html` from deck metadata during `build.py` (title, description, accent, preset extracted per deck)

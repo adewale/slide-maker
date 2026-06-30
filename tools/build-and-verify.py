@@ -38,7 +38,7 @@ if sys.stdout.isatty():
 else:
     GREEN = YELLOW = RED = BOLD = DIM = RESET = ""
 
-# ── Decks — mirrors build.sh ────────────────────────────────────────────────
+# ── Decks — mirrors tools/build.py ──────────────────────────────────────────
 
 # (directory, name) tuples
 CORE_DECKS = [

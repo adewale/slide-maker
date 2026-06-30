@@ -677,32 +677,6 @@ GLOBAL_BOTTOM_VUE = textwrap.dedent("""\
 """)
 
 
-# ─── Build script update ─────────────────────────────────────────────────────
-
-
-def update_build_sh(deck_name: str) -> None:
-    build_file = PROJECT_ROOT / "examples" / "build.sh"
-    if not build_file.is_file():
-        print(f"Warning: build.sh not found at {build_file} — skipping LOCAL_DECKS update.")
-        return
-
-    content = build_file.read_text()
-    entry = f'"{deck_name}:{deck_name}"'
-
-    if entry in content:
-        print(f"Note: '{deck_name}' is already in build.sh LOCAL_DECKS array.")
-        return
-
-    # Insert new entry after the durable-objects line
-    anchor = '"durable-objects:durable-objects"'
-    if anchor in content:
-        content = content.replace(anchor, f'{anchor}\n  {entry}')
-        build_file.write_text(content)
-        print(f"Added '{deck_name}:{deck_name}' to build.sh LOCAL_DECKS array.")
-    else:
-        print("Warning: could not locate LOCAL_DECKS anchor in build.sh — skipping update.")
-
-
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 
@@ -754,9 +728,6 @@ def main() -> None:
             continue
         shutil.copy2(src, dst)
 
-    # ── Update build.sh ──
-    update_build_sh(deck_name)
-
     # ── Summary ──
     created_files = [
         f"decks/{deck_name}/slides.md",
@@ -784,7 +755,7 @@ def main() -> None:
     print(f"  1. Edit deck.spec.md — fill in purpose, audience, tone, and slide plan")
     print(f"  2. Edit slides.md — build your slides")
     print(f"  3. Preview:  cd decks/{deck_name} && npx slidev")
-    print(f"  4. Build:    cd examples && bash build.sh")
+    print(f"  4. Build:    npm run build   # builds all decks, including decks/{deck_name}")
 
 
 if __name__ == "__main__":

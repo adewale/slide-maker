@@ -191,7 +191,7 @@ The time spent building these tools is small compared to the time spent debuggin
 |------|---------|-------------|
 | `tools/new-deck.sh <name> <preset>` | Scaffold a new deck from preset template | When creating a new deck |
 | `tools/deck-lint.mjs [deck...]` | Validate structure, tokens, imports, overflow | Before building |
-| `npm run build` (`tools/build.py`) | Build all decks (canonical entry; `examples/build.sh` is the legacy bash equivalent) | After code changes |
+| `npm run build` (`tools/build.py`) | Build all decks | After code changes |
 | `tools/style-audit.mjs [deck...]` | Verify CSS tokens/selectors in build output | After building |
 | `tools/build-and-verify.sh` | Full post-build smoke test (tokens, fonts, counts) | After building |
 | `tools/deck-preview.mjs <deck>` | Screenshot all slides to contact sheet | For visual review |

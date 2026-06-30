@@ -88,7 +88,7 @@ def main():
 
     repo_root = get_repo_root()
     examples_dir = os.path.join(repo_root, "examples")
-    build_script = os.path.join(examples_dir, "build.sh")
+    build_script = os.path.join(repo_root, "tools", "build.py")
     build_dir = os.path.join(examples_dir, "_build")
 
     if not os.path.isfile(build_script):
@@ -117,7 +117,7 @@ def main():
     build_env = os.environ.copy()
     build_env["BASE_PREFIX"] = base
     result = run(
-        ["bash", build_script],
+        [sys.executable, build_script],
         cwd=repo_root,
         env=build_env,
         check=False,
