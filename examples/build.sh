@@ -356,24 +356,23 @@ SITE_URL="${SITE_URL:-}"
   done
 } > "$OUT/llms.txt"
 
-# ── Root 404.html for GitHub Pages SPA routing ───────────────
-# GitHub Pages serves this for any route that doesn't match a file.
-# It redirects to the index which handles deck routing.
-cat > "$OUT/404.html" << 'HTML404'
+# ── Root 404.html ────────────────────────────────────────────
+# Decks use hash routing (routerMode: hash), so deep links survive reload with
+# no server-side SPA fallback. This is a plain "Page not found" page — no
+# redirect logic (the old redirect hack looped on non-matching paths). Kept
+# byte-identical to tools/build.py's _make_404_html (the canonical builder).
+if [ -n "${BASE_PREFIX:-}" ]; then INDEX_URL="${BASE_PREFIX}/"; else INDEX_URL="/"; fi
+cat > "$OUT/404.html" << HTML404
 <!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"><title>Redirecting...</title></head>
-<body>
-<script>
-// GitHub Pages SPA redirect: preserve the path for client-side routing
-var path = window.location.pathname;
-if (path !== '/' && path !== '/index.html') {
-  // Keep the path — let the deck's own index.html handle hash routing
-  window.location.replace(path);
-} else {
-  window.location.replace('/');
-}
-</script>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found</title>
+</head>
+<body style="font-family:system-ui,sans-serif;padding:3rem 2rem;max-width:36rem;color:#444">
+<h1 style="font-size:1.5rem;font-weight:600;margin-bottom:1rem">Page not found</h1>
+<p><a href="${INDEX_URL}" style="color:#2563eb">Back to index</a></p>
 </body>
 </html>
 HTML404
