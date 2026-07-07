@@ -141,18 +141,18 @@
           "type": "contains_any",
           "values": [
             "affected",
-            "deck.spec.md",
             "slides.md"
-          ]
+          ],
+          "description": "Prompt-echoed values removed by leakage cleanup."
         },
         {
           "name": "slidev-output",
           "type": "contains_any",
           "values": [
-            "deck.spec",
             "slides.md",
             "Slidev"
-          ]
+          ],
+          "description": "Prompt-echoed values removed by leakage cleanup."
         },
         {
           "name": "qualitative-review",
@@ -185,18 +185,18 @@
           "name": "detect-speaker-notes",
           "type": "contains_any",
           "values": [
-            "<!--",
-            "Slidev"
-          ]
+            "<!--"
+          ],
+          "description": "Prompt-echoed values removed by leakage cleanup."
         },
         {
           "name": "slidev-output",
           "type": "contains_any",
           "values": [
             "deck.spec",
-            "slides.md",
-            "Slidev"
-          ]
+            "slides.md"
+          ],
+          "description": "Prompt-echoed values removed by leakage cleanup."
         },
         {
           "name": "qualitative-review",
@@ -230,9 +230,9 @@
           "type": "contains_any",
           "values": [
             "index.html",
-            "serve.json",
-            "deploy"
-          ]
+            "serve.json"
+          ],
+          "description": "Prompt-echoed values removed by leakage cleanup."
         },
         {
           "name": "slidev-output",
@@ -358,9 +358,10 @@
           "name": "require-tokenized-scoped-style",
           "type": "contains_all",
           "values": [
-            "var(--deck",
-            "scoped"
-          ]
+            "tokens.css",
+            "semantic tokens"
+          ],
+          "description": "Prompt-echoed values replaced with non-prompt alternatives. Prompt-echoed values replaced with non-prompt alternatives."
         },
         {
           "name": "require-token-validation",
@@ -478,10 +479,11 @@
           "name": "cover-rendered-risks",
           "type": "contains_all",
           "values": [
-            "flash-bang",
-            "contrast",
-            "overflow"
-          ]
+            "visual validation",
+            "readability",
+            "clipping"
+          ],
+          "description": "Requires rendered-artifact risk coverage without relying on prompt-echoed risk words."
         },
         {
           "name": "qualitative-review",
@@ -898,53 +900,160 @@
       "id": "no-spec-source",
       "removed_component": "deck.spec.md source-of-truth",
       "expected_regressions": [
-        "Spec/slides drift and unclear visual direction."
+        {
+          "summary": "Deck outputs drift from deck.spec/slides source-of-truth.",
+          "cases": [
+            "pos-update-affected-only",
+            "pos-architecture-throughline"
+          ],
+          "assertions": [
+            "detect-update-affected-only",
+            "slidev-output"
+          ]
+        }
       ],
-      "applies_to_cases": []
+      "applies_to_cases": [],
+      "mechanism": "section",
+      "class": "instructions",
+      "target": {
+        "skill_root": "skills/slide-maker/SKILL.md",
+        "heading": "## Source-of-truth model"
+      },
+      "notes": "Materialized removal: runner-visible skill tree is altered by the declared mechanism/target."
     },
     {
       "id": "no-token-system",
       "removed_component": "token system",
       "expected_regressions": [
-        "Hardcoded colors and inconsistent theming."
+        {
+          "summary": "Hardcoded scoped colors are accepted instead of semantic tokens.",
+          "cases": [
+            "neg-hardcoded-colors",
+            "round3-fixture-image-deck-validation"
+          ],
+          "assertions": [
+            "require-tokenized-scoped-style",
+            "requires-token-vars",
+            "fixture-script-oracle"
+          ]
+        }
       ],
       "applies_to_cases": [
         "neg-hardcoded-colors"
-      ]
+      ],
+      "mechanism": "list_item",
+      "class": "instructions",
+      "target": {
+        "skill_root": "skills/slide-maker/SKILL.md",
+        "section": "## Non-negotiable rules",
+        "contains": [
+          "token system"
+        ]
+      },
+      "notes": "Materialized removal: runner-visible skill tree is altered by the declared mechanism/target."
     },
     {
       "id": "no-render-gate",
       "removed_component": "validation/render gate",
       "expected_regressions": [
-        "Overflow/contrast issues escape."
+        {
+          "summary": "Image/gradient decks no longer require rendered validation.",
+          "cases": [
+            "neg-render-gate",
+            "neg-skip-render-gate-image-background",
+            "round3-fixture-image-deck-validation"
+          ],
+          "assertions": [
+            "require-render-gate-command",
+            "requires-render-gate",
+            "fixture-script-oracle"
+          ]
+        }
       ],
       "applies_to_cases": [
         "neg-render-gate"
-      ]
+      ],
+      "mechanism": "section",
+      "class": "instructions",
+      "target": {
+        "skill_root": "skills/slide-maker/SKILL.md",
+        "heading": "### 7. Validate"
+      },
+      "notes": "Materialized removal: runner-visible skill tree is altered by the declared mechanism/target."
     },
     {
       "id": "no-progressive-loading",
       "removed_component": "progressive loading",
       "expected_regressions": [
-        "Dense slides lack reveals."
+        {
+          "summary": "Dense-slide cases stop being split/revealed appropriately.",
+          "cases": [
+            "neg-dense-30-bullets"
+          ],
+          "assertions": [
+            "avoid-dense-30-bullets"
+          ]
+        }
       ],
-      "applies_to_cases": []
+      "applies_to_cases": [],
+      "mechanism": "reference",
+      "class": "resource",
+      "target": {
+        "skill_root": "skills/slide-maker/SKILL.md",
+        "path": "COMPILER_RULES.md",
+        "remove": "content"
+      },
+      "notes": "Materialized removal: runner-visible skill tree is altered by the declared mechanism/target."
     },
     {
       "id": "no-heldout-rubric",
       "removed_component": "held-out quality check",
       "expected_regressions": [
-        "Goodharts visible assertions."
+        {
+          "summary": "Fixture quality review loses blind/quality gate behavior.",
+          "cases": [
+            "round3-fixture-image-deck-validation"
+          ],
+          "assertions": [
+            "fixture-script-oracle"
+          ]
+        }
       ],
-      "applies_to_cases": []
+      "applies_to_cases": [],
+      "notes": "Materialized removal: runner-visible skill tree is altered by the declared mechanism/target.",
+      "mechanism": "patch",
+      "class": "instructions",
+      "target": {
+        "skill_root": "skills/slide-maker/SKILL.md",
+        "patch": "evals/ablations/no-heldout-rubric.patch"
+      }
     },
     {
       "id": "no-quickstart-distinction",
       "removed_component": "quickstart distinction",
       "expected_regressions": [
-        "Over-interrogates simple requests."
+        {
+          "summary": "Quickstart deck requests over-interrogate or skip required outputs.",
+          "cases": [
+            "pos-quickstart-five"
+          ],
+          "assertions": [
+            "detect-quickstart-five",
+            "slidev-output"
+          ]
+        }
       ],
-      "applies_to_cases": []
+      "applies_to_cases": [],
+      "mechanism": "list_item",
+      "class": "instructions",
+      "target": {
+        "skill_root": "skills/slide-maker/SKILL.md",
+        "section": "### 1. Determine mode",
+        "contains": [
+          "quickstart"
+        ]
+      },
+      "notes": "Materialized removal: runner-visible skill tree is altered by the declared mechanism/target."
     }
   ]
 }

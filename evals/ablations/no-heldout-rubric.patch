@@ -1,0 +1,2 @@
+@@ -124,1 +124,0 @@
+-**Held-out quality check:** for a quality (not just structural) judgment, dispatch a fresh grading **sub-agent** to score the deck against `evals/holdout-rubric.md` — criteria deliberately *not* in the generation docs, so the review judges blind rather than re-checking the rules you optimized for. Use a sub-agent (it reuses your own model access — no API key); do not call an external API. A high structural score with a low held-out score means the deck is competent but forgettable.
