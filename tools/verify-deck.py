@@ -22,7 +22,6 @@ import sys
 import tempfile
 import time
 
-
 # ── WCAG Contrast Checking ──────────────────────────────────────────────────
 
 def hex_to_rgb(hex_color):
@@ -167,8 +166,8 @@ import os
 
 def main():
     slide_nums = {slides_json}
-    output_dir = {repr(output_dir)}
-    deck_name = {repr(deck_name)}
+    output_dir = {output_dir!r}
+    deck_name = {deck_name!r}
     base_url = "http://127.0.0.1:{port}"
 
     with sync_playwright() as p:
@@ -210,7 +209,7 @@ def visual_verify(deck_dir, slide_nums, output_dir, width, height, no_open):
             capture_output=True,
         )
         if result.returncode != 0:
-            print(f"  ERROR: build failed")
+            print("  ERROR: build failed")
             if result.stderr:
                 print(result.stderr.decode()[-500:])
             return False

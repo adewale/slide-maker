@@ -139,11 +139,7 @@ def apply_replacement(text, old, new, mode):
 
     for kind, start, end in regions:
         chunk = text[start:end]
-        if mode == "in-comments" and kind == "comment":
-            count = chunk.count(old)
-            total_replacements += count
-            parts.append(chunk.replace(old, new))
-        elif mode == "in-body" and kind == "body":
+        if mode == "in-comments" and kind == "comment" or mode == "in-body" and kind == "body":
             count = chunk.count(old)
             total_replacements += count
             parts.append(chunk.replace(old, new))

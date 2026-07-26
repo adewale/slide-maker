@@ -11,10 +11,10 @@ Output:
     /tmp/presenter-notes.html
 """
 
+import html
 import os
 import re
 import sys
-import html
 
 
 def parse_slides(md_text):

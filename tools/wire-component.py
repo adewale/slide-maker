@@ -61,7 +61,7 @@ def main():
     source_file = os.path.join(source_dir, f"{component_name}.vue")
     if not os.path.isfile(source_file):
         print(f"Error: component not found: {source_file}", file=sys.stderr)
-        print(f"\nAvailable components:", file=sys.stderr)
+        print("\nAvailable components:", file=sys.stderr)
         if os.path.isdir(source_dir):
             for f in sorted(os.listdir(source_dir)):
                 if f.endswith(".vue"):
@@ -88,7 +88,7 @@ def main():
     # Step 1: Copy the component file
     if os.path.isfile(dest_component_file) and not args.force:
         print(f"  Component already exists: {os.path.relpath(dest_component_file, deck_dir)}")
-        print(f"  (Use --force to overwrite)")
+        print("  (Use --force to overwrite)")
     else:
         if args.dry_run:
             print(f"  [dry-run] Would copy: {os.path.relpath(source_file, repo_root)}")
