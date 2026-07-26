@@ -756,8 +756,8 @@ def main() -> None:
         print(f"  {f}")
     print()
     print("Next steps:")
-    print(f"  1. Edit deck.spec.md — fill in purpose, audience, tone, and slide plan")
-    print(f"  2. Edit slides.md — build your slides")
+    print("  1. Edit deck.spec.md — fill in purpose, audience, tone, and slide plan")
+    print("  2. Edit slides.md — build your slides")
     print(f"  3. Preview:  cd decks/{deck_name} && npx slidev")
     print(f"  4. Build:    npm run build   # builds all decks, including decks/{deck_name}")
 

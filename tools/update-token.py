@@ -16,7 +16,6 @@ import os
 import re
 import sys
 
-
 # All recognized --deck-* tokens
 KNOWN_TOKENS = [
     "deck-bg",
