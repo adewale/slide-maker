@@ -175,6 +175,8 @@ The time spent building these tools is small compared to the time spent debuggin
 
 **The lesson:** "Same major version = safe" is a hope, not a guarantee — a minor bump can break routing without tripping any structural check. The only thing that caught this was a headless page-through: load a subdirectory-based deck, press Right a few times, assert the hash route is `#/N` (not `#/<base>/N`), then reload a deep link and confirm it resolves. Make that the smoke test after *any* Slidev bump, before deploying. When you pin around an upstream bug, record the cause/fix issue numbers and the un-pin trigger (here: slidevjs/slidev#2630) so the freeze is removable, not mysterious.
 
+**Enforced by:** `tools/nav-smoke.mjs` runs this smoke on every PR (`verify.yml`, demo deck under `/slide-maker/slide-maker/`) and on every built deck in the exact Pages artifact before `deploy-pages.yml` publishes (the deploy also needs all of `verify.yml` to pass). Built with Slidev 52.16.0 it fails with `ArrowRight moved #/1 -> "#/slide-maker/slide-maker/2"`.
+
 ---
 
 ## 19. Reference docs drift from the tree — audit prose against `git ls-files`, not memory
@@ -201,7 +203,8 @@ The time spent building these tools is small compared to the time spent debuggin
 | `tools/eval-runner.mjs --record / --trend` | Append a run to `evals/history.jsonl`; report score drift and meta-signals over time | Each eval run / when checking for regressions |
 | `tools/pixel-audit.mjs <dir>` | Flash-bang detection from rendered screenshots (per-slide luminance) — the rendered counterpart to deck-lint | After screenshotting (`screenshot-audit.mjs`) |
 | `tools/render-gate.mjs <dist>` | Rendered gate: serves a built deck, drives a browser, checks flash-bang + real WCAG contrast + overflow from pixels/DOM | After building; or via `build-and-verify.py --rendered` |
-| `tools/gate-check.mjs [--record/--trend]` | Two-sided gate: should-pass decks lint clean (precision) + adversarial defects all covered (recall); trends gallery warnings | When changing any check; in CI |
+| `tools/gate-check.mjs [--run-catchers] [--record/--trend]` | Two-sided gate: should-pass decks lint clean (precision) + each adversarial defect caught by an executed gate (recall). `--run-catchers` builds decks that slip deck-lint and runs their declared rendered catcher; LLM-judge catchers are reported as "declared, unverified"; trends gallery warnings | When changing any check; in CI (`verify.yml`) |
+| `tools/nav-smoke.mjs <site> --base /slide-maker (--deck N \| --all)` | Lesson 18 navigation smoke: serves built decks under the Pages base, presses ArrowRight, asserts `#/N` routes, reloads a deep link | Per PR (`verify.yml`) and on the exact Pages artifact before deploy (`deploy-pages.yml`); after any Slidev bump |
 | `tools/adversarial.mjs --emit / --screen` | Author decks that try to slip the gate; screen them and report false passes (blind spots) | When hardening the eval gate |
 
 ### Recommended workflow

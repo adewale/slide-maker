@@ -4,8 +4,9 @@
 // Usage:  node deck-lint.mjs [deck1] [deck2] ...
 //         node deck-lint.mjs            (scans all subdirs with slides.md)
 
-import { readFileSync, readdirSync, statSync, existsSync } from 'fs';
+import { readFileSync, readdirSync, statSync, existsSync, realpathSync } from 'fs';
 import { join, basename, resolve } from 'path';
+import { fileURLToPath } from 'url';
 
 // ── Terminal colours ──────────────────────────────────────────────
 
@@ -1808,4 +1809,13 @@ function main() {
   process.exit(hasFailures ? 1 : 0);
 }
 
-main();
+// Rule functions are exported for tools/deck-lint.test.mjs. The CLI runs only when
+// this file is executed directly, not when it is imported.
+export {
+  checkFlashBang, checkMermaidSyntax, checkOverflow, checkSlop, colorToHex, contrastRatio,
+  countMermaidNodes, extractSources, slideNeedsSources, splitSlides,
+};
+
+if (process.argv[1] && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
+  main();
+}

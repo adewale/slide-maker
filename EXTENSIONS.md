@@ -194,7 +194,9 @@ Two deployment targets are supported:
 
 ### GitHub Pages
 
-Automated via `.github/workflows/deploy-pages.yml`. Triggers on push to `main`.
+Automated via `.github/workflows/deploy-pages.yml`. Triggers on push to `main`,
+runs every `verify.yml` gate first (deploy only if they pass), and runs
+`tools/nav-smoke.mjs` on the built artifact before uploading it.
 Sets `BASE_PREFIX=/slide-maker` for subdirectory hosting. Live at
 `https://adewale.github.io/slide-maker/`.
 

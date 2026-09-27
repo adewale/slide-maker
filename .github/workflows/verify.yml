@@ -8,14 +8,33 @@ name: verify
 #   gate-check    two-sided: should-pass decks lint clean AND adversarial defects
 #                 are each covered by some gate (LESSONS_LEARNED #15)
 #   eval-runner   deterministic assertion suite (must pass)
+#   npm test      unit tests for deck-lint rule functions
 #
-# The rendered gate (browser + screenshots) is slow; it lives in
-# rendered-gate.yml (workflow_dispatch + weekly schedule) instead of running here.
+# browser-gates (headless Chromium, ~2 min):
+#   nav-smoke     LESSONS_LEARNED #18: build the demo deck under the GitHub Pages
+#                 subdirectory base, page through it with ArrowRight, reload a deep
+#                 link. The Slidev 52.16.0 routing regression passed every static
+#                 gate and escaped to Pages; this is the check that catches it.
+#   gate-check --run-catchers   builds each adversarial deck that slips deck-lint
+#                 and runs its declared rendered catcher (pixel-audit), so recall
+#                 is executed, not just declared. LLM-judge catchers are reported
+#                 as "declared, unverified".
+#
+# eval-manifest: the pinned skill-eval-harness model-free manifest gate.
+#
+# The full rendered gate (every deck, every slide, mobile viewports) is slower;
+# it lives in rendered-gate.yml (workflow_dispatch + weekly schedule).
+#
+# deploy-pages.yml calls this workflow (workflow_call) and deploys only if it passes.
 
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
 
 jobs:
   fast-gates:
@@ -43,3 +62,50 @@ jobs:
 
       - name: eval-runner (deterministic assertions)
         run: npm run eval
+
+      - name: deck-lint unit tests
+        run: npm test
+
+  browser-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      # playwright-chromium's postinstall downloads the browser; install-deps adds
+      # the system libraries (same as rendered-gate.yml).
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      # Same base GitHub Pages uses for this deck (BASE_PREFIX=/slide-maker in
+      # deploy-pages.yml -> /slide-maker/<deck>/), so a base-path routing bug shows up.
+      - name: Build the demo deck under the Pages subdirectory base
+        working-directory: examples/demo
+        run: npx slidev build --base /slide-maker/slide-maker/ --out "$RUNNER_TEMP/site/slide-maker"
+
+      - name: nav-smoke (LESSONS_LEARNED #18)
+        run: node tools/nav-smoke.mjs "$RUNNER_TEMP/site" --base /slide-maker --deck slide-maker
+
+      - name: gate-check with declared rendered catchers executed
+        run: node tools/gate-check.mjs --run-catchers
+
+  eval-manifest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v9.0.0
+      # Model-free and key-free: manifest shape, regex compilation, prompt leakage,
+      # ablation targets, and audit blockers, with the harness version pinned.
+      - name: Validate shared benchmark manifest (skill-eval-harness 0.6.0)
+        run: uvx --from skill-eval-harness==0.6.0 skill-benchmark validate --strict-leakage --check-ablations evals/shared-benchmark.json
+      - name: Audit shared benchmark manifest
+        run: uvx --from skill-eval-harness==0.6.0 skill-benchmark audit-manifest evals/shared-benchmark.json --fail-on-blockers
