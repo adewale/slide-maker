@@ -24,7 +24,15 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # The same gates every PR runs (verify.yml), on the commit being deployed.
+  # Nothing is published unless they pass.
+  verify:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/verify.yml
+
   build:
+    needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -49,6 +57,11 @@ jobs:
 
       - name: Build all decks
         run: python3 tools/build.py
+
+      # LESSONS_LEARNED #18, on the exact artifact about to be published, served
+      # under the same /slide-maker/ base Pages uses.
+      - name: nav-smoke every built deck
+        run: node tools/nav-smoke.mjs examples/_build --base /slide-maker --all
 
       - uses: actions/configure-pages@v5
 
