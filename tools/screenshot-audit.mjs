@@ -20,6 +20,7 @@
 // Requires: playwright (npm install playwright)
 
 import { chromium } from 'playwright';
+import { gotoSlide, pressNext } from './slidev-nav.mjs';
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
@@ -364,9 +365,11 @@ async function getClickCount(page) {
   });
 }
 
-async function advanceClick(page) {
-  await page.keyboard.press('ArrowRight');
-  await page.waitForTimeout(400);
+// Press ArrowRight and wait for the route to advance (#/N?clicks=C+1 or #/N+1);
+// throws on any other route. On the deck's last slide the final click has nowhere
+// to go, so an unchanged route there is the end of the deck, not an error.
+async function advanceClick(page, slide, totalSlides) {
+  return pressNext(page, { atEnd: slide === totalSlides });
 }
 
 // ── Main analysis for one slide at one viewport ───────────────
@@ -433,7 +436,9 @@ async function main() {
   const page = await browser.newPage({ viewport: primaryVP });
 
   // Discover slide count
-  await page.goto(`${deckUrl}/#/1`, { waitUntil: 'networkidle', timeout: 15000 }).catch(() => {});
+  // gotoSlide asserts HTTP OK and route #/1 (networkidle never arrives for decks
+  // with web fonts, and a swallowed timeout used to hide a dead server).
+  await gotoSlide(page, deckUrl, 1);
   await page.waitForTimeout(1500);
   const totalSlides = await page.evaluate(() => {
     const footer = document.body.innerText.match(/\/ (\d+)/);
@@ -457,7 +462,7 @@ async function main() {
 
     // ── Primary viewport: full analysis with v-clicks and hover ──
     await page.setViewportSize(primaryVP);
-    await page.goto(`${deckUrl}/#/${i}`, { waitUntil: 'networkidle', timeout: 15000 }).catch(() => {});
+    await gotoSlide(page, deckUrl, i);
     await page.waitForTimeout(WAIT_MS);
 
     // Screenshot at click 0
@@ -473,13 +478,8 @@ async function main() {
     if (clickTargets > 0) {
       const maxClicks = Math.min(clickTargets, 10); // cap to avoid infinite loops
       for (let c = 1; c <= maxClicks; c++) {
-        await advanceClick(page);
-        // Check if we're still on the same slide (ArrowRight may navigate to next slide)
-        const currentSlide = await page.evaluate(() => {
-          const footer = document.body.innerText.match(/(\d+) \/ \d+/);
-          return footer ? parseInt(footer[1]) : 0;
-        });
-        if (currentSlide !== i) break; // moved to next slide, stop clicking
+        const route = await advanceClick(page, i, totalSlides);
+        if (route.slide !== i || route.clicks !== c) break; // moved to next slide (or deck end), stop clicking
         const clickIssues = await analyseSlideState(page, i, c, primaryVP.label, primaryVP.height);
         allIssues.push(...clickIssues);
       }
@@ -487,7 +487,7 @@ async function main() {
 
     // Blind spot #6: Check hover states
     // Navigate back to the slide fresh for hover testing
-    await page.goto(`${deckUrl}/#/${i}`, { waitUntil: 'networkidle', timeout: 15000 }).catch(() => {});
+    await gotoSlide(page, deckUrl, i);
     await page.waitForTimeout(800);
     const hoverIssues = await checkHoverStates(page);
     for (const h of hoverIssues) allIssues.push({ severity: 'WARN', message: h });
@@ -499,7 +499,7 @@ async function main() {
     for (let v = 1; v < VIEWPORTS.length; v++) {
       const vp = VIEWPORTS[v];
       await page.setViewportSize(vp);
-      await page.goto(`${deckUrl}/#/${i}`, { waitUntil: 'networkidle', timeout: 15000 }).catch(() => {});
+      await gotoSlide(page, deckUrl, i);
       await page.waitForTimeout(800);
       const vpIssues = await analyseSlideState(page, i, 0, vp.label, vp.height);
       allIssues.push(...vpIssues);
@@ -508,12 +508,8 @@ async function main() {
       if (vpClickTargets > 0) {
         const maxVpClicks = Math.min(vpClickTargets, 10);
         for (let c = 1; c <= maxVpClicks; c++) {
-          await advanceClick(page);
-          const stillHere = await page.evaluate(() => {
-            const footer = document.body.innerText.match(/(\d+) \/ \d+/);
-            return footer ? parseInt(footer[1]) : 0;
-          });
-          if (stillHere !== i) break;
+          const route = await advanceClick(page, i, totalSlides);
+          if (route.slide !== i || route.clicks !== c) break;
           const vpClickIssues = await analyseSlideState(page, i, c, vp.label, vp.height);
           allIssues.push(...vpClickIssues);
         }

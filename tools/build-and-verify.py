@@ -314,8 +314,11 @@ def verify(decks: list[tuple[str, str]] | None = None, rendered: bool = False, m
                 fail_msg("Rendered gate found violations: " + ("; ".join(viol[:3]) or "see render-gate output"))
                 deck_fail = True
             else:
-                warn_msg(f"Rendered gate could not run (exit {proc.returncode}); skipping")
-                deck_warn = True
+                # --rendered was asked for; a gate that could not run (no browser,
+                # page never reached #/1) must not count as a pass.
+                detail = (proc.stderr.strip().splitlines() or ["no output"])[-1]
+                fail_msg(f"Rendered gate could not run (exit {proc.returncode}): {detail}")
+                deck_fail = True
 
         # ── Per-deck summary ─────────────────────────────────────────────────
         if deck_fail:

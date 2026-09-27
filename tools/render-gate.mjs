@@ -19,11 +19,14 @@
 // Usage:
 //   node tools/render-gate.mjs <built-dist-dir> [--name N] [--threshold 0.5]
 //                                               [--viewport WxH[:label]] [--mobile]
-//                                               [--json p]
+//                                               [--json p] [--shots dir]
 //   node tools/render-gate.mjs --url http://localhost:3030 [...]   # already serving
 //
-// Exits non-zero if any flash-bang / contrast / overflow violation is found
-// on any viewport.
+// --shots dir keeps the per-viewport screenshots (dir/<viewport>/slide-NN.png, the
+// layout tools/pixel-audit.mjs reads); by default they go to a temp dir.
+//
+// Exits 1 if any flash-bang / contrast / overflow violation is found on any
+// viewport, 2 if the deck could not be loaded or navigated (never a silent pass).
 
 import { createServer } from 'node:http';
 import { readFileSync, existsSync, readdirSync, mkdirSync, writeFileSync, statSync } from 'node:fs';
@@ -31,6 +34,7 @@ import { join, resolve, extname, dirname, basename } from 'node:path';
 import { tmpdir } from 'node:os';
 import { chromium } from 'playwright';
 import { PNG } from 'pngjs';
+import { gotoSlide } from './slidev-nav.mjs';
 
 const C = { reset: '\x1b[0m', bold: '\x1b[1m', dim: '\x1b[2m', red: '\x1b[31m', green: '\x1b[32m', yellow: '\x1b[33m', magenta: '\x1b[35m', cyan: '\x1b[36m' };
 const CHECK = `${C.green}✓${C.reset}`, CROSS = `${C.red}✗${C.reset}`, DOT = `${C.yellow}○${C.reset}`;
@@ -46,10 +50,22 @@ const MOBILE_VPS = [
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.woff': 'font/woff', '.ttf': 'font/ttf', '.ico': 'image/x-icon' };
 
-function serveStatic(root) {
+// The base path a deck was built with (`slidev build --base /<name>/`), read from
+// the built index.html's own asset URLs. tools/build.py builds every deck under
+// /<prefix>/<name>/, so serving the dist at "/" would 404 every asset (the SPA
+// fallback then hands back index.html as JavaScript) and the gate would audit a
+// blank page. Serving under the real base makes the gate see the real deck.
+function builtBase(dist) {
+  const html = readFileSync(join(dist, 'index.html'), 'utf8');
+  const m = html.match(/<script[^>]+src="(\/[^"]*?)assets\//);
+  return m ? m[1] : '/';
+}
+
+function serveStatic(root, base = '/') {
   return new Promise((res) => {
     const server = createServer((req, resp) => {
       let p = decodeURIComponent(req.url.split('?')[0]);
+      if (base !== '/' && (p + '/').startsWith(base)) p = '/' + p.slice(base.length);
       let fp = join(root, p);
       try { if (statSync(fp).isDirectory()) fp = join(fp, 'index.html'); } catch {}
       if (!existsSync(fp)) fp = join(root, 'index.html'); // SPA fallback
@@ -124,13 +140,14 @@ function parseViewport(spec) {
 }
 
 function parseArgs(argv) {
-  const o = { dist: null, url: null, name: null, threshold: FLASHBANG_DELTA, json: null, viewports: [] };
+  const o = { dist: null, url: null, name: null, threshold: FLASHBANG_DELTA, json: null, shots: null, viewports: [] };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--url') o.url = argv[++i];
     else if (a === '--name') o.name = argv[++i];
     else if (a === '--threshold') o.threshold = Number(argv[++i]);
     else if (a === '--json') o.json = argv[++i];
+    else if (a === '--shots') o.shots = argv[++i];
     else if (a === '--viewport') o.viewports.push(parseViewport(argv[++i]));
     else if (a === '--mobile') o.viewports.push(...MOBILE_VPS);
     else if (a === '-h' || a === '--help') o.help = true;
@@ -142,11 +159,12 @@ function parseArgs(argv) {
 
 async function runOnViewport(browser, baseUrl, vp, threshold, shotRoot) {
   const page = await browser.newPage({ viewport: { width: vp.w, height: vp.h } });
-  // domcontentloaded (not networkidle) — Slidev SPA is rendered by DCL, and
-  // decks with external Google Fonts / image backgrounds keep the network busy
-  // indefinitely so networkidle stalls until each per-nav timeout fires.
-  await page.goto(`${baseUrl}/#/1`, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => {});
-  await page.waitForTimeout(1000);
+  // gotoSlide waits for domcontentloaded (not networkidle: decks with external
+  // Google Fonts / image backgrounds keep the network busy indefinitely), then
+  // asserts the route is #/1 with slide 1 rendered. A failed load or a wrong
+  // route throws instead of auditing whatever page happened to load.
+  await gotoSlide(page, baseUrl, 1);
+  await page.waitForTimeout(1000); // settle fonts/transitions before sampling
   // Slidev's nav footer renders as "N / TOTAL" — the same discovery strategy
   // screenshot-audit.mjs already uses. The /#/999 trick does NOT redirect on
   // Slidev 52+, so parsing the hash gives a bogus count and the loop never
@@ -161,12 +179,12 @@ async function runOnViewport(browser, baseUrl, vp, threshold, shotRoot) {
 
   const slides = [];
   for (let i = 1; i <= count; i++) {
-    await page.goto(`${baseUrl}/#/${i}`, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => {});
-    await page.waitForTimeout(700);
+    await gotoSlide(page, baseUrl, i);
+    await page.waitForTimeout(700); // settle transitions before the screenshot
     const shot = join(shotDir, `slide-${String(i).padStart(2, '0')}.png`);
     await page.screenshot({ path: shot });
     const lum = pngLuminance(PNG.sync.read(readFileSync(shot)));
-    const dom = await page.evaluate(samplePage, { w: vp.w, h: vp.h }).catch(() => ({ contrast: [], overflow: [] }));
+    const dom = await page.evaluate(samplePage, { w: vp.w, h: vp.h }); // a failed sample must fail the gate, not read as clean
     slides.push({ i, lum, ...dom });
   }
   await page.close();
@@ -216,11 +234,12 @@ async function main() {
   if (!baseUrl) {
     const dist = resolve(o.dist);
     if (!existsSync(join(dist, 'index.html'))) { console.error(`${C.red}no index.html in ${dist} — build the deck first${C.reset}`); process.exit(2); }
-    handle = await serveStatic(dist);
-    baseUrl = `http://127.0.0.1:${handle.port}`;
+    const base = builtBase(dist);
+    handle = await serveStatic(dist, base);
+    baseUrl = `http://127.0.0.1:${handle.port}${base.replace(/\/$/, '')}`;
   }
   const name = o.name || (o.dist ? basename(resolve(o.dist)) : 'deck');
-  const shotRoot = join(tmpdir(), `render-gate-${process.pid}`);
+  const shotRoot = o.shots ? resolve(o.shots) : join(tmpdir(), `render-gate-${process.pid}`);
   mkdirSync(shotRoot, { recursive: true });
 
   const vpLabels = o.viewports.map(v => `${v.label}(${v.w}x${v.h})`).join(', ');
