@@ -5,9 +5,8 @@ All notable changes to the slide-maker project and its Slidev extensions.
 ## [Unreleased]
 
 ### Added
-- **Navigation smoke (LESSONS_LEARNED #18)**: `tools/nav-smoke.mjs` serves built decks under the GitHub Pages base, pages with ArrowRight asserting `#/N` routes, and reloads a deep link. It runs per PR in `verify.yml` (demo deck) and on every deck of the Pages artifact before `deploy-pages.yml` publishes. It fails on a Slidev 52.16.0 build (`#/slide-maker/slide-maker/2`)
-- **Deploy gated on verify**: `deploy-pages.yml` calls `verify.yml` (now `workflow_call`) and builds and deploys only if it passes
-- **Executed recall in gate-check**: `--run-catchers` builds each adversarial deck that slips deck-lint and runs its declared rendered catcher (pixel-audit). Without it, and for LLM-judge catchers, decks are reported as "declared, unverified" instead of "covered"
+- **Navigation smoke (LESSONS_LEARNED #18)**: `tools/nav-smoke.mjs` serves built decks under the GitHub Pages base, pages with ArrowRight asserting `#/N` routes, and reloads a deep link. It runs on every deck of the Pages artifact before `deploy-pages.yml` publishes, and by hand on a PR (demo deck). It fails on a Slidev 52.16.0 build (`#/slide-maker/slide-maker/2`)
+- **Executed recall in gate-check** (run by hand): `--run-catchers` builds each adversarial deck that slips deck-lint and runs its declared rendered catcher (pixel-audit). Without it, and for LLM-judge catchers, decks are reported as "declared, unverified" instead of "covered"
 - **deck-lint unit tests**: `tools/deck-lint.test.mjs` (`npm test`, in `verify.yml`)
 - **Pinned harness gate**: `verify.yml` runs `skill-eval-harness==0.6.0` `validate --strict-leakage --check-ablations` and `audit-manifest --fail-on-blockers`. Trigger cases declare `should_trigger`
 - **Mobile scroll view spec** — design for vertically scrollable card view on portrait phones

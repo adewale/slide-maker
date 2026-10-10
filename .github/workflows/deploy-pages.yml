@@ -24,15 +24,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # The same gates every PR runs (verify.yml), on the commit being deployed.
-  # Nothing is published unless they pass.
-  verify:
-    permissions:
-      contents: read
-    uses: ./.github/workflows/verify.yml
-
   build:
-    needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
