@@ -8,14 +8,24 @@ name: verify
 #   gate-check    two-sided: should-pass decks lint clean AND adversarial defects
 #                 are each covered by some gate (LESSONS_LEARNED #15)
 #   eval-runner   deterministic assertion suite (must pass)
+#   npm test      unit tests for deck-lint rule functions
+#   eval-manifest the pinned skill-eval-harness model-free manifest gate
 #
-# The rendered gate (browser + screenshots) is slow; it lives in
-# rendered-gate.yml (workflow_dispatch + weekly schedule) instead of running here.
+# Browser checks run by hand, not here (the owner's verification-cost standard):
+#   nav-smoke     LESSONS_LEARNED #18 on the demo deck under the Pages base:
+#                 (cd examples/demo && npx slidev build --base /slide-maker/slide-maker/ --out ../../.site/slide-maker)
+#                 node tools/nav-smoke.mjs .site --base /slide-maker --deck slide-maker
+#   gate-check --run-catchers   executes each adversarial deck's rendered catcher.
+# deploy-pages.yml runs nav-smoke on every built deck before publishing, and the
+# full rendered gate lives in rendered-gate.yml (workflow_dispatch + weekly schedule).
 
 on:
   push:
     branches: [main]
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   fast-gates:
@@ -43,3 +53,16 @@ jobs:
 
       - name: eval-runner (deterministic assertions)
         run: npm run eval
+
+      - name: deck-lint unit tests
+        run: npm test
+
+      # Model-free and key-free: manifest shape, regex compilation, prompt leakage,
+      # ablation targets, and audit blockers, with the harness version pinned.
+      - uses: astral-sh/setup-uv@v9.0.0
+
+      - name: Validate shared benchmark manifest (skill-eval-harness 0.6.0)
+        run: uvx --from skill-eval-harness==0.6.0 skill-benchmark validate --strict-leakage --check-ablations evals/shared-benchmark.json
+
+      - name: Audit shared benchmark manifest
+        run: uvx --from skill-eval-harness==0.6.0 skill-benchmark audit-manifest evals/shared-benchmark.json --fail-on-blockers

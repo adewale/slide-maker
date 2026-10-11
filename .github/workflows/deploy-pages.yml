@@ -50,6 +50,11 @@ jobs:
       - name: Build all decks
         run: python3 tools/build.py
 
+      # LESSONS_LEARNED #18, on the exact artifact about to be published, served
+      # under the same /slide-maker/ base Pages uses.
+      - name: nav-smoke every built deck
+        run: node tools/nav-smoke.mjs examples/_build --base /slide-maker --all
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3

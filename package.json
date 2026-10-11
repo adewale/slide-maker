@@ -13,16 +13,18 @@
     "render-gate": "node tools/render-gate.mjs",
     "render-probe": "node tools/render-probe.mjs",
     "gate-check": "node tools/gate-check.mjs",
-    "adversarial": "node tools/adversarial.mjs"
+    "adversarial": "node tools/adversarial.mjs",
+    "nav-smoke": "node tools/nav-smoke.mjs",
+    "test": "node --test tools/*.test.mjs"
   },
   "dependencies": {
     "@iconify-json/carbon": "^1.2.19",
     "@iconify-json/logos": "^1.2.10",
     "@iconify-json/mdi": "^1.2.3",
     "@slidev/cli": "52.15.2",
-    "@slidev/theme-apple-basic": "latest",
-    "@slidev/theme-default": "latest",
-    "@slidev/theme-seriph": "latest",
+    "@slidev/theme-apple-basic": "0.25.1",
+    "@slidev/theme-default": "0.25.0",
+    "@slidev/theme-seriph": "0.25.0",
     "beautiful-mermaid": "^1.1.3",
     "qrcode": "^1.5.4"
   },
