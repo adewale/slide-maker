@@ -25,7 +25,8 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # playwright-chromium's postinstall needs a supported Ubuntu image.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       # Project pages live under /<repo>/, so every deck is based at
